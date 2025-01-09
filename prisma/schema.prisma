@@ -1,0 +1,382 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model User {
+  id                    String               @id
+  username              String               @unique
+  displayName           String
+  email                 String?              @unique
+  passwordHash          String?
+  googleId              String?              @unique
+  avatarUrl             String?
+  bio                   String?
+  referredBy            String?
+  points                Int                  @default(0)
+  mscoin                Int                  @default(0)
+  subscriptionEndDate   DateTime?
+  createdAt             DateTime             @default(now())
+  adultauth             Boolean              @default(false)
+  kakaoId               String?              @unique
+  naverId               String?              @unique
+  myLanguage            Language             @default(KOREAN)
+  postCount             Int                  @default(0)
+  subscription          Subscription?
+  billingKeys           BillingKey[]
+  payments              Payment[]
+  userRole              Int                  @default(10)
+  bookmarks             Bookmark[]
+  comments              Comment[]
+  following             Follow[]             @relation("Following")
+  followers             Follow[]             @relation("Followers")
+  Inquiry               Inquiry[]
+  likes                 Like[]
+  issuedNotifications   Notification[]       @relation("Issuer")
+  receivedNotifications Notification[]       @relation("Recipient")
+  PasswordResetToken    PasswordResetToken[]
+  posts                 Post[]
+  sessions              Session[]
+  referrer              User?                @relation("Referrals", fields: [referredBy], references: [username])
+  referrals             User[]               @relation("Referrals")
+  videoViews            VideoView[]
+  videoProgress UserVideoProgress[]
+
+  @@index([adultauth])
+  @@index([mscoin])
+  @@index([email])
+  @@index([username])
+  @@index([subscriptionEndDate])
+  @@map("users")
+}
+
+model Session {
+  id        String   @id
+  userId    String
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model Follow {
+  followerId  String
+  followingId String
+  follower    User   @relation("Following", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User   @relation("Followers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@map("follows")
+}
+
+model Post {
+  id                  String         @id @default(cuid())
+  postNum             Int            @unique @default(autoincrement())
+  title               String?
+  titleI18n           Json?
+  content             String
+  contentI18n         Json?
+  thumbnailUrl        String?
+  postLanguage        Language       @default(CHINESE)
+  status              PostStatus     @default(DRAFT)
+  featured            Boolean        @default(false)
+  priority            Int            @default(5)
+  userId              String
+  viewCount           Int            @default(0)
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime?      @updatedAt
+  publishedAt         DateTime?
+  ageLimit            Int            @default(15)
+  categories          CategoryType[]
+  titleOriginal       String?
+  videoCount          Int            @default(0)
+  bookmarks           Bookmark[]
+  comments            Comment[]
+  Inquiry             Inquiry[]
+  likes               Like[]
+  linkedNotifications Notification[]
+  user                User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  videos              Video[]
+  UserVideoProgress UserVideoProgress[]
+
+  @@index([postNum])
+  @@index([status, featured, priority])
+  @@index([userId, status])
+  @@map("posts")
+
+}
+
+model Video {
+  id             String               @id @default(cuid())
+  postId         String
+  url            String
+  sequence       Int
+  isPremium      Boolean              @default(false)
+  filename       String
+  createdAt      DateTime             @default(now())
+  subtitle       Language[]
+  VideoSettlement VideoSettlement[]
+  views          VideoView[]
+  post           Post                 @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, sequence])
+  @@index([isPremium])
+  @@map("videos")
+
+}
+
+model VideoView {
+  id           String       @id @default(cuid())
+  userId       String
+  videoId      String
+  createdAt    DateTime     @default(now())
+  viewCount    Int          @default(1)       // sequence 1번 무료시청시만 increment
+  accessMethod AccessMethod @default(FREE)
+  timestamp    Int?         // 시청 시점 (초)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  video        Video        @relation(fields: [videoId], references: [id], onDelete: Cascade)
+
+  @@index([userId, videoId])
+  @@index([videoId, accessMethod, createdAt])
+  @@map("video_views")
+}
+
+// 현재 누적 상태
+model VideoSettlement {
+  id                    String    @id @default(cuid())
+  videoId               String
+  totalSubscriptionViews Int      @default(0)  // 구독 총 누적 시청수
+  postSettlementSubViews Int      @default(0)  // 정산 후 구독 누적 시청수
+  totalCoinViews        Int      @default(0)   // 코인 총 누적 시청수
+  postSettlementCoinViews Int     @default(0)  // 정산 후 코인 누적 시청수
+  lastSettledAt         DateTime?              // 마지막 정산 시점
+  video                 Video     @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  settlementHistories   SettlementHistory[]    // 정산 히스토리
+
+  @@unique([videoId])
+  @@index([lastSettledAt])
+  @@map("video_settlements")
+}
+
+// 정산 히스토리
+model SettlementHistory {
+  id                String   @id @default(cuid())
+  videoSettlementId String
+  settledAt         DateTime @default(now())
+  subscriptionViews Int      // 이번 정산 구독 시청수
+  coinViews         Int      // 이번 정산 코인 시청수
+  settlement        VideoSettlement @relation(fields: [videoSettlementId], references: [id], onDelete: Cascade)
+
+  @@index([videoSettlementId, settledAt])
+  @@map("settlement_histories")
+}
+
+model UserVideoProgress {
+  id               String   @id @default(cuid())
+  userId           String
+  postId           String
+  lastVideoSequence Int     @default(1)
+  updatedAt        DateTime @updatedAt
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post             Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@index([userId, postId])
+  @@map("user_video_progress")
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  userId    String
+  postId    String
+  createdAt DateTime @default(now())
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("comments")
+}
+
+model Like {
+  userId String
+  postId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@map("likes")
+}
+
+model Bookmark {
+  id        String   @id @default(cuid())
+  userId    String
+  postId    String
+  createdAt DateTime @default(now())
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@map("bookmarks")
+}
+
+model Notification {
+  id          String           @id @default(cuid())
+  recipientId String
+  issuerId    String
+  postId      String?
+  metadata    Json?            // 추가: 코인 수량 등 추가 정보를 저장할 필드
+  type        NotificationType
+  read        Boolean          @default(false)
+  createdAt   DateTime         @default(now())
+  issuer      User             @relation("Issuer", fields: [issuerId], references: [id], onDelete: Cascade)
+  post        Post?            @relation(fields: [postId], references: [id], onDelete: Cascade)
+  recipient   User             @relation("Recipient", fields: [recipientId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+model PasswordResetToken {
+  id         String   @id @default(cuid())
+  token_hash String   @unique
+  user_id    String
+  expires_at DateTime
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("password_reset_tokens")
+}
+
+model Inquiry {
+  id            String        @id @default(cuid())
+  type          InquiryType
+  userId        String
+  title         String
+  content       String
+  userEmail     String
+  postId        String?
+  status        InquiryStatus @default(PENDING)
+  adminResponse String?
+  respondedAt   DateTime?
+  respondedBy   String?
+  createdAt     DateTime      @default(now())
+  post          Post?         @relation(fields: [postId], references: [id])
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("inquiries")
+}
+
+// 구독 정보
+model Subscription {
+  id              String      @id @default(cuid())
+  userId          String      @unique
+  user            User        @relation(fields: [userId], references: [id])
+  status          String      @default("inactive") // inactive, active, cancelled, suspended
+  type            String      // weekly, yearly
+  currentPeriodStart DateTime
+  currentPeriodEnd   DateTime
+  cancelAtPeriodEnd  Boolean  @default(false)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+// 빌링키 관리
+model BillingKey {
+  id              String      @id @default(cuid())
+  userId          String
+  user            User        @relation(fields: [userId], references: [id])
+  billingKey      String      @unique
+  customerKey     String
+  status          String      @default("active") // active, inactive
+  cardCompany     String?
+  cardNumber      String?     // 마스킹된 카드번호
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+// 결제 내역
+model Payment {
+  id              String      @id @default(cuid())
+  userId          String
+  user            User        @relation(fields: [userId], references: [id])
+  type            String      // subscription, coin
+  status          String      // success, failed
+  amount          Int
+  orderId         String      @unique
+  paymentKey      String?     @unique
+  billingKey      String?
+  method          String?     // card, virtual_account 등
+  requestedAt     DateTime
+  approvedAt      DateTime?
+  metadata        Json?       // 추가 정보 (구독 기간, 코인 수량 등)
+  failureReason   String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+enum AccessMethod {
+  FREE
+  SUBSCRIPTION
+  POINT_PAYMENT
+}
+
+enum CategoryType {
+  COMIC
+  ROMANCE
+  ACTION
+  THRILLER
+  DRAMA
+  PERIOD
+  FANTASY
+  HIGHTEEN
+  ADULT
+  NOTIFICATION
+  MSPOST
+}
+
+enum Language {
+  KOREAN
+  ENGLISH
+  CHINESE
+  JAPANESE
+  THAI
+  SPANISH
+  INDONESIAN
+  VIETNAMESE
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+}
+
+enum NotificationType {
+  LIKE
+  FOLLOW
+  COMMENT
+  POST
+  COIN
+  POINT
+  BOOKMARK
+}
+
+enum InquiryType {
+  REPORT
+  INQUIRY
+}
+
+enum InquiryStatus {
+  PENDING
+  IN_PROGRESS
+  CLOSED
+}

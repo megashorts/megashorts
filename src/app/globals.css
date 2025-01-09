@@ -1,0 +1,258 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+/* @layer base {
+  :root {
+    --background: 224, 5%, 95%;
+    --foreground: 240 10% 3.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+
+    --primary: 142.1 76.2% 36.3%;
+    --primary-foreground: 355.7 100% 97.3%;
+
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 142.1 76.2% 36.3%;
+
+    --radius: 1rem;
+  } 
+
+  .dark {
+    --background: 20 14.3% 4.1%;
+    --foreground: 0 0% 95%;
+
+    --card: 24 9.8% 10%;
+    --card-foreground: 0 0% 95%;
+
+    --popover: 0 0% 9%;
+    --popover-foreground: 0 0% 95%;
+
+    --primary: 142.1 70.6% 45.3%;
+    --primary-foreground: 144.9 80.4% 10%;
+
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 0 0% 15%;
+    --muted-foreground: 240 5% 64.9%;
+
+    --accent: 12 6.5% 15.1%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 62.8% 50%;
+    --destructive-foreground: 0 85.7% 97.3%;
+
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 142.4 71.8% 29.2%;
+  }
+} */
+
+@layer base {
+  :root {
+    --background: 224, 5%, 95%;
+    --foreground: 240 10% 3.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+
+    /* 기존 녹색에서 붉은 계열로 변경 */
+    --primary: 0 70.2% 52.5%; /* 붉은색 계열 */
+    --primary-foreground: 0 100% 97.3%; /* 밝은 배경에 맞는 텍스트 색상 */
+
+    --secondary: 12 60% 90%; /* 약간 붉은 느낌의 중간색 */
+    --secondary-foreground: 0 5.9% 10%;
+
+    --muted: 12 50% 90%; /* muted 색상에 약간의 붉은 톤 추가 */
+    --muted-foreground: 0 3.8% 46.1%;
+
+    --accent: 12 60% 90%;
+    --accent-foreground: 0 5.9% 10%;
+
+    /* 파괴적인 요소는 더 짙은 붉은 계열로 설정 */
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 0 70.2% 52.5%; /* primary와 일관된 붉은 톤 */
+    
+    --radius: 1rem;
+    
+    --sidebar-background: 0 0% 98%;
+    
+    --sidebar-foreground: 240 5.3% 26.1%;
+    
+    --sidebar-primary: 240 5.9% 10%;
+    
+    --sidebar-primary-foreground: 0 0% 98%;
+    
+    --sidebar-accent: 240 4.8% 95.9%;
+    
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    
+    --sidebar-border: 220 13% 91%;
+    
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  } 
+
+  .dark {
+    --background: 20 14.3% 4.1%;
+    --foreground: 0 0% 95%;
+
+    --card: 24 9.8% 10%;
+    --card-foreground: 0 0% 95%;
+
+    --popover: 0 0% 9%;
+    --popover-foreground: 0 0% 95%;
+
+    /* 다크 모드에서 붉은 계열로 변경 */
+    --primary: 0 75.6% 45.3%; /* 어두운 배경에 맞는 붉은 톤 */
+    --primary-foreground: 0 85.7% 97.3%;
+
+    --secondary: 12 20% 25.9%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 10% 65%;
+
+    --accent: 12 6.5% 25.1%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 62.8% 50%;
+    --destructive-foreground: 0 85.7% 97.3%;
+
+    --border: 0 10% 25.9%;
+    --input: 0 10% 25.9%;
+    --ring: 0 75.6% 45.3%; /* primary와 일관성 유지 */ --sidebar-background: 240 5.9% 10%; --sidebar-foreground: 240 4.8% 95.9%; --sidebar-primary: 224.3 76.3% 48%; --sidebar-primary-foreground: 0 0% 100%; --sidebar-accent: 240 3.7% 15.9%; --sidebar-accent-foreground: 240 4.8% 95.9%; --sidebar-border: 240 3.7% 15.9%; --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+
+/* nav ul li a {
+  position: relative; 
+  text-decoration: none; 
+}
+
+nav ul li a::after {
+  content: "";
+  width: 100%;
+  position: absolute;
+  bottom: -10px; 
+  left: 0;
+  border-top: 2px solid #fcaa1f;
+  transform: scaleX(0); 
+  transition: transform 0.2s; 
+
+nav ul li a:hover::after {
+  transform: scaleX(1); 
+} */
+
+
+/* styles/globals.css 에 추가할 스타일 */
+.swiper {
+  padding: 0 15%;
+}
+
+.swiper-slide {
+  transition: all 0.3s ease;
+  /* opacity: 0.6; */
+}
+
+.swiper-container-1 .swiper-slide-active {
+  opacity: 1;
+  transform: scale(1.1);
+  z-index: 2;
+}
+
+.swiper-pagination-bullet {
+  background: white !important;
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+  color: white !important;
+}
+
+/* Mobile에서는 숨기기 */
+@media (max-width: 767px) {
+  .pagination-container {
+    /* display: none; */
+    position: relative;
+    bottom: 20px !important;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 0px; /* 동그라미 간격 조정 */
+  }
+  .swiper-slide {
+    padding: 0px;
+  }
+}
+
+/* Desktop에서는 슬라이드 바로 하단에 위치 조정 */
+@media (min-width: 768px) {
+  .swiper-container-1 .swiper-slide {
+    padding: 15px;
+  }
+  .pagination-container {
+    position: relative;
+    bottom: 30px !important;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 0px; /* 동그라미 간격 조정 */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-BMDOHYEON); /* 기본 폰트로 설정 */
+  }
+}
+
+.led-indicator {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.led-blue {
+  background-color: #007bff;
+  box-shadow: 0 0 10px #007bff;
+}
+
+.led-red {
+  background-color: #dc3545;
+  box-shadow: 0 0 10px #dc3545;
+}
