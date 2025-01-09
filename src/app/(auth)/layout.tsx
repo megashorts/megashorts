@@ -10,13 +10,13 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
         className="absolute inset-0 -z-1
           bg-[url('/MS_BackImage1_1.webp')] 
           bg-no-repeat
-          bg-[length:180%_auto]
-          bg-[position:60%_6%]
-          sm:bg-[length:120%_auto]
+          bg-[length:130%_auto]
+          bg-[position:70%_15%]
+          sm:bg-[length:80%_auto]
           sm:bg-[position:center_20%]
-          md:bg-[length:90%_auto]
+          md:bg-[length:40%_auto]
           md:bg-[position:center_15%]
-          lg:bg-[length:75%_auto]
+          lg:bg-[length:50%_auto]
           transition-all duration-300 ease-in-out"
       />
       <div className="absolute inset-0 bg-black/40" />
