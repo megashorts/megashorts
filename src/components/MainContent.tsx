@@ -202,7 +202,7 @@ export default async function MainContent() {
     return (
       <div className="container mx-auto px-4 py-4 z-5">
         <FeaturedPostSlider posts={getFeaturedPost} />
-        <div className="space-y-6 py-12">
+        <div className="space-y-6 py-12 md:py-12">
            <PostSlider
             posts={latestPosts}
             title="⚡️ 최신 업데이트 ⚡️"

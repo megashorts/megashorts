@@ -78,12 +78,12 @@ export default function NavLinks({ view }: NavLinksProps) {
       <Button
         variant="ghost"
         className={`flex flex-col items-center hover:bg-transparent ${
-          isActive("/foryou") ? "text-primary" : "hover:text-primary"
+          isActive("/recommended-videos") ? "text-primary" : "hover:text-primary"
         }`}
         title="For you"
         asChild
       >
-        <Link href="/videos">
+        <Link href="/recommended-videos">
           <Compass className="size-8" />
         </Link>
       </Button>

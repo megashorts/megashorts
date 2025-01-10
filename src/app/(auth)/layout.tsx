@@ -1,10 +1,11 @@
 import { ReactNode } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { AuthTitle } from "@/components/auth/AuthTitle";
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="relative flex h-screen w-screen flex-col bg-black md:items-center md:justify-center md:bg-transparent">
+    <div className="relative flex min-h-[100dvh] w-screen flex-col bg-black md:items-center md:justify-center md:bg-transparent">
       {/* 배경 이미지 */}
       <div 
         className="absolute inset-0 -z-1
@@ -22,7 +23,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
       <div className="absolute inset-0 bg-black/40" />
 
       {/* 메인 컨텐츠 */}
-      <div className="relative flex min-h-screen w-full items-center justify-center">
+      <div className="relative flex min-h-[100dvh] w-full items-center justify-center">
         {/* 좌측 로고 */}
         <Link href="/" className="absolute left-4 top-4 object-contain md:left-10 md:top-6">
           <Image 
@@ -34,12 +35,17 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           />
         </Link>
 
-        {/* 자식 컴포넌트 */}
+        {/* 컨텐츠 박스 */}
         <div 
-          className="flex flex-col items-center justify-center rounded bg-black/60 py-4 sm:py-3 px-4
-          w-80 sm:w-96 md:w-[20rem] 
-          h-[46vh] sm:h-[65vh] md:h-[41vh]">
-          {children}
+          className="flex flex-col w-[78%] sm:w-[80%] md:w-[25rem] rounded border-white bg-black/60"
+        >
+          {/* 타이틀과 구분선 */}
+          <AuthTitle />
+          
+          {/* 자식 컴포넌트를 위한 컨테이너 */}
+          <div className="flex-1 px-4 py-8">
+            {children}
+          </div>
         </div>
       </div>
     </div>

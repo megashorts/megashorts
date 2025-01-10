@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback, useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import {
@@ -20,9 +22,10 @@ import { Progress } from "@/components/ui/progress";
 import { Language } from "@prisma/client";
 import { useUploader } from "@/hooks/useUploader";
 import { toast } from "@/components/ui/use-toast";
-import { PostWithVideos } from "@/lib/types";
+import { VideoWithSubtitles } from "@/lib/types";
+import { useSession } from "@/components/SessionProvider";
 
-type Video = PostWithVideos['videos'][0];
+type Video = VideoWithSubtitles;
 
 interface VideoUploaderProps {
   videos: Video[];
@@ -34,21 +37,17 @@ function matchVideoAndSubtitles(files: File[]) {
   const videos: File[] = [];
   const subtitles: Map<string, { file: File; language: string }[]> = new Map();
 
-  // 먼저 모든 비디오 파일을 처리
   files.forEach(file => {
     const ext = file.name.split('.').pop()?.toLowerCase();
     if (ext === 'mp4' || ext === 'webm') {
-      // 파일명에서 언어 코드 제외한 기본 이름 추출
       const baseName = file.name.replace(/_(ko|en|zh)\.[^.]+$/, '').replace(/\.[^.]+$/, '');
       videos.push(file);
     }
   });
 
-  // 그 다음 자막 파일을 처리하고 매칭
   files.forEach(file => {
     const ext = file.name.split('.').pop()?.toLowerCase();
     if (ext === 'srt' || ext === 'vtt') {
-      // 자막 파일명에서 언어 코드와 기본 이름 추출
       const match = file.name.match(/^(.+?)_(ko|en|zh)\.(srt|vtt)$/i);
       if (!match) return;
 
@@ -63,7 +62,6 @@ function matchVideoAndSubtitles(files: File[]) {
       const language = languageMap[langCode.toLowerCase()];
       if (!language) return;
 
-      // 매칭되는 비디오가 있는지 확인
       const matchingVideo = videos.find(v => {
         const videoBaseName = v.name.replace(/_(ko|en|zh)\.[^.]+$/, '').replace(/\.[^.]+$/, '');
         return videoBaseName === baseName;
@@ -89,12 +87,21 @@ export function VideoUploader({
   const [videos, setVideos] = useState(initialVideos);
   const [uploading, setUploading] = useState(false);
   const { uploadVideo, uploadSubtitle, progress } = useUploader();
+  const { user } = useSession();
 
   useEffect(() => {
     setVideos(initialVideos);
   }, [initialVideos]);
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
+    if (!user) {
+      toast({
+        variant: "destructive",
+        description: "로그인이 필요합니다."
+      });
+      return;
+    }
+
     if (videos.length + acceptedFiles.length > maxFiles) {
       toast({
         variant: "destructive",
@@ -109,15 +116,13 @@ export function VideoUploader({
       const { videos: videoFiles, subtitles } = matchVideoAndSubtitles(acceptedFiles);
       
       const newVideos = await Promise.all(
-        videoFiles.map(async (file, index) => {
+        videoFiles.map(async (file: File, index: number) => {
           const sequence = videos.length + index + 1;
           const baseName = file.name.replace(/_(ko|en|zh)\.[^.]+$/, '').replace(/\.[^.]+$/, '');
       
           try {
-            // 1. 비디오 업로드
             const { id, url, filename } = await uploadVideo(file);
             
-            // 2. 매칭되는 자막 파일이 있으면 업로드
             const matchedSubtitles = subtitles.get(baseName) || [];
             const uploadedLanguages: Language[] = [];
             
@@ -125,7 +130,6 @@ export function VideoUploader({
               matchedSubtitles.map(async ({ file: subtitleFile, language }) => {
                 try {
                   const result = await uploadSubtitle(id, subtitleFile, language);
-                  // result.result.language 대신 원래 language 사용
                   uploadedLanguages.push(language as Language);
                 } catch (subtitleError) {
                   console.error(`Failed to upload subtitle for ${baseName}:`, subtitleError);
@@ -137,9 +141,8 @@ export function VideoUploader({
               })
             );
             
-            return {
+            const newVideo: Partial<Video> = {
               id,
-              postId: '',
               url,
               filename,
               sequence,
@@ -147,7 +150,9 @@ export function VideoUploader({
               createdAt: new Date(),
               subtitle: uploadedLanguages,
               views: []
-            } as Video;
+            };
+
+            return newVideo as Video;
           } catch (uploadError) {
             console.error(`Failed to upload ${file.name}:`, uploadError);
             throw uploadError;
@@ -170,7 +175,7 @@ export function VideoUploader({
     } finally {
       setUploading(false);
     }
-  }, [videos, maxFiles, uploadVideo, uploadSubtitle, onChange]);
+  }, [videos, maxFiles, uploadVideo, uploadSubtitle, onChange, user]);
 
   const handleDragEnd = useCallback((event: DragEndEvent) => {
     const { active, over } = event;
@@ -204,7 +209,6 @@ export function VideoUploader({
   
       const updatedVideos = videos.map(video => {
         if (video.id === videoId) {
-          // 이미 있는 언어면 중복 추가하지 않음
           const newSubtitles = video.subtitle.includes(language as Language)
             ? video.subtitle
             : [...video.subtitle, language as Language];

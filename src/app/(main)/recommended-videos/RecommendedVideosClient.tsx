@@ -109,11 +109,11 @@ export function RecommendedVideosClient({ posts }: RecommendedVideosClientProps)
                 <div className="relative w-[calc(100vh*16/9)] max-w-[640px] h-full md:pt-24 md:mb-8 pb-8 mb-8 pt-8">
                   <div 
                     className={cn(
-                      "absolute inset-x-0 top-0 md:pt-24 md:mb-8 pb-8 mb-8 pt-20 z-10 bg-gradient-to-b from-black/70 to-transparent h-24 transition-opacity duration-300",
+                      "absolute inset-x-0 top-0 pt-20 md:pt-24 md:mb-8 pb-8 mb-8 z-10 bg-gradient-to-b from-black/70 to-transparent h-24 transition-opacity duration-300",
                       showButtons ? "opacity-100" : "opacity-0"
                     )}
                   >
-                    <div className="pl-5 md:pl-10 pt-4 text-white flex items-center">
+                    <div className="pl-16 md:pl-10 pt-4 text-white flex items-center">
                       <Link 
                         // href={`/video-view/${post.id}`}
                         href={`/video-view/${post.id}?t=${currentTime}`}
@@ -138,7 +138,7 @@ export function RecommendedVideosClient({ posts }: RecommendedVideosClientProps)
 
                   <div 
                     className={cn(
-                      "absolute right-4 bottom-20 md:right-[-5.5rem] md:bottom-30 z-10 transition-opacity duration-300",
+                      "absolute right-4 bottom-32 md:right-[-5.5rem] md:bottom-30 z-10 transition-opacity duration-300",
                       showButtons ? "opacity-100" : "opacity-0"
                     )}
                     onClick={(e) => e.stopPropagation()}
@@ -160,9 +160,8 @@ export function RecommendedVideosClient({ posts }: RecommendedVideosClientProps)
                         } else {
                           swiperRef.current?.slidePrev();
                         }
-                      }}
-                      visible={showButtons}
-                    />
+                      } }
+                      visible={showButtons} videos={[]}                    />
                   </div>
                 </div>
               </div>

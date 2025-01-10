@@ -300,7 +300,7 @@ useEffect(() => {
         @media (max-width: 767px) {
           video::cue {
             background-color: rgba(0, 0, 0, 0.7);
-            font-size: 30px;
+            font-size: 24px;
             position: absolute;
             transform: translateY(-300px);
             line-height: 1.5;
@@ -318,7 +318,7 @@ useEffect(() => {
       <video
         ref={videoRef}
         className={cn(
-          "absolute top-0 left-0 w-full h-full transition-opacity duration-300",
+          "absolute top-0 left-0 w-full h-full transition-opacity duration-300 pt-10 md:pt-0 pb-4 md:pb-0",
           (isActive && isLoaded) ? "opacity-100" : "opacity-0",
           className
         )}

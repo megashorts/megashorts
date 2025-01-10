@@ -252,16 +252,12 @@ export function VideoViewClient({ post, initialSequence, initialTime }: VideoVie
                   <div className="relative w-[calc(100vh*16/9)] max-w-[640px] h-full md:pt-24 md:mb-8 pb-8 mb-8 pt-8">
                     
                     <div 
-                      // className={cn(
-                      //   "absolute inset-x-0 top-0 h-full z-10 bg-gradient-to-b from-black/70 to-transparent h-24 transition-opacity duration-300",
-                      //   showButtons ? "opacity-100" : "opacity-0"
-                      // )}
                       className={cn(
-                        "absolute inset-x-0 top-0 md:pt-24 md:mb-8 pb-8 mb-8 pt-20 z-10 bg-gradient-to-b from-black/70 to-transparent h-24 transition-opacity duration-300",
+                        "absolute inset-x-0 top-0 pt-20 md:pt-24 md:mb-8 pb-8 mb-8 z-10 bg-gradient-to-b from-black/70 to-transparent h-24 transition-opacity duration-300",
                         showButtons ? "opacity-100" : "opacity-0"
                       )}
                     >
-                      <div className="pl-5 md:pl-10 pt-4 text-white flex items-center">
+                      <div className="pl-16 md:pl-10 pt-3 text-white flex items-center">
                         <h1 className="text-sm md:text-lg text-slate-100">{post.title}</h1>
                         <h1 className="text-sm md:text-lg text-white pl-2">EP.{activeIndex + 1}</h1>
                         <p className="text-xl font-semibold relative top-[3px] pl-2">👀</p>
@@ -343,7 +339,7 @@ export function VideoViewClient({ post, initialSequence, initialTime }: VideoVie
                         {/* VideoControls 추가 */}
                         <div 
                           className={cn(
-                            "absolute right-4 bottom-20 md:right-[-5.5rem] md:bottom-30 z-10 transition-opacity duration-300",
+                            "absolute right-4 bottom-32 md:right-[-5.5rem] md:bottom-30 z-10 transition-opacity duration-300",
                             showButtons ? "opacity-100" : "opacity-0"
                           )}
                           onClick={(e) => e.stopPropagation()}

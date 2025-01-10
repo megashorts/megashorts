@@ -31,7 +31,7 @@ export default function Layout({
     <SessionProvider value={sessionData}>
       <div className="relative">
         <Navbar />
-        <div className="absolute inset-0 pt-[64px]">
+        <div className="absolute inset-0 pt-[55px] md:pt-[64px]">
           <main className="w-full max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div className="flex min-h-screen flex-col">
             <MainPopupModal />

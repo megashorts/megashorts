@@ -1,12 +1,10 @@
 import { Toaster } from "@/components/ui/toaster";
-// import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import localFont from "next/font/local";
-// import { extractRouterConfig } from "uploadthing/server";
-// import { fileRouter } from "./api/uploadthing/core";
 import "./globals.css";
 import ReactQueryProvider from "./ReactQueryProvider";
+import { OrientationModal } from "@/components/OrientationModal";
 
 const BMDOHYEON = localFont({
   src: [
@@ -16,25 +14,16 @@ const BMDOHYEON = localFont({
   variable: "--font-BMDOHYEON",
 });
 
-// const NanumGothic = localFont({
-//   src: [
-//     { path: "./fonts/NanumGothic.woff2", weight: "normal" },
-//     { path: "./fonts/NanumGothic.woff", weight: "normal" },
-//   ],
-//   variable: "--font-NanumGothic",
-// });
-
-// const NanumGothicBold = localFont({
-//   src: [
-//     { path: "./fonts/NanumGothicBold.woff2", weight: "normal" },
-//     { path: "./fonts/NanumGothicBold.woff", weight: "normal" },
-//   ],
-//   variable: "--font-NanumGothicBold",
-// });
-
 export const metadata: Metadata = {
   title: "MS",
   description: "Short form contents",
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+    viewportFit: "cover"
+  },
 };
 
 export default function RootLayout({
@@ -42,20 +31,18 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${BMDOHYEON.variable} ${BMDOHYEON.variable}`}>
-        {/* <NextSSRPlugin routerConfig={extractRouterConfig(fileRouter)} /> */}
+      <body className={`${BMDOHYEON.variable}`}>
         <ReactQueryProvider>
           <ThemeProvider
             attribute="class"
-            // defaultTheme="light"
-            defaultTheme="dark"  // 여기서 기본 테마를 다크로 설정
-            enableSystem={false} // 시스템 테마 적용을 막음
+            defaultTheme="dark"
+            enableSystem={false}
             disableTransitionOnChange
           >
             {children}
+            <OrientationModal />
           </ThemeProvider>
         </ReactQueryProvider>
         <Toaster />
