@@ -17,6 +17,9 @@ const BMDOHYEON = localFont({
 export const metadata: Metadata = {
   title: "MS",
   description: "Short form contents",
+  icons: {
+    icon: '/favicon.ico',
+  },
   viewport: {
     width: "device-width",
     initialScale: 1,
