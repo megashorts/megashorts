@@ -30,11 +30,11 @@ export function MainPopupModal() {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70" onClick={handleClose} >
       <div className="relative w-[75%] md:w-[35%] md:max-w-[450px] bg-red-500 rounded-lg">
         {/* 이미지 */}
         <div className="relative">
-          <Link href="/notice/8412ab3b-38a0-4a8d-8dbe-ddb0966a6f92">
+          <Link href="/notice/f9c6e2ee-dd89-4387-9c5b-4dcf99537d1b" onClick={handleClose} >
             <Image
               src="/MG_AdImageOri.webp"
               alt="Main Popup"

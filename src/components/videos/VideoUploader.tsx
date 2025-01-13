@@ -24,6 +24,7 @@ import { useUploader } from "@/hooks/useUploader";
 import { toast } from "@/components/ui/use-toast";
 import { VideoWithSubtitles } from "@/lib/types";
 import { useSession } from "@/components/SessionProvider";
+import { MobileVideoUploader } from "./MobileVideoUploader";
 
 type Video = VideoWithSubtitles;
 
@@ -31,6 +32,7 @@ interface VideoUploaderProps {
   videos: Video[];
   onChange: (videos: Video[]) => void;
   maxFiles?: number;
+  isNewPost?: boolean;  // 새 포스트 작성인지 여부
 }
 
 function matchVideoAndSubtitles(files: File[]) {
@@ -39,7 +41,7 @@ function matchVideoAndSubtitles(files: File[]) {
 
   files.forEach(file => {
     const ext = file.name.split('.').pop()?.toLowerCase();
-    if (ext === 'mp4' || ext === 'webm') {
+    if (ext === 'mp4' || ext === 'webm' || ext === 'mov') {
       const baseName = file.name.replace(/_(ko|en|zh)\.[^.]+$/, '').replace(/\.[^.]+$/, '');
       videos.push(file);
     }
@@ -82,16 +84,23 @@ function matchVideoAndSubtitles(files: File[]) {
 export function VideoUploader({
   videos: initialVideos,
   onChange,
-  maxFiles = 10
+  maxFiles = 10,
+  isNewPost = false
 }: VideoUploaderProps) {
   const [videos, setVideos] = useState(initialVideos);
   const [uploading, setUploading] = useState(false);
   const { uploadVideo, uploadSubtitle, progress } = useUploader();
   const { user } = useSession();
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    setVideos(initialVideos);
-  }, [initialVideos]);
+    setIsMobile(window.innerWidth < 768);
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     if (!user) {
@@ -293,36 +302,45 @@ export function VideoUploader({
 
   return (
     <div className="space-y-4">
-      <div
-        {...getRootProps()}
-        className={`
-          border-2 border-dashed rounded-lg p-6 text-center
-          ${uploading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
-        `}
-      >
-        <input {...getInputProps()} />
-        {uploading ? (
-          <div className="space-y-2">
-            <p>업로드 중...</p>
-            {Object.entries(progress).map(([filename, value]) => (
-              <div key={filename} className="space-y-1">
-                <p className="text-sm">{filename}</p>
-                <Progress value={value} />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-xs text-muted-foreground">
-            비디오 & 자막을 클릭 또는 드래그하세요.
-            <br />
-            <span className="text-xs text-gray-500">
-              (최대 {maxFiles}개, 각 100MB 이하)
+      {isMobile && isNewPost ? (
+        <MobileVideoUploader
+          onVideoSelect={onDrop}
+          disabled={uploading}
+        />
+      ) : (
+        <div
+          {...getRootProps()}
+          className={`
+            border-2 border-dashed rounded-lg p-6 text-center
+            ${uploading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
+          `}
+        >
+          <input {...getInputProps()} />
+          {uploading ? (
+            <div className="space-y-2">
+              <p>업로드 중...</p>
+              {Object.entries(progress).map(([filename, value]) => (
+                <div key={filename} className="space-y-1">
+                  <p className="text-sm">{filename}</p>
+                  <Progress value={value} />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-xs text-muted-foreground">
+              <span className="text-xs text-white">@ 모바일에서는 동영상 업로드 관리 최적화가 지원되지 않습니다.</span>
               <br />
-              비디오: MP4/WebM, 자막: VTT (_ko 접미사로 구분)
-            </span>
-          </p>
-        )}
-      </div>
+              비디오 & 자막을 클릭 또는 드래그하세요.
+              <br />
+              <span className="text-xs text-gray-500">
+                (최대 {maxFiles}개, 각 100MB 이하)
+                <br />
+                비디오: MP4/WebM, 자막: VTT (_ko 접미사로 구분)
+              </span>
+            </p>
+          )}
+        </div>
+      )}
 
       <DndContext
         sensors={sensors}

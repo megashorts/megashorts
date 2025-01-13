@@ -7,23 +7,20 @@ import type { z } from 'zod';
 import { postSchema } from "@/lib/validation";
 import { ImageUploader } from "@/components/ImageUploader"; 
 import { VideoUploader } from "@/components/videos/VideoUploader";
-import { useEditor, EditorContent } from "@tiptap/react";  // Editor를 EditorContent로 변경
+import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import { Language, CategoryType } from "@prisma/client";
 import { PostData, VideoWithSubtitles } from '@/lib/types';
-// import { PostWithVideos } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { toast, useToast } from "@/components/ui/use-toast";
 import { Label } from "@radix-ui/react-label";
 import { useUploader } from "@/hooks/useUploader";
-import { useSubmitPostMutation } from "./mutations";  // useCreatePost 대신 useSubmitPostMutation 사용
+import { useSubmitPostMutation } from "./mutations";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { useSession } from "@/components/SessionProvider";
 import LanguageFlag from "@/components/LanguageFlag";
 
-// postSchema로부터 form 데이터 타입 추출
 type PostFormData = z.infer<typeof postSchema>;
 
 const CATEGORIES: Record<CategoryType, string> = {
@@ -73,7 +70,6 @@ export function PostEditor({ initialData }: PostEditorProps) {
     initialData?.postLanguage || Language.CHINESE
   );
 
-
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -104,7 +100,7 @@ export function PostEditor({ initialData }: PostEditorProps) {
   } = useForm<PostFormData>({
     resolver: zodResolver(postSchema),
     defaultValues: initialData ? {
-      title: initialData.title || '',  // null → empty string
+      title: initialData.title || '',
       titleOriginal: initialData.titleOriginal || undefined,
       content: initialData.content || '',
       priority: initialData.priority || 5,
@@ -116,27 +112,8 @@ export function PostEditor({ initialData }: PostEditorProps) {
     } : undefined
   });
 
-  // 카테고리 선택 핸들러
-  // const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-  //   const selectedOptions = Array.from(event.target.selectedOptions).map(
-  //     option => option.value as CategoryType
-  //   );
-  
-  //   // 최대 3개 제한
-  //   if (selectedOptions.length > 5) {
-  //     toast({
-  //       description: "카테고리는 최대 5개까지 선택 가능합니다.",
-  //     });
-  //     return;
-  //   }
-  
-  //   setSelectedCategories(selectedOptions);
-  //   setValue('categories', selectedOptions);
-  // };
-
-  // 비디오 상태 업데이트 핸들러
   const handleVideosChange = (updatedVideos: VideoType[]) => {
-    setVideos(updatedVideos);  // 로컬 상태만 업데이트
+    setVideos(updatedVideos);
   };
 
   const handleSave = async (status: 'PUBLISHED' | 'DRAFT') => {
@@ -225,7 +202,6 @@ export function PostEditor({ initialData }: PostEditorProps) {
       });
   
       if (newPost && typeof newPost === 'object' && 'id' in newPost) {
-        // 타임스탬프 추가하여 리다이렉트
         router.push(`/posts/${newPost.id}?t=${Date.now()}`);
       }
   
@@ -242,7 +218,6 @@ export function PostEditor({ initialData }: PostEditorProps) {
 
   return (
     <div className="max-w-4xl mx-auto p-1 space-y-6">
-      {/* 제목 입력 */}
       <div>
         <label className="block text-sm font-medium mb-2">
           제목
@@ -251,7 +226,7 @@ export function PostEditor({ initialData }: PostEditorProps) {
           type="text"
           {...register("title")}
           placeholder="제목을 입력해주세요 (필수)"
-          className="w-full text-sm rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 p-3"
+          className="w-full text-base rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 p-3"
         />
         {errors.title && (
           <p className="mt-1 text-sm text-red-600">
@@ -265,7 +240,7 @@ export function PostEditor({ initialData }: PostEditorProps) {
           type="text"
           {...register("titleOriginal")}
           placeholder="원작제목의 언어가 다르다면 입력하세요 (옵션)"
-          className="w-full text-sm rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 p-3"
+          className="w-full text-base rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 p-3"
         />
         {errors.titleOriginal && (
           <p className="mt-1 text-sm text-red-600">
@@ -274,7 +249,6 @@ export function PostEditor({ initialData }: PostEditorProps) {
         )}
       </div>
 
-      {/* 동영상 언어 선택 추가 */}
       <div>
         <label className="block text-sm font-medium mb-2">
           동영상 언어
@@ -301,8 +275,6 @@ export function PostEditor({ initialData }: PostEditorProps) {
         </div>
       </div>
 
-
-      {/* 썸네일 업로더 */}
       <div className="space-y-4">
         <label className="block text-sm font-medium mb-2">
           썸네일 이미지
@@ -311,7 +283,7 @@ export function PostEditor({ initialData }: PostEditorProps) {
         <ImageUploader
           onImagePrepared={(image) => {
             setPreparedImage(image);
-            setExistingThumbnail(null);  // 새 이미지가 준비되면 기존 썸네일 제거
+            setExistingThumbnail(null);
           }}
           aspectRatio={2/3}
           username={user?.username}
@@ -340,10 +312,8 @@ export function PostEditor({ initialData }: PostEditorProps) {
             </button>
           </div>
         )}
-
       </div>
 
-      {/* 카테고리 선택 */}
       <div>
         <label className="block text-sm font-medium mb-2">
         카테고리 (최대 3개)
@@ -400,15 +370,15 @@ export function PostEditor({ initialData }: PostEditorProps) {
         </div>
       </div>
 
-      {/* 비디오 업로더 */}
       <div>
         <label className="block text-sm font-medium mb-2">
           비디오
         </label>
         <VideoUploader
           videos={videos}
-          onChange={handleVideosChange}  // setVideos 대신 핸들러 사용
+          onChange={handleVideosChange}
           maxFiles={10}
+          isNewPost={!initialData}
         />
         {errors.videos && (
           <p className="mt-1 text-sm text-red-600">
@@ -417,14 +387,13 @@ export function PostEditor({ initialData }: PostEditorProps) {
         )}
       </div>
 
-      {/* 컨텐츠 에디터 */}
       <div>
         <label className="block text-sm font-medium mb-2">
           내용
         </label>
         <EditorContent
           editor={editor}
-          className="mt-1 text-sm min-h-[200px] border border-gray-300 rounded-md p-3 [&_.ProseMirror]:outline-none focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-1 [&_.is-editor-empty]:before:text-gray-400 [&_.is-editor-empty]:before:content-[attr(data-placeholder)] [&_.is-editor-empty]:before:float-left [&_.is-editor-empty]:before:pointer-events-none"
+          className="mt-1 text-base min-h-[200px] border border-gray-300 rounded-md p-3 [&_.ProseMirror]:outline-none focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-1 [&_.is-editor-empty]:before:text-gray-400 [&_.is-editor-empty]:before:content-[attr(data-placeholder)] [&_.is-editor-empty]:before:float-left [&_.is-editor-empty]:before:pointer-events-none"
         />
         {errors.content && (
           <p className="mt-1 text-sm text-red-600">
@@ -433,7 +402,6 @@ export function PostEditor({ initialData }: PostEditorProps) {
         )}
       </div>
 
-       {/* 연령제한 선택 */}
        <div className="space-y-4">
         <div className="flex items-center gap-4">
           <label className="text-sm font-medium">
@@ -442,7 +410,7 @@ export function PostEditor({ initialData }: PostEditorProps) {
            <select
             {...register("ageLimit")}
             defaultValue="15"
-            className="w-32 text-sm rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary p-2"
+            className="w-32 text-base rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary p-2"
           >
             <option value="0">전체</option>
             <option value="12">12세 이상</option>
@@ -450,34 +418,8 @@ export function PostEditor({ initialData }: PostEditorProps) {
             <option value="18">18세 이상</option>
           </select>
         </div>
-
-        {/* 추천 컨텐츠 */}
-        <label className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            {...register("featured")}
-            className="rounded border-gray-300"
-          />
-          <span className="text-sm">추천 컨텐츠</span>
-        </label>
-
-        {/* 우선순위 */}
-        <div className="flex items-center gap-2">
-          <label className="text-sm font-medium">
-            우선순위 (1-10)
-          </label>
-          <input
-            type="number"
-            {...register("priority")}
-            min={1}
-            max={10}
-            placeholder="5"
-            className="w-32 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary p-2"
-          />
-        </div>
       </div>
 
-      {/* 제출 버튼 */}
       <div className="flex justify-end gap-4">
         <Button
           type="button"

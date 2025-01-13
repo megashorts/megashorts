@@ -128,6 +128,7 @@ async function UserProfile({ user, loggedInUserId }: UserProfileProps) {
             <div className="text-muted-foreground">@{user.username}</div>
           </div>
           <div>{formatDate(user.createdAt, "MMM d, yyyy")}{" "}
+            <br />
             {user.email
               ? `이메일 가입 ${user.email}`
               : user.googleId
