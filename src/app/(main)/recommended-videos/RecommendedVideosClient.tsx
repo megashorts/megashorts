@@ -76,7 +76,7 @@ export function RecommendedVideosClient({ posts }: RecommendedVideosClientProps)
           eventsTarget: '.swiper-container'
         }}
         virtual
-        className="h-full w-full swiper-container"
+        className="h-full w-full swiper-container aspect-[9/16]"
         onSwiper={(swiper) => {
           console.log('onSwiper called');
           swiperRef.current = swiper;
@@ -106,7 +106,7 @@ export function RecommendedVideosClient({ posts }: RecommendedVideosClientProps)
           return (
             <SwiperSlide key={post.id} virtualIndex={index}>
               <div className="w-full h-full flex items-center justify-center bg-black">
-                <div className="relative w-[calc(100vh*16/9)] max-w-[640px] h-full md:pt-24 md:mb-8 pb-8 mb-8 pt-8">
+                <div className="relative aspect-[8/16] h-full md:pt-24 md:mb-8 pb-8 mb-8 pt-8">
                   <div 
                     className={cn(
                       "absolute inset-x-0 top-0 pt-20 md:pt-24 md:mb-8 pb-8 mb-8 z-10 bg-gradient-to-b from-black/70 to-transparent h-24 transition-opacity duration-300",

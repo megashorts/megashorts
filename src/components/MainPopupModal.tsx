@@ -27,12 +27,15 @@ export function MainPopupModal() {
     setIsOpen(false);
   };
 
+  const handleCheckboxArea = (e: React.MouseEvent) => {
+    e.stopPropagation(); // 체크박스 영역 클릭 시 모달 닫힘 방지
+  };
+
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70" onClick={handleClose} >
       <div className="relative w-[75%] md:w-[35%] md:max-w-[450px] bg-red-500 rounded-lg">
-        {/* 이미지 */}
         <div className="relative">
           <Link href="/notice/f9c6e2ee-dd89-4387-9c5b-4dcf99537d1b" onClick={handleClose} >
             <Image
@@ -45,7 +48,6 @@ export function MainPopupModal() {
             />
           </Link>
           
-          {/* 닫기 버튼 */}
           <button
             onClick={handleClose}
             className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-sm hover:bg-white/20"
@@ -53,8 +55,10 @@ export function MainPopupModal() {
             <X className="size-5" />
           </button>
           
-          {/* 하단 체크박스 */}
-          <div className="absolute bottom-3 left-3 flex items-center gap-2 text-white">
+          <div 
+            className="absolute bottom-3 left-3 flex items-center gap-2 text-white"
+            onClick={handleCheckboxArea}  // 체크박스 영역 클릭 시 모달 닫힘 방지
+          >
             <Checkbox
               id="hideToday"
               checked={hideToday}
@@ -65,7 +69,7 @@ export function MainPopupModal() {
             />
             <label
               htmlFor="hideToday"
-              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              className="text-lg font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
             >
               오늘은 그만보기
             </label>

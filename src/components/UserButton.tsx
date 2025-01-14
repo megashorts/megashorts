@@ -30,34 +30,58 @@ export default function UserButton({ className }: UserButtonProps) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmenuOpen, setIsSubmenuOpen] = useState(false); // 서브메뉴 상태
-  const [userRole, setUserRole] = useState<number>(0);
+  // const [userRole, setUserRole] = useState<number>(0);
 
   // https://lucide.dev/ 에서 아이콘 모양확인
 
-  useEffect(() => {
-    async function fetchUserRole() {
-      if (user) {
-        try {
-          const response = await fetch("/api/users/role", {
-            headers: {
-              "x-user-id": user.id
-            }
-          });
-          const data = await response.json();
-          if (data.userRole) {
-            setUserRole(data.userRole);
-          }
-        } catch (error) {
-          console.error("Failed to fetch user role:", error);
-        }
-      }
-    }
-    fetchUserRole();
-  }, [user]);
+  // useEffect(() => {
+  //   async function fetchUserRole() {
+  //     if (user) {
+  //       try {
+  //         const response = await fetch("/api/users/role", {
+  //           headers: {
+  //             "x-user-id": user.id
+  //           }
+  //         });
+  //         const data = await response.json();
+  //         if (data.userRole) {
+  //           setUserRole(data.userRole);
+  //         }
+  //       } catch (error) {
+  //         console.error("Failed to fetch user role:", error);
+  //       }
+  //     }
+  //   }
+  //   fetchUserRole();
+  // }, [user]);
+
+  // if (!user) {
+  //   router.push("/login");
+  //   return null;
+  // }
 
   if (!user) {
-    router.push("/login");
-    return null;
+    return (
+      <DropdownMenu onOpenChange={setIsOpen}>
+        <DropdownMenuTrigger asChild>
+          <button className={cn("flex-none hover:bg-transparent", className)}>
+            <UserCircle className="size-6" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          sideOffset={20}
+          align="end"
+          className="z-50 w-56 lg:w-64 text-lg"
+        >
+          <Link href="/login">
+            <DropdownMenuItem>
+              <UserIcon className="mr-2 size-4" />
+              로그인
+            </DropdownMenuItem>
+          </Link>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
   }
 
   return (
@@ -80,19 +104,19 @@ export default function UserButton({ className }: UserButtonProps) {
       <DropdownMenuTrigger asChild>
         <button className={cn("flex-none hover:bg-transparent", className)}>
           {/* <UserAvatar avatarUrl={user.avatarUrl} size={30} /> */}
-          <UserCircle className="size-7" />
+          <UserCircle className="size-6" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
         sideOffset={20}  // sideOffset={isMobile ? 4 : 16} and side={isMobile ? "top" : "bottom"}
         align="end"     // align={isMobile ? "start" : "end"}
-        className="z-50 w-56 lg:w-64" // 모바일과 데스크탑의 너비 다르게 설정
+        className="z-50 w-64 lg:w-72 text-lg md:text-base " // 모바일과 데스크탑의 너비 다르게 설정
       >
-        <DropdownMenuLabel>반가워요! @{user.username}님.</DropdownMenuLabel>
+        <DropdownMenuLabel>반가워요! @{user?.username}님.</DropdownMenuLabel>
 
         <DropdownMenuSeparator className="h-[0.5px] bg-gray-600" />
         <div className="text-xs font-medium text-gray-600">사용자 정보</div>
-        <Link href={`/usermenu/users/${user.username}`}>
+        <Link href={`/usermenu/users/${user?.username}`}>
           <DropdownMenuItem>
             <UserIcon className="mr-2 size-4" />
             나의 정보
@@ -134,25 +158,6 @@ export default function UserButton({ className }: UserButtonProps) {
             나의 컨텐츠 관리
           </DropdownMenuItem>
         </Link>
-
-        {/* {userRole >= USER_ROLES.CREATOR && (
-        <>
-        <DropdownMenuSeparator />
-        <div className="text-xs font-medium text-gray-600">운영관리</div>
-        <Link href={`/subscription`}>
-          <DropdownMenuItem>
-            <PencilRuler className="mr-2 size-4" />
-            운영관리 설정
-          </DropdownMenuItem>
-        </Link>
-        <Link href={`/subscription`}>
-          <DropdownMenuItem>
-            <Users className="mr-2 size-4" />
-            사용자 조회관리
-          </DropdownMenuItem>
-        </Link>
-        </>
-        )} */}
 
         <DropdownMenuSeparator />
         <div className="text-xs font-medium text-gray-600">분류별 바로보기</div>
@@ -226,32 +231,6 @@ export default function UserButton({ className }: UserButtonProps) {
             </DropdownMenuItem>
           </Link>                                               
         </div>
-
-        {/* <DropdownMenuSub>
-          <DropdownMenuSubTrigger>
-            <Monitor className="mr-2 size-4" />
-            Theme
-          </DropdownMenuSubTrigger>
-          <DropdownMenuPortal>
-            <DropdownMenuSubContent>
-              <DropdownMenuItem onClick={() => setTheme("system")}>
-                <Monitor className="mr-2 size-4" />
-                System default
-                {theme === "system" && <Check className="ms-2 size-4" />}
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme("light")}>
-                <Sun className="mr-2 size-4" />
-                Light
-                {theme === "light" && <Check className="ms-2 size-4" />}
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme("dark")}>
-                <Moon className="mr-2 size-4" />
-                Dark
-                {theme === "dark" && <Check className="ms-2 size-4" />}
-              </DropdownMenuItem>
-            </DropdownMenuSubContent>
-          </DropdownMenuPortal>
-        </DropdownMenuSub> */}
         <DropdownMenuSeparator className="h-[0.5px] bg-gray-600" />
         <DropdownMenuItem
           onClick={() => {
@@ -260,7 +239,7 @@ export default function UserButton({ className }: UserButtonProps) {
           }}
         >
           <LogOutIcon className="mr-2 size-4" />
-          Logout
+          로그아웃
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

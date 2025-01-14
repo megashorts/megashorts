@@ -249,7 +249,7 @@ export function VideoViewClient({ post, initialSequence, initialTime }: VideoVie
             return (
               <SwiperSlide key={video.id} virtualIndex={index}>
                 <div className="w-full h-full flex items-center justify-center bg-black">
-                  <div className="relative w-[calc(100vh*16/9)] max-w-[640px] h-full md:pt-24 md:mb-8 pb-8 mb-8 pt-8">
+                  <div className="relative aspect-[8/16] max-w-[640px] h-full md:pt-24 md:mb-8 pb-8 mb-8 pt-8">
                     
                     <div 
                       className={cn(

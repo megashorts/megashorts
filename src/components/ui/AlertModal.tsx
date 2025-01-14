@@ -72,7 +72,7 @@ export function AlertModal({
       {/* 배경 오버레이 */}
       <div 
         className="fixed inset-0 bg-black/50 transition-opacity"
-        onClick={onClose}
+        // onClick={onClose}
         aria-hidden="true"
       />
       

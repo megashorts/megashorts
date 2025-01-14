@@ -1,32 +1,43 @@
-import { validateRequest } from '@/auth';
+
 import prisma from '@/lib/prisma';
 import { getPostDataInclude, PostsPage } from '@/lib/types';
 import { NextRequest } from 'next/server';
 
+
+
 export async function GET(req: NextRequest) {
   try {
-    const q = req.nextUrl.searchParams.get('q') || '';
-    const cursor = req.nextUrl.searchParams.get('cursor') || undefined;
+    const { searchParams } = new URL(req.url);
+    let q = searchParams.get("q") || "";
+    const cursor = searchParams.get("cursor") || undefined;
+    const pageSize = 20;  // Categories와 동일하게 20개로 설정
 
-    // 검색어를 공백으로 분리하고 각각을 검색 대상으로 사용
-    const searchTerms = q.split(/\s+/).filter(Boolean);
-    const searchQuery = searchTerms.join(' | '); // OR 검색으로 변경
-
-    const pageSize = 10;
-
-    const { user } = await validateRequest();
-
-    if (!user) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    // URL 디코딩
+    try {
+      q = decodeURIComponent(q);
+    } catch (e) {
+      console.error('Decoding error:', e);
     }
+
+    // 검색어 처리 개선
+    const searchTerms = q.split(/\s+/).filter(Boolean);
+    const searchQuery = searchTerms.join(' | '); // OR 검색
+    const containsQuery = q.replace(/\s+/g, ''); // 공백 제거 버전
 
     const posts = await prisma.post.findMany({
       where: {
         OR: [
-          // 제목 검색 추가
+          // 제목 검색 (search 연산자)
           {
             title: {
               search: searchQuery,
+            },
+          },
+          // 제목 검색 (공백 무시 contains)
+          {
+            title: {
+              contains: containsQuery,
+              mode: 'insensitive'
             },
           },
           // 내용 검색
@@ -52,10 +63,9 @@ export async function GET(req: NextRequest) {
             },
           },
         ],
-        // 게시 상태가 PUBLISHED인 게시물만 검색
         status: 'PUBLISHED',
       },
-      include: getPostDataInclude(user.id),
+      include: getPostDataInclude(''),
       orderBy: [
         // 검색 관련도순으로 정렬 후 최신순
         {
