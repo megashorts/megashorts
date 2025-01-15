@@ -51,7 +51,7 @@ export async function GET(req: NextRequest) {
           Authorization: `Bearer ${tokens.accessToken}`,
         },
       })
-      .json<{ id: string; name: string }>();
+      .json<{ id: string; name: string; email: string  }>();
     // ky를 사용해 구글 API에 요청을 보내고, 사용자의 정보를 JSON 형태로 받아옴. 
     // 여기서는 구글 사용자 ID와 이름을 가져옴.
 
@@ -92,8 +92,22 @@ export async function GET(req: NextRequest) {
           username,
           displayName: googleUser.name,
           googleId: googleUser.id,
+          email: googleUser.email,
         },
       });
+
+    // 웰컴 메시지 추가
+    await tx.notification.create({
+      data: {
+        recipientId: userId,
+        issuerId: userId,
+        type: 'COMMENT',
+        metadata: {
+          reason: '가입을 환영합니다! 🎉🎉'
+        }
+      }
+    });
+
       // Prisma 트랜잭션을 사용해 데이터베이스에 새로운 사용자 정보를 저장. 
       // 트랜잭션을 사용하면 여러 데이터베이스 작업이 하나의 단위로 처리됨.
 

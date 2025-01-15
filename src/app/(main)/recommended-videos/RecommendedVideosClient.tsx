@@ -105,15 +105,15 @@ export function RecommendedVideosClient({ posts }: RecommendedVideosClientProps)
           const streamId = video.url.split('/')[3];
           return (
             <SwiperSlide key={post.id} virtualIndex={index}>
-              <div className="w-full h-full flex items-center justify-center bg-black">
-                <div className="relative aspect-[9/16] h-full md:pt-24 md:mb-8 pt-4">
+              <div className="w-full h-full flex items-center justify-center bg-black pt-[48px] md:pt-[70px] pb-1">
+                <div className="relative aspect-[9/16] h-full mx-auto">
                   <div 
                     className={cn(
-                      "absolute inset-x-0 top-28 md:mb-8 z-10 transition-opacity duration-300",
+                      "absolute inset-x-0 top-10 md:mb-8 z-10 transition-opacity duration-300",
                       showButtons ? "opacity-100" : "opacity-0"
                     )}
                   >
-                    <div className="pl-8 md:pl-12 pt-4 text-white flex items-center relative">
+                    <div className="pl-4 md:pl-4 pt-4 text-white flex items-center relative">
                       <div className="bg-gradient-to-r from-black/70 to-transparent px-4 py-2 rounded-lg">
                         <Link 
                           // href={`/video-view/${post.id}`}

@@ -129,13 +129,13 @@ async function UserProfile({ user, loggedInUserId }: UserProfileProps) {
           </div>
           <div>{formatDate(user.createdAt, "MMM d, yyyy")}{" "}
             <br />
-            {user.email
-              ? `이메일 가입 ${user.email}`
-              : user.googleId
-              ? `구글아이디 가입 ${user.googleId}`
+            {user.googleId
+              ? `구글아이디 가입 ${user.email}`
               : user.naverId
-              ? `네이버아이디 가입 ${user.naverId}`
-              : `카카오아이디 가입 ${user.kakaoId}`}
+              ? `네이버아이디 가입 ${user.email}`
+              : user.kakaoId
+              ? `카카오아이디 가입 ${user.email}`
+              : `이메일 가입 ${user.email}`}
           </div>
 
           <div className="space-y-4">

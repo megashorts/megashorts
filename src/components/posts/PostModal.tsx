@@ -73,7 +73,7 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
                   className="object-cover"
                 />
               </div>
-
+{/* 
               {(showPreview && firstVideoId) && (
                 <div 
                   className={`absolute inset-0 transition-opacity duration-500 ${
@@ -89,10 +89,24 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
                   />
                 </div>
               )}
+            </div> */}
+
+              {(showPreview && firstVideoId) && (
+                <div className="absolute inset-0 bg-black">
+                  <VideoPlayer
+                    videoId={firstVideoId}
+                    postId={post.id}
+                    sequence={1}
+                    isActive={true}
+                    className="w-full h-full"
+                    controls={false}
+                  />
+                </div>
+              )}
             </div>
 
             {/* 버튼 영역 */}
-            <div className="flex flex-col items-center justify-start gap-4 p-4">
+            <div className="flex flex-col items-center justify-end gap-4 p-4">
               <button 
                 onClick={handleClose}
                 className="relative top-0 left-5 -translate-y-2 p-1 bg-slate-500/15 hover:bg-black/70 rounded-full border-red-500 text-muted-foreground z-10"
@@ -246,6 +260,7 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
               />
             </div>
           )}
+          
         </div>
   
         <div className="w-full bg-black pl-10 pr-10 pb-6 pt-4 overflow-y-auto flex-grow max-h-[calc(90vh)] md:max-h-none">

@@ -248,16 +248,14 @@ export function VideoViewClient({ post, initialSequence, initialTime }: VideoVie
             const streamId = video.url.split('/')[3];
             return (
               <SwiperSlide key={video.id} virtualIndex={index}>
-                <div className="w-full h-full flex items-center justify-center bg-black">
-                  <div className="relative aspect-[9/16] h-full md:pt-24 md:mb-8 pt-4">
-                    
-                    <div 
-                      className={cn(
-                        "absolute inset-x-0 top-28 md:mb-8 z-10 transition-opacity duration-300",
-                        showButtons ? "opacity-100" : "opacity-0"
-                      )}
-                    >
-                      <div className="pl-8 md:pl-12 pt-4 text-white flex items-center relative">
+                <div className="w-full h-full flex items-center justify-center bg-black pt-[48px] md:pt-[70px] pb-1">
+                  {/* <div className="relative w-[calc(100vh*16/9)] max-w-[640px] h-full md:pt-24 md:mb-8 pb-8 mb-8 pt-8"> */}
+                  <div className="relative aspect-[9/16] h-full mx-auto">
+                    <div className={cn(
+                      "absolute inset-x-0 top-10 md:mb-8 z-10 transition-opacity duration-300",
+                      showButtons ? "opacity-100" : "opacity-0"
+                    )}>
+                      <div className="pl-4 md:pl-4 pt-4 text-white flex items-center relative">
                         <div className="bg-gradient-to-r from-black/70 to-transparent px-4 py-2 rounded-lg">
                           <h1 className="text-sm md:text-lg text-slate-100 inline">{post.title}</h1>
                           <h1 className="text-sm md:text-lg text-white pl-2 inline-block">EP.{activeIndex + 1}</h1>
@@ -273,6 +271,7 @@ export function VideoViewClient({ post, initialSequence, initialTime }: VideoVie
                       isActive={index === activeIndex}
                       onEnded={handleVideoEnd}
                       className="w-full h-full"
+                      userLanguage="KOREAN"
                       initialTime={
                         // 1. 이어보기로 이동한 경우: resumeData의 시간 사용
                         index === activeIndex && resumeData?.sequence === video.sequence

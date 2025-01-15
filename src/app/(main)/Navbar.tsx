@@ -56,9 +56,9 @@ export default function NavBar({ className }: NavBarProps) {
           <div className="flex items-center gap-1 md:gap-3">
             <NavLinks />
             {session?.user ? (
-              <div className="relative">
+              <div className="relative pl-1 ">
                 <UserButton 
-                  className="transition-colors text-white border-transparent hover:border-primary rounded-full border-2 focus:outline-none focus:ring-0"
+                  className="transition-colors text-white flex items-center justify-center border-transparent hover:border-primary rounded-full border-2 focus:outline-none focus:ring-0 "
                 />
                 {unreadCount > 0 && (
                   <span
