@@ -1,55 +1,57 @@
-import { NextResponse } from 'next/server';
-import { validateRequest } from '@/auth';
-import prisma from '../../../../lib/prisma';
+import { NextRequest } from 'next/server';
+import { CategoryType } from '@prisma/client';
+import prisma from '@/lib/prisma';
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const searchParams = req.nextUrl.searchParams;
+  const skip = parseInt(searchParams.get('skip') || '0');
+  const take = parseInt(searchParams.get('take') || '5');
+
   try {
-    const { user } = await validateRequest();
-
-    // 무료 비디오가 있는 포스트를 가져옵니다
     const posts = await prisma.post.findMany({
       where: {
+        status: 'PUBLISHED',
+        NOT: {
+          categories: {
+            hasSome: [CategoryType.MSPOST, CategoryType.NOTIFICATION]
+          }
+        },
         videos: {
           some: {
+            sequence: 1,
             isPremium: false,
-            // 로그인한 사용자의 경우 시청하지 않은 비디오가 있는 포스트만 가져옵니다
-            ...(user ? {
-              views: {
-                none: {
-                  userId: user.id,
-                },
-              },
-            } : {}),
-          },
-        },
+          }
+        }
       },
-      orderBy: [
-        // 관리자가 지정한 포스트 번호순으로 정렬
-        { postNum: 'asc' },
-        // 생성일 순으로 정렬
-        { createdAt: 'desc' },
-      ],
-      include: {
+      select: {
+        id: true,
+        title: true,
         videos: {
           where: {
+            sequence: 1,
             isPremium: false,
           },
-          orderBy: {
-            sequence: 'asc',
-          },
-          include: {
-            views: true,
-          },
-        },
+          select: {
+            id: true,
+            url: true,
+            sequence: true,
+          }
+        }
       },
+      orderBy: [
+        { featured: 'desc' },
+        { postNum: 'asc' },
+        { createdAt: 'desc' }
+      ],
+      skip,
+      take
     });
 
-    return NextResponse.json(posts);
+    const validPosts = posts.filter(post => post.videos.length > 0);
+    return Response.json(validPosts);
+
   } catch (error) {
     console.error('Failed to fetch recommended posts:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch recommended posts' },
-      { status: 500 }
-    );
+    return new Response('Failed to fetch posts', { status: 500 });
   }
 }

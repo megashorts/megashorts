@@ -132,6 +132,23 @@ class VideoDBManager {
     });
   }
 
+  async getWatchedVideos() {
+    await this.init();
+    if (!this.db) throw new Error('Database not initialized');
+  
+    return new Promise<string[]>((resolve, reject) => {
+      const transaction = this.db!.transaction(['watchedVideos'], 'readonly');
+      const store = transaction.objectStore('watchedVideos');
+      const request = store.getAll();
+  
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => {
+        const videos = request.result || [];
+        resolve(videos.map(v => v.videoId));
+      };
+    });
+  }
+
   // 다른 사용자 로그인 시에만 호출되는 초기화 메서드
   async clearForNewUser() {
     await this.init();

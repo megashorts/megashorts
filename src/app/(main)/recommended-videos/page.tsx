@@ -1,15 +1,23 @@
 import prisma from "@/lib/prisma";
+import { CategoryType } from '@prisma/client';
 import { RecommendedVideosClient } from "./RecommendedVideosClient";
 
 // 5분마다 재렌더링
-export const revalidate = 300;
+export const revalidate = 3600;
 
 export default async function RecommendedVideosPage() {
   const posts = await prisma.post.findMany({
     where: {
+      status: 'PUBLISHED',
+      NOT: {
+        categories: {
+          hasSome: [CategoryType.MSPOST, CategoryType.NOTIFICATION]
+        }
+      },
       videos: {
         some: {
-          sequence: 1
+          sequence: 1,
+          isPremium: false,
         }
       }
     },
@@ -18,7 +26,8 @@ export default async function RecommendedVideosPage() {
       title: true,
       videos: {
         where: {
-          sequence: 1
+          sequence: 1,
+          isPremium: false,
         },
         select: {
           id: true,
@@ -27,14 +36,15 @@ export default async function RecommendedVideosPage() {
         }
       }
     },
-    orderBy: {
-      createdAt: 'desc'
-    },
+    orderBy: [
+      { featured: 'desc' },
+      { postNum: 'asc' },
+      { createdAt: 'desc' }
+    ],
     take: 5  // 초기 5개만 로드
   });
 
   const validPosts = posts.filter(post => post.videos.length > 0);
-
   return <RecommendedVideosClient posts={validPosts} />;
 }
 
