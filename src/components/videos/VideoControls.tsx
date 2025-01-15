@@ -89,7 +89,7 @@ export default function VideoControls({
       onMouseMove={updateControlsVisibility}
       onTouchStart={updateControlsVisibility}
     >
-      <div className="absolute right-5 bottom-1 md:right-[2rem] md:bottom-1 flex flex-col gap-2 md:gap-3">
+      <div className="absolute right-3 md:right-[2rem] bottom-1 md:bottom-0 translate-y-10 flex flex-col gap-2 md:gap-3">
         {hasPrevVideo && (
           <div 
             onClick={() => onNavigate('prev')}

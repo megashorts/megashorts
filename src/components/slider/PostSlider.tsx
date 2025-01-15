@@ -146,7 +146,7 @@ const PostSlider = ({ posts, title, category, viewAllHref, sliderId }: PostSlide
           ))}
         </Swiper>
 
-        {shouldEnableSwiper && (
+        {/* {shouldEnableSwiper && (
           <>
             <button 
               className={`swiper-button-prev-${sliderId} absolute left-0 top-0 z-10 h-full w-12 bg-black/30
@@ -163,7 +163,7 @@ const PostSlider = ({ posts, title, category, viewAllHref, sliderId }: PostSlide
               <ChevronRight className="w-8 h-8 text-white" />
             </button>
           </>
-        )}
+        )} */}
       </div>
 
       {selectedPost && (

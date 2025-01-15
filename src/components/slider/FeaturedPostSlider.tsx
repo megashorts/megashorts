@@ -40,10 +40,10 @@ const FeaturedPostSlider = ({ posts }: FeaturedPostSliderProps) => {
           effect="coverflow"
           breakpoints={{
             640: {
-              slidesPerView: 2,
+              slidesPerView: 2.2,
             },
             1024: {
-              slidesPerView: 4,
+              slidesPerView: 4.2,
             },
           }}
           centeredSlides={true}
@@ -67,7 +67,7 @@ const FeaturedPostSlider = ({ posts }: FeaturedPostSliderProps) => {
           {posts.slice(0, 10).map((post) => (
             <SwiperSlide
               key={post.id}
-              className="relative z-0"
+              className="relative z-0 aspect-[2/3]"
               style={{
                 width: 'calc(33.333% - 20px)',
                 height: '100%',
@@ -86,17 +86,17 @@ const FeaturedPostSlider = ({ posts }: FeaturedPostSliderProps) => {
                       : isVisible
                       ? 'linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3))'
                       : '',
-                    boxShadow: isActive
-                      ? '0 0 6px 6px rgba(255, 255, 255, 0.15), 0 0 8px 8px rgba(255, 255, 255, 0.1), 0 0 16px 16px rgba(255, 255, 255, 0.05)'
-                      : '',
+                    // boxShadow: isActive
+                    //   ? '0 0 6px 6px rgba(255, 255, 255, 0.15), 0 0 8px 8px rgba(255, 255, 255, 0.1), 0 0 16px 16px rgba(255, 255, 255, 0.05)'
+                    //   : '',
+                    boxShadow: 'none',
                     aspectRatio: '2/3',
                     borderRadius: '15px',
                     overflow: 'hidden',
                     minWidth: '280px',
                     visibility: isVisible ? 'visible' : 'hidden',
-                    transform: 'scale(0.95)', // 모바일에서 살짝 줄어듦
                   }}
-                  onMouseEnter={() => isActive && setHoveredIndex(post.id)}
+                  onMouseEnter={() => setHoveredIndex(post.id)}
                   onMouseLeave={() => setHoveredIndex(null)}
                   onClick={() => handleSlideClick(post)}
                 >
@@ -105,7 +105,9 @@ const FeaturedPostSlider = ({ posts }: FeaturedPostSliderProps) => {
                       src={post.thumbnailUrl || '/placeholder.jpg'}
                       alt={post.title || ''}
                       fill
-                      className="object-cover"
+                      className={`object-cover transition-transform duration-300 ${
+                        hoveredIndex === post.id ? 'scale-105' : 'scale-100'
+                      }`} // 마우스 올리면 썸네일만 확대
                       priority
                     />
                     {/* 비활성 슬라이드에 대한 어두운 오버레이 */}
@@ -113,7 +115,7 @@ const FeaturedPostSlider = ({ posts }: FeaturedPostSliderProps) => {
                       <div 
                       className={`absolute inset-0 transition-opacity duration-300 ${
                         isPrev || isNext
-                          ? 'bg-black/10'  // 중앙 바로 옆 슬라이드
+                          ? 'bg-black/40'  // 중앙 바로 옆 슬라이드
                           : 'bg-black/85'   // 더 멀리 있는 슬라이드
                       }`}
                     />

@@ -24,7 +24,7 @@ export default function NavBar({ className }: NavBarProps) {
 
   return (
     <header className={`absolute w-full z-50 bg-transparent ${className}`}>
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-5 px-5 lg:px-8 lg:py-6 py-3">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-5 px-5 lg:px-8 lg:py-6 py-1 md:py-3">
         {/* 좌측 로고 */}
         <Link href="/" className="w-64 hidden md:block">
           {/* <Image src={Logo} sizes="(max-width: 600px) 100vw, (max-width: 1024px) 75vw, 80vw" alt="MEGASHORTS logo" priority /> */}
@@ -51,7 +51,7 @@ export default function NavBar({ className }: NavBarProps) {
         </Link>
         
         {/* 우측 메뉴 */}
-        <div className="flex items-center gap-3 md:gap-3 ml-auto">
+        <div className="flex items-center gap-4 md:gap-3 ml-auto">
           {/* <div className="hidden lg:flex items-center gap-5"> */}
           <div className="flex items-center gap-1 md:gap-3">
             <NavLinks />

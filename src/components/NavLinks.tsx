@@ -219,9 +219,9 @@ export default function NavLinks() {
           >
             <Link href="/recommended-videos" className="relative">
               <Compass className="size-5" />
-              <span className={`${isActive("/foryou") ? "text-primary" : "group-hover:text-primary"} hidden md:block`}>포유</span>
+              <span className={`${isActive("/recommended-videos") ? "text-primary" : "group-hover:text-primary"} hidden md:block`}>포유</span>
               {/* <span className={`${isActive("/") ? "text-primary" : "group-hover:text-primary"}`}>포유</span> */}
-              <span className="absolute left-0 bottom-[0px] w-full h-1 bg-primary scale-x-0 transition-transform duration-200 group-hover:scale-x-100" />
+              <span className="absolute left-0 bottom-[0px] w-full h-1 bg-primary scale-x-0 transition-transform duration-200 group-hover:scale-x-100 hidden md:block" />
             </Link>
           </Button>
           {/* <Button

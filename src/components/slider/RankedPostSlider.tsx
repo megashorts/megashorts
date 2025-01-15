@@ -149,7 +149,7 @@ const RankedPostSlider = ({ posts, title, sliderId }: RankedPostSliderProps) => 
           ))}
         </Swiper>
 
-        <button 
+        {/* <button 
           className={`swiper-button-prev-${sliderId} absolute left-0 top-0 z-10 h-full w-12 bg-black/30
             opacity-0 transition-opacity duration-200 group-hover:opacity-100 disabled:opacity-0
             flex items-center justify-center ${isBeginning ? 'hidden' : ''}`}
@@ -162,7 +162,7 @@ const RankedPostSlider = ({ posts, title, sliderId }: RankedPostSliderProps) => 
             flex items-center justify-center ${isEnd ? 'hidden' : ''}`}
         >
           <ChevronRight className="w-8 h-8 text-white" />
-        </button>
+        </button> */}
       </div>
       {selectedPost && (
         <PostModal

@@ -249,18 +249,20 @@ export function VideoViewClient({ post, initialSequence, initialTime }: VideoVie
             return (
               <SwiperSlide key={video.id} virtualIndex={index}>
                 <div className="w-full h-full flex items-center justify-center bg-black">
-                  <div className="relative aspect-[8/16] max-w-[640px] h-full md:pt-24 md:mb-8 pb-8 mb-8 pt-8">
+                  <div className="relative aspect-[9/16] h-full md:pt-24 md:mb-8 pt-4">
                     
                     <div 
                       className={cn(
-                        "absolute inset-x-0 top-0 pt-20 md:pt-24 md:mb-8 pb-8 mb-8 z-10 bg-gradient-to-b from-black/70 to-transparent h-24 transition-opacity duration-300",
+                        "absolute inset-x-0 top-28 md:mb-8 z-10 transition-opacity duration-300",
                         showButtons ? "opacity-100" : "opacity-0"
                       )}
                     >
-                      <div className="pl-16 md:pl-10 pt-3 text-white flex items-center">
-                        <h1 className="text-sm md:text-lg text-slate-100">{post.title}</h1>
-                        <h1 className="text-sm md:text-lg text-white pl-2">EP.{activeIndex + 1}</h1>
-                        <p className="text-xl font-semibold relative top-[3px] pl-2">👀</p>
+                      <div className="pl-8 md:pl-12 pt-4 text-white flex items-center relative">
+                        <div className="bg-gradient-to-r from-black/70 to-transparent px-4 py-2 rounded-lg">
+                          <h1 className="text-sm md:text-lg text-slate-100 inline">{post.title}</h1>
+                          <h1 className="text-sm md:text-lg text-white pl-2 inline-block">EP.{activeIndex + 1}</h1>
+                          <p className="text-xl font-semibold pl-2 inline-block relative top-[4px]">👀</p>
+                        </div>
                       </div>
                     </div>
                     

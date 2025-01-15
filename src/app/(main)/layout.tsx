@@ -31,11 +31,11 @@ export default function Layout({
     <SessionProvider value={sessionData}>
       <div className="relative">
         <Navbar />
-        <div className="absolute inset-0 pt-[55px] md:pt-[64px]">
+        <div className="absolute inset-0 pt-[45px] md:pt-[64px]">
           <main className="w-full max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div className="flex min-h-screen flex-col">
             <MainPopupModal />
-              <div className="mx-auto flex w-full max-w-7xl grow gap-1 sm:pt-3 md:gap-2">
+              <div className="mx-auto flex w-full max-w-7xl grow gap-1 sm:pt-2 md:gap-2">
                 <MenuBar className="relative h-fit flex-none space-y-1 rounded-2xl bg-card px-2 py-3 shadow-sm lg:px-3 xl:w-56" />
                 {children}
               </div>

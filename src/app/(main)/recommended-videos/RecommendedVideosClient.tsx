@@ -106,22 +106,24 @@ export function RecommendedVideosClient({ posts }: RecommendedVideosClientProps)
           return (
             <SwiperSlide key={post.id} virtualIndex={index}>
               <div className="w-full h-full flex items-center justify-center bg-black">
-                <div className="relative aspect-[8/16] h-full md:pt-24 md:mb-8 pb-8 mb-8 pt-8">
+                <div className="relative aspect-[9/16] h-full md:pt-24 md:mb-8 pt-4">
                   <div 
                     className={cn(
-                      "absolute inset-x-0 top-0 pt-20 md:pt-24 md:mb-8 pb-8 mb-8 z-10 bg-gradient-to-b from-black/70 to-transparent h-24 transition-opacity duration-300",
+                      "absolute inset-x-0 top-28 md:mb-8 z-10 transition-opacity duration-300",
                       showButtons ? "opacity-100" : "opacity-0"
                     )}
                   >
-                    <div className="pl-16 md:pl-10 pt-4 text-white flex items-center">
-                      <Link 
-                        // href={`/video-view/${post.id}`}
-                        href={`/video-view/${post.id}?t=${currentTime}`}
-                        className="hover:text-primary transition-colors"
-                      >
-                        <h1 className="text-sm md:text-lg text-slate-100">{post.title} 보러가기</h1>
-                      </Link>
-                      <p className="text-xl font-semibold relative top-[3px] pl-2">👀</p>
+                    <div className="pl-8 md:pl-12 pt-4 text-white flex items-center relative">
+                      <div className="bg-gradient-to-r from-black/70 to-transparent px-4 py-2 rounded-lg">
+                        <Link 
+                          // href={`/video-view/${post.id}`}
+                          href={`/video-view/${post.id}?t=${currentTime}`}
+                          className="hover:text-primary transition-colors"
+                        >
+                          <h1 className="text-base md:text-lg text-slate-100 inline">{post.title} 보러가기</h1>
+                        </Link>
+                        <p className="text-xl font-semibold inline-block pl-2 relative top-[3px]">👀</p>
+                      </div>
                     </div>
                   </div>
                   
@@ -132,13 +134,13 @@ export function RecommendedVideosClient({ posts }: RecommendedVideosClientProps)
                     isActive={index === activeIndex}
                     onEnded={handleVideoEnd}
                     onTimeUpdate={setCurrentTime}
-                    className="w-full h-full"
+                    className="w-full h-full aspect-[9/16]"
                     userLanguage="KOREAN"
                   />
 
                   <div 
                     className={cn(
-                      "absolute right-4 bottom-32 md:right-[-5.5rem] md:bottom-30 z-10 transition-opacity duration-300",
+                      "relative right-4 bottom-32 md:right-[-5.5rem] md:bottom-30 z-10 transition-opacity duration-300",
                       showButtons ? "opacity-100" : "opacity-0"
                     )}
                     onClick={(e) => e.stopPropagation()}
