@@ -21,6 +21,32 @@ export default function Layout({
     session: null
   });
 
+  // 모바일에서 불필요한 포커스 방지
+  useEffect(() => {
+    // input, textarea, [contenteditable="true"] 제외한 모든 요소에 적용
+    const preventFocus = (e: Event) => {
+      const target = e.target as HTMLElement;
+      if (
+        target.tagName !== 'INPUT' && 
+        target.tagName !== 'TEXTAREA' && 
+        target.getAttribute('contenteditable') !== 'true' &&
+        !target.closest('[role="searchbox"]') // 검색 관련 요소 제외
+      ) {
+        e.preventDefault();
+        if (document.activeElement instanceof HTMLElement) {
+          document.activeElement.blur();
+        }
+      }
+    };
+
+    // touchstart 이벤트에 캡처 단계에서 적용
+    document.addEventListener('touchstart', preventFocus, { capture: true });
+    
+    return () => {
+      document.removeEventListener('touchstart', preventFocus, { capture: true });
+    };
+  }, []);
+
   useEffect(() => {
     fetch('/api/auth/session')
       .then(res => res.json())

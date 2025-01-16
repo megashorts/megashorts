@@ -131,6 +131,14 @@ export function VideoViewClient({ post, initialSequence, initialTime }: VideoVie
     }
   }, [activeIndex, post.videos.length]);
 
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
   return (
     <>
       <ResumeModal
@@ -229,13 +237,17 @@ export function VideoViewClient({ post, initialSequence, initialTime }: VideoVie
 
             if (swiper.isBeginning && !swiper.allowSlidePrev) {
               toast({
-                description: '처음 동영상입니다.'
+                variant: "default",
+                description: '처음 동영상입니다.',
+                duration: 1000,
               });
             }
 
             if (swiper.isEnd && !swiper.allowSlideNext) {
               toast({
-                description: '마지막 동영상입니다.'
+                variant: "default",
+                description: '마지막 동영상입니다.',
+                duration: 1000,
               });
             }
           }}

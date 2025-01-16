@@ -39,14 +39,14 @@ export default function NavLinks() {
       return (
         <Button
           variant="ghost"
-          className={`flex items-center md:gap-4 hover:bg-transparent group relative ${
+          className={`flex items-center md:gap-2 hover:bg-transparent group relative ${
             isActive("usermenu/bookmarks") ? "text-primary" : ""
           }`}
           title="Bookmarks"
           asChild
         >
           <Link href="/usermenu/bookmarks" className="relative">
-            <Bookmark className="size-5" />
+            <Bookmark className="size-6" />
             <span className={`${isActive("/bookmarks") ? "text-primary" : "group-hover:text-primary"} hidden md:block`}>나의 리스트</span>
             <span className="absolute left-0 bottom-[0px] w-full h-1 bg-primary scale-x-0 transition-transform duration-200 group-hover:scale-x-100 hidden md:block" />
           </Link>
@@ -204,7 +204,7 @@ export default function NavLinks() {
             asChild
           >
             <Link href="/" className="relative">
-              <Home className="size-5 hidden md:block" />
+              <Home className="size-6 hidden md:block" />
               <span className={`${isActive("/") ? "text-primary" : "group-hover:text-primary"} hidden md:block`}>홈</span>
               <span className="absolute left-0 bottom-[0px] w-full h-1 bg-primary scale-x-0 transition-transform duration-200 group-hover:scale-x-100 hidden md:block" />
             </Link>
@@ -218,7 +218,7 @@ export default function NavLinks() {
             asChild
           >
             <Link href="/recommended-videos" className="relative">
-              <Compass className="size-5" />
+              <Compass className="size-6" />
               <span className={`${isActive("/recommended-videos") ? "text-primary" : "group-hover:text-primary"} hidden md:block`}>포유</span>
               {/* <span className={`${isActive("/") ? "text-primary" : "group-hover:text-primary"}`}>포유</span> */}
               <span className="absolute left-0 bottom-[0px] w-full h-1 bg-primary scale-x-0 transition-transform duration-200 group-hover:scale-x-100 hidden md:block" />

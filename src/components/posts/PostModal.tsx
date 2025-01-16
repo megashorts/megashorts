@@ -40,6 +40,84 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
 
   const firstVideoId = getVideoId(post.videos?.[0]?.url);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const hlsRef = useRef<any>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !firstVideoId || !showPreview) return;
+
+    let isMounted = true;
+
+    const initHls = async () => {
+      try {
+        const { default: Hls } = await import('hls.js');
+        
+        if (Hls.isSupported()) {
+          const hls = new Hls({
+            enableWorker: true,
+            lowLatencyMode: true,
+            backBufferLength: 90
+          });
+          hlsRef.current = hls;
+
+          const videoUrl = `https://customer-2cdfxbmja64x0pqo.cloudflarestream.com/${firstVideoId}/manifest/video.m3u8`;
+          hls.loadSource(videoUrl);
+          hls.attachMedia(video);
+
+          hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            if (isMounted) {
+              // video.muted = true;
+              video.play().then(() => {
+                setIsVideoReady(true);
+              }).catch(error => {
+                console.error('Error playing video:', error);
+              });
+            }
+          });
+
+          hls.on(Hls.Events.ERROR, (_event: any, data: any) => {
+            if (data.fatal) {
+              switch (data.type) {
+                case Hls.ErrorTypes.NETWORK_ERROR:
+                  hls.startLoad();
+                  break;
+                case Hls.ErrorTypes.MEDIA_ERROR:
+                  hls.recoverMediaError();
+                  break;
+                default:
+                  hls.destroy();
+                  initHls();
+                  break;
+              }
+            }
+          });
+        }
+        else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+          video.src = `https://customer-2cdfxbmja64x0pqo.cloudflarestream.com/${firstVideoId}/manifest/video.m3u8`;
+          video.addEventListener('loadedmetadata', () => {
+            if (isMounted) {
+              video.muted = true;
+              video.play().then(() => {
+                setIsVideoReady(true);
+              }).catch(console.error);
+            }
+          });
+        }
+      } catch (error) {
+        console.error('Error initializing HLS:', error);
+      }
+    };
+
+    initHls();
+
+    return () => {
+      isMounted = false;
+      if (hlsRef.current) {
+        hlsRef.current.destroy();
+        hlsRef.current = null;
+      }
+    };
+  }, [firstVideoId, showPreview]);
 
   if (typeof window !== 'undefined' && (window.innerWidth < 1024 || window.innerHeight < 800)) {
     return (
@@ -92,14 +170,26 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
             </div> */}
 
               {(showPreview && firstVideoId) && (
-                <div className="absolute inset-0 bg-black">
-                  <VideoPlayer
+                <div 
+                  className={`absolute inset-0 transition-opacity duration-500 ${
+                    isVideoReady ? 'opacity-100' : 'opacity-0'
+                  }`}
+                >
+                  {/* <VideoPlayer
                     videoId={firstVideoId}
                     postId={post.id}
                     sequence={1}
                     isActive={true}
                     className="w-full h-full"
                     controls={false}
+                  /> */}
+                  <video
+                    ref={videoRef}
+                    playsInline
+                    preload="auto"
+                    className="w-full h-full translate-x-2"
+                    autoPlay
+                    onLoad={() => setIsVideoReady(true)}
                   />
                 </div>
               )}
@@ -247,15 +337,12 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
                 isVideoReady ? 'opacity-100' : 'opacity-0'
               }`}
             >
-              <iframe
-                src={`https://iframe.videodelivery.net/${firstVideoId}/watch?autoplay=1&controls=0&fit=cover&preload=auto&startTime=0&monitoring=false&customerMonitoring=false`}
-                className="w-full h-full"
-                style={{
-                  width: '100%',
-                  height: '100%',
-                }}
-                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
+              <video
+                ref={videoRef}
+                playsInline
+                preload="auto"
+                className="w-full h-full translate-x-2"
+                autoPlay
                 onLoad={() => setIsVideoReady(true)}
               />
             </div>

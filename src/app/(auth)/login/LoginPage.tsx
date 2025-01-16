@@ -14,7 +14,7 @@ export default function LoginPage() {
     e.preventDefault();
     toast({
       description: "사업자 인증계정 등록시 연결됩니다.",
-      duration: 3000,
+      duration: 1000,
     });
   };
 

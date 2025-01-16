@@ -328,6 +328,7 @@ useEffect(() => {
         preload="auto"
         poster={thumbnailUrl}
         controls={controls}
+        autoPlay
       />
     </div>
   );
