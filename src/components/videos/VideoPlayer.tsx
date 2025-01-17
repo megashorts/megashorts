@@ -37,6 +37,8 @@ const VideoPlayer = dynamic(() => Promise.resolve(({
   
   const thumbnailUrl = `https://customer-2cdfxbmja64x0pqo.cloudflarestream.com/${videoId}/thumbnails/thumbnail.jpg?time=&height=600`;
   const videoUrl = `https://customer-2cdfxbmja64x0pqo.cloudflarestream.com/${videoId}/manifest/video.m3u8`;
+  // const videoUrl = `https://customer-2cdfxbmja64x0pqo.cloudflarestream.com/${videoId}/manifest/video.m3u8?subtitleSize=200`;  // subtitleSize 파라미터 추가
+
 
   // 시청 시간 추적
   const handleTimeUpdate = () => {
@@ -281,30 +283,25 @@ useEffect(() => {
     //   onEnded?.();
     // };
 
-    const handleEnded = async () => {
-      // 전체화면 상태 체크
-      const isFullscreen = !!(
-        document.fullscreenElement ||
-        (document as any).webkitFullscreenElement ||
-        (document as any).mozFullScreenElement ||
-        (document as any).msFullscreenElement
-      );
-  
-      // 전체화면이면 해제
-      if (isFullscreen) {
-        try {
-          if (document.exitFullscreen) {
-            await document.exitFullscreen();
-          } else if ((document as any).webkitExitFullscreen) {
-            await (document as any).webkitExitFullscreen();
-          } else if ((document as any).mozCancelFullScreen) {
-            await (document as any).mozCancelFullScreen();
-          } else if ((document as any).msExitFullscreen) {
-            await (document as any).msExitFullscreen();
-          }
-        } catch (error) {
-          console.error('Error exiting fullscreen:', error);
+    const handleEnded = () => {
+      try {
+        // 모든 가능한 전체화면 체크 및 해제 시도
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        } else if ((document as any).webkitFullscreenElement) {
+          (document as any).webkitExitFullscreen();
+        } else if ((document as any).mozFullScreenElement) {
+          (document as any).mozCancelFullScreen();
+        } else if ((document as any).msFullscreenElement) {
+          (document as any).msExitFullscreen();
         }
+  
+        // video 요소에서도 시도
+        if ((video as any).webkitEnterFullscreen) {
+          (video as any).webkitExitFullscreen();
+        }
+      } catch (error) {
+        // 에러 무시 (이미 전체화면이 아닌 경우 등)
       }
   
       // 기존 onEnded 콜백 실행
@@ -337,6 +334,23 @@ useEffect(() => {
             transform: translateY(-300px);
             line-height: 1.5;
             padding: 4px 8px;
+          }
+
+          /* 전체화면 상태일 때의 자막 스타일 */
+          :fullscreen video::cue,
+          :-webkit-full-screen video::cue,
+          :-moz-full-screen video::cue,
+          :-ms-fullscreen video::cue {
+            font-size: 36px;          /* 더 큰 폰트 크기 */
+            transform: translateY(-400px); /* 위치 조정 */
+            padding: 8px 16px;        /* 여백 증가 */
+            line-height: 1.8;         /* 줄 간격 증가 */
+            background-color: rgba(0, 0, 0, 0.8); /* 더 진한 배경 */
+          }
+            
+          /* iOS Safari 전체화면 자막 스타일 */
+          video::-webkit-media-text-track-display {
+            font-size: 40px !important;
           }
         }
       `}</style>
