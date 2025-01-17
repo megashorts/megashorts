@@ -277,7 +277,37 @@ useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    const handleEnded = () => {
+    // const handleEnded = () => {
+    //   onEnded?.();
+    // };
+
+    const handleEnded = async () => {
+      // 전체화면 상태 체크
+      const isFullscreen = !!(
+        document.fullscreenElement ||
+        (document as any).webkitFullscreenElement ||
+        (document as any).mozFullScreenElement ||
+        (document as any).msFullscreenElement
+      );
+  
+      // 전체화면이면 해제
+      if (isFullscreen) {
+        try {
+          if (document.exitFullscreen) {
+            await document.exitFullscreen();
+          } else if ((document as any).webkitExitFullscreen) {
+            await (document as any).webkitExitFullscreen();
+          } else if ((document as any).mozCancelFullScreen) {
+            await (document as any).mozCancelFullScreen();
+          } else if ((document as any).msExitFullscreen) {
+            await (document as any).msExitFullscreen();
+          }
+        } catch (error) {
+          console.error('Error exiting fullscreen:', error);
+        }
+      }
+  
+      // 기존 onEnded 콜백 실행
       onEnded?.();
     };
 

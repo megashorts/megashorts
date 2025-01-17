@@ -227,33 +227,33 @@ export default async function PostPage({ params }: Props) {
                     <span className="text-white/70">원작 타이틀 </span>
                     <span>{post.titleOriginal}</span>
                   </div>
-                )} */}
+                )} */}  
 
-              <div>
-                <p className="text-white/70">
-                  @{post.user.displayName}
-                </p>
-              </div>
-
-              {/* 영상 언어 */}
-              {post.videos?.[0] && (
-                <div className="flex items-center gap-2">
-                  <span className="text-white/70">영상 언어 </span>
-                  <LanguageFlag language={post.postLanguage} />
+                <div>
+                  <p className="text-white/70">
+                    No.{post.postNum} - @{post.user.displayName}
+                  </p>
                 </div>
-              )}
 
-              {/* 자막 지원 */}
-              {post.videos?.[0]?.subtitle?.length > 0 && (
-                <div className="flex items-center gap-2">
-                  <span className="text-white/70">자막 지원 </span>
-                  <div className="flex gap-1">
-                    {post.videos[0].subtitle.map((lang: Language) => (
-                      <LanguageFlag key={lang} language={lang} />
-                    ))}
+                {/* 영상 언어 */}
+                {post.videos?.[0] && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-white/70">영상 언어 </span>
+                    <LanguageFlag language={post.postLanguage} />
                   </div>
-                </div>
-              )}
+                )}
+
+                {/* 자막 지원 */}
+                {post.videos?.[0]?.subtitle?.length > 0 && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-white/70">자막 지원 </span>
+                    <div className="flex gap-1">
+                      {post.videos[0].subtitle.map((lang: Language) => (
+                        <LanguageFlag key={lang} language={lang} />
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* 연령 제한 */}
                 <div className="flex items-center gap-4">
@@ -331,12 +331,19 @@ export default async function PostPage({ params }: Props) {
             </div>
 
             {/* 정보 영역 50% */}
-            <div className="w-1/2 p-4 rounded-lg flex flex-col">
-              <div className="space-y-3 text-sm text-white/90 flex-grow">
+            <div className="w-1/2 pl-4 pr-4 rounded-lg flex flex-col">
+              <div className="space-y-2 text-sm text-white/90 flex-grow">
+
+                <div className="flex items-center gap-2">
+                  <span className="text-white/70">
+                    @{post.user.displayName}
+                  </span>
+                </div>
+
                 {/* 원작 타이틀 */}
                 {post.titleOriginal && post.titleOriginal !== post.title && (
                   <div className="flex items-center gap-2">
-                    <span className="text-white/70">원작 타이틀:</span>
+                    <span className="text-white/70">원작</span>
                     <span>{post.titleOriginal}</span>
                   </div>
                 )}
@@ -344,7 +351,7 @@ export default async function PostPage({ params }: Props) {
                 {/* 영상 언어 */}
                 {post.videos?.[0] && (
                   <div className="flex items-center gap-2">
-                    <span className="text-white/70">영상 언어:</span>
+                    <span className="text-white/70">언어 </span>
                     <LanguageFlag language={post.postLanguage} />
                   </div>
                 )}
@@ -352,7 +359,7 @@ export default async function PostPage({ params }: Props) {
                 {/* 자막 지원 */}
                 {post.videos?.[0]?.subtitle?.length > 0 && (
                   <div className="flex items-center gap-2">
-                    <span className="text-white/70">자막 지원 </span>
+                    <span className="text-white/70">자막 </span>
                     <div className="flex gap-1">
                       {post.videos[0].subtitle.map((lang: Language) => (
                         <LanguageFlag key={lang} language={lang} />
@@ -363,7 +370,7 @@ export default async function PostPage({ params }: Props) {
 
                 {/* 연령 제한 */}
                 <div className="flex items-center gap-2">
-                  <div className={`flex items-center justify-center w-14 h-9 rounded-md border border-white font-bold text-sm text-white ${
+                  <div className={`flex items-center justify-center w-12 h-7 rounded-sm border border-white font-bold text-sm text-white ${
                       post.ageLimit === 18 ? "bg-red-700" : "bg-blue-700"
                     }`}>
                     {post.ageLimit === 0 ? "전체" : `${post.ageLimit} +`}
@@ -391,16 +398,21 @@ export default async function PostPage({ params }: Props) {
                 <ReportButton />
               </div> */}
 
-              <ReportDialog 
-                type={InquiryType.REPORT}
-                postId={post.id}
-                postTitle={post.title || undefined}  // null을 undefined로 변환
-                title="신고하기"
-              />
+              <div className="flex items-center gap-2">
+                <span className="text-white/70 text-sm">
+                  No.{post.postNum} 
+                </span>
+                <ReportDialog 
+                  type={InquiryType.REPORT}
+                  postId={post.id}
+                  postTitle={post.title || undefined}  // null을 undefined로 변환
+                  title="신고하기"
+                />
+              </div>
 
             </div>
           </div>
-          <p className="text-gray-300 text-mase font-sans text-muted-foreground whitespace-pre-wrap mt-2 mb-4">{post.content}</p>
+          <p className="text-gray-300 text-mase font-sans text-muted-foreground whitespace-pre-wrap mt-4 mb-4">{post.content}</p>
         </div>
 
         

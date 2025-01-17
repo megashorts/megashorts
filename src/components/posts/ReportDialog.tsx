@@ -83,7 +83,7 @@ export default function ReportDialog({ type, postId, postTitle, title }: ReportD
     <div className="text-left md:text-right ">
       <button
         onClick={handleOpen}
-        className="inline-flex mt-3 items-center justify-center gap-2 py-3 text-xs md:text-sm rounded-md hover:text-red-500 bg-slate-950 w-[100px]"
+        className="inline-flex items-center justify-center gap-2 py-3 text-xs md:text-sm rounded-md hover:text-red-500 bg-slate-950 w-[100px]"
       >
         <Flag className="w-4 h-4" />
         {title}

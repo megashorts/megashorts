@@ -182,9 +182,9 @@ export default async function NoticePage() {
 
               <BlogCard post={post} />
 
-              {post.featured && (
+              {/* {post.featured && (
                 <Pin className="absolute left-[1.0rem] top-4 w-4 h-4 text-red-500" />
-              )}
+              )} */}
             </div>
           ))}
         </div>

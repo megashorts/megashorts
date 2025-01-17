@@ -189,16 +189,22 @@ export default async function NoticePostPage({ params }: Props) {
                 <Image
                   src={post.thumbnailUrl}
                   alt={post.title || ''}
-                  fill
                   className="object-cover rounded-lg"
                   priority
+                  width={1200}         // 2배 증가
+                  height={900}         // 2배 증가
+                  quality={100}         // 최적의 품질
+                  sizes="(max-width: 640px) 100vw, 
+                        (max-width: 1024px) 100vw, 
+                        1200px"       // 반응형 크기
+                  loading="eager"      // 즉시 로딩
                 />
               </div>
             )}
 
             {/* 포스트 내용 */}
             <div className="prose prose-invert max-w-none">
-              <p className="whitespace-pre-wrap text-base text-gray-400">{post.content}</p>
+              <p className="whitespace-pre-wrap font-sans text-base text-white">{post.content}</p>
             </div>
           </div>
 

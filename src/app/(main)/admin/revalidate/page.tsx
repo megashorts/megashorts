@@ -20,7 +20,8 @@ export default function RevalidatePage() {
         '/categories/period',
         '/categories/fantasy',
         '/categories/highteen',
-        '/categories/adult'
+        '/categories/adult',
+        '/recommended-videos'
       ];
 
       await Promise.all(

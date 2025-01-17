@@ -35,16 +35,18 @@ export function MainPopupModal() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70" onClick={handleClose} >
-      <div className="relative w-[75%] md:w-[35%] md:max-w-[450px] bg-red-500 rounded-lg">
+      <div className="relative w-[70%] md:w-[30%] md:max-w-[450px] bg-red-500 rounded-lg">
         <div className="relative">
           <Link href="/notice/f9c6e2ee-dd89-4387-9c5b-4dcf99537d1b" onClick={handleClose} >
             <Image
-              src="/MG_AdImageOri.webp"
+              src="/MS Poster5.webp"
               alt="Main Popup"
-              width={2000}
-              height={1500}
+              width={900}
+              height={1200}
+              quality={100}         // 최적의 품질
+              loading="eager"      // 즉시 로딩
               priority
-              className="w-full h-auto rounded-lg cursor-pointer shadow-md shadow-slate-500"
+              className="w-full h-auto rounded-lg cursor-pointer"
             />
           </Link>
           
@@ -69,7 +71,7 @@ export function MainPopupModal() {
             />
             <label
               htmlFor="hideToday"
-              className="text-lg font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+              className="text-base text-muted-foreground translate-y-0.5 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
             >
               오늘은 그만보기
             </label>

@@ -56,12 +56,20 @@ model User {
   @@map("users")
 }
 
-model Session {
-  id        String   @id
-  userId    String
-  expiresAt DateTime
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+enum SessionStatus {
+  ACTIVE
+  INVALIDATED
+}
 
+model Session {
+  id            String        @id
+  userId        String
+  expiresAt     DateTime
+  invalidatedAt DateTime?     // 세션 무효화 시점
+  status        SessionStatus @default(ACTIVE)
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status, invalidatedAt]) // 무효화된 세션 조회 성능 향상
   @@map("sessions")
 }
 

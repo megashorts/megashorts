@@ -15,8 +15,24 @@ const BMDOHYEON = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "MS",
-  description: "Short form contents",
+  title: "메가쇼츠 MEGASHORTS",
+  description: "글로벌 No.1 숏폼컨텐츠 오픈형 플랫폼",
+  openGraph: {
+    type: "website",
+    locale: "ko_KR", // 언어 설정
+    url: "https://megashorts.vercel.app/", // 웹사이트 URL
+    title: "메가쇼츠 MEGASHORTS",
+    description: "글로벌 No.1 숏폼컨텐츠 오픈형 플랫폼",
+    siteName: "MEGASHORTS", // 사이트 이름
+    images: [
+      {
+        url: "https://megashorts.vercel.app/public/MSWebLogo.png", // OG 이미지 URL
+        width: 1200, // 이미지 너비
+        height: 630, // 이미지 높이
+        alt: "MEGASHORTS 로고", // 대체 텍스트
+      },
+    ],
+  },
   icons: {
     icon: '/favicon.ico',
   },

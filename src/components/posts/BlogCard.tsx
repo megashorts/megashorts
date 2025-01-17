@@ -4,6 +4,7 @@ import { Post, User, Prisma } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
 import { format } from "date-fns";
+import { Pin } from "lucide-react";
 
 type BlogPost = Prisma.PostGetPayload<{
   include: {
@@ -44,6 +45,9 @@ export default function BlogCard({ post }: BlogCardProps) {
           {/* 하단 정보 */}
           {/* <div className="flex justify-between items-center text-sm text-muted-foreground mt-2"> */}
           <div className="items-end text-start sm:text-end text-[10px] sm:text-xs text-muted-foreground mt-2">
+            {post.featured && (
+              <Pin className="inline-block w-4 h-4 mr-1 text-red-500" />
+            )}
             <span>{format(post.createdAt, 'yyyy.MM.dd')}{"  "}</span>
             <span>{post.user.displayName}</span>
           </div>
