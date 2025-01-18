@@ -9,6 +9,11 @@ const corsHeaders = {
 };
 
 export function middleware(request: NextRequest) {
+  // 구글 인증 콜백 경로는 제외
+  if (request.nextUrl.pathname.startsWith('/api/auth/callback')) {
+    return NextResponse.next();
+  }
+
   // Handle preflight requests
   if (request.method === 'OPTIONS') {
     return new NextResponse(null, {
@@ -30,5 +35,8 @@ export function middleware(request: NextRequest) {
 
 // Only run middleware on API routes
 export const config = {
-  matcher: '/api/:path*'
+  matcher: [
+  '/api/:path*',
+  '/((?!api/auth/callback).*)'  // auth 콜백 경로를 제외한 모든 경로
+  ]
 };
