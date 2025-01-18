@@ -31,10 +31,20 @@ export async function GET(req: NextRequest) {
   const state = req.nextUrl.searchParams.get("state");
   // 사용자가 구글 로그인 후 리다이렉트될 때 URL에 포함된 'code'(인증 코드)와 'state'(요청 무결성을 보장하는 값)를 가져옴.
 
+  // 디버깅을 위한 로그 추가
+  console.log('Auth callback params:', { code: !!code, state: !!state });
+
   const storedState = (await cookies()).get("state")?.value;
   const storedCodeVerifier = (await cookies()).get("code_verifier")?.value;
   // 이전에 클라이언트에 저장한 'state'와 'code_verifier'를 쿠키에서 가져옴.
   // 이 값들은 OAuth 보안 절차의 일부로, 요청의 신뢰성을 보장하는 데 필요.
+
+    // 쿠키 상태 로깅
+    console.log('Stored values:', { 
+      hasStoredState: !!storedState, 
+      hasCodeVerifier: !!storedCodeVerifier,
+      stateMatch: state === storedState 
+    });
 
   if (!code || !state || !storedState || !storedCodeVerifier || state !== storedState) {
     return new Response(null, { status: 400 });
@@ -44,6 +54,8 @@ export async function GET(req: NextRequest) {
   try {
     const tokens = await google.validateAuthorizationCode(code, storedCodeVerifier);
     // 구글로부터 받은 인증 코드와 검증자를 사용해 액세스 토큰을 요청하고 검증. 이 토큰은 구글 사용자 정보에 접근하는 데 사용됨.
+
+    console.log('Tokens received:', !!tokens);
 
     const googleUser = await kyInstance
       .get("https://www.googleapis.com/oauth2/v1/userinfo", {
@@ -130,12 +142,33 @@ export async function GET(req: NextRequest) {
     });
     // 성공적으로 로그인하면 메인 페이지로 리다이렉트.
   } catch (error) {
-    console.error(error);
+    // console.error(error);
+
+    // 자세한 에러 로깅
+    console.error('Google callback error:', {
+      name: error instanceof Error ? error.name : 'Unknown',
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined
+    });
+    
     if (error instanceof OAuth2RequestError) {
       return new Response(null, { status: 400 });
       // OAuth 인증 과정에서 발생한 오류를 처리. 잘못된 요청이면 400 상태 반환.
     }
-    return new Response(null, { status: 500 });
+    // return new Response(null, { status: 500 });
     // 그 외의 오류는 서버 오류로 처리하고 500 상태 반환.
+
+    return new Response(
+      JSON.stringify({ 
+        error: error instanceof Error ? error.message : 'Internal Server Error'
+      }), 
+      { 
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
   }
 }
