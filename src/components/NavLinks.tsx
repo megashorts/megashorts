@@ -78,7 +78,7 @@ export default function NavLinks() {
               className="flex items-center md:gap-2 hover:bg-transparent group relative"
               title="Bookmarks"
             >
-              <Bookmark className="size-5" />
+              <Bookmark className="size-6" />
               <span className="group-hover:text-primary hidden md:block">나의 리스트</span>
               <span className="absolute left-0 bottom-[0px] w-full h-1 bg-primary scale-x-0 transition-transform duration-200 group-hover:scale-x-100 hidden md:block" />
             </Button>

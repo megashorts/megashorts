@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     siteName: "MEGASHORTS", // 사이트 이름
     images: [
       {
-        url: "https://megashorts.vercel.app/public/MSWebLogo.png", // OG 이미지 URL
+        url: "/MS_OCimage.webp", // OG 이미지 URL
         width: 1200, // 이미지 너비
         height: 630, // 이미지 높이
         alt: "MEGASHORTS 로고", // 대체 텍스트

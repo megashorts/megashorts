@@ -10,6 +10,7 @@ import { useToast } from "@/components/ui/use-toast";
 import PaymentModal from "@/app/(main)/usermenu/payments/PaymentModal";
 import BillingModal from "../../usermenu/payments/BillingModal";
 import { SubscriptionButton } from "./SubscriptionButton";
+import { CoinPurchaseButton } from "./CoinPurchaseButton";
 
 // 구독 정보 타입
 type SubscriptionPlanType = 'weekly' | 'yearly';
@@ -272,13 +273,19 @@ const SubscriptionPage = () => {
               {selectedCoin ? `${selectedCoin}코인 구매` : '수량을 선택해주세요'}
             </Button> */}
 
-            <Button 
+            {/* <Button 
               onClick={() => setShowModal(true)}
               disabled={!selectedCoin}
               className="mt-4 w-full"
             >
               {selectedCoin ? `${selectedCoin}코인 구매` : '수량을 선택해주세요'}
-            </Button>
+            </Button> */}
+
+            <CoinPurchaseButton
+              selectedCoin={selectedCoin}
+              onPurchase={() => setShowModal(true)}
+            />
+
             <p className="mt-3 text-xs dark:text-neutral-400 text-center">
               한시적 이벤트 가격은 사전 예고없이 종료됨.
             </p>

@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { useSession } from "@/components/SessionProvider";
 import { useSubscription } from "@/hooks/useSubscription";
+import Link from "next/link";
 
 type SubscriptionType = 'weekly' | 'yearly' | 'upgrade';
 
@@ -18,14 +19,24 @@ export function SubscriptionButton({ type, title, onSubscribe }: SubscriptionBut
   const { data: status, isLoading } = useSubscription();
 
   // 로그인하지 않은 경우 기본 버튼 표시
+  // if (!user?.id) {
+  //   return (
+  //     <Button
+  //       onClick={() => onSubscribe(type)}
+  //       className="mt-4 w-full"
+  //     >
+  //       {title} 시작하기
+  //     </Button>
+  //   );
+  // }
+
   if (!user?.id) {
     return (
-      <Button
-        onClick={() => onSubscribe(type)}
-        className="mt-4 w-full"
-      >
-        {title} 시작하기
-      </Button>
+      <Link href="/login" className="w-full">
+        <Button className="mt-4 w-full">
+          {title} 시작하기
+        </Button>
+      </Link>
     );
   }
 
