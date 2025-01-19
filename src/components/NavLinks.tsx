@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Bookmark, Home, Compass } from "lucide-react";
+import { Bookmark, Home, Compass, Clapperboard } from "lucide-react";
 import { Building, ChevronDown, ChevronRight, FolderOpen, LogOutIcon, Megaphone, NotebookPen, TvMinimalPlay, UserCircle, UserIcon, Users, WalletCards } from "lucide-react";
 
 import Link from "next/link";
@@ -78,8 +78,8 @@ export default function NavLinks() {
               className="flex items-center md:gap-2 hover:bg-transparent group relative"
               title="Bookmarks"
             >
-              <Bookmark className="size-6" />
-              <span className="group-hover:text-primary hidden md:block">나의 리스트</span>
+              <Clapperboard className="size-6" />
+              <span className="group-hover:text-primary hidden md:block">메가쇼츠</span>
               <span className="absolute left-0 bottom-[0px] w-full h-1 bg-primary scale-x-0 transition-transform duration-200 group-hover:scale-x-100 hidden md:block" />
             </Button>
           </DropdownMenuTrigger>
@@ -219,7 +219,7 @@ export default function NavLinks() {
           >
             <Link href="/recommended-videos" className="relative">
               <Compass className="size-6" />
-              <span className={`${isActive("/recommended-videos") ? "text-primary" : "group-hover:text-primary"} hidden md:block`}>포유</span>
+              <span className={`${isActive("/recommended-videos") ? "text-primary" : "group-hover:text-primary"} hidden md:block`}>추천</span>
               {/* <span className={`${isActive("/") ? "text-primary" : "group-hover:text-primary"}`}>포유</span> */}
               <span className="absolute left-0 bottom-[0px] w-full h-1 bg-primary scale-x-0 transition-transform duration-200 group-hover:scale-x-100 hidden md:block" />
             </Link>

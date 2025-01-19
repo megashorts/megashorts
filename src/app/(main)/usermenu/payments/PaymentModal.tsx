@@ -119,15 +119,15 @@ export default function PaymentModal({ paymentAmount: paymentAmount, coins, onCl
       />
       
       {/* 모달 컨텐츠 */}
-      <div className="relative z-10 flex min-h-screen items-center justify-center p-4">
-        <div className="w-full max-w-[480px] rounded-lg bg-white dark:bg-white p-5 shadow-xl">
-          <div className="flex justify-between items-center mb-4">
-            <h1 className="text-lg font-bold text-gray-900 dark:text-black">
+      <div className="relative z-10 flex min-h-screen items-center justify-center p-1">
+        <div className="w-full max-w-[450px] rounded-lg bg-white dark:bg-white p-1 shadow-xl">
+          <div className="flex justify-between items-center">
+            <h1 className="text-lg font-bold text-gray-900 dark:text-black pl-6 pt-2">
               💎 {coins ? `${coins}코인 구매` : '구독 결제'}
             </h1>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              className="pl-2 pr-2 hover:bg-gray-100 rounded-full transition-colors"
               aria-label="닫기"
             >
               <svg 
@@ -145,18 +145,18 @@ export default function PaymentModal({ paymentAmount: paymentAmount, coins, onCl
           </div>
           
           {error && (
-            <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 rounded text-sm">
+            <div className="mb-2 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 rounded text-sm">
               {error}
             </div>
           )}
           
-          <div id="payment-method" className="mb-4" />
-          <div id="agreement" className="mb-4" />
+          <div id="payment-method" className="mb-0" />
+          <div id="agreement" className="mb-0" />
           
           <button 
             onClick={handlePayment}
             disabled={!ready}
-            className="w-full bg-red-500 text-white py-2.5 px-4 rounded hover:bg-red-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed text-sm"
+            className="w-full bg-red-500 text-white py-2.5 px-6 mb-2 rounded rounded-2xl hover:bg-red-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed text-sm"
           >
             {!ready ? '로딩중...' : '결제하기'}
           </button>

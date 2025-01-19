@@ -205,34 +205,34 @@ export default async function MainContent() {
         <div className="space-y-6 py-12 md:py-12">
            <PostSlider
             posts={latestPosts}
-            title="⚡️ 최신 업데이트 ⚡️"
+            title="최신 업데이트 ⚡️"
             category={null}
             viewAllHref={"/categories/recent"}
             sliderId="latest-updates"  // 추가
           />
           <RankedPostSlider
             posts={mostLikedPosts}
-            title="🎉 TOP 10 인기작품"
+            title="TOP 10 인기작품 🎉"
             viewAllHref={""}
             sliderId="ranked-posts"  // 추가
           />
           <PostSlider
             posts={romancePosts}
-            title="❤️ 인기 로맨스"
+            title="인기 로맨스 ❤️"
             category={CategoryType.ROMANCE}
             viewAllHref={"/categories/ROMANCE"}
             sliderId="romance-posts"  // 추가
           />
           <PostSlider
             posts={featuredDramaPosts}
-            title="😭 감동적인 드라마"
+            title="감동적인 드라마 😭"
             category={CategoryType.DRAMA}
             viewAllHref={"/categories/DRAMA"}
             sliderId="drama-posts"  // 추가
           />
           <PostSlider
             posts={actionPosts}
-            title="⚔️ 숨막히는 액션"
+            title="숨막히는 액션 ⚔️"
             category={CategoryType.ACTION}
             viewAllHref={"/categories/ACTION"}
             sliderId="action-posts"  // 추가

@@ -78,7 +78,7 @@ export default function EditProfileDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="w-full min-x-[150px] max-w-[80%] md:max-w-[30%] rounded-lg h-auto">
+      <DialogContent className="w-full md:min-w-[450px] max-w-[90%] md:max-w-[30%] rounded-lg h-auto">
         <DialogHeader>
           <DialogTitle>프로필 수정</DialogTitle>
         </DialogHeader>

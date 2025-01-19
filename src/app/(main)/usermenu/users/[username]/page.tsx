@@ -17,6 +17,8 @@ import { WalletCards } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import Notifications from './Notifications';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { AuthButton } from './AuthButton';
 
 
 interface PageProps {
@@ -164,6 +166,7 @@ async function UserProfile({ user, loggedInUserId }: UserProfileProps) {
           <div className="flex items-center">
             <span className={`led-indicator ${user.adultauth ? 'led-blue' : 'led-red'}`}></span>
             {user.adultauth ? '성인인증 완료' : '성인인증 미완료'}
+            <AuthButton isAuthenticated={user.adultauth} />
           </div>
 
           <div className="flex items-center">
@@ -174,6 +177,17 @@ async function UserProfile({ user, loggedInUserId }: UserProfileProps) {
               )}
               {user.subscription && user.subscription.status === 'cancelled' && user.subscriptionEndDate && (
                 <span className="ml-2">/ 구독만료 {formatDate(user.subscriptionEndDate, "yyyy-MM-dd")}</span>
+              )}
+              {!user.subscription && (
+                <Link href="/subscription">
+                  <Button 
+                    variant="outline" 
+                    className='ml-2'
+                    size="sm"
+                  >
+                    구독신청
+                  </Button>
+                </Link>
               )}
             </div>
           </div>
