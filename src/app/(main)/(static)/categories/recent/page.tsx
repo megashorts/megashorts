@@ -1,6 +1,7 @@
 import PostGrid from "@/components/PostGrid";
 import prisma from "@/lib/prisma";
 import { getPostDataInclude } from "@/lib/types";
+import { CategoryType } from "@prisma/client";
 
 // export const dynamic = 'force-static';
 // export const revalidate = false;
@@ -13,6 +14,11 @@ export default async function RecentPage() {
   const posts = await prisma.post.findMany({
     where: {
       status: "PUBLISHED",
+      NOT: {
+        categories: {
+          hasSome: [CategoryType.MSPOST, CategoryType.NOTIFICATION]
+        }
+      }
     },
     include: getPostDataInclude(""),
     orderBy: { 
