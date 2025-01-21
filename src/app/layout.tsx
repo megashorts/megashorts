@@ -23,9 +23,6 @@ export const viewport: Viewport = {
   colorScheme: 'dark',
 }
 
-// width: 600, // 이미지 너비
-// height: 630, // 이미지 높이
-
 export const metadata: Metadata = {
   metadataBase: new URL('https://megashorts.com'),
   title: {
@@ -66,9 +63,9 @@ export const metadata: Metadata = {
     description: "글로벌 No.1 숏폼컨텐츠 오픈형 플랫폼",
     siteName: "MEGASHORTS",
     images: [{
-      url: "/MS_OCimage.webp",
+      url: "/megashortsSNS.jpg",
       width: 800,   
-      height: 149,  
+      height: 420,  
       alt: "MEGASHORTS 로고",
     }],
   },
@@ -76,7 +73,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: "메가쇼츠 MEGASHORTS",
     description: "글로벌 No.1 숏폼컨텐츠 오픈형 플랫폼",
-    images: ["/MS_OCimage.webp"],
+    images: ["/megashortsSNS.jpg"],
   },
   alternates: {
     canonical: "https://megashorts.com",
