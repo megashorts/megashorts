@@ -63,7 +63,7 @@ export const metadata: Metadata = {
     description: "글로벌 No.1 숏폼컨텐츠 오픈형 플랫폼",
     siteName: "MEGASHORTS",
     images: [{
-      url: "/megashortsSNS.jpg",
+      url: "/megashortsSNS2.jpg",
       width: 800,   
       height: 420,  
       alt: "MEGASHORTS 로고",
