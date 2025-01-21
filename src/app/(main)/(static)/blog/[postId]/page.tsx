@@ -28,13 +28,13 @@ type Props = {
       },
     });
   
-    if (!post) return { title: '블로그' };
+    if (!post) return { title: 'MS블로그' };
   
     return {
-      title: post.title || '블로그',
+      title: post.title || 'MS블로그',
       description: post.content || '',
       openGraph: {
-        title: post.title || '블로그',
+        title: post.title || 'MS블로그',
         description: post.content || '',
         images: post.thumbnailUrl ? [post.thumbnailUrl] : [],
       },

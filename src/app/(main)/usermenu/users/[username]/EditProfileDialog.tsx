@@ -2,6 +2,7 @@ import LoadingButton from "@/components/LoadingButton";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -79,8 +80,10 @@ export default function EditProfileDialog({
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="w-full md:min-w-[450px] max-w-[90%] md:max-w-[30%] rounded-lg h-auto">
-        <DialogHeader>
+        <DialogHeader id="dialog-title">
           <DialogTitle>프로필 수정</DialogTitle>
+          <DialogDescription>
+          </DialogDescription>
         </DialogHeader>
         {/* <div className="space-y-1.5">
           <Label>Avatar</Label>

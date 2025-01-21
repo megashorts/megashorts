@@ -182,6 +182,7 @@ export default async function PostPage({ params }: Props) {
                   src={post.thumbnailUrl || '/post-placeholder.jpg'}
                   alt={post.title || '포스트 썸네일'}
                   fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 30vw, 30vw"  // 컨테이너가 30%
                   className="object-cover rounded-lg"
                   priority
                 />
@@ -324,6 +325,7 @@ export default async function PostPage({ params }: Props) {
                   src={post.thumbnailUrl || '/post-placeholder.jpg'}
                   alt={post.title || '포스트 썸네일'}
                   fill
+                  sizes="(max-width: 768px) 50vw, (max-width: 1200px) 50vw, 30vw"  // 모바일에서 50%
                   className="object-cover rounded-lg"
                   priority
                 />
@@ -341,12 +343,12 @@ export default async function PostPage({ params }: Props) {
                 </div>
 
                 {/* 원작 타이틀 */}
-                {post.titleOriginal && post.titleOriginal !== post.title && (
+                {/* {post.titleOriginal && post.titleOriginal !== post.title && (
                   <div className="flex items-center gap-2">
                     <span className="text-white/70">원작</span>
                     <span>{post.titleOriginal}</span>
                   </div>
-                )}
+                )} */}
 
                 {/* 영상 언어 */}
                 {post.videos?.[0] && (

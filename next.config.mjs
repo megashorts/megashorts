@@ -27,6 +27,7 @@ const nextConfig = {
         pathname: "/**",
       }
     ],
+    dangerouslyAllowSVG: true,  // SVG 허용
   },
   rewrites: () => {
     return [

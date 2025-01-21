@@ -1,13 +1,12 @@
 'use client';
 
-import { Share2, NotebookText, ChevronLeft, ChevronRight } from "lucide-react";  // List -> Info로 변경
+import { Share2, ChevronLeft, ChevronRight, VolumeX, ListCollapse, Volume2 } from "lucide-react";  // List -> Info로 변경
 import { useState, useEffect, useCallback, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
 import LikeButtonOnly from "../posts/LikeButtonOnly";
 import BookmarkButton from "../posts/BookmarkButton";
 import { useSession } from "../SessionProvider";
-import { useRouter } from 'next/navigation';  // 추가
 import Link from "next/link";
 
 interface VideoControlsProps {
@@ -29,6 +28,8 @@ interface VideoControlsProps {
     sequence: number;
     isPremium: boolean;
   }[];
+  onMuteToggle: (newState: boolean) => void; 
+  isMuted: boolean;  
 }
 
 export default function VideoControls({
@@ -38,12 +39,25 @@ export default function VideoControls({
   hasNextVideo,
   hasPrevVideo,
   onNavigate,
+  onMuteToggle,
+  isMuted,
 }: VideoControlsProps) {
   const [showControls, setShowControls] = useState(true);
   const controlsTimeoutRef = useRef<NodeJS.Timeout>();
   const { toast } = useToast();
   const { user } = useSession();
-  const router = useRouter();  // 추가
+
+  const handleMuteToggle = () => {
+    const newMuteState = !isMuted;
+    onMuteToggle(newMuteState);
+    
+    // 언뮤트 상태를 localStorage에 저장
+    if (!newMuteState) {
+      localStorage.setItem('videoMuted', 'false');
+    } else {
+      localStorage.removeItem('videoMuted');
+    }
+  };
 
   const updateControlsVisibility = useCallback(() => {
     if (controlsTimeoutRef.current) {
@@ -140,7 +154,7 @@ export default function VideoControls({
           <Link href={`/posts/${postId}`}> 
             <div className="rounded-full bg-black/40 p-4 md:p-5 backdrop-blur-lg transition-all group-hover:bg-black/40 border border-white/40">
               {/* 아이콘 크기만 별도로 조정 */}
-              <NotebookText className="h-5 w-5 md:h-5 md:w-5 text-white" />
+              <ListCollapse className="h-5 w-5 md:h-5 md:w-5 text-white" />
             </div>
           </Link>
         </div>
@@ -151,6 +165,27 @@ export default function VideoControls({
         >
           <div className="rounded-full bg-black/40 p-4 md:p-5 backdrop-blur-lg transition-all group-hover:bg-black/40 border border-white/40">
             <Share2 className="h-5 w-5 md:h-5 md:w-5 text-white" />
+          </div>
+        </div>
+
+        <div 
+          onClick={() => onMuteToggle(!isMuted)} 
+          className="group flex flex-col items-center gap-1 cursor-pointer"
+        >
+          <div className={cn(
+            "rounded-full p-4 md:p-5 backdrop-blur-lg transition-all border",
+            isMuted 
+              ? "bg-black/40 border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]" 
+              : "bg-black/40 border-white/40"
+          )}>
+            {isMuted ? (
+              <VolumeX className={cn(
+                "h-5 w-5 md:h-5 md:w-5",
+                isMuted ? "text-red-500" : "text-white"
+              )} />
+            ) : (
+              <VolumeX className="h-5 w-5 md:h-5 md:w-5 text-white" />
+            )}
           </div>
         </div>
       </div>

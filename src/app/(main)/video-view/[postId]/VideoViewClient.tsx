@@ -10,7 +10,6 @@ import 'swiper/css/virtual';
 import { toast } from '@/components/ui/use-toast';
 import { AlertModal } from '@/components/ui/AlertModal';
 import PlayPermissionCheck from '@/components/videos/PlayPermissionCheck';
-import { useSession } from '@/components/SessionProvider';
 import { cn } from '@/lib/utils';
 import VideoControls from '@/components/videos/VideoControls';
 import { useSearchParams } from 'next/navigation';
@@ -57,41 +56,63 @@ export function VideoViewClient({ post, initialSequence, initialTime }: VideoVie
   });
   const [showButtons, setShowButtons] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout>();
+  const [isMuted, setIsMuted] = useState(true);
+  const resumeHandledRef = useRef(false);
+
+  useEffect(() => {
+    const savedMuteState = localStorage.getItem('videoMuted');
+    if (savedMuteState === 'false') {
+      setIsMuted(false);
+    }
+  }, []);
+  
+  // setIsMuted의 prev => !prev 패턴 사용
+  const handleMuteToggle = useCallback(() => {
+    setIsMuted(prev => {
+      const newState = !prev;
+      if (!newState) {
+        localStorage.setItem('videoMuted', 'false');
+      } else {
+        localStorage.removeItem('videoMuted');
+      }
+      return newState;
+    });
+  }, []);
 
   useEffect(() => {
     const checkResumePoint = async () => {
+      // 이미 처리된 경우 스킵
+      if (resumeHandledRef.current) return;
+
       try {
-        // URL의 시간 파라미터 확인
         const timeParam = searchParams.get('t');
-        
-        // IndexedDB에서 시청 기록 확인
         const lastView = await videoDB.getLastView(post.id);
         
         if (lastView && lastView.sequence >= initialSequence && lastView.sequence > 1) {  
-          // 시청 기록이 있고 현재 시청하려는 순서보다 크거나 같은 경우 모달 표시
           setResumeData({
             sequence: lastView.sequence,
             timestamp: lastView.timestamp
           });
           setShowResumeModal(true);
         } else if (timeParam) {
-          // 시청 기록은 없지만 URL에 시간값이 있는 경우
           const time = parseInt(timeParam, 10);
           if (!isNaN(time)) {
-            setActiveIndex(0); // 첫 번째 영상으로 설정
+            setActiveIndex(0);
             const video = document.querySelector('video');
             if (video) {
               video.currentTime = time;
             }
           }
         }
+        // 처리 완료 표시
+        resumeHandledRef.current = true;
       } catch (error) {
         console.error('Failed to check resume point:', error);
       }
     };
-  
+
     checkResumePoint();
-  }, [post.id]);
+  }, [post.id, initialSequence, searchParams]);
 
   // 마우스 움직임 감지 핸들러 추가
   // const updateButtonsVisibility = useCallback(() => {
@@ -293,6 +314,7 @@ export function VideoViewClient({ post, initialSequence, initialTime }: VideoVie
                               ? initialTime 
                               : 0
                       }
+                      muted={isMuted}
                     />
 
                     {index === activeIndex && (
@@ -377,6 +399,8 @@ export function VideoViewClient({ post, initialSequence, initialTime }: VideoVie
                             }}
                             visible={showButtons}
                             videos={post.videos}
+                            onMuteToggle={handleMuteToggle}
+                            isMuted={isMuted}
                           />
                         </div>
 

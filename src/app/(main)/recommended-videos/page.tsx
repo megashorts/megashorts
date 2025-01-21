@@ -1,9 +1,23 @@
 import prisma from "@/lib/prisma";
 import { CategoryType } from '@prisma/client';
 import { RecommendedVideosClient } from "./RecommendedVideosClient";
+import { Metadata } from "next";
 
 // 5분마다 재렌더링
 export const revalidate = 3600;
+
+export const metadata: Metadata = {
+  title: '추천 동영상',
+  description: '메가쇼츠의 엄선된 추천 동영상을 만나보세요.',
+  openGraph: {
+    title: '메가쇼츠 추천 동영상',
+    description: '메가쇼츠의 엄선된 추천 동영상을 만나보세요.',
+    type: 'video.other',
+  },
+  alternates: {
+    canonical: 'https://megashorts.vercel.app/recommended-videos',
+  },
+};
 
 export default async function RecommendedVideosPage() {
   const posts = await prisma.post.findMany({

@@ -46,7 +46,7 @@ export default function PaymentModal({ paymentAmount: paymentAmount, coins, onCl
     }
   
     fetchPaymentWidgets();
-  }, [process.env.NEXT_PUBLIC_TOSS_PAYMENTS_CLIENT_KEY, customerKey]);
+  }, [customerKey]);
 
   useEffect(() => {
     async function renderPaymentWidgets() {
@@ -79,7 +79,7 @@ export default function PaymentModal({ paymentAmount: paymentAmount, coins, onCl
     }
 
     renderPaymentWidgets()
-  }, [widgets])
+  }, [widgets, paymentAmount]);
 
   useEffect(() => {
     document.body.style.overflow = 'hidden'
@@ -106,7 +106,7 @@ export default function PaymentModal({ paymentAmount: paymentAmount, coins, onCl
       })
     } catch (err) {
       console.error('결제 요청 실패:', err)
-      setError('결제 처리 중 오류가 발생했습니다. 모달페이지')
+      setError('결제 처리 중 모달페이지에서 오류가 발생했습니다. ')
     }
   }
 

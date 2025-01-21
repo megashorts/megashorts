@@ -105,6 +105,7 @@ const FeaturedPostSlider = ({ posts }: FeaturedPostSliderProps) => {
                       src={post.thumbnailUrl || '/placeholder.jpg'}
                       alt={post.title || ''}
                       fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       className={`object-cover transition-transform duration-300 ${
                         hoveredIndex === post.id ? 'scale-105' : 'scale-100'
                       }`} // 마우스 올리면 썸네일만 확대

@@ -25,29 +25,31 @@ export default function NavBar({ className }: NavBarProps) {
   return (
     <header className={`absolute w-full z-50 bg-transparent ${className}`}>
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-5 px-5 lg:px-8 lg:py-6 py-1 md:py-3">
-        {/* 좌측 로고 */}
-        <Link href="/" className="w-64 hidden md:block">
-          {/* <Image src={Logo} sizes="(max-width: 600px) 100vw, (max-width: 1024px) 75vw, 80vw" alt="MEGASHORTS logo" priority /> */}
-          <Image 
-            src="/MSWebLogoSVG.svg" 
-            alt="MEGASHORTS logo" 
-            width={192}
-            height={48}
-            className="w-48 h-auto ml-1 mt-1"
-            priority
-          />
+        {/* 데스크탑 로고 */}
+        <Link rel="preload" href="/" className="hidden md:block">
+          <span className="relative flex items-center justify-center w-[192px] h-[24px]">
+            <Image 
+              src="/MSWebLogoSVG.svg" 
+              alt="MEGASHORTS logo" 
+              fill
+              sizes="(min-width: 768px) 192px, 0px"  // md 이상에서만 표시
+              className="object-contain"
+
+            />
+          </span>
         </Link>
 
-        <Link href="/" className="md:hidden relative">
-          {/* <Image src={Logo} sizes="(max-width: 600px) 100vw, (max-width: 1024px) 75vw, 80vw" alt="MEGASHORTS logo" priority /> */}
-          <Image 
-            src="/MS Logo emblem.svg" 
-            alt="MEGASHORTS emblem" 
-            width={48}
-            height={48}
-            className="h-auto flex justify-start items-start"
-            priority
-          />
+        <Link rel="preload" href="/" className="md:hidden">
+          <span className="relative flex items-center justify-center w-[48px] h-[24px]">
+            <Image 
+              src="/MS Logo emblem.svg"
+              alt="MEGASHORTS emblem" 
+              fill
+              sizes="(max-width: 767px) 48px, 0px"  // md 미만에서만 표시
+              className="object-contain object-center"
+
+            />
+          </span>
         </Link>
         
         {/* 우측 메뉴 */}

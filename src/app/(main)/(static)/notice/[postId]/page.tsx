@@ -23,8 +23,10 @@ export async function generateMetadata(
   { params }: Props,
   parent: ResolvingMetadata
 ): Promise<Metadata> {
+  const resolvedParams = await params;
+
   const post = await prisma.post.findUnique({
-    where: { id: params.postId },
+    where: { id: resolvedParams.postId },
     select: { 
       title: true, 
       content: true,
@@ -66,7 +68,7 @@ export default async function NoticePostPage({ params }: Props) {
   console.log(`[Server] Rendering notice page: ${resolvedParams.postId}`, new Date().toISOString());
   // 현재 포스트 데이터 조회
   const post = await prisma.post.findUnique({
-    where: { id: params.postId },
+    where: { id: resolvedParams.postId },
     include: {
       user: {
         select: {

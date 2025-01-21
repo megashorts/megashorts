@@ -30,20 +30,24 @@ export default function Layout({
         target.tagName !== 'INPUT' && 
         target.tagName !== 'TEXTAREA' && 
         target.getAttribute('contenteditable') !== 'true' &&
-        !target.closest('[role="searchbox"]') // 검색 관련 요소 제외
+        !target.closest('[role="searchbox"]') && // 검색 관련 요소 제외
+        !target.closest('.video-container')  // 비디오 컨테이너 제외
       ) {
-        e.preventDefault();
         if (document.activeElement instanceof HTMLElement) {
           document.activeElement.blur();
         }
       }
     };
-
-    // touchstart 이벤트에 캡처 단계에서 적용
-    document.addEventListener('touchstart', preventFocus, { capture: true });
+  
+    // capture만 사용
+    document.addEventListener('touchstart', preventFocus, { 
+      capture: true
+    });
     
     return () => {
-      document.removeEventListener('touchstart', preventFocus, { capture: true });
+      document.removeEventListener('touchstart', preventFocus, { 
+        capture: true
+      });
     };
   }, []);
 

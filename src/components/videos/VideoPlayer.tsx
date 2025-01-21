@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import dynamic from 'next/dynamic';
 import { videoTracking } from '@/lib/videoTracking';
@@ -17,6 +17,7 @@ const VideoPlayer = dynamic(() => Promise.resolve(({
   userLanguage = 'KOREAN',
   initialTime = 0,
   controls = true,
+  muted,
 }: {
   videoId: string;
   postId: string;
@@ -28,35 +29,49 @@ const VideoPlayer = dynamic(() => Promise.resolve(({
   userLanguage?: 'KOREAN' | 'ENGLISH' | 'JAPANESE' | 'CHINESE' | 'THAI' | 'SPANISH' | 'INDONESIAN' | 'VIETNAMESE'; 
   initialTime?: number;  
   controls?: boolean;
+  muted: boolean;
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<any>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const lastTrackedTimeRef = useRef<number>(0);
   const { user } = useSession();
+  const [isMuted, setIsMuted] = useState(true);
   
   const thumbnailUrl = `https://customer-2cdfxbmja64x0pqo.cloudflarestream.com/${videoId}/thumbnails/thumbnail.jpg?time=&height=600`;
   const videoUrl = `https://customer-2cdfxbmja64x0pqo.cloudflarestream.com/${videoId}/manifest/video.m3u8`;
   // const videoUrl = `https://customer-2cdfxbmja64x0pqo.cloudflarestream.com/${videoId}/manifest/video.m3u8?subtitleSize=200`;  // subtitleSize 파라미터 추가
 
+  // 컴포넌트 마운트 시 localStorage에서 뮤트 상태 확인
+  useEffect(() => {
+    const savedMuteState = localStorage.getItem('videoMuted');
+    if (savedMuteState === 'false') {
+      setIsMuted(false);
+    }
+  }, []);
+
+  // 뮤트 상태가 변경될 때마다 비디오 요소에 적용
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    
+    video.muted = isMuted;
+  }, [isMuted]);
+
+  // const handleMuteToggle = (newMuteState: boolean) => {
+  //   setIsMuted(newMuteState);
+  // };
 
   // 시청 시간 추적
-  const handleTimeUpdate = () => {
+  // const handleTimeUpdate = () => {
+  const handleTimeUpdate = useCallback(() => {
     const video = videoRef.current;
     if (!video || !isActive || !user?.id) return;
     
     const currentTime = Math.floor(video.currentTime);
     if (currentTime === 0) return;
     
-    // console.log('Time update:', {
-    //   isActive,
-    //   videoId,
-    //   sequence,
-    //   currentTime,
-    //   lastTrackedTime: lastTrackedTimeRef.current
-    // });
-    
-    // 현재 시간 전달 (기존 기능에 영향 없음)
+    // 현재 시간 전달
     onTimeUpdate?.(currentTime);
 
     // 3초 도달 시 첫 저장
@@ -100,7 +115,7 @@ const VideoPlayer = dynamic(() => Promise.resolve(({
         lastTrackedTimeRef.current = nextCheckpoint;
       }
     }
-  };
+  }, [videoId, sequence, isActive, postId, user?.id, onTimeUpdate]);
 
 // HLS 초기화
 useEffect(() => {
@@ -196,13 +211,13 @@ useEffect(() => {
   });
 
   // 이전 리스너 제거 후 새로 등록
-  video.removeEventListener('timeupdate', handleTimeUpdate);
+  // video.removeEventListener('timeupdate', handleTimeUpdate);
   video.addEventListener('timeupdate', handleTimeUpdate);
 
   return () => {
     video.removeEventListener('timeupdate', handleTimeUpdate);
   };
-}, [videoId, sequence, isActive, postId, user?.id]);
+}, [handleTimeUpdate]);
 
 // 재생 제어
 useEffect(() => {
@@ -255,16 +270,6 @@ useEffect(() => {
         }
       });
     }
-
-    // video.play().catch(error => {
-    //   console.error('Error playing video:', error);
-    //   // 재생 실패 시 재시도
-    //   setTimeout(() => {
-    //     if (isActive) {
-    //       video.play().catch(console.error);
-    //     }
-    //   }, 1000);
-    // });
   } else {
     video.pause();
     if (hlsRef.current) {
@@ -312,13 +317,52 @@ useEffect(() => {
     return () => video.removeEventListener('ended', handleEnded);
   }, [onEnded]);
 
+  // 자막위치 조정
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handleCueChange = (event: Event) => {
+      const track = event.target as TextTrack;
+      if (track.cues) {
+        // 데스크탑 체크 (768px 이상)
+        const isDesktop = window.matchMedia('(min-width: 768px)').matches;
+        const lineValue = isDesktop ? 24 : 16;
+  
+        for (let i = 0; i < track.cues.length; i++) {
+          const cue = track.cues[i] as VTTCue;
+          cue.line = lineValue;
+        }
+      }
+    };
+
+    const handleLoadedMetadata = () => {
+      if (video.textTracks.length > 0) {
+        const track = video.textTracks[0];
+        track.mode = 'showing';
+        track.addEventListener('cuechange', handleCueChange);
+      }
+    };
+
+    video.addEventListener('loadedmetadata', handleLoadedMetadata);
+
+    return () => {
+      if (video.textTracks.length > 0) {
+        const track = video.textTracks[0];
+        track.removeEventListener('cuechange', handleCueChange);
+      }
+      video.removeEventListener('loadedmetadata', handleLoadedMetadata);
+    };
+  }, []);
+
+
   return (
     <div className={cn('relative w-full h-full', className)}>
       <style jsx global>{`
         @media (min-width: 768px) {
           video::cue {
             background-color: rgba(0, 0, 0, 0.7);
-            font-size: 30px;
+            font-size: 36px;
             position: relative;
             transform: translateY(-100px);
             line-height: 1.5;
@@ -333,26 +377,36 @@ useEffect(() => {
             position: absolute;
             transform: translateY(-300px);
             line-height: 1.5;
-            padding: 4px 8px;
+            padding: 2px 2px;
           }
 
-          /* 전체화면 상태일 때의 자막 스타일 */
-          :fullscreen video::cue,
-          :-webkit-full-screen video::cue,
-          :-moz-full-screen video::cue,
-          :-ms-fullscreen video::cue {
-            font-size: 36px;          /* 더 큰 폰트 크기 */
-            transform: translateY(-400px); /* 위치 조정 */
-            padding: 8px 16px;        /* 여백 증가 */
-            line-height: 1.8;         /* 줄 간격 증가 */
-            background-color: rgba(0, 0, 0, 0.8); /* 더 진한 배경 */
-          }
+        //   :fullscreen video::cue,
+        //   :-webkit-full-screen video::cue,
+        //   :-moz-full-screen video::cue,
+        //   :-ms-fullscreen video::cue {
+        //     font-size: 48px;         
+        //     transform: translateY(-400px); 
+        //     padding: 8px 16px;       
+        //     line-height: 1.8;       
+        //     background-color: rgba(0, 0, 0, 0.8); 
+        //   }
             
-          /* iOS Safari 전체화면 자막 스타일 */
-          video::-webkit-media-text-track-display {
-            font-size: 40px !important;
-          }
-        }
+        //   video::-webkit-media-text-track-display {
+        //     font-size: 40px !important;
+        //   }
+        // }
+
+        // video::-webkit-media-controls {
+        //   z-index: auto !important;
+        //   opacity: 1 !important;
+        //   display: flex !important;
+        // }
+
+        // video::-webkit-media-controls-enclosure {
+        //   display: flex !important;
+        //   opacity: 1 !important;
+        //   z-index: 2147483647;
+        // }
       `}</style>
       <div 
         className={cn(
@@ -372,6 +426,7 @@ useEffect(() => {
         preload="auto"
         poster={thumbnailUrl}
         controls={controls}
+        muted={muted} 
         autoPlay
       />
     </div>

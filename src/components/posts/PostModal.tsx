@@ -148,6 +148,7 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
                   src={post.thumbnailUrl || '/post-placeholder.jpg'}
                   alt={post.content || ''}
                   fill
+                  sizes="(max-width: 768px) 90vw, (max-width: 1200px) 40vw, 500px"  // 컨테이너 크기에 맞게 설정
                   className="object-cover"
                 />
               </div>
@@ -204,7 +205,9 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
                 <X className="w-4 h-4" />
               </button>
               <div className="w-10 aspect-square flex items-center justify-center hover:bg-white/10"></div>
+
               <div className="w-10 aspect-square flex items-center justify-center hover:bg-white/10"></div>
+
               {!user && (
                 <>
                   <div className="w-10 aspect-square flex items-center justify-center hover:bg-white/10"></div>
@@ -327,6 +330,7 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
               src={post.thumbnailUrl || '/post-placeholder.jpg'}
               alt={post.content || ''}
               fill
+              sizes="(max-width: 768px) 90vw, (max-width: 1200px) 40vw, 500px"  // 컨테이너 크기에 맞게 설정
               className="object-cover"
             />
           </div>
@@ -361,6 +365,7 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
                   <Play className="size-5 text-white" />
                 </Link>
               )}
+
               {user && (
                 <>
                   <div className="w-12 aspect-square flex items-center justify-center hover:bg-white/10 border border-white rounded-full">

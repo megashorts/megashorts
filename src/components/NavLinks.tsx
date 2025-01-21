@@ -27,8 +27,6 @@ export default function NavLinks() {
   const { user } = useSession();
   const isActive = (path: string) => pathname === path;
 
-
-
   // 북마크 버튼 부분만 수정
   const BookmarkButton = () => {
     const [isOpen, setIsOpen] = useState(false);

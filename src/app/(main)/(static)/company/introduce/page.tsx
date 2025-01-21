@@ -9,6 +9,43 @@ import { Button } from "@/components/ui/button";
 import { Mail } from "lucide-react";
 import ReportDialog from "@/components/posts/ReportDialog";
 import { InquiryType } from "@prisma/client";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: '회사소개',
+  description: '메가쇼츠는 창의적인 기획과 설계로 숏폼 컨텐츠의 새로운 가치를 창출합니다.',
+  openGraph: {
+    title: '메가쇼츠 회사소개',
+    description: '메가쇼츠는 창의적인 기획과 설계로 숏폼 컨텐츠의 새로운 가치를 창출합니다.',
+    images: ['/MSWebLogo.png'],
+  },
+  alternates: {
+    canonical: 'https://megashorts.vercel.app/company/introduce',
+  },
+};
+
+// Schema.org 구조화 데이터
+export const generateStructuredData = () => ({
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "APPLIED LABS Co.,ltd",
+  description: "메가쇼츠는 숏폼컨텐츠 최적화 플랫폼으로 다양한 장르의 짧은 컨텐츠를 제공합니다.",
+  url: "https://megashorts.com",
+  logo: "https://megashorts.com/MSWebLogo.png",
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "송도미래로 30 스마트밸리 지식산업센터 D-1106",
+    addressLocality: "연수구",
+    addressRegion: "인천광역시",
+    postalCode: "21990",
+    addressCountry: "KR"
+  },
+  contactPoint: {
+    "@type": "ContactPoint",
+    email: "hello@megashorts.com",
+    contactType: "customer service"
+  }
+});
 
 export default function CompanyIntroduce() {
   return (
@@ -20,15 +57,19 @@ export default function CompanyIntroduce() {
         <div className="grid grid-cols-1 md:grid-cols-2 bass:grid-cols-2 mb-4">
           {/* 첫 번째 그리드 */}
           <div className="flex items-center sm:justify-end justify-center h-[250px] pt-16 sm:pr-12">
-            <Image
-              src="/MSphone.webp"
-              alt="MS Making Phone"
-              width={250} // 이미지 크기를 조정
-              height={250}
-              className="object-contain"
-              priority
-            />
+            <div className="relative aspect-square w-[250px]">
+              <Image
+                src="/MSphone.webp"
+                alt="MS Making Phone"
+                fill
+                sizes="250px"
+                priority  // priority 대신 lazy 로딩 사용
+                className="object-contain"
+              />
+            </div>
           </div>
+
+
 
           {/* 두 번째 그리드 */}
           <div className="flex flex-col justify-center sm:items-start sm:justify-end items-center h-[200px] sm:pl-12 relative">
@@ -47,13 +88,16 @@ export default function CompanyIntroduce() {
 
           {/* 세 번째 그리드 */}
           <div className="flex items-center justify-center sm:justify-end h-[250px] pt-8 sm:pr-12">
-            <Image
-              src="/MSgirl.webp"
-              alt="MS Making Girl"
-              width={280} // 이미지 크기를 조정
-              height={280}
-              className="object-contain"
-            />
+            <div className="relative aspect-square w-[280px]">
+              <Image
+                src="/MSgirl.webp"
+                alt="MS Making Girl"
+                fill
+                sizes="280px"
+                priority  // priority 대신 lazy 로딩 사용
+                className="object-contain"
+              />
+            </div>
           </div>
 
           {/* 네 번째 그리드 */}
@@ -74,7 +118,7 @@ export default function CompanyIntroduce() {
         {/* 하단 2개 그리드 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:pt-2">
           {/* 첫 번째 하단 그리드 */}
-          <div className="relative flex flex-col justify-start items-center p-10 sm:items-end relative">
+          <div className="relative flex flex-col justify-start items-center p-10 sm:items-end">
             <h3 className="text-3xl font-bold mb-3 text-white relative">
               FAQ
               <span className="absolute bottom-0 left-0 h-[10px] bg-red-500 -z-10 w-[110%] translate-y-0.6"></span>

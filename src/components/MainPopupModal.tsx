@@ -45,7 +45,6 @@ export function MainPopupModal() {
               height={1200}
               quality={100}         // 최적의 품질
               loading="eager"      // 즉시 로딩
-              priority
               className="w-full h-auto rounded-lg cursor-pointer"
             />
           </Link>
