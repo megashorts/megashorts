@@ -35,7 +35,7 @@ export function MainPopupModal() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70" onClick={handleClose} >
-      <div className="relative w-[70%] md:w-[30%] md:max-w-[450px] bg-red-500 rounded-lg">
+      <div className="relative w-[70%] md:w-[45%] lg:w-[30%] md:max-w-[450px] bg-red-500 rounded-lg">
         <div className="relative">
           <Link href="/notice/f9c6e2ee-dd89-4387-9c5b-4dcf99537d1b" onClick={handleClose}>
             {/* 이미지 컨테이너에 명확한 크기 지정 */}
