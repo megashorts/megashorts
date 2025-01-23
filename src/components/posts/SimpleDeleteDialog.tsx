@@ -33,10 +33,10 @@ export default function SimpleDeleteDialog({
         {/* 헤더 */}
         <div className="space-y-1.5 text-center sm:text-left">
           <h2 className="text-lg font-semibold leading-none tracking-tight">
-            Delete post?
+            이 포스트를 삭제할까요?
           </h2>
           <p className="text-sm text-muted-foreground">
-            Are you sure you want to delete this post? This action cannot be undone.
+            이 진행은 삭제 후 취소가 불가능합니다.
           </p>
         </div>
 
@@ -53,14 +53,14 @@ export default function SimpleDeleteDialog({
             }}
             loading={mutation.isPending}
           >
-            Delete
+            삭제
           </LoadingButton>
           <Button
             variant="outline"
             onClick={onClose}
             disabled={mutation.isPending}
           >
-            Cancel
+            취소
           </Button>
         </div>
       </div>

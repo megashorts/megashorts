@@ -49,6 +49,9 @@ export async function submitPost(input: PostFormData) {
           featured: validatedData.featured,
           priority: validatedData.priority,
           videoCount: input.videos?.length || 0,
+          publishedAt: validatedData.status === 'PUBLISHED' 
+          ? existingPost.publishedAt || new Date()  // 기존 publishedAt이 없으면 현재 시간
+          : null  // DRAFT 상태면 null
         },
         include: getPostDataInclude(user.id),
       }) :
@@ -66,6 +69,7 @@ export async function submitPost(input: PostFormData) {
           featured: validatedData.featured,
           priority: validatedData.priority,
           videoCount: input.videos?.length || 0,
+          publishedAt: validatedData.status === 'PUBLISHED' ? new Date() : null  // PUBLISHED면 현재 시간, DRAFT면 null
         },
         include: getPostDataInclude(user.id),
       });

@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Language } from '@prisma/client';
 import { VideoWithSubtitles } from "@/lib/types";
 import { toast } from "../ui/use-toast";
+import { useUploader } from "@/hooks/useUploader";
 
 type Video = VideoWithSubtitles;
 
@@ -29,6 +30,8 @@ export function VideoItem({
     transform,
     transition
   } = useSortable({ id: video.id });
+
+  const { deleteSubtitle } = useUploader(); 
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -119,15 +122,24 @@ export function VideoItem({
               <button
                 onClick={async () => {
                   try {
+                    // 클라우드플레어에서 자막 삭제
+                    await deleteSubtitle(video.id, lang);
+
                     onUpdate({
                       ...video,
                       subtitle: video.subtitle.filter(l => l !== lang)
+                    });
+                    toast({
+                      variant: "default",
+                      description: "자막이 삭제되었습니다.",
+                      duration: 1500
                     });
                   } catch (error) {
                     console.error('Error deleting subtitle:', error);
                     toast({
                       variant: "destructive",
-                      description: "자막 삭제에 실패했습니다."
+                      description: "자막 삭제에 실패했습니다.",
+                      duration: 1500
                     });
                   }
                 }}

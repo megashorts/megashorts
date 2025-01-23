@@ -27,32 +27,7 @@ export function useDeletePostMutation() {
     mutationFn: deletePost,
     onSuccess: async (deletedPost) => {
       try {
-        // 1. 먼저 페이지들 재생성
-        const revalidatePaths = [
-          '/',  // 메인 페이지
-          '/categories/recent'
-        ];
-
-        deletedPost.categories.forEach(category => {
-          revalidatePaths.push(`/categories/${category.toLowerCase()}`);
-        });
-
-        await Promise.all(
-          revalidatePaths.map(path =>
-            fetch('/api/revalidate', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ path })
-            })
-          )
-        );
-
-        // 2. 서버 컴포넌트 리프레시
-        router.refresh();
-
-        // 3. 클라이언트 상태 업데이트
+        // 1. 클라이언트 상태 업데이트 (즉시 UI 반영)
         queryClient.setQueriesData<InfiniteData<PostsPage>>(
           {
             queryKey: ["your-posts", "PUBLISHED"],
@@ -87,34 +62,50 @@ export function useDeletePostMutation() {
           }
         );
 
-        // 4. 알림
+        // 2. 페이지 revalidate (백그라운드에서 처리)
+        const revalidatePaths = [
+          '/',
+          '/categories/recent',
+          ...deletedPost.categories.map(category => 
+            `/categories/${category.toLowerCase()}`
+          )
+        ];
+
+        Promise.all(
+          revalidatePaths.map(path =>
+            fetch('/api/revalidate', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ path })
+            })
+          )
+        ).catch(error => {
+          console.error('Failed to revalidate paths:', error);
+        });
+
+        // 3. 알림
         toast({
           description: "Post deleted",
         });
 
-        // 5. 메인페이지 새로고침 후 이동
+        // 4. 페이지 이동 (현재 페이지가 삭제된 포스트 페이지인 경우)
         if (pathname === `/posts/${deletedPost.id}`) {
-          // 메인페이지를 백그라운드에서 열고 새로고침
-          const mainWindow = window.open('/', '_blank');
-          if (mainWindow) {
-            mainWindow.addEventListener('load', () => {
-              mainWindow.location.reload();
-              mainWindow.close();
-              // 메인페이지로 이동
-              router.push('/');
-            });
-          } else {
-            // 팝업이 차단된 경우 바로 메인페이지로 이동
-            router.push('/');
-          }
+          router.push('/');
         }
 
+        // 5. 서버 컴포넌트 리프레시 (마지막에 처리)
+        setTimeout(() => {
+          router.refresh();
+        }, 0);
+
       } catch (error) {
-        console.error('Failed to revalidate paths:', error);
+        console.error('Error in onSuccess:', error);
       }
     },
     onError(error) {
-      console.error(error);
+      console.error('Delete mutation error:', error);
       toast({
         variant: "destructive",
         description: "Failed to delete post. Please try again.",

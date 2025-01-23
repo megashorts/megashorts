@@ -146,11 +146,32 @@ export function useUploader() {
     return response.json();
   };
 
+  const deleteSubtitle = async (
+    videoId: string,
+    language: string
+  ): Promise<boolean> => {
+    const response = await fetch('/api/videos/subtitle/delete', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ videoId, language })
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to delete subtitle');
+    }
+
+    const data = await response.json();
+    return data.success;
+  };
+
   return {
     progress,
     uploadVideo,
     uploadImage,
-    uploadSubtitle
+    uploadSubtitle,
+    deleteSubtitle
   };
 }
 
