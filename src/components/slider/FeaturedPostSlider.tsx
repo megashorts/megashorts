@@ -39,8 +39,11 @@ const FeaturedPostSlider = ({ posts }: FeaturedPostSliderProps) => {
           modules={[Pagination, Autoplay, Navigation, EffectCoverflow]}
           effect="coverflow"
           breakpoints={{
-            640: {
+            420: {
               slidesPerView: 2.2,
+            },
+            640: {
+              slidesPerView: 3.2,
             },
             1024: {
               slidesPerView: 4.2,

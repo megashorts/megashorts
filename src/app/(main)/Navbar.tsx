@@ -26,30 +26,25 @@ export default function NavBar({ className }: NavBarProps) {
     <header className={`absolute w-full z-50 bg-transparent ${className}`}>
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-5 px-5 lg:px-8 lg:py-6 py-1 md:py-3">
         {/* 데스크탑 로고 */}
-        <Link rel="preload" href="/" className="hidden md:block">
-          <span className="relative flex items-center justify-center w-[192px] h-[24px]">
-            <Image 
+        <Link href="/" className="hidden md:block">
+          <div className="relative w-[192px] h-[24px]">
+            <img 
               src="/MSWebLogoSVG.svg" 
               alt="MEGASHORTS logo" 
-              fill
-              sizes="(min-width: 768px) 192px, 0px"  // md 이상에서만 표시
-              className="object-contain"
-
+              className="w-full h-full object-contain"
             />
-          </span>
+          </div>
         </Link>
 
-        <Link rel="preload" href="/" className="md:hidden">
-          <span className="relative flex items-center justify-center w-[48px] h-[24px]">
-            <Image 
+        {/* 모바일 로고 */}
+        <Link href="/" className="md:hidden">
+          <div className="relative w-[48px] h-[24px]">
+            <img 
               src="/MS Logo emblem.svg"
               alt="MEGASHORTS emblem" 
-              fill
-              sizes="(max-width: 767px) 48px, 0px"  // md 미만에서만 표시
-              className="object-contain object-center"
-
+              className="w-full h-full object-contain object-center"
             />
-          </span>
+          </div>
         </Link>
         
         {/* 우측 메뉴 */}

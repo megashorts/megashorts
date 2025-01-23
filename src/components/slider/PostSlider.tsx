@@ -77,7 +77,7 @@ const PostSlider = ({ posts, title, category, viewAllHref, sliderId }: PostSlide
               spaceBetween: 12
             },
             768: {
-              slidesPerView: 4.2,
+              slidesPerView: 5.2,
               spaceBetween: 16
             },
             1024: {

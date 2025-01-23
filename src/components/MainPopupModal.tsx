@@ -37,18 +37,22 @@ export function MainPopupModal() {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70" onClick={handleClose} >
       <div className="relative w-[70%] md:w-[30%] md:max-w-[450px] bg-red-500 rounded-lg">
         <div className="relative">
-          <Link href="/notice/f9c6e2ee-dd89-4387-9c5b-4dcf99537d1b" onClick={handleClose} >
-            <Image
-              src="/MS Poster5.webp"
-              alt="Main Popup"
-              width={900}
-              height={1200}
-              quality={100}         // 최적의 품질
-              loading="eager"      // 즉시 로딩
-              className="w-full h-auto rounded-lg cursor-pointer"
-            />
+          <Link href="/notice/f9c6e2ee-dd89-4387-9c5b-4dcf99537d1b" onClick={handleClose}>
+            {/* 이미지 컨테이너에 명확한 크기 지정 */}
+            <div className="relative w-full aspect-[2/3]">  {/* 가로:세로 비율 2:3 유지 */}
+              <div className="relative w-full h-full">      {/* fill을 위한 relative 컨테이너 */}
+                <Image
+                  src="/MS Poster5.webp"
+                  alt="Main Popup"
+                  fill                                      
+                  className="object-cover rounded-lg"
+                  sizes="(max-width: 768px) 70vw, (max-width: 1200px) 30vw, 450px"  
+                  priority
+                />
+              </div>
+            </div>
           </Link>
-          
+  
           <button
             onClick={handleClose}
             className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-sm hover:bg-white/20"

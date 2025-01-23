@@ -118,12 +118,12 @@ export default function CompanyIntroduce() {
         {/* 하단 2개 그리드 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:pt-2">
           {/* 첫 번째 하단 그리드 */}
-          <div className="relative flex flex-col justify-start items-center p-10 sm:items-end">
+          <div className="relative flex flex-col justify-start items-center pr-10 pt-10 sm:items-end">
             <h3 className="text-3xl font-bold mb-3 text-white relative">
               FAQ
               <span className="absolute bottom-0 left-0 h-[10px] bg-red-500 -z-10 w-[110%] translate-y-0.6"></span>
             </h3>
-            <Accordion type="single" collapsible className="w-full sm:w-9/12">
+            <Accordion type="single" collapsible className="w-full sm:w-11/12">
             <AccordionItem value="item-1" className="border-b">
               <AccordionTrigger className="text-base py-4 hover:no-underline">
               메가쇼츠는 어떤 플랫폼인가요?

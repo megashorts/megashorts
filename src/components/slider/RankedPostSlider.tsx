@@ -67,7 +67,7 @@ const RankedPostSlider = ({ posts, title, sliderId }: RankedPostSliderProps) => 
               spaceBetween: 12
             },
             768: {
-              slidesPerView: 4.2,
+              slidesPerView: 5.6,
               spaceBetween: 16
             },
             1024: {
@@ -102,7 +102,7 @@ const RankedPostSlider = ({ posts, title, sliderId }: RankedPostSliderProps) => 
           {posts.map((post, index) => (
             <SwiperSlide
               key={post.id}
-              className="!w-[calc(100%/3.5+40px)] md:!w-[calc(100%/4.5+40px)] lg:!w-[calc(100%/8.5+40px)] xl:!w-[calc(100%/8.5+40px)]"  // slidesPerView 값과 맞춤
+              className="!w-[calc(100%/3.5+40px)] md:!w-[calc(100%/5.5+40px)] lg:!w-[calc(100%/8.5+40px)] xl:!w-[calc(100%/8.5+40px)]"  // slidesPerView 값과 맞춤
             >
               <div className="relative pl-[35px]">
                 <div 

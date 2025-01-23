@@ -4,7 +4,7 @@ import Link from "next/link";
 // <Suspense fallback={<Loader2 className="mx-auto animate-spin" />}> => sidebar loading indicator
 export default function NoticeSidebar() {
   return (
-    <div className="relative hidden h-fit w-60 flex-none space-y-5 md:block lg:w-60 ml-2">
+    <div className="relative hidden h-fit flex-none space-y-5 md:block lg:w-60 ml-2">
       <Link href={`/subscription`}>
         <div className="relative w-full h-[360px]">
           <div className="relative w-full h-full">  {/* Image를 감싸는 relative div 추가 */}

@@ -154,6 +154,30 @@ useEffect(() => {
             const koreanTrack = subtitleTracks.findIndex(track => track.lang === 'ko');
             if (koreanTrack !== -1) {
               hls.subtitleTrack = koreanTrack;
+
+              // iOS 체크 및 자막 스타일 설정
+              const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+              if (isIOS) {
+                // 동적 스타일 추가
+                const styleElement = document.createElement('style');
+                styleElement.textContent = `
+                  video::-webkit-media-text-track-container { font-size: 96px !important; }
+                  video::-webkit-media-text-track-display { font-size: 96px !important; }
+                `;
+                document.head.appendChild(styleElement);
+
+                // 자막 트랙에 직접 스타일 적용
+                if (video.textTracks[koreanTrack]) {
+                  const track = video.textTracks[koreanTrack];
+                  track.mode = 'showing';
+                  Array.from(track.cues || []).forEach((cue: any) => {
+                    if (cue) {
+                      cue.size = 200;  // 더 큰 크기로 설정
+                    }
+                  });
+                }
+              }
+
             }
           }
         });
@@ -325,13 +349,39 @@ useEffect(() => {
     const handleCueChange = (event: Event) => {
       const track = event.target as TextTrack;
       if (track.cues) {
-        // 데스크탑 체크 (768px 이상)
-        const isDesktop = window.matchMedia('(min-width: 768px)').matches;
-        const lineValue = isDesktop ? 24 : 16;
-  
+
+        // 화면 크기 체크
+        const isDesktop = window.matchMedia('(min-width: 1024px)').matches;
+
+        // 전체화면 상태 확인
+        const isFullscreen = !!(
+          document.fullscreenElement ||
+          (document as any).webkitFullscreenElement ||
+          (document as any).mozFullScreenElement ||
+          (document as any).msFullscreenElement
+        );
+        
+        // iOS 체크
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    
         for (let i = 0; i < track.cues.length; i++) {
           const cue = track.cues[i] as VTTCue;
-          cue.line = lineValue;
+          cue.size = 95;
+          cue.track
+          
+          if (isIOS) {
+            if (isDesktop) {
+              cue.line = 18;  // iOS 데스크톱
+            } else {
+              cue.line = 16;  // iOS 모바일
+            }
+          } else {
+            if (isDesktop) {
+              cue.line = 18;  // 일반 데스크톱
+            } else {
+              cue.line = 16;   // 일반 모바일
+            }
+          }
         }
       }
     };
@@ -358,56 +408,26 @@ useEffect(() => {
 
   return (
     <div className={cn('relative w-full h-full', className)}>
-      <style jsx global>{`
-        @media (min-width: 768px) {
-          video::cue {
-            background-color: rgba(0, 0, 0, 0.7);
-            font-size: 36px;
-            position: relative;
-            transform: translateY(-100px);
-            line-height: 1.5;
-            padding: 4px 40px;
-          }
-        }
 
-        @media (max-width: 767px) {
-          video::cue {
-            background-color: rgba(0, 0, 0, 0.7);
-            font-size: 24px;
-            position: absolute;
-            transform: translateY(-300px);
-            line-height: 1.5;
-            padding: 2px 2px;
-          }
+<style jsx global>{`
+  // /* 기본 자막 스타일 */
+  // video::cue {
+  //   font-size: 24px;
+  //   background-color: rgba(0, 0, 0, 0.7);
+  //   line-height: 1.5;
+  // }
 
-        //   :fullscreen video::cue,
-        //   :-webkit-full-screen video::cue,
-        //   :-moz-full-screen video::cue,
-        //   :-ms-fullscreen video::cue {
-        //     font-size: 48px;         
-        //     transform: translateY(-400px); 
-        //     padding: 8px 16px;       
-        //     line-height: 1.8;       
-        //     background-color: rgba(0, 0, 0, 0.8); 
-        //   }
-            
-        //   video::-webkit-media-text-track-display {
-        //     font-size: 40px !important;
-        //   }
-        // }
+  // /* Safari 기본 자막 스타일 */
+  // ::-webkit-media-text-track-container {
+  //   font-size: 24px !important;
+  // }
 
-        // video::-webkit-media-controls {
-        //   z-index: auto !important;
-        //   opacity: 1 !important;
-        //   display: flex !important;
-        // }
+  // ::-webkit-media-text-track-display {
+  //   font-size: 24px !important;
+  //   line-height: 1.5 !important;
+  // }
+`}</style>
 
-        // video::-webkit-media-controls-enclosure {
-        //   display: flex !important;
-        //   opacity: 1 !important;
-        //   z-index: 2147483647;
-        // }
-      `}</style>
       <div 
         className={cn(
           "absolute top-0 left-0 w-full h-full bg-cover bg-center",
