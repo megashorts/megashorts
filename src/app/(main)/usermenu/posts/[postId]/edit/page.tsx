@@ -2,7 +2,7 @@ import { validateRequest } from '@/auth';
 import prisma from '@/lib/prisma';
 import { notFound, redirect } from "next/navigation";
 import { PostEditor } from '@/components/posts/editor/PostEditor';
-import { getPostDataInclude } from '@/lib/types';  // getPostDataSelect → getPostDataInclude
+import { getPostDataInclude } from '@/lib/types';
 import { Suspense } from 'react';
 import NoticeSidebar from '@/components/NoticeSidebar';
 
@@ -16,8 +16,11 @@ export default async function EditPostPage({ params }: PageProps) {
     redirect("/login");
   }
 
+  // params를 await로 감싸서 사용
+  const { postId } = await Promise.resolve(params);
+
   const post = await prisma.post.findUnique({
-    where: { id: params.postId },
+    where: { id: postId },
     include: getPostDataInclude(user.id)
   });
 
@@ -31,7 +34,7 @@ export default async function EditPostPage({ params }: PageProps) {
     videos: post.videos.map(v => ({
       id: v.id,
       filename: v.filename,
-      subtitle: v.subtitle  // 자막 데이터 확인
+      subtitle: v.subtitle
     }))
   });
 

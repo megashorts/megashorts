@@ -25,6 +25,7 @@ import { toast } from "@/components/ui/use-toast";
 import { VideoWithSubtitles } from "@/lib/types";
 import { useSession } from "@/components/SessionProvider";
 import { MobileVideoUploader } from "./MobileVideoUploader";
+import { MobileVideoEditor } from "./MobileVideoEditor";
 
 type Video = VideoWithSubtitles;
 
@@ -32,7 +33,8 @@ interface VideoUploaderProps {
   videos: Video[];
   onChange: (videos: Video[]) => void;
   maxFiles?: number;
-  isNewPost?: boolean;  // 새 포스트 작성인지 여부
+  isNewPost?: boolean; 
+  postId?: string;
 }
 
 function matchVideoAndSubtitles(files: File[]) {
@@ -85,7 +87,8 @@ export function VideoUploader({
   videos: initialVideos,
   onChange,
   maxFiles = 10,
-  isNewPost = false
+  isNewPost = false,
+  postId
 }: VideoUploaderProps) {
   const [videos, setVideos] = useState(initialVideos);
   const [uploading, setUploading] = useState(false);
@@ -94,9 +97,11 @@ export function VideoUploader({
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    setIsMobile(window.innerWidth < 768);
+    const checkMobile = () => window.innerWidth < 768;
+    setIsMobile(checkMobile());
+
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
+      setIsMobile(checkMobile());
     };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
@@ -130,26 +135,32 @@ export function VideoUploader({
           const baseName = file.name.replace(/_(ko|en|zh)\.[^.]+$/, '').replace(/\.[^.]+$/, '');
       
           try {
+            // 1. 비디오 업로드
             const { id, url, filename } = await uploadVideo(file);
             
+            // 2. 자막 업로드
             const matchedSubtitles = subtitles.get(baseName) || [];
             const uploadedLanguages: Language[] = [];
             
-            await Promise.all(
-              matchedSubtitles.map(async ({ file: subtitleFile, language }) => {
-                try {
-                  const result = await uploadSubtitle(id, subtitleFile, language);
-                  uploadedLanguages.push(language as Language);
-                } catch (subtitleError) {
-                  console.error(`Failed to upload subtitle for ${baseName}:`, subtitleError);
-                  toast({
-                    description: `자막 업로드 실패: ${subtitleFile.name}`,
-                    variant: "destructive",
-                  });
-                }
-              })
-            );
+            // 자막이 있으면 바로 업로드 시도
+            if (matchedSubtitles.length > 0) {
+              await Promise.all(
+                matchedSubtitles.map(async ({ file: subtitleFile, language }) => {
+                  try {
+                    const result = await uploadSubtitle(id, subtitleFile, language);
+                    uploadedLanguages.push(language as Language);
+                  } catch (subtitleError) {
+                    console.error(`Failed to upload subtitle for ${baseName}:`, subtitleError);
+                    toast({
+                      description: `자막 업로드 실패: ${subtitleFile.name}`,
+                      variant: "destructive",
+                    });
+                  }
+                })
+              );
+            }
             
+            // 3. 비디오 정보 반환 (자막 정보 포함)
             const newVideo: Partial<Video> = {
               id,
               url,
@@ -160,7 +171,7 @@ export function VideoUploader({
               subtitle: uploadedLanguages,
               views: []
             };
-
+      
             return newVideo as Video;
           } catch (uploadError) {
             console.error(`Failed to upload ${file.name}:`, uploadError);
@@ -247,18 +258,31 @@ export function VideoUploader({
 
   const handleVideoDelete = useCallback(async (videoId: string) => {
     try {
+      // URL에서 실제 클라우드플레어 비디오 ID 추출
+      const video = videos.find(v => v.id === videoId);
+      if (!video) {
+        throw new Error('Video not found');
+      }
+  
+      // URL 형식: https://videodelivery.net/[video-id]/manifest/video.m3u8
+      const matches = video.url.match(/videodelivery\.net\/([^/]+)/);
+      const cloudflareVideoId = matches ? matches[1] : videoId;
+  
       const response = await fetch('/api/videos/delete', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ videoId }),
+        body: JSON.stringify({ 
+          videoId: cloudflareVideoId,  // cloudflareId
+          dbId: video.id  // DB ID
+        }),
       });
-
+  
       if (!response.ok) {
         throw new Error('Failed to delete video');
       }
-
+  
       const updatedVideos = videos.filter(v => v.id !== videoId);
       const reorderedVideos = updatedVideos.map((v, idx) => ({
         ...v,
@@ -302,76 +326,92 @@ export function VideoUploader({
 
   return (
     <div className="space-y-4">
-      {isMobile && isNewPost ? (
-        <MobileVideoUploader
-          onVideoSelect={onDrop}
-          disabled={uploading}
-        />
+      {isMobile ? (
+        // 모바일 버전
+        isNewPost ? (
+          // 새 포스트 작성 시
+          <MobileVideoUploader
+            onVideoSelect={onDrop}
+            disabled={uploading}
+          />
+        ) : (
+          // 포스트 수정 시
+          <MobileVideoEditor
+            videos={videos}
+            onChange={(updatedVideos) => {
+              setVideos(updatedVideos);  // 내부 상태 업데이트
+              onChange(updatedVideos);    // 부모 컴포넌트에 알림
+            }}
+            maxFiles={maxFiles}
+            postId={postId!}
+          />
+        )
       ) : (
-        <div
-          {...getRootProps()}
-          className={`
-            border-2 border-dashed rounded-lg p-6 text-center
-            ${uploading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
-          `}
-        >
-          <input {...getInputProps()} />
-          {uploading ? (
-            <div className="space-y-2">
-              <p>업로드 중...</p>
-              {Object.entries(progress).map(([filename, value]) => (
-                <div key={filename} className="space-y-1">
-                  <p className="text-sm">{filename}</p>
-                  <Progress value={value} />
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-xs text-muted-foreground">
-              <span className="text-xs text-white">@ 모바일에서는 동영상 업로드 관리 최적화가 지원되지 않습니다.</span>
-              <br />
-              비디오 & 자막을 클릭 또는 드래그하세요.
-              <br />
-              <span className="text-xs text-gray-500">
-                (최대 {maxFiles}개, 각 100MB 이하)
+        // 데스크톱 버전
+        <>
+          <div
+            {...getRootProps()}
+            className={`
+              border-2 border-dashed rounded-lg p-6 text-center
+              ${uploading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
+            `}
+          >
+            <input {...getInputProps()} />
+            {uploading ? (
+              <div className="space-y-2">
+                <p>업로드 중...</p>
+                {Object.entries(progress).map(([filename, value]) => (
+                  <div key={filename} className="space-y-1">
+                    <p className="text-sm">{filename}</p>
+                    <Progress value={value} />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                비디오 & 자막을 클릭 또는 드래그하세요.
                 <br />
-                비디오: MP4/WebM, 자막: VTT (_ko 접미사로 구분)
-              </span>
-            </p>
-          )}
-        </div>
-      )}
-
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
-        <SortableContext
-          items={videos.map(v => v.id)}
-          strategy={verticalListSortingStrategy}
-        >
-          <div className="space-y-2">
-            {videos.map((video) => (
-              <VideoItem
-                key={video.id}
-                video={video}
-                onRemove={() => handleVideoDelete(video.id)}
-                onSubtitleUpload={(file, language) => {
-                  handleSubtitleUpload(video.id, file, language);
-                }}
-                onUpdate={(updated) => {
-                  const updatedVideos = videos.map(v => 
-                    v.id === video.id ? updated : v
-                  );
-                  setVideos(updatedVideos);
-                  onChange(updatedVideos);
-                }}
-              />
-            ))}
+                <span className="text-xs text-gray-500">
+                  (최대 {maxFiles}개, 각 100MB 이하)
+                  <br />
+                  비디오: MP4/WebM, 자막: VTT (_ko 접미사로 구분)
+                </span>
+              </p>
+            )}
           </div>
-        </SortableContext>
-      </DndContext>
+
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={videos.map(v => v.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="space-y-2">
+                {videos.map((video) => (
+                  <VideoItem
+                    key={video.id}
+                    video={video}
+                    onRemove={() => handleVideoDelete(video.id)}
+                    onSubtitleUpload={(file, language) => {
+                      handleSubtitleUpload(video.id, file, language);
+                    }}
+                    onUpdate={(updated) => {
+                      const updatedVideos = videos.map(v => 
+                        v.id === video.id ? updated : v
+                      );
+                      setVideos(updatedVideos);
+                      onChange(updatedVideos);
+                    }}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
+        </>
+      )}
     </div>
   );
 }

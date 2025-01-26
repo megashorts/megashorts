@@ -12,9 +12,4 @@ npm i --legacy-peer-deps
 npm i --legacy-peer-deps
 
 
-npx prisma db push : 새로운 테이블을 추가하거나 필드를 변경했을 때
-npx prisma migrate dev : **마이그레이션 파일을 생성**하고, 변경 사항을 기록하며 **버전 관리**를 하고 싶을 때
-npx prisma generate : 변경된 모델을 코드에서 사용할 수 있도록 Prisma 클라이언트를 다시 생성
-
-
 https://megashorts.vercel.app/

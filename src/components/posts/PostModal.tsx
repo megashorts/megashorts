@@ -23,22 +23,8 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
   const { user } = useSession();
   const [showPreview, setShowPreview] = useState(true);
   const [isVideoReady, setIsVideoReady] = useState(false);
-  
-  function getVideoId(url: string | undefined): string | null {
-    if (!url) return null;
-    
-    try {
-      const urlObj = new URL(url);
-      const pathParts = urlObj.pathname.split('/');
-      const videoId = pathParts.find(part => part !== '' && part !== 'watch');
-      return videoId || null;
-    } catch (e) {
-      console.error('Error parsing video URL:', e);
-      return null;
-    }
-  }
 
-  const firstVideoId = getVideoId(post.videos?.[0]?.url);
+  const firstVideoId = post.videos?.[0]?.id;
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<any>(null);
 
@@ -74,6 +60,7 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
               });
             }
           });
+
 
           hls.on(Hls.Events.ERROR, (_event: any, data: any) => {
             if (data.fatal) {
@@ -145,7 +132,8 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
                 }`}
               >
                 <Image
-                  src={post.thumbnailUrl || '/post-placeholder.jpg'}
+                  // src={post.thumbnailUrl || '/post-placeholder.jpg'}
+                  src={post.thumbnailId ? `https://imagedelivery.net/wuhPilUNWOdMaNWjMYkZJg/${post.thumbnailId}/thumbnail` : '/post-placeholder.jpg'}
                   alt={post.content || ''}
                   fill
                   sizes="(max-width: 768px) 90vw, (max-width: 1200px) 40vw, 500px"  // 컨테이너 크기에 맞게 설정

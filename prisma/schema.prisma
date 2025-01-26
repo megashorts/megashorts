@@ -83,6 +83,7 @@ model Post {
   content             String
   contentI18n         Json?
   thumbnailUrl        String?
+  thumbnailId         String?  
   postLanguage        Language       @default(CHINESE)
   status              PostStatus     @default(DRAFT)
   featured            Boolean        @default(false)

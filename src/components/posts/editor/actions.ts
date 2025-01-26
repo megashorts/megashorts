@@ -107,29 +107,30 @@ export async function submitPost(input: PostFormData) {
         }
       }
 
-      // 비디오 생성 또는 업데이트
-      await Promise.all(
-        input.videos.map((video) =>
-          tx.video.upsert({
-            where: { id: video.id || '' },
-            create: {
+      if (input.videos && input.videos.length > 0) {
+        // 1. 기존 비디오 모두 삭제
+        if (existingPost) {
+          await tx.video.deleteMany({
+            where: { postId: post.id }
+          });
+        }
+      
+        // 2. 새로운 순서로 비디오 다시 생성
+        for (const video of input.videos) {
+          await tx.video.create({
+            data: {
+              id: video.id,
               postId: post.id,
               url: video.url,
               filename: video.filename,
               sequence: video.sequence,
               isPremium: video.isPremium,
-              subtitle: video.subtitle || []
-            },
-            update: {
-              url: video.url,
-              filename: video.filename,
-              sequence: video.sequence,
-              isPremium: video.isPremium,
-              subtitle: video.subtitle || []
+              subtitle: video.subtitle || [],
             }
-          })
-        )
-      );
+          });
+        }
+      }
+
     }
 
     // 새 포스트인 경우에만 postCount 증가
