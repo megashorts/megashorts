@@ -315,7 +315,7 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
             }`}
           >
             <Image
-              src={post.thumbnailUrl || '/post-placeholder.jpg'}
+              src={post.thumbnailId ? `https://imagedelivery.net/wuhPilUNWOdMaNWjMYkZJg/${post.thumbnailId}/thumbnail` : '/post-placeholder.jpg'}
               alt={post.content || ''}
               fill
               sizes="(max-width: 768px) 90vw, (max-width: 1200px) 40vw, 500px"  // 컨테이너 크기에 맞게 설정
