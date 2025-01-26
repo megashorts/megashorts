@@ -4,6 +4,13 @@ export const getEmailSender = () => {
   return process.env.SEND_EMAIL || 'noreply@example.com';
 };
 
+export const CLOUDFLARE_ACCOUNT_HASH = 'wuhPilUNWOdMaNWjMYkZJg';
+
+export const getThumbnailUrl = (thumbnailId: string | null | undefined, variant: 'thumbnail' | 'public' = 'thumbnail') => {
+  if (!thumbnailId) return '/post-placeholder.jpg';
+  return `https://imagedelivery.net/${CLOUDFLARE_ACCOUNT_HASH}/${thumbnailId}/${variant}`;
+};
+
 // import { env } from "@env";
 
 

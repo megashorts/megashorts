@@ -22,6 +22,7 @@ const postSelect = {
   postNum: true,
   title: true,
   content: true,
+  thumbnailId: true,
   thumbnailUrl: true,
   categories: true,
   status: true,

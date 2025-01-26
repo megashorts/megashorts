@@ -9,9 +9,8 @@ import Link from "next/link";
 import BookmarkButton from "./BookmarkButton";
 import { cn } from "@/lib/utils";
 import LikeButton from "./LikeButtonOnly";
-import { getCategoryName } from "@/lib/constants";
+import { getCategoryName, getThumbnailUrl } from "@/lib/constants";
 import { useEffect, useRef, useState } from "react";
-import VideoPlayer from "../videos/VideoPlayer";
 
 interface PostModalProps {
   post: PostData;
@@ -133,8 +132,8 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
               >
                 <Image
                   // src={post.thumbnailUrl || '/post-placeholder.jpg'}
-                  src={post.thumbnailId ? `https://imagedelivery.net/wuhPilUNWOdMaNWjMYkZJg/${post.thumbnailId}/thumbnail` : '/post-placeholder.jpg'}
-                  alt={post.content || ''}
+                  src={getThumbnailUrl(post.thumbnailId)}
+                  alt={`타이틀 ${post.title || ''} - ${post.categories || ''} 컨텐츠의 대표 이미지`}
                   fill
                   sizes="(max-width: 768px) 90vw, (max-width: 1200px) 40vw, 500px"  // 컨테이너 크기에 맞게 설정
                   className="object-cover"
@@ -289,6 +288,9 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
     );
   }
 
+  console.log('thumbnailId:', post.thumbnailId);
+  console.log('thumbnailUrl:', post.thumbnailUrl);
+  console.log('Generated URL:', getThumbnailUrl(post.thumbnailId));
   return (
     <div 
       className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4"
@@ -315,12 +317,13 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
             }`}
           >
             <Image
-              src={post.thumbnailId ? `https://imagedelivery.net/wuhPilUNWOdMaNWjMYkZJg/${post.thumbnailId}/thumbnail` : '/post-placeholder.jpg'}
-              alt={post.content || ''}
+              src={getThumbnailUrl(post.thumbnailId)}
+              alt={`타이틀 ${post.title || ''} - ${post.categories || ''} 컨텐츠의 대표 이미지`}
               fill
               sizes="(max-width: 768px) 90vw, (max-width: 1200px) 40vw, 500px"  // 컨테이너 크기에 맞게 설정
               className="object-cover"
             />
+            
           </div>
 
           {(showPreview && firstVideoId) && (
