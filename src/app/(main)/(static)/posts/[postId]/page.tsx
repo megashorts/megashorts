@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import VideoSection from "@/components/videos/VideoSection";
 import PostMoreButton from "@/components/posts/PostMoreButton";
-import { getCategoryName } from "@/lib/constants";
+import { getCategoryName, getThumbnailUrl } from "@/lib/constants";
 import LanguageFlag from "@/components/LanguageFlag";
 import PublicActions from "@/components/posts/PublicActions";
 import UserActions from "@/components/posts/UserActions";
@@ -37,7 +37,7 @@ export async function generateMetadata(
     select: { 
       title: true, 
       content: true,
-      thumbnailUrl: true,
+      thumbnailId: true,
       user: {
         select: {
           displayName: true
@@ -48,7 +48,7 @@ export async function generateMetadata(
 
   const title = post?.title || '게시물';
   const description = post?.content?.slice(0, 200) || '';  // 설명 길이 제한
-  const image = post?.thumbnailUrl || '/post-placeholder.jpg';
+  const image = post?.thumbnailId || '/post-placeholder.jpg';
 
   // 플랫폼별 site name
   const siteNames = {
@@ -179,8 +179,8 @@ export default async function PostPage({ params }: Props) {
             <div className="w-[30%]">
               <div className="relative w-full aspect-[2/3]">
                 <Image
-                  src={post.thumbnailUrl || '/post-placeholder.jpg'}
-                  alt={post.title || '포스트 썸네일'}
+                  src={getThumbnailUrl(post.thumbnailId)}
+                  alt={`타이틀 ${post.title || ''} - ${post.categories || ''} 컨텐츠의 대표 이미지`}
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 30vw, 30vw"  // 컨테이너가 30%
                   className="object-cover rounded-lg"
@@ -322,8 +322,8 @@ export default async function PostPage({ params }: Props) {
             <div className="w-1/2">
               <div className="relative aspect-[2/3]">
                 <Image
-                  src={post.thumbnailUrl || '/post-placeholder.jpg'}
-                  alt={post.title || '포스트 썸네일'}
+                  src={getThumbnailUrl(post.thumbnailId)}
+                  alt={`타이틀 ${post.title || ''} - ${post.categories || ''} 컨텐츠의 대표 이미지`}
                   fill
                   sizes="(max-width: 768px) 50vw, (max-width: 1200px) 50vw, 30vw"  // 모바일에서 50%
                   className="object-cover rounded-lg"

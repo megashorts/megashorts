@@ -23,7 +23,6 @@ const postSelect = {
   title: true,
   content: true,
   thumbnailId: true,
-  thumbnailUrl: true,
   categories: true,
   status: true,
   featured: true,

@@ -24,16 +24,16 @@ export async function deletePost(id: string) {
   if (post.userId !== user.id) throw new Error("Unauthorized");
 
   // 1. 썸네일 이미지 삭제
-  if (post.thumbnailUrl) {
+  if (post.thumbnailId) {
     try {
       // imagedelivery.net URL에서 이미지 ID 추출
       // URL 형식: https://imagedelivery.net/[account-hash]/[image-id]/[variant]
-      const matches = post.thumbnailUrl.match(/imagedelivery\.net\/[^/]+\/([^/]+)/);
+      const matches = post.thumbnailId.match(/imagedelivery\.net\/[^/]+\/([^/]+)/);
       const imageId = matches?.[1];
       
       console.log('Attempting to delete image:', { 
         imageId, 
-        url: post.thumbnailUrl,
+        url: post.thumbnailId,
         matches: matches
       });
       

@@ -287,10 +287,6 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
 
     );
   }
-
-  console.log('thumbnailId:', post.thumbnailId);
-  console.log('thumbnailUrl:', post.thumbnailUrl);
-  console.log('Generated URL:', getThumbnailUrl(post.thumbnailId));
   return (
     <div 
       className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4"

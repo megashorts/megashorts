@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { format } from "date-fns";
 import { Pin } from "lucide-react";
+import { getThumbnailUrl } from "@/lib/constants";
 
 type BlogPost = Prisma.PostGetPayload<{
   include: {
@@ -23,8 +24,8 @@ export default function BlogCard({ post }: BlogCardProps) {
         {/* 썸네일 (2:3 비율) */}
         <div className="relative w-[100px] sm:w-[150px] aspect-[3/2] flex-shrink-0">
           <Image
-            src={post.thumbnailUrl || "/post-placeholder.jpg"}
-            alt={post.title || ""}
+            src={getThumbnailUrl(post.thumbnailId)}
+            alt={`타이틀 ${post.title || ''} - ${post.categories || ''} 컨텐츠의 대표 이미지`}
             fill
             className="object-cover rounded-sm"
             sizes="200px"

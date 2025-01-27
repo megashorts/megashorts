@@ -9,6 +9,7 @@ import PostModal from "./PostModal";
 import LikeButtonOnly from "./LikeButtonOnly";
 import { PostData } from "@/lib/types";
 import { useSession } from "@/components/SessionProvider";
+import { getThumbnailUrl } from "@/lib/constants";
 
 interface PostProps {
   post: PostData;
@@ -29,8 +30,8 @@ export default function PostCard({ post }: PostProps) {
           className="relative aspect-[2/3] rounded-md overflow-hidden cursor-pointer group"
         >
           <Image
-            src={post.thumbnailUrl || '/post-placeholder.jpg'}
-            alt={post.content || ''}
+            src={getThumbnailUrl(post.thumbnailId)}
+            alt={`타이틀 ${post.title || ''} - ${post.categories || ''} 컨텐츠의 대표 이미지`}
             fill
             className="object-cover transition-transform duration-300 group-hover:scale-105"
             sizes="(max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"

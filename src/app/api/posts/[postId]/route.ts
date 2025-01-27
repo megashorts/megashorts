@@ -43,7 +43,7 @@ export async function PUT(
           title: validatedData.title,
           titleOriginal: validatedData.titleOriginal,
           content: validatedData.content,
-          thumbnailUrl: validatedData.thumbnailUrl,
+          thumbnailId: validatedData.thumbnailId,
           status: validatedData.status,
           categories: validatedData.categories,
           ageLimit: validatedData.ageLimit,

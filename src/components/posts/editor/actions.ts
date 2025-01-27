@@ -42,7 +42,7 @@ export async function submitPost(input: PostFormData) {
           title: validatedData.title,
           titleOriginal: validatedData.titleOriginal,
           content: validatedData.content,
-          thumbnailUrl: validatedData.thumbnailUrl || null,
+          thumbnailId: validatedData.thumbnailId || null,
           status: validatedData.status,
           categories: validatedData.categories,
           ageLimit: validatedData.ageLimit,
@@ -61,7 +61,7 @@ export async function submitPost(input: PostFormData) {
           title: validatedData.title,
           titleOriginal: validatedData.titleOriginal,
           content: validatedData.content,
-          thumbnailUrl: validatedData.thumbnailUrl || null,
+          thumbnailId: validatedData.thumbnailId || null,
           userId: user.id,
           status: validatedData.status,
           categories: validatedData.categories,
@@ -163,86 +163,3 @@ function toBCP47(language: string): string {
   };
   return languageMap[language] || language.toLowerCase();
 }
-
-// export async function submitPost(input: {
-//   content: string;
-//   title?: string;
-//   thumbnailUrl?: string | null;
-//   categories?: CategoryType[]; 
-//   ageLimit?: number;
-//   status?: PostStatus;
-//   videos?: VideoData[];
-// }) {
-
-//   const { user } = await validateRequest();
-
-//   if (!user) throw new Error("Unauthorized");
-
-//   const { 
-//     title, 
-//     content, 
-//     thumbnailUrl, 
-//     categories = [], 
-//     status = "PUBLISHED",
-//   } = postSchema.parse({ 
-//     title: input.title,
-//     content: input.content,
-//     thumbnailUrl: input.thumbnailUrl,
-//     categories: input.categories,
-//     status: input.status,
-//   });
-
-//   const newPost = await prisma.$transaction(async (tx) => {
-//     const lastPost = await tx.post.findFirst({
-//       orderBy: { postNum: 'desc' }
-//     });
-
-//     const nextPostNum = (lastPost?.postNum || 0) + 1;
-
-//     const post = await tx.post.create({
-//       data: {
-//         postNum: nextPostNum,
-//         title: title || null,
-//         content,
-//         thumbnailUrl: thumbnailUrl || null,
-//         userId: user.id,
-//         status,
-//         categories, 
-//         ageLimit: input.ageLimit || 15, 
-//         videoCount: input.videos?.length || 0,
-//       },
-//       include: getPostDataInclude(user.id),
-//     });
-
-//     // 3. 비디오가 있다면 생성
-//     if (input.videos && input.videos.length > 0) {
-//       await Promise.all(
-//         input.videos.map((video) =>
-//           tx.video.create({
-//             data: {
-//               postId: post.id,
-//               url: video.url,
-//               filename: video.filename,
-//               sequence: video.sequence,
-//               language: Language.KOREAN,
-//             },
-//           })
-//         )
-//       );
-//     }
-
-//     // 4. 사용자의 postCount 증가 (atomic 연산)
-//     await tx.user.update({
-//       where: { id: user.id },
-//       data: {
-//         postCount: {
-//           increment: 1
-//         }
-//       }
-//     });
-
-//     return post;
-//   });
-
-//   return newPost;
-// }

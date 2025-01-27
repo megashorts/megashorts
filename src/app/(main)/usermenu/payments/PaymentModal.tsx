@@ -24,7 +24,8 @@ export default function PaymentModal({ paymentAmount: paymentAmount, coins, onCl
   const user = session.user as AuthUser;
   const now = new Date();
   const dateStr = now.toISOString().split('T')[0].replace(/-/g, '');
-  const customerKey = `${user?.id}_${dateStr}_${paymentAmount}`;
+  // const customerKey = `${user?.id}_${dateStr}_${paymentAmount}`;
+  const customerKey = `${user?.id}`;
 
   useEffect(() => {
     async function fetchPaymentWidgets() {

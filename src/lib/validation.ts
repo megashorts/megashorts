@@ -27,7 +27,7 @@ export type LoginValues = z.infer<typeof loginSchema>;
 export const createPostSchema = z.object({
   title: z.string().optional().default("Untitled Post"),
   content: requiredString,
-  thumbnailUrl: z.string().url("Invalid URL").optional(),
+  thumbnailId: z.string().url("Invalid URL").optional(),
   categoryIds: z.array(z.nativeEnum(CategoryType)).optional().default([]),
   status: z.nativeEnum(PostStatus).optional().default("PUBLISHED"),
 });
@@ -53,7 +53,7 @@ export const postSchema = z.object({
   titleOriginal: z.string().optional(),
   content: z.string().min(1, "내용을 입력해주세요"),
   contentI18n: z.record(z.string()).optional(),
-  thumbnailUrl: z.string().url().optional(),
+  thumbnailId: z.string().url().optional(),
   ageLimit: z.number().int().min(0).max(18).default(15),
   status: z.nativeEnum(PostStatus).default(PostStatus.DRAFT),
   postLanguage: z.nativeEnum(Language),

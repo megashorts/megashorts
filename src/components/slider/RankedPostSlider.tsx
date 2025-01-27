@@ -13,6 +13,7 @@ import 'swiper/css';
 import 'swiper/css/free-mode';
 import 'swiper/css/navigation';
 import PostModal from '../posts/PostModal';
+import { getThumbnailUrl } from '@/lib/constants';
 
 
 interface RankedPostSliderProps {
@@ -128,8 +129,8 @@ const RankedPostSlider = ({ posts, title, sliderId }: RankedPostSliderProps) => 
                   onClick={() => handleSlideClick(post)}
                 >
                   <Image
-                    src={post.thumbnailUrl || '/placeholder.jpg'}
-                    alt={post.title || ''}
+                    src={getThumbnailUrl(post.thumbnailId)}
+                    alt={`타이틀 ${post.title || ''} - ${post.categories || ''} 컨텐츠의 대표 이미지`}
                     fill
                     className="object-cover transition-transform duration-300 group-hover/item:scale-105"
                     sizes="(max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"

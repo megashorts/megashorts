@@ -7,6 +7,7 @@ import { Metadata, ResolvingMetadata } from "next";
 import { CategoryType, Post, Prisma } from "@prisma/client";
 import { ArrowLeft, ArrowRight, List } from "lucide-react";
 import NoticeSidebar from "@/components/NoticeSidebar";
+import { getThumbnailUrl } from "@/lib/constants";
 
 type Props = {
   params: {
@@ -30,7 +31,7 @@ export async function generateMetadata(
     select: { 
       title: true, 
       content: true,
-      thumbnailUrl: true 
+      thumbnailId: true 
     },
   });
 
@@ -42,7 +43,7 @@ export async function generateMetadata(
     openGraph: {
       title: post.title || '공지사항',
       description: post.content || '',
-      images: post.thumbnailUrl ? [post.thumbnailUrl] : [],
+      images: post.thumbnailId ? [getThumbnailUrl(post.thumbnailId)] : [],
     },
   };
 }
@@ -186,11 +187,11 @@ export default async function NoticePostPage({ params }: Props) {
             </div>
 
             {/* 썸네일 이미지 */}
-            {post.thumbnailUrl && (
+            {post.thumbnailId && (
               <div className="relative w-full aspect-[3/2] mb-4">
                 <Image
-                  src={post.thumbnailUrl}
-                  alt={post.title || ''}
+                  src={getThumbnailUrl(post.thumbnailId)}
+                  alt={`타이틀 ${post.title || ''} - ${post.categories || ''} 컨텐츠의 대표 이미지`}
                   className="object-cover rounded-lg"
                   priority
                   width={1200}         // 2배 증가

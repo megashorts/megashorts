@@ -11,6 +11,7 @@ import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import { useState } from 'react';
 import PostModal from '../posts/PostModal';
+import { getThumbnailUrl } from '@/lib/constants';
 
 interface FeaturedPostSliderProps {
   posts: PostData[];
@@ -105,8 +106,8 @@ const FeaturedPostSlider = ({ posts }: FeaturedPostSliderProps) => {
                 >
                   <div className="relative w-full h-full rounded-lg overflow-hidden">
                     <Image
-                      src={post.thumbnailUrl || '/placeholder.jpg'}
-                      alt={post.title || ''}
+                      src={getThumbnailUrl(post.thumbnailId)}
+                      alt={`타이틀 ${post.title || ''} - ${post.categories || ''} 컨텐츠의 대표 이미지`}
                       fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       className={`object-cover transition-transform duration-300 ${

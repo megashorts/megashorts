@@ -60,7 +60,7 @@ export function PostEditor({ initialData }: PostEditorProps) {
   );
   const [preparedImage, setPreparedImage] = useState<PreparedImage | null>(null);
   const [existingThumbnail, setExistingThumbnail] = useState<string | null>(
-    initialData?.thumbnailUrl || null
+    initialData?.thumbnailId || null
   );
 
   const { toast } = useToast();
@@ -186,14 +186,14 @@ export function PostEditor({ initialData }: PostEditorProps) {
         return;
       }
   
-      let thumbnailUrl = existingThumbnail || undefined;
+      let thumbnailId = existingThumbnail || undefined;
       if (preparedImage) {
-        thumbnailUrl = await uploadImage(preparedImage.file);
+        thumbnailId = await uploadImage(preparedImage.file);
       }
   
       const newPost = await mutation.mutateAsync({
         ...result.data,
-        thumbnailUrl,
+        thumbnailId,
       });
   
       toast({
@@ -288,9 +288,9 @@ export function PostEditor({ initialData }: PostEditorProps) {
           aspectRatio={2/3}
           username={user?.username}
         />
-        {errors.thumbnailUrl && (
+        {errors.thumbnailId && (
           <p className="mt-1 text-sm text-red-600">
-            {errors.thumbnailUrl?.message}
+            {errors.thumbnailId?.message}
           </p>
         )}
 
