@@ -62,7 +62,6 @@ export const postSchema = z.object({
   categories: z.array(z.nativeEnum(CategoryType)).min(1, "카테고리를 선택해주세요"),
   videos: z.array(z.object({
     id: z.string().optional(),  // 비디오 ID도 추가 (수정 시 사용)
-    url: z.string().url(),
     sequence: z.number().int().min(1),
     isPremium: z.boolean().default(false),
     filename: z.string(),

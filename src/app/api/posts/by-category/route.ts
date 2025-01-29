@@ -18,7 +18,13 @@ export async function GET(req: NextRequest) {
         categories: {
           has: category.toUpperCase() as CategoryType
         }
-      } : {})
+      } : {
+        NOT: {
+          categories: {
+            hasSome: [CategoryType.MSPOST, CategoryType.NOTIFICATION]
+          }
+        }
+      })
     };
 
     const posts = await prisma.post.findMany({

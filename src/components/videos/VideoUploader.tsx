@@ -163,7 +163,6 @@ export function VideoUploader({
             // 3. 비디오 정보 반환 (자막 정보 포함)
             const newVideo: Partial<Video> = {
               id,
-              url,
               filename,
               sequence,
               isPremium: true,
@@ -258,25 +257,12 @@ export function VideoUploader({
 
   const handleVideoDelete = useCallback(async (videoId: string) => {
     try {
-      // URL에서 실제 클라우드플레어 비디오 ID 추출
-      const video = videos.find(v => v.id === videoId);
-      if (!video) {
-        throw new Error('Video not found');
-      }
-  
-      // URL 형식: https://videodelivery.net/[video-id]/manifest/video.m3u8
-      const matches = video.url.match(/videodelivery\.net\/([^/]+)/);
-      const cloudflareVideoId = matches ? matches[1] : videoId;
-  
       const response = await fetch('/api/videos/delete', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
-          videoId: cloudflareVideoId,  // cloudflareId
-          dbId: video.id  // DB ID
-        }),
+        body: JSON.stringify({ videoId }),
       });
   
       if (!response.ok) {

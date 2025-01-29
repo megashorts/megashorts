@@ -45,7 +45,6 @@ export default async function RecommendedVideosPage() {
         },
         select: {
           id: true,
-          url: true,
           sequence: true,
         }
       }

@@ -20,26 +20,39 @@ export default function VideoButtons({ videos, userId, postId, onVideoSelect }: 
   const [watchedVideos, setWatchedVideos] = useState<Set<string>>(new Set());
 
   // 시청 기록 확인
+  // const checkWatchHistory = async () => {
+  //   try {
+  //     await videoDB.init();
+  //     const transaction = videoDB['db']!.transaction(['watchedVideos'], 'readonly');
+  //     const store = transaction.objectStore('watchedVideos');
+  //     const request = store.getAll();
+
+  //     request.onsuccess = () => {
+  //       const records = request.result || [];
+  //       const watchedSet = new Set(records.map(record => record.videoId));
+  //       setWatchedVideos(watchedSet);
+  //     };
+
+  //     request.onerror = () => {
+  //       console.error('Failed to read watch history');
+  //     };
+
+  //     transaction.onerror = () => {
+  //       console.error('Transaction error');
+  //     };
+  //   } catch (error) {
+  //     console.error('Failed to check watch history:', error);
+  //   }
+  // };
+
   const checkWatchHistory = async () => {
     try {
-      await videoDB.init();
-      const transaction = videoDB['db']!.transaction(['watchedVideos'], 'readonly');
-      const store = transaction.objectStore('watchedVideos');
-      const request = store.getAll();
+      const watchedVideoIds = await videoDB.getWatchedVideos();
 
-      request.onsuccess = () => {
-        const records = request.result || [];
-        const watchedSet = new Set(records.map(record => record.videoId));
-        setWatchedVideos(watchedSet);
-      };
+      console.log('VideoButtons - watchedVideoIds:', watchedVideoIds);
+      console.log('VideoButtons - current videos:', videos.map(v => v.id));
 
-      request.onerror = () => {
-        console.error('Failed to read watch history');
-      };
-
-      transaction.onerror = () => {
-        console.error('Transaction error');
-      };
+      setWatchedVideos(new Set(watchedVideoIds));
     } catch (error) {
       console.error('Failed to check watch history:', error);
     }
@@ -77,6 +90,12 @@ export default function VideoButtons({ videos, userId, postId, onVideoSelect }: 
           const isWatched = watchedVideos.has(video.id);
           const isPremium = video.isPremium;
 
+          console.log('VideoButtons - rendering button:', {
+            videoId: video.id,
+            isWatched,
+            watchedVideosSize: watchedVideos.size
+          });
+
           return (
             <Link
               key={video.id}
@@ -86,13 +105,14 @@ export default function VideoButtons({ videos, userId, postId, onVideoSelect }: 
               <button
                 onClick={() => onVideoSelect(video.sequence)}
                 className={cn(
-                  "relative w-full aspect-square rounded text-xs font-medium transition-colors",
+                  "relative w-full aspect-square rounded text-xs font-medium transition-colors flex items-center justify-center",
                   isWatched
-                    ? "opacity-50 bg-gray-300 hover:bg-gray-400"  // 시청한 컨텐츠는 더 흐리게
+                    ? isPremium
+                      ? "border-2 border-white bg-red-400 hover:bg-red-500 text-white" // 유료 + 시청 후: 분홍빛
+                      : "border-2 border-red-300 bg-white hover:bg-gray-100 text-gray-400" // 무료 + 시청 후: 테두리와 숫자 흐리게
                     : isPremium
-                      ? "bg-primary/90 hover:bg-primary/100"
-                      : "border-2 border-red-500 bg-white hover:bg-gray-100 text-black",
-                  "flex items-center justify-center"
+                    ? "bg-red-500 hover:bg-red-600 text-white" // 유료 + 시청 전: 붉은 배경
+                    : "border-2 border-red-500 bg-white hover:bg-gray-100 text-black" // 무료 + 시청 전: 기본 스타일
                 )}
               >
                 <span>{video.sequence}</span>

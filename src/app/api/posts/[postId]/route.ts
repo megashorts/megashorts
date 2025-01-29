@@ -66,7 +66,6 @@ export async function PUT(
             tx.video.create({
               data: {
                 postId: post.id,
-                url: video.url,
                 filename: video.filename,
                 sequence: video.sequence,
                 isPremium: video.isPremium,

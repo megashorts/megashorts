@@ -74,9 +74,9 @@ const VideoPlayer = dynamic(() => Promise.resolve(({
     // 현재 시간 전달
     onTimeUpdate?.(currentTime);
 
-    // 3초 도달 시 첫 저장
-    if (currentTime >= 3 && lastTrackedTimeRef.current === 0) {
-      console.log('First tracking at 3 seconds:', {
+    // 5초 도달 시 첫 저장
+    if (currentTime >= 5 && lastTrackedTimeRef.current === 0) {
+      console.log('First tracking at 5 seconds:', {
         videoId,
         sequence,
         currentTime

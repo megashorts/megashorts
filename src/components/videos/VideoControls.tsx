@@ -24,7 +24,7 @@ interface VideoControlsProps {
   visible?: boolean;
   videos: {
     id: string;
-    url: string;
+    // url: string;
     sequence: number;
     isPremium: boolean;
   }[];

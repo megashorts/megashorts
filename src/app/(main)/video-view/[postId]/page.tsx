@@ -25,7 +25,6 @@ interface PageProps {
         videos: {
           select: {
             id: true,
-            url: true,
             sequence: true,
             isPremium: true 
           },

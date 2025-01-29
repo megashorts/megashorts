@@ -66,7 +66,6 @@ export function MobileVideoEditor({
       const newVideo = {  
         id,
         postId,
-        url,
         filename,
         sequence: videos.length + 1,
         isPremium: true,
@@ -112,27 +111,13 @@ export function MobileVideoEditor({
 
   const handleVideoDelete = async (videoId: string) => {
     try {
-      const video = videos.find(v => v.id === videoId);
-      if (!video) {
-        throw new Error('Video not found');
-      }
-  
-      // URL에서 클라우드플레어 ID 추출
-      const matches = video.url.match(/videodelivery\.net\/([^/]+)/);
-      if (!matches) {
-        throw new Error('Invalid video URL format');
-      }
-      const cloudflareId = matches[1];
   
       const response = await fetch('/api/videos/delete', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
-          videoId: cloudflareId,  // 클라우드플레어 ID
-          dbId: videoId          // 데이터베이스 ID
-        }),
+        body: JSON.stringify({ videoId }),
       });
   
       if (!response.ok) {

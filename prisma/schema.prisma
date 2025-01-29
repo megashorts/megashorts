@@ -82,7 +82,6 @@ model Post {
   titleI18n           Json?
   content             String
   contentI18n         Json?
-  thumbnailUrl        String?
   thumbnailId         String?  
   postLanguage        Language       @default(CHINESE)
   status              PostStatus     @default(DRAFT)
@@ -116,7 +115,6 @@ model Post {
 model Video {
   id             String               @id @default(cuid())
   postId         String
-  url            String
   sequence       Int
   isPremium      Boolean              @default(false)
   filename       String

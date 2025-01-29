@@ -30,7 +30,7 @@ export async function POST(req: Request) {
     const { videoId, postId, sequence, timestamp } = await req.json();
     console.log('Request body:', { videoId, postId, sequence, timestamp });
 
-    if (timestamp < 3) {
+    if (timestamp < 5) {
       return Response.json({ message: "Duration too short" });
     }
 
@@ -41,7 +41,6 @@ export async function POST(req: Request) {
           videos: {
             select: {
               id: true,
-              url: true,
               isPremium: true
             }
           }
@@ -53,7 +52,7 @@ export async function POST(req: Request) {
         return Response.json({ error: "Post not found" }, { status: 404 });
       }
 
-      const video = post.videos.find(v => v.url.includes(videoId));
+      const video = post.videos.find(v => v.id === videoId);
       if (!video) {
         console.error('Video not found:', videoId);
         return Response.json({ error: "Video not found" }, { status: 404 });

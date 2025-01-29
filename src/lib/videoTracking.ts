@@ -11,7 +11,7 @@ export const videoTracking = {
   async trackView(params: TrackViewParams) {
     const { sequence, videoId, postId, timestamp } = params;
 
-    if (timestamp < 3) {
+    if (timestamp < 5) {
       console.log('Skipping: timestamp < 3');
       return;
     }

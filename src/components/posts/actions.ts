@@ -64,16 +64,9 @@ export async function deletePost(id: string) {
 // 2. 비디오와 자막 삭제
 for (const video of post.videos) {
   try {
-    // videodelivery.net URL에서 비디오 ID 추출
-    // URL 형식: https://videodelivery.net/[video-id]/manifest/video.m3u8
-    const matches = video.url.match(/videodelivery\.net\/([^/]+)/);
-    const videoId = matches?.[1];
+    const videoId = video.id;
     
-    console.log('Attempting to delete video:', { 
-      videoId, 
-      url: video.url,
-      matches: matches
-    });
+    console.log('Attempting to delete video:', { videoId });
     
     if (videoId) {
       const videoResponse = await fetch(
@@ -94,7 +87,7 @@ for (const video of post.videos) {
         data: videoData
       });
     } else {
-      console.error('Failed to extract video ID from URL:', video.url);
+      console.error('Failed to extract video ID from URL:', video.id);
     }
   } catch (error) {
     console.error('Video deletion error:', error);

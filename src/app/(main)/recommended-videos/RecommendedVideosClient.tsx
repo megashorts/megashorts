@@ -19,7 +19,6 @@ interface RecommendedVideosClientProps {
     title: string | null;
     videos: {
       id: string;
-      url: string;
       sequence: number;
     }[];
   }[];
@@ -85,7 +84,7 @@ export function RecommendedVideosClient({ posts: initialPosts }: RecommendedVide
         newIndex,
         video: loadedPosts[newIndex].videos[0],
         sequence: loadedPosts[newIndex].videos[0].sequence,
-        streamId: loadedPosts[newIndex].videos[0].url.split('/')[3]
+        streamId: loadedPosts[newIndex].videos[0].id
       });
   
       setActiveIndex(newIndex);
@@ -187,7 +186,7 @@ export function RecommendedVideosClient({ posts: initialPosts }: RecommendedVide
       >
         {loadedPosts.map((post, index) => {
           const video = post.videos[0];
-          const streamId = video.url.split('/')[3];
+          const streamId = video.id;
           return (
             <SwiperSlide key={`${post.id}-${index}`} virtualIndex={index}>
               <div className="w-full h-full flex items-center justify-center bg-black pt-[48px] md:pt-[70px] pb-1">
