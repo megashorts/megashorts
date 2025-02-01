@@ -49,8 +49,8 @@ export default function VideoButtons({ videos, userId, postId, onVideoSelect }: 
     try {
       const watchedVideoIds = await videoDB.getWatchedVideos();
 
-      console.log('VideoButtons - watchedVideoIds:', watchedVideoIds);
-      console.log('VideoButtons - current videos:', videos.map(v => v.id));
+      // console.log('VideoButtons - watchedVideoIds:', watchedVideoIds);
+      // console.log('VideoButtons - current videos:', videos.map(v => v.id));
 
       setWatchedVideos(new Set(watchedVideoIds));
     } catch (error) {
@@ -89,6 +89,12 @@ export default function VideoButtons({ videos, userId, postId, onVideoSelect }: 
         {sortedVideos.map((video) => {
           const isWatched = watchedVideos.has(video.id);
           const isPremium = video.isPremium;
+
+          // console.log('VideoButtons - rendering button:', {
+          //   videoId: video.id,
+          //   isWatched,
+          //   watchedVideosSize: watchedVideos.size
+          // });
 
           return (
             <Link
