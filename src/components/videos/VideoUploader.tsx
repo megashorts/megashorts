@@ -116,10 +116,10 @@ export function VideoUploader({
       return;
     }
 
-    if (videos.length + acceptedFiles.length > maxFiles) {
+    if (acceptedFiles.length > maxFiles) {
       toast({
         variant: "destructive",
-        description: `최대 ${maxFiles}개의 파일만 업로드할 수 있습니다.`
+        description: `한 번에 최대 ${maxFiles}개의 파일만 업로드할 수 있습니다.`
       });
       return;
     }

@@ -113,7 +113,6 @@ export function VideoItem({
                   try {
                     console.log('Deleting subtitle:', {
                       videoId: video.id,
-                      url: video.url,
                       language: lang
                     });
 

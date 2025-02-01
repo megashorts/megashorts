@@ -53,7 +53,7 @@ export const postSchema = z.object({
   titleOriginal: z.string().optional(),
   content: z.string().min(1, "내용을 입력해주세요"),
   contentI18n: z.record(z.string()).optional(),
-  thumbnailId: z.string().url().optional(),
+  thumbnailId: z.string().optional(),
   ageLimit: z.number().int().min(0).max(18).default(15),
   status: z.nativeEnum(PostStatus).default(PostStatus.DRAFT),
   postLanguage: z.nativeEnum(Language),
@@ -61,12 +61,13 @@ export const postSchema = z.object({
   priority: z.number().int().min(1).max(10).default(5),
   categories: z.array(z.nativeEnum(CategoryType)).min(1, "카테고리를 선택해주세요"),
   videos: z.array(z.object({
-    id: z.string().optional(),  // 비디오 ID도 추가 (수정 시 사용)
+    id: z.string(),  // 비디오 ID도 추가 (수정 시 사용)
     sequence: z.number().int().min(1),
     isPremium: z.boolean().default(false),
     filename: z.string(),
     subtitle: z.array(z.nativeEnum(Language)).optional().default([]) 
-  })).min(1, "최소 1개의 비디오가 필요합니다")  // optional 제거하고 min 조건 추가
+  // })).min(1, "최소 1개의 비디오가 필요합니다")  // optional 제거하고 min 조건 추가
+  })).min(1, "최소 1개의 비디오가 필요합니다").default([])  
 });
 
 export type PostFormData = z.infer<typeof postSchema>;

@@ -51,12 +51,17 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
 
           hls.on(Hls.Events.MANIFEST_PARSED, () => {
             if (isMounted) {
-              // video.muted = true;
-              video.play().then(() => {
-                setIsVideoReady(true);
-              }).catch(error => {
-                console.error('Error playing video:', error);
-              });
+              let playPromise = video.play();
+              playPromise
+                .then(() => {
+                  setIsVideoReady(true);
+                })
+                .catch(error => {
+                  // AbortError는 무시 (정상적인 상황)
+                  if (error.name !== 'AbortError') {
+                    console.error('Error playing video:', error);
+                  }
+                });
             }
           });
 

@@ -93,7 +93,6 @@ export function useUploader() {
     }
   };
 
-
   const uploadImage = async (file: File): Promise<string> => {
     const formData = new FormData();
     formData.append('file', file);
@@ -108,7 +107,7 @@ export function useUploader() {
     }
 
     const data = await response.json();
-    return data.url;
+    return data.id;
   };
 
   const uploadSubtitle = async (

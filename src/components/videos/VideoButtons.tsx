@@ -90,12 +90,6 @@ export default function VideoButtons({ videos, userId, postId, onVideoSelect }: 
           const isWatched = watchedVideos.has(video.id);
           const isPremium = video.isPremium;
 
-          console.log('VideoButtons - rendering button:', {
-            videoId: video.id,
-            isWatched,
-            watchedVideosSize: watchedVideos.size
-          });
-
           return (
             <Link
               key={video.id}

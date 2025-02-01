@@ -20,6 +20,7 @@ import { useSubmitPostMutation } from "./mutations";
 import { useRouter } from "next/navigation";
 import { useSession } from "@/components/SessionProvider";
 import LanguageFlag from "@/components/LanguageFlag";
+import { getThumbnailUrl } from "@/lib/constants";
 
 type PostFormData = z.infer<typeof postSchema>;
 
@@ -146,7 +147,6 @@ export function PostEditor({ initialData }: PostEditorProps) {
         postLanguage: selectedLanguage,
         videos: videos.map(video => ({
           id: video.id,
-          url: video.url,
           filename: video.filename,
           sequence: video.sequence,
           isPremium: video.isPremium,
@@ -154,6 +154,12 @@ export function PostEditor({ initialData }: PostEditorProps) {
         }))
       };
   
+      console.log('Saving post data:', {
+        videos: videos,  // 원본 videos 배열
+        mappedVideos: postData.videos,  // 매핑된 videos 배열
+        validation: postSchema.safeParse(postData)  // 검증 결과
+      });
+
       const result = postSchema.safeParse(postData);
   
       if (!result.success) {
@@ -297,7 +303,7 @@ export function PostEditor({ initialData }: PostEditorProps) {
         {existingThumbnail && !preparedImage && (
           <div className="mb-4">
             <img 
-              src={existingThumbnail} 
+              src={getThumbnailUrl(existingThumbnail)}
               alt="현재 썸네일" 
               width={90}
               height={135}

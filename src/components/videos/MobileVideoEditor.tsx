@@ -32,11 +32,12 @@ interface MobileVideoEditorProps {
 }
 
 export function MobileVideoEditor({
-  videos,
+  videos: initialVideos,
   onChange,
   maxFiles = 10,
   postId
 }: MobileVideoEditorProps) {
+  const [videos, setVideos] = useState(initialVideos);
   const [uploading, setUploading] = useState(false);
   const { uploadVideo, uploadSubtitle } = useUploader();
 
@@ -50,14 +51,6 @@ export function MobileVideoEditor({
   const handleVideoSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-  
-    if (videos.length >= maxFiles) {
-      toast({
-        variant: "destructive",
-        description: `최대 ${maxFiles}개의 파일만 업로드할 수 있습니다.`
-      });
-      return;
-    }
   
     setUploading(true);
     try {
@@ -77,8 +70,12 @@ export function MobileVideoEditor({
       const updatedVideos = [...videos, newVideo].sort(
         (a, b) => a.sequence - b.sequence
       );
+    
+      // 로컬 상태 먼저 업데이트
+      setVideos(updatedVideos);
+      // 그 다음 부모에 알림
       onChange(updatedVideos);
-  
+
       toast({
         description: "비디오가 업로드되었습니다.",
       });
@@ -96,22 +93,44 @@ export function MobileVideoEditor({
   const handleDragEnd = useCallback((event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
-
+  
     const oldIndex = videos.findIndex(item => item.id === active.id);
     const newIndex = videos.findIndex(item => item.id === over.id);
-
-    const reorderedItems = arrayMove([...videos], oldIndex, newIndex);
-    const updatedItems = reorderedItems.map((item, index) => ({
-      ...item,
-      sequence: index + 1
-    }));
-
+  
+    // 1. 먼저 이동할 비디오의 sequence를 임시값으로 변경
+    const movingVideo = videos[oldIndex];
+    const tempItems = [...videos];
+    tempItems[oldIndex] = {
+      ...movingVideo,
+      sequence: -1  // 임시로 음수값 사용
+    };
+    setVideos(tempItems);
+  
+    // 2. 순서 재배열
+    const reorderedItems = arrayMove(videos, oldIndex, newIndex);
+  
+    // 3. 변경된 비디오만 찾아서 순차적으로 업데이트
+    const updatedItems = reorderedItems.map((item, index) => {
+      const newSequence = index + 1;
+      // sequence가 변경된 비디오만 업데이트
+      if (item.sequence !== newSequence) {
+        return {
+          ...item,
+          sequence: newSequence
+        };
+      }
+      return item;
+    });
+  
+    setVideos(updatedItems);
     onChange(updatedItems);
   }, [videos, onChange]);
 
   const handleVideoDelete = async (videoId: string) => {
     try {
   
+      console.log('Attempting to delete video:', videoId);
+
       const response = await fetch('/api/videos/delete', {
         method: 'POST',
         headers: {
@@ -120,6 +139,11 @@ export function MobileVideoEditor({
         body: JSON.stringify({ videoId }),
       });
   
+      console.log('Delete response:', {  // 응답 로그
+        status: response.status,
+        ok: response.ok
+      });
+
       if (!response.ok) {
         throw new Error('Failed to delete video');
       }
@@ -131,7 +155,11 @@ export function MobileVideoEditor({
           sequence: idx + 1
         }));
       
+      // 로컬 상태 먼저 업데이트
+      setVideos(updatedVideos);
+      // 그 다음 부모에 알림
       onChange(updatedVideos);
+
       toast({
         description: "비디오가 삭제되었습니다."
       });
@@ -192,7 +220,7 @@ export function MobileVideoEditor({
             document.getElementById('mobile-video-edit')?.click();
           }}
         >
-          {uploading ? "업로드 중..." : `동영상 추가 (${videos.length}/${maxFiles})`}
+          {uploading ? "업로드 중..." : "동영상 추가"}
         </Button>
       </div>
 
@@ -216,9 +244,13 @@ export function MobileVideoEditor({
                   handleSubtitleUpload(video.id, file, language);
                 }}
                 onUpdate={(updated) => {
+                  // 먼저 로컬 상태 업데이트
                   const updatedVideos = videos.map(v => 
                     v.id === video.id ? updated : v
                   );
+                  setVideos(updatedVideos);
+                  
+                  // 그 다음 부모 컴포넌트에 알림
                   onChange(updatedVideos);
                 }}
               />

@@ -35,7 +35,8 @@ export async function POST(request: Request) {
         body: JSON.stringify({
           maxDurationSeconds: 3600,
           creator: user.username,
-          requireSignedURLs: false
+          requireSignedURLs: false,
+          scheduledDeletion: new Date(Date.now() + 31 * 24 * 60 * 60 * 1000).toISOString()  // 30일 후 (최소 요구사항)
         })
       }
     );
