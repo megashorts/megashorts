@@ -36,6 +36,13 @@ export async function POST(request: Request) {
           maxDurationSeconds: 3600,
           creator: user.username,
           requireSignedURLs: false,
+          allowedOrigins: [
+            "megashorts.com",          // 메인 도메인
+            "www.megashorts.com",      // www 서브도메인
+            "*.megashorts.com",        // 모든 서브도메인 (모바일 웹 포함)
+            "m.megashorts.com",        // 모바일 전용 도메인 (필요한 경우)
+            "localhost:3000"           // 개발 환경
+          ],
           scheduledDeletion: new Date(Date.now() + 31 * 24 * 60 * 60 * 1000).toISOString()  // 30일 후 (최소 요구사항)
         })
       }

@@ -19,7 +19,7 @@ export const ResetPasswordTemplate = ({ link }: ResetPasswordTemplateProps) => {
   return (
     <Html>
       <Head />
-      <Preview>Reset your password</Preview>
+      <Preview>MEGASHORTS - Reset your password</Preview>
       <Body style={main}>
         <Container style={container}>
           <Section>

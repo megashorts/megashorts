@@ -5,6 +5,7 @@ import { PostEditor } from '@/components/posts/editor/PostEditor';
 import { getPostDataInclude } from '@/lib/types';
 import { Suspense } from 'react';
 import NoticeSidebar from '@/components/NoticeSidebar';
+import { USER_ROLE } from '@/lib/constants';
 
 interface PageProps {
   params: { postId: string };
@@ -24,7 +25,12 @@ export default async function EditPostPage({ params }: PageProps) {
     include: getPostDataInclude(user.id)
   });
 
-  if (!post || post.user.id !== user.id) {
+  // if (!post || post.user.id !== user.id) {
+  //   notFound();
+  // }
+
+  // 자신의 포스트이거나 운영팀 이상의 권한을 가진 경우에만 수정 가능
+  if (!post || (post.user.id !== user.id && user.userRole < USER_ROLE.OPERATION3)) {
     notFound();
   }
 

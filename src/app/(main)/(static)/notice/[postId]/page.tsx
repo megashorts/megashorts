@@ -190,7 +190,7 @@ export default async function NoticePostPage({ params }: Props) {
             {post.thumbnailId && (
               <div className="relative w-full aspect-[3/2] mb-4">
                 <Image
-                  src={getThumbnailUrl(post.thumbnailId)}
+                  src={getThumbnailUrl(post.thumbnailId, 'public')}
                   alt={`타이틀 ${post.title || ''} - ${post.categories || ''} 컨텐츠의 대표 이미지`}
                   className="object-cover rounded-lg"
                   priority

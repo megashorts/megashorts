@@ -6,6 +6,9 @@ const nextConfig = {
     staleTimes: {
       dynamic: 30,
     },
+    turbo: {
+      enabled: true
+    },
     // runtime 제거
   },
   serverExternalPackages: ["@node-rs/argon2"],

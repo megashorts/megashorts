@@ -3,7 +3,6 @@
 import prisma from "@/lib/prisma";
 import { resetPasswordRequestSchema, resetPasswordSchema } from "@/lib/validation";
 import { hash } from "@node-rs/argon2";
-import { isRedirectError } from "next/dist/client/components/redirect";
 import { redirect } from "next/navigation";
 import { createHash, randomBytes } from "crypto";
 import { sendMail, EmailTemplate } from "@/lib/email";
@@ -139,80 +138,12 @@ export async function resetPassword(
 
     return redirect("/login");
   } catch (error) {
-    if (isRedirectError(error)) throw error;
+    if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
+      throw error;
+    }
     console.error(error);
     return {
       error: "비밀번호 재설정 중 오류가 발생했습니다",
     };
   }
 }
-
-// "use server";
-
-// import prisma from "@/lib/prisma";
-// import { resetPasswordRequestSchema, resetPasswordSchema } from "@/lib/validation";
-// import { hash } from "@node-rs/argon2";
-// import { isRedirectError } from "next/dist/client/components/redirect";
-// import { redirect } from "next/navigation";
-
-// export async function requestPasswordReset(
-//   email: string
-// ): Promise<{ error?: string }> {
-//   try {
-//     const { email: validatedEmail } = resetPasswordRequestSchema.parse({ email });
-
-//     const user = await prisma.user.findFirst({
-//       where: {
-//         email: {
-//           equals: validatedEmail,
-//           mode: "insensitive",
-//         },
-//       },
-//     });
-
-//     if (!user) {
-//       return {
-//         error: "등록되지 않은 이메일입니다",
-//       };
-//     }
-
-//     // 구글 로그인 사용자 체크 추가
-//     if (user.googleId) {
-//         return {
-//         error: "구글 계정으로 로그인한 사용자는 비밀번호 재설정이 불가능합니다. 구글 로그인을 이용해주세요.",
-//         };
-//     }
-
-//     // TODO: 이메일 발송 로직 구현
-//     // 실제 이메일 발송 로직은 기존 코드를 그대로 사용
-
-//     return {};
-//   } catch (error) {
-//     console.error(error);
-//     return {
-//       error: "비밀번호 재설정 요청 중 오류가 발생했습니다",
-//     };
-//   }
-// }
-
-// export async function resetPassword(
-//   token: string,
-//   values: { password: string; confirmPassword: string }
-// ): Promise<{ error?: string }> {
-//   try {
-//     const { password } = resetPasswordSchema.parse(values);
-
-//     const passwordHash = await hash(password);
-
-//     // TODO: 토큰 검증 및 비밀번호 업데이트 로직
-//     // 실제 토큰 검증 및 비밀번호 업데이트 로직은 기존 코드를 그대로 사용
-
-//     return redirect("/login");
-//   } catch (error) {
-//     if (isRedirectError(error)) throw error;
-//     console.error(error);
-//     return {
-//       error: "비밀번호 재설정 중 오류가 발생했습니다",
-//     };
-//   }
-// }

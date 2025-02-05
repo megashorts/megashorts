@@ -14,6 +14,7 @@ import { PostData } from "@/lib/types";
 import SimpleDeleteDialog from "./SimpleDeleteDialog";
 import { useSession } from "../SessionProvider";
 import { useRouter } from "next/navigation";
+import { USER_ROLE } from "@/lib/constants";
 
 interface PostMoreButtonProps {
   post: PostData;
@@ -28,10 +29,10 @@ export default function PostMoreButton({
   const { user } = useSession();
   const router = useRouter();
   
-  // 권한이 없는 경우 버튼을 숨김
-  if (!user || user.id !== post.user.id) {
+  if (!user || (user.id !== post.user.id && user.userRole < USER_ROLE.OPERATION3)) {
     return null;
   }
+  
 
   const handleEdit = () => {
     router.push(`/usermenu/posts/${post.id}/edit`);

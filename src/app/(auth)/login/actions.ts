@@ -13,9 +13,6 @@ import { loginSchema, LoginValues } from "@/lib/validation";
 // 패스워드 해시 검증을 위한 Argon2 라이브러리에서 제공하는 `verify` 함수를 불러옵니다.
 import { verify } from "@node-rs/argon2";
 
-// Next.js에서 리디렉션 오류를 처리할 때 사용되는 `isRedirectError` 함수를 불러옵니다. 이는 리디렉션 오류인지 확인하기 위한 함수입니다.
-import { isRedirectError } from "next/dist/client/components/redirect";
-
 // Next.js에서 서버 측의 쿠키를 조작할 수 있게 하는 `cookies` 유틸리티를 불러옵니다. 이를 통해 세션 쿠키를 설정할 수 있습니다.
 import { cookies } from "next/headers";
 
@@ -100,8 +97,10 @@ export async function login(
     // 사용자가 로그인에 성공하면 홈 페이지로 리디렉션 시킵니다.
     return redirect("/");
   } catch (error) {
-    // 리디렉션 오류인 경우 그대로 오류를 다시 던져 리디렉션이 발생하도록 합니다.
-    if (isRedirectError(error)) throw error;
+  // Next.js 15.1 리디렉션 에러 처리
+  if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
+    throw error;
+  }
 
     // 그 외의 오류가 발생하면 콘솔에 오류를 출력하고, 사용자에게 일반적인 오류 메시지를 반환합니다.
     console.error(error);
