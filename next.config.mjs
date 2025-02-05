@@ -9,6 +9,7 @@ const nextConfig = {
     turbo: {
       enabled: true
     },
+    optimizeCss: true,
     // runtime 제거
   },
   serverExternalPackages: ["@node-rs/argon2"],
