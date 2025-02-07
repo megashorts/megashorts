@@ -111,7 +111,7 @@ async function migrateVideoIds() {
           where: { id: sampleVideo.id },
           data: {
             id: cloudflareVideo.uid,  // 클라우드플레어 비디오 ID로 업데이트
-            url: newUrl
+            // url: newUrl
           }
         });
         console.log(`비디오 ${sampleVideo.id}: ID를 ${cloudflareVideo.uid}로, URL을 ${newUrl}로 업데이트 완료`);

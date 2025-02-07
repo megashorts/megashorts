@@ -93,8 +93,8 @@ export const USER_ROLE = {
   OPERATION3: 60,
   OPERATION2: 70,
   OPERATION1: 80,
-  ADMIN: 90,
-  SUPER_ADMIN: 99,
+  EXECUTIVE: 90,
+  MASTER_ADMIN: 99,
 } as const;
 
 // 임시로 한국어 이름만 사용 (나중에 next-i18next로 교체 예정)
@@ -109,14 +109,14 @@ export const USER_ROLE_NAME = {
   [USER_ROLE.CREATOR_Lv7]: "크리에이터 Lv7",
   [USER_ROLE.CREATOR_Lv8]: "크리에이터 Lv8",
   [USER_ROLE.SUPPORTERS]: "서포터즈",
-  [USER_ROLE.TEAM_MEMBER]: "팀원",
+  [USER_ROLE.TEAM_MEMBER]: "영업팀",
   [USER_ROLE.TEAM_AGENCY]: "에이젼시",
   [USER_ROLE.TEAM_MASTER]: "본부",
   [USER_ROLE.MARKETING2]: "마케팅팀",
   [USER_ROLE.MARKETING1]: "마케팅 매니저",
-  [USER_ROLE.OPERATION3]: "운영팀 CS",
+  [USER_ROLE.OPERATION3]: "운영팀",
   [USER_ROLE.OPERATION2]: "운영팀 매니저",
-  [USER_ROLE.OPERATION1]: "운영팀 리더",
-  [USER_ROLE.ADMIN]: "관리자",
-  [USER_ROLE.SUPER_ADMIN]: "최고 관리자",
+  [USER_ROLE.OPERATION1]: "운영팀 마스터",
+  [USER_ROLE.EXECUTIVE]: "임원진",
+  [USER_ROLE.MASTER_ADMIN]: "최고 관리자",
 } as const;

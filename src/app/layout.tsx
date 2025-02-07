@@ -5,6 +5,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import ReactQueryProvider from "./ReactQueryProvider";
 import { OrientationModal } from "@/components/OrientationModal";
+import { Analytics } from '@vercel/analytics/next';
 
 const BMDOHYEON = localFont({
   src: './fonts/BMDOHYEON.woff2',  // src/app/fonts 폴더 내의 폰트 파일
@@ -103,6 +104,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             {children}
+            <Analytics />
             <OrientationModal />
           </ThemeProvider>
         </ReactQueryProvider>

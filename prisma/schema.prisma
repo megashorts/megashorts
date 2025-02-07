@@ -5,8 +5,10 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  url       = env("POSTGRES_PRISMA_URL")
-  directUrl = env("POSTGRES_URL_NON_POOLING")
+  // url       = env("POSTGRES_PRISMA_URL")
+  // directUrl = env("POSTGRES_URL_NON_POOLING")
+  url = env("DATABASE_URL") // supabse
+  directUrl = env("DIRECT_URL")    // supabse
 }
 
 model User {
@@ -20,18 +22,18 @@ model User {
   bio                   String?
   referredBy            String?
   points                Int                  @default(0)
-  mscoin                Int                  @default(0)
   subscriptionEndDate   DateTime?
   createdAt             DateTime             @default(now())
   adultauth             Boolean              @default(false)
   kakaoId               String?              @unique
   naverId               String?              @unique
-  myLanguage            Language             @default(KOREAN)
   postCount             Int                  @default(0)
-  subscription          Subscription?
+  userRole              Int                  @default(10)
+  mscoin                Int                  @default(0)
+  myLanguage            Language             @default(KOREAN)
   billingKeys           BillingKey[]
   payments              Payment[]
-  userRole              Int                  @default(10)
+  subscription          Subscription?
   bookmarks             Bookmark[]
   comments              Comment[]
   following             Follow[]             @relation("Following")
@@ -43,10 +45,10 @@ model User {
   PasswordResetToken    PasswordResetToken[]
   posts                 Post[]
   sessions              Session[]
+  videoProgress         UserVideoProgress[]
   referrer              User?                @relation("Referrals", fields: [referredBy], references: [username])
   referrals             User[]               @relation("Referrals")
   videoViews            VideoView[]
-  videoProgress UserVideoProgress[]
 
   @@index([adultauth])
   @@index([mscoin])
@@ -76,58 +78,56 @@ model Follow {
 }
 
 model Post {
-  id                  String         @id @default(cuid())
-  postNum             Int            @unique @default(autoincrement())
+  id                  String              @id @default(cuid())
+  postNum             Int                 @unique @default(autoincrement())
   title               String?
   titleI18n           Json?
   content             String
   contentI18n         Json?
-  thumbnailId         String?  
-  postLanguage        Language       @default(CHINESE)
-  status              PostStatus     @default(DRAFT)
-  featured            Boolean        @default(false)
-  priority            Int            @default(5)
+  status              PostStatus          @default(DRAFT)
+  featured            Boolean             @default(false)
+  priority            Int                 @default(5)
   userId              String
-  viewCount           Int            @default(0)
-  createdAt           DateTime       @default(now())
-  updatedAt           DateTime?      @updatedAt
+  viewCount           Int                 @default(0)
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime?           @updatedAt
   publishedAt         DateTime?
-  ageLimit            Int            @default(15)
   categories          CategoryType[]
   titleOriginal       String?
-  videoCount          Int            @default(0)
+  videoCount          Int                 @default(0)
+  ageLimit            Int                 @default(15)
+  postLanguage        Language            @default(CHINESE)
+  thumbnailId         String?
   bookmarks           Bookmark[]
   comments            Comment[]
   Inquiry             Inquiry[]
   likes               Like[]
   linkedNotifications Notification[]
-  user                User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user                User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  UserVideoProgress   UserVideoProgress[]
   videos              Video[]
-  UserVideoProgress UserVideoProgress[]
 
   @@index([postNum])
   @@index([status, featured, priority])
   @@index([userId, status])
   @@map("posts")
-
 }
 
 model Video {
-  id             String               @id @default(cuid())
-  postId         String
-  sequence       Int
-  isPremium      Boolean              @default(false)
-  filename       String
-  createdAt      DateTime             @default(now())
-  subtitle       Language[]
-  VideoSettlement VideoSettlement[]
-  views          VideoView[]
-  post           Post                 @relation(fields: [postId], references: [id], onDelete: Cascade)
+  id              String           @id @default(cuid())
+  postId          String
+  sequence        Int
+  isPremium       Boolean          @default(false)
+  filename        String
+  createdAt       DateTime         @default(now())
+  subtitle        Language[]
+  VideoSettlement VideoSettlement?
+  views           VideoView[]
+  post            Post             @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@unique([postId, sequence])
   @@index([isPremium])
   @@map("videos")
-
 }
 
 model VideoView {
@@ -135,9 +135,9 @@ model VideoView {
   userId       String
   videoId      String
   createdAt    DateTime     @default(now())
-  viewCount    Int          @default(1)       // sequence 1번 무료시청시만 increment
   accessMethod AccessMethod @default(FREE)
-  timestamp    Int?         // 시청 시점 (초)
+  viewCount    Int          @default(1)
+  timestamp    Int?
   user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   video        Video        @relation(fields: [videoId], references: [id], onDelete: Cascade)
 
@@ -146,30 +146,27 @@ model VideoView {
   @@map("video_views")
 }
 
-// 현재 누적 상태
 model VideoSettlement {
-  id                    String    @id @default(cuid())
-  videoId               String
-  totalSubscriptionViews Int      @default(0)  // 구독 총 누적 시청수
-  postSettlementSubViews Int      @default(0)  // 정산 후 구독 누적 시청수
-  totalCoinViews        Int      @default(0)   // 코인 총 누적 시청수
-  postSettlementCoinViews Int     @default(0)  // 정산 후 코인 누적 시청수
-  lastSettledAt         DateTime?              // 마지막 정산 시점
-  video                 Video     @relation(fields: [videoId], references: [id], onDelete: Cascade)
-  settlementHistories   SettlementHistory[]    // 정산 히스토리
+  id                      String              @id @default(cuid())
+  videoId                 String              @unique
+  totalSubscriptionViews  Int                 @default(0)
+  postSettlementSubViews  Int                 @default(0)
+  totalCoinViews          Int                 @default(0)
+  postSettlementCoinViews Int                 @default(0)
+  lastSettledAt           DateTime?
+  settlementHistories     SettlementHistory[]
+  video                   Video               @relation(fields: [videoId], references: [id], onDelete: Cascade)
 
-  @@unique([videoId])
   @@index([lastSettledAt])
   @@map("video_settlements")
 }
 
-// 정산 히스토리
 model SettlementHistory {
-  id                String   @id @default(cuid())
+  id                String          @id @default(cuid())
   videoSettlementId String
-  settledAt         DateTime @default(now())
-  subscriptionViews Int      // 이번 정산 구독 시청수
-  coinViews         Int      // 이번 정산 코인 시청수
+  settledAt         DateTime        @default(now())
+  subscriptionViews Int
+  coinViews         Int
   settlement        VideoSettlement @relation(fields: [videoSettlementId], references: [id], onDelete: Cascade)
 
   @@index([videoSettlementId, settledAt])
@@ -177,13 +174,13 @@ model SettlementHistory {
 }
 
 model UserVideoProgress {
-  id               String   @id @default(cuid())
-  userId           String
-  postId           String
-  lastVideoSequence Int     @default(1)
-  updatedAt        DateTime @updatedAt
-  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  post             Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  id                String   @id @default(cuid())
+  userId            String
+  postId            String
+  lastVideoSequence Int      @default(1)
+  updatedAt         DateTime @updatedAt
+  post              Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, postId])
   @@index([userId, postId])
@@ -229,10 +226,10 @@ model Notification {
   recipientId String
   issuerId    String
   postId      String?
-  metadata    Json?            // 추가: 코인 수량 등 추가 정보를 저장할 필드
   type        NotificationType
   read        Boolean          @default(false)
   createdAt   DateTime         @default(now())
+  metadata    Json?
   issuer      User             @relation("Issuer", fields: [issuerId], references: [id], onDelete: Cascade)
   post        Post?            @relation(fields: [postId], references: [id], onDelete: Cascade)
   recipient   User             @relation("Recipient", fields: [recipientId], references: [id], onDelete: Cascade)
@@ -270,52 +267,49 @@ model Inquiry {
   @@map("inquiries")
 }
 
-// 구독 정보
 model Subscription {
-  id              String      @id @default(cuid())
-  userId          String      @unique
-  user            User        @relation(fields: [userId], references: [id])
-  status          String      @default("inactive") // inactive, active, cancelled, suspended
-  type            String      // weekly, yearly
+  id                 String   @id @default(cuid())
+  userId             String   @unique
+  status             String   @default("inactive")
+  type               String
   currentPeriodStart DateTime
   currentPeriodEnd   DateTime
   cancelAtPeriodEnd  Boolean  @default(false)
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  user               User     @relation(fields: [userId], references: [id])
 }
 
-// 빌링키 관리
 model BillingKey {
-  id              String      @id @default(cuid())
-  userId          String
-  user            User        @relation(fields: [userId], references: [id])
-  billingKey      String      @unique
-  customerKey     String
-  status          String      @default("active") // active, inactive
-  cardCompany     String?
-  cardNumber      String?     // 마스킹된 카드번호
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  id          String   @id @default(cuid())
+  userId      String
+  billingKey  String   @unique
+  customerKey String
+  status      String   @default("active")
+  cardCompany String?
+  cardNumber  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id])
 }
 
-// 결제 내역
 model Payment {
-  id              String      @id @default(cuid())
-  userId          String
-  user            User        @relation(fields: [userId], references: [id])
-  type            String      // subscription, coin
-  status          String      // success, failed
-  amount          Int
-  orderId         String      @unique
-  paymentKey      String?     @unique
-  billingKey      String?
-  method          String?     // card, virtual_account 등
-  requestedAt     DateTime
-  approvedAt      DateTime?
-  metadata        Json?       // 추가 정보 (구독 기간, 코인 수량 등)
-  failureReason   String?
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  id            String    @id @default(cuid())
+  userId        String
+  type          String
+  status        String
+  amount        Int
+  orderId       String    @unique
+  paymentKey    String?   @unique
+  billingKey    String?
+  method        String?
+  requestedAt   DateTime
+  approvedAt    DateTime?
+  metadata      Json?
+  failureReason String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  user          User      @relation(fields: [userId], references: [id])
 }
 
 enum AccessMethod {
