@@ -88,7 +88,7 @@ export default function MenuBar({ className }: MenuBarProps) {
           { href: "/categories/ACTION", label: "액션" },
           { href: "/categories/THRILLER", label: "스릴러" },
           { href: "/categories/DRAMA", label: "드라마" },
-          { href: "/categories/PERIOD", label: "시대극" },
+          { href: "/categories/PERIODPLAY", label: "시대극" },
           { href: "/categories/FANTASY", label: "판타지" },
           { href: "/categories/HIGHTEEN", label: "하이틴" },
           { href: "/categories/ADULT", label: "성인" }

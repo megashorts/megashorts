@@ -175,7 +175,7 @@ export default function UserButton({ className }: UserButtonProps) {
               드라마
             </DropdownMenuItem>
           </Link>
-          <Link href={`/categories/PERIOD`}>
+          <Link href={`/categories/PERIODPLAY`}>
             <DropdownMenuItem>
               시대극
             </DropdownMenuItem>
