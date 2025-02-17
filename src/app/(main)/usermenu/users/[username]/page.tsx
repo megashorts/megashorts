@@ -19,6 +19,7 @@ import Notifications from './Notifications';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { AuthButton } from './AuthButton';
+import PaymentHistory from './PaymentHistory';
 
 
 interface PageProps {
@@ -90,6 +91,7 @@ export default async function Page({ params }: PageProps) {
             <Notifications />
           </TabsContent>
           <TabsContent value="pay">
+            {/* <PaymentHistory userId={''} /> */}
             {/* <YourPosts status="DRAFT" /> */}
             <p className="text-center text-muted-foreground mt-8">
               {/* You don&apos;t have any notifications yet. */}
