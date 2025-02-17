@@ -16,11 +16,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { login } from "./actions";
+import { logActivity } from "@/lib/activity-logger/client";
+import { locationManager } from "@/lib/activity-logger/location-manager";
 
 export default function LoginForm() {
   const [error, setError] = useState<string>();
-
   const [isPending, startTransition] = useTransition();
+  const [loginAttempt, setLoginAttempt] = useState<{
+    identifier: string;
+  } | null>(null);
 
   const form = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
@@ -32,9 +36,66 @@ export default function LoginForm() {
 
   async function onSubmit(values: LoginValues) {
     setError(undefined);
+
+    // 로그인 시도 정보 저장
+    setLoginAttempt({
+      identifier: values.username
+    });
+
     startTransition(async () => {
-      const { error } = await login(values);
-      if (error) setError(error);
+      try {
+        const { error } = await login(values);
+        const locationInfo = await locationManager.getInfo();
+        
+        if (error) {
+          setError(error);
+          // 로그인 실패 로그
+          logActivity({
+            timestamp: new Date().toISOString(),
+            type: 'auth',
+            method: 'LOGIN',
+            path: '',
+            status: 400,
+            ip: locationInfo.ip,
+            country: locationInfo.country,
+            city: locationInfo.city,
+            device: locationInfo.device,
+            request: {
+              body: { username: loginAttempt?.identifier || values.username }
+            },
+            response: {
+              status: 400,
+              error: error
+            }
+          });
+        }
+      } catch (error) {
+        // NEXT_REDIRECT는 정상적인 리다이렉션이므로 성공 로그 저장
+        if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
+          const locationInfo = await locationManager.getInfo();
+          
+          logActivity({
+            timestamp: new Date().toISOString(),
+            type: 'auth',
+            method: 'LOGIN',
+            path: '',
+            status: 200,
+            ip: locationInfo.ip,
+            country: locationInfo.country,
+            city: locationInfo.city,
+            device: locationInfo.device,
+            request: {
+              body: { username: loginAttempt?.identifier || values.username }
+            },
+            response: {
+              status: 200,
+              data: { success: true }
+            }
+          });
+        } else {
+          console.error('Login error:', error);
+        }
+      }
     });
   }
 

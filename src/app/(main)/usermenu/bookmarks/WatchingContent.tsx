@@ -4,9 +4,10 @@ import Image from "next/image";
 import { useSession } from "@/components/SessionProvider";
 import PostGrid from "@/components/PostGrid";
 import PostsLoadingSkeleton from "@/components/posts/PostsLoadingSkeleton";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import kyInstance from "@/lib/ky";
 import { PostsPage } from "@/lib/types";
+import { videoDB } from "@/lib/indexedDB";
 
 export default function WatchingContent() {
   const { user } = useSession();
@@ -68,10 +69,12 @@ export default function WatchingContent() {
     );
   }
 
+  const apiEndpoint = `/api/videos/watching`;
+
   return (
     <PostGrid 
       initialPosts={initialPosts}
-      apiEndpoint="/api/videos/watching"
+      apiEndpoint={apiEndpoint}
     />
   );
 }

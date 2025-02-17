@@ -12,8 +12,6 @@ interface PaymentModalProps {
   onClose: () => void
 }
 
-// const customerKey = "Lf_QiT4USZ9eANDbcpXxi";
-
 export default function PaymentModal({ paymentAmount: paymentAmount, coins, onClose }: PaymentModalProps) {
   // const [, setAmount] = useState(false)
   const [ready, setReady] = useState(false)
@@ -21,7 +19,8 @@ export default function PaymentModal({ paymentAmount: paymentAmount, coins, onCl
   const [error, setError] = useState<string | null>(null)
   const orderId = `order_${nanoid()}_${coins}`
   const session = useSession();
-  const user = session.user as AuthUser;
+  // const user = session.user as AuthUser;
+  const user = session.user as unknown as AuthUser;
   const now = new Date();
   const dateStr = now.toISOString().split('T')[0].replace(/-/g, '');
   // const customerKey = `${user?.id}_${dateStr}_${paymentAmount}`;
@@ -99,8 +98,8 @@ export default function PaymentModal({ paymentAmount: paymentAmount, coins, onCl
       await widgets.requestPayment({
         orderId: orderId,
         orderName: coins + "MS코인",
-        successUrl: `${window.location.origin}/usermenu/payments/result/success`,
-        failUrl: `${window.location.origin}/usermenu/payments/result/fail`,
+        successUrl: `${window.location.origin}/usermenu/payments/result/coin/success`,
+        failUrl: `${window.location.origin}/usermenu/payments/result/coin/fail`,
         customerEmail: user.email,
         customerName: user.username,
         customerMobilePhone: "01012341234",
@@ -166,134 +165,3 @@ export default function PaymentModal({ paymentAmount: paymentAmount, coins, onCl
     </div>
   )
 }
-
-// 'use client'
-
-// import {
-//   Dialog,
-//   DialogContent,
-//   DialogOverlay,
-//   DialogPortal,
-//   DialogTitle,
-// } from '@/components/ui/dialog'
-// import { useEffect, useState } from 'react'
-// import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk"
-// import { nanoid } from 'nanoid'
-
-// interface PaymentModalProps {
-//   amount: number
-//   coins?: number
-//   onClose: () => void
-// }
-
-// export default function PaymentModal({ amount, coins, onClose }: PaymentModalProps) {
-//   const [ready, setReady] = useState(false)
-//   const [widgets, setWidgets] = useState<any>(null)
-//   const [error, setError] = useState<string | null>(null)
-//   const orderId = `order_${nanoid()}`
-
-//   useEffect(() => {
-//     const initPayment = async () => {
-//       try {
-//         // 토스페이먼츠 SDK 초기화
-//         const tossPayments = await loadTossPayments(process.env.NEXT_PUBLIC_TOSS_PAYMENTS_CLIENT_KEY || '')
-//         const paymentWidgets = tossPayments.widgets({ customerKey: ANONYMOUS })
-        
-//         // 금액 설정
-//         await paymentWidgets.setAmount({
-//           value: amount,
-//           currency: 'KRW'
-//         })
-        
-//         setWidgets(paymentWidgets)
-//         setError(null)
-//       } catch (err) {
-//         console.error('결제 위젯 초기화 실패:', err)
-//         setError('결제 위젯을 불러오는데 실패했습니다.')
-//       }
-//     }
-
-//     // 모달이 마운트된 후 초기화 시작
-//     const timer = setTimeout(() => {
-//       initPayment()
-//     }, 0)
-
-//     return () => clearTimeout(timer)
-//   }, [amount])
-
-//   useEffect(() => {
-//     if (!widgets) return
-
-//     const renderWidgets = async () => {
-//       try {
-//         // UI 렌더링
-//         await widgets.renderPaymentMethods({
-//           selector: "#payment-widget",
-//           variantKey: "DEFAULT",
-//         })
-//         await widgets.renderAgreement({
-//           selector: "#agreement",
-//           variantKey: "AGREEMENT",
-//         })
-//         setReady(true)
-//       } catch (err) {
-//         console.error('결제 위젯 렌더링 실패:', err)
-//         setError('결제 수단을 불러오는데 실패했습니다.')
-//       }
-//     }
-
-//     renderWidgets()
-//   }, [widgets])
-
-//   const handlePayment = async () => {
-//     if (!widgets || !ready) return
-
-//     try {
-//       await widgets.requestPayment({
-//         orderId: orderId,
-//         orderName: coins ? `메가쇼츠 ${coins}코인` : "메가쇼츠 구독",
-//         customerEmail: "subscriber@example.com",
-//         customerName: "구독자",
-//         successUrl: `${window.location.origin}/usermenu/payments/result/success`,
-//         failUrl: `${window.location.origin}/usermenu/payments/result/fail`,
-//       })
-//     } catch (err) {
-//       console.error('결제 요청 실패:', err)
-//       setError('결제 처리 중 오류가 발생했습니다.')
-//     }
-//   }
-
-//   return (
-//     <Dialog open onOpenChange={onClose}>
-//       <DialogPortal>
-//         <DialogOverlay className="fixed inset-0 bg-black/50 z-50" />
-//         <DialogContent className="fixed left-[50%] top-[50%] z-50 translate-x-[-50%] translate-y-[-50%] w-full max-w-[560px] bg-white p-5 shadow-xl rounded-lg">
-//           <DialogTitle className="sr-only">
-//             {coins ? `${coins}코인 구매` : '구독 결제'}
-//           </DialogTitle>
-          
-//           <h1 className="text-lg font-bold mb-4 ml-6 text-gray-900">
-//             {coins ? `${coins}코인 구매` : '구독 결제'}
-//           </h1>
-          
-//           {error && (
-//             <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 rounded text-sm">
-//               {error}
-//             </div>
-//           )}
-          
-//           <div id="payment-widget" className="mb-4" />
-//           <div id="agreement" className="mb-4" />
-          
-//           <button 
-//             onClick={handlePayment}
-//             disabled={!ready}
-//             className="w-full bg-red-500 text-white py-2.5 px-4 rounded hover:bg-red-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed text-sm"
-//           >
-//             {!ready ? '로딩중...' : '결제하기'}
-//           </button>
-//         </DialogContent>
-//       </DialogPortal>
-//     </Dialog>
-//   )
-// }

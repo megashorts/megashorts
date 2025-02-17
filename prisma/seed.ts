@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 const prisma = new PrismaClient();
 
-const SAMPLE_USER_ID = 'avtpj76tmacx3ln4';
+const SAMPLE_USER_ID = '4qn7hl4z5gkmz4c5'; 
 
 const thumbnailImages = [
   'https://imagedelivery.net/wuhPilUNWOdMaNWjMYkZJg/25c705bf-eb43-4bf8-344e-32c8b068c300/thumbnail',

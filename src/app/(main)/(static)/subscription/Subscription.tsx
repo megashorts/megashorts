@@ -1,14 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import Image from "next/image";
-
-import { Button } from "@/components/ui/button";
-import { useSearchParams } from "next/navigation";
-import { useToast } from "@/components/ui/use-toast";
 import PaymentModal from "@/app/(main)/usermenu/payments/PaymentModal";
-import BillingModal from "../../usermenu/payments/BillingModal";
+import BillingModal from "@/app/(main)/usermenu/payments/BillingModal";
 import { SubscriptionButton } from "./SubscriptionButton";
 import { CoinPurchaseButton } from "./CoinPurchaseButton";
 
@@ -44,17 +40,6 @@ const subscriptionPlans: Record<'weekly' | 'yearly', SubscriptionPlan> = {
   }
 }
 
-// PaymentModal import 수정
-// const PaymentModal = dynamic(
-//   () => import('@/app/(main)/usermenu/payments/PaymentModal'),
-//   { ssr: false }
-// )
-
-// const BillingPaymentModal = dynamic(
-//   () => import('@/app/(main)/usermenu/payments/BillingPaymentModal'),
-//   { ssr: false }
-// )
-
 const SubscriptionPage = () => {
   // const [isWeekly, setIsweekly] = useState(true);
   const [selectedCoin, setSelectedCoin] = useState<number | null>(null);
@@ -63,26 +48,6 @@ const SubscriptionPage = () => {
   // const searchParams = useSearchParams()
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlanType>('weekly');
   const [billingType, setBillingType] = useState<BillingType>('weekly');
-
-  // 결제 성공 메시지
-  // useEffect(() => {
-  //   const success = searchParams.get('success')
-  //   const type = searchParams.get('type')
-  //   const amount = searchParams.get('amount')
-
-  //   if (success === 'true' && type && amount) {
-  //     const messages = {
-  //       subscription: `${type === 'weekly' ? '주간' : '연간'} 구독이 시작되었습니다.`,
-  //       coin: `${Number(amount).toLocaleString()}원 결제가 완료되었습니다.`
-  //     }
-      
-  //     toast({
-  //       title: '결제 성공',
-  //       description: messages[type as keyof typeof messages],
-  //     })
-  //   }
-  // }, [searchParams, toast])
-
 
   interface CoinOption {
     value: number;

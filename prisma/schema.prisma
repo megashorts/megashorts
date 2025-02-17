@@ -5,9 +5,8 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  // url       = env("POSTGRES_PRISMA_URL")
+  url       = env("DATABASE_URL")
   directUrl = env("POSTGRES_URL_NON_POOLING")
-  url = env("DATABASE_URL") // supabase
 }
 
 model User {
@@ -30,10 +29,11 @@ model User {
   userRole              Int                  @default(10)
   mscoin                Int                  @default(0)
   myLanguage            Language             @default(KOREAN)
-  billingKeys           BillingKey[]
   payments              Payment[]
-  subscription          Subscription?
+  billingKeys           BillingKey[]
   bookmarks             Bookmark[]
+  receivedCoinUsages    CoinUsage[]          @relation("ReceivedCoins")
+  sentCoinUsages        CoinUsage[]          @relation("SentCoins")
   comments              Comment[]
   following             Follow[]             @relation("Following")
   followers             Follow[]             @relation("Followers")
@@ -44,6 +44,8 @@ model User {
   PasswordResetToken    PasswordResetToken[]
   posts                 Post[]
   sessions              Session[]
+  subscription          Subscription?
+  SystemSetting         SystemSetting[]
   videoProgress         UserVideoProgress[]
   referrer              User?                @relation("Referrals", fields: [referredBy], references: [username])
   referrals             User[]               @relation("Referrals")
@@ -120,6 +122,7 @@ model Video {
   filename        String
   createdAt       DateTime         @default(now())
   subtitle        Language[]
+  coinUsages      CoinUsage[]
   VideoSettlement VideoSettlement?
   views           VideoView[]
   post            Post             @relation(fields: [postId], references: [id], onDelete: Cascade)
@@ -136,13 +139,32 @@ model VideoView {
   createdAt    DateTime     @default(now())
   accessMethod AccessMethod @default(FREE)
   viewCount    Int          @default(1)
-  timestamp    Int?
+  deleteSet    Boolean      @default(false)
+  updatedAt    DateTime?    @default(now())
   user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   video        Video        @relation(fields: [videoId], references: [id], onDelete: Cascade)
 
   @@index([userId, videoId])
   @@index([videoId, accessMethod, createdAt])
   @@map("video_views")
+}
+
+model CoinUsage {
+  id           String   @id @default(cuid())
+  userId       String
+  videoId      String?
+  recipientId  String?
+  coins        Int      @default(2)
+  createdAt    DateTime @default(now())
+  eventMessage String?
+  type         String   @default("VIDEO_VIEW")
+  recipient    User?    @relation("ReceivedCoins", fields: [recipientId], references: [id])
+  user         User     @relation("SentCoins", fields: [userId], references: [id])
+  video        Video?   @relation(fields: [videoId], references: [id])
+
+  @@index([userId, videoId])
+  @@index([createdAt])
+  @@map("coin_usages")
 }
 
 model VideoSettlement {
@@ -267,29 +289,52 @@ model Inquiry {
 }
 
 model Subscription {
-  id                 String   @id @default(cuid())
-  userId             String   @unique
-  status             String   @default("inactive")
+  id                 String      @id @default(cuid())
+  userId             String      @unique
+  status             String      @default("inactive")
   type               String
   currentPeriodStart DateTime
   currentPeriodEnd   DateTime
-  cancelAtPeriodEnd  Boolean  @default(false)
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-  user               User     @relation(fields: [userId], references: [id])
+  cancelAtPeriodEnd  Boolean     @default(false)
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+  failCount          Int         @default(0)
+  lastFailedAt       DateTime?
+  nextRetryAt        DateTime?
+  billingKey         BillingKey? @relation("SubscriptionToBillingKey")
+  user               User        @relation(fields: [userId], references: [id])
+
+  @@index([status, currentPeriodEnd])
+  @@map("subscriptions")
+}
+
+model webhookLog {
+  id        String   @id @default(cuid())
+  eventType String
+  payload   Json
+  status    String
+  error     String?
+  createdAt DateTime @default(now())
+
+  @@map("webhook_logs")
 }
 
 model BillingKey {
-  id          String   @id @default(cuid())
-  userId      String
-  billingKey  String   @unique
-  customerKey String
-  status      String   @default("active")
-  cardCompany String?
-  cardNumber  String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  user        User     @relation(fields: [userId], references: [id])
+  id             String       @id @default(cuid())
+  userId         String
+  subscriptionId String       @unique
+  billingKey     String       @unique
+  customerKey    String
+  status         String       @default("active")
+  cardCompany    String?
+  cardNumber     String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  subscription   Subscription @relation("SubscriptionToBillingKey", fields: [subscriptionId], references: [id], map: "billing_keys_subscription_fkey")
+  user           User         @relation(fields: [userId], references: [id], map: "billing_keys_user_fkey")
+
+  @@index([status, userId])
+  @@map("billing_keys")
 }
 
 model Payment {
@@ -311,22 +356,36 @@ model Payment {
   user          User      @relation(fields: [userId], references: [id])
 }
 
+model SystemSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     Json
+  updatedAt DateTime @default(now()) @updatedAt
+  updatedBy String?
+  user      User?    @relation(fields: [updatedBy], references: [id])
+
+  @@map("system_settings")
+}
+
 enum AccessMethod {
   FREE
   SUBSCRIPTION
-  POINT_PAYMENT
+  COIN
 }
 
 enum CategoryType {
-  COMIC
+  COMEDY
   ROMANCE
   ACTION
   THRILLER
   DRAMA
-  PERIOD
+  PERIODPLAY
   FANTASY
   HIGHTEEN
   ADULT
+  HUMANE
+  CALM
+  VARIETYSHOW
   NOTIFICATION
   MSPOST
 }

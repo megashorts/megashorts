@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import dynamic from 'next/dynamic';
 import { videoTracking } from '@/lib/videoTracking';
 import { useSession } from '@/components/SessionProvider';
+import { videoDB } from '@/lib/indexedDB';
 
 const VideoPlayer = dynamic(() => Promise.resolve(({ 
   videoId, 
@@ -94,7 +95,7 @@ const VideoPlayer = dynamic(() => Promise.resolve(({
     }
     
     // 이후 10초 단위로 저장
-    if (lastTrackedTimeRef.current > 0) {
+    if (lastTrackedTimeRef.current >= 10) {
       const nextCheckpoint = Math.floor(currentTime / 10) * 10;
       
       if (nextCheckpoint > lastTrackedTimeRef.current) {
@@ -105,13 +106,10 @@ const VideoPlayer = dynamic(() => Promise.resolve(({
           nextCheckpoint
         });
         
-        videoTracking.trackView({
-          videoId,
-          postId,
-          sequence,
-          timestamp: nextCheckpoint
-        });
-        
+        // trackProgress 대신 브라우저 저장만
+        videoDB.saveLastView(postId, sequence, nextCheckpoint)
+          .catch(error => console.error('IndexedDB saveLastView error:', error));
+
         lastTrackedTimeRef.current = nextCheckpoint;
       }
     }
@@ -256,8 +254,13 @@ useEffect(() => {
   });
 
   if (isActive) {
-    // 재생 시작 시 lastTrackedTimeRef 초기화
-    lastTrackedTimeRef.current = 0;
+    if (initialTime > 0) {
+      // 이어보기인 경우 lastTrackedTimeRef도 해당 시점으로 설정
+      lastTrackedTimeRef.current = Math.floor(initialTime / 10) * 10;
+    } else if (video.currentTime === 0) {
+      // 처음부터 보는 경우에만 초기화
+      lastTrackedTimeRef.current = 0;
+    }
     
     if (hlsRef.current) {
       hlsRef.current.startLoad(-1);

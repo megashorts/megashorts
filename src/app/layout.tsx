@@ -6,6 +6,7 @@ import "./globals.css";
 import ReactQueryProvider from "./ReactQueryProvider";
 import { OrientationModal } from "@/components/OrientationModal";
 import { Analytics } from '@vercel/analytics/next';
+import '@/lib/logging-wrapper';
 
 const BMDOHYEON = localFont({
   src: './fonts/BMDOHYEON.woff2',  // src/app/fonts 폴더 내의 폰트 파일
@@ -93,7 +94,6 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-
     <html lang="ko" suppressHydrationWarning>
       <body className={BMDOHYEON.className}>
         <ReactQueryProvider>

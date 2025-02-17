@@ -9,7 +9,7 @@ const nextConfig = {
     turbo: {
       enabled: true
     },
-    // runtime 제거
+    // runtime: 'edge'
   },
   serverExternalPackages: ["@node-rs/argon2"],
   images: {

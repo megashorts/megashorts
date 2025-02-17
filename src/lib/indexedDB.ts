@@ -149,6 +149,27 @@ class VideoDBManager {
     });
   }
 
+  // 1화보다 더 본 포스트 ID 목록 가져오기
+  async getWatchingPostIds() {
+    await this.init();
+    if (!this.db) throw new Error('Database not initialized');
+
+    return new Promise<string[]>((resolve, reject) => {
+      const transaction = this.db!.transaction(['lastViews'], 'readonly');
+      const store = transaction.objectStore('lastViews');
+      const request = store.getAll();
+
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => {
+        const views = request.result || [];
+        const watchingPosts = views
+          .filter(view => view.sequence > 1)
+          .map(view => view.postId);
+        resolve(watchingPosts);
+      };
+    });
+  }
+
   // 다른 사용자 로그인 시에만 호출되는 초기화 메서드
   async clearForNewUser() {
     await this.init();

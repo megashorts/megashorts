@@ -418,7 +418,7 @@ interface VideoViewStore {
   watchedVideos: {
     videoId: string;
     timestamp: number;
-    accessMethod: 'SUBSCRIPTION' | 'POINT_PAYMENT';
+    accessMethod: 'SUBSCRIPTION' | 'COIN';
   }[];
   
   // 포스트별 마지막 시청 정보
@@ -445,5 +445,5 @@ interface VideoViewData {
   sequence: number;
   timestamp: number;
   duration: number;
-  accessMethod: 'FREE' | 'SUBSCRIPTION' | 'POINT_PAYMENT';
+  accessMethod: 'FREE' | 'SUBSCRIPTION' | 'COIN';
 }

@@ -20,17 +20,16 @@ export default function SessionProvider({
   useEffect(() => {
     const currentUserId = value.user?.id;
     const prevUserId = prevUserIdRef.current;
-
+  
     const handleUserChange = async () => {
-      // 로그인 시에만 동작
       if (currentUserId) {
         try {
-          // 처음 로그인이거나 다른 사용자로 로그인한 경우
-          if (!prevUserId || currentUserId !== prevUserId) {
-            await videoDB.clearForNewUser();  // IndexedDB 초기화
+          // 다른 사용자로 로그인한 경우에만 초기화
+          if (prevUserId && currentUserId !== prevUserId) {
+            await videoDB.clearForNewUser();
           }
-
-          // 서버에서 시청 기록 가져와서 동기화
+  
+          // 로그인할 때마다 항상 동기화 체크
           const res = await fetch('/api/videos/sync');
           const data = await res.json();
           
@@ -45,7 +44,7 @@ export default function SessionProvider({
         }
       }
     };
-
+  
     handleUserChange();
     prevUserIdRef.current = currentUserId;
   }, [value.user?.id]);

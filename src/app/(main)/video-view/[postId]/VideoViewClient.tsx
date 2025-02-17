@@ -57,6 +57,7 @@ export function VideoViewClient({ post, initialSequence, initialTime }: VideoVie
   const timeoutRef = useRef<NodeJS.Timeout>();
   const [isMuted, setIsMuted] = useState(true);
   const resumeHandledRef = useRef(false);
+  const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
     const savedMuteState = localStorage.getItem('videoMuted');
@@ -166,25 +167,22 @@ export function VideoViewClient({ post, initialSequence, initialTime }: VideoVie
         onClose={() => setShowResumeModal(false)}
         onResume={() => {
           setShowResumeModal(false);
+          setIsPaused(false);  // 재생 재개
           if (resumeData && swiperRef.current) {
-            // 브라우저에 저장된 순서의 슬라이드로 이동
             const targetIndex = post.videos.findIndex(v => v.sequence === resumeData.sequence);
             if (targetIndex !== -1) {
-              // 저장된 순서로 슬라이드 이동
               swiperRef.current.slideTo(targetIndex);
               setActiveIndex(targetIndex);
-              
-              // 기존 initialTime prop 활용을 위해 URL 파라미터 추가
               const url = new URL(window.location.href);
               url.searchParams.set('t', resumeData.timestamp.toString());
               window.history.replaceState({}, '', url);
-              
             }
           }
         }}
         onStartOver={() => {
-          // setActiveIndex(0);
           setShowResumeModal(false);
+          setResumeData(null);  // 재생 재개
+
         }}
         message="시청 기록이 있습니다!"
         imageUrl="/MS Logo emblem.svg"
@@ -300,7 +298,7 @@ export function VideoViewClient({ post, initialSequence, initialTime }: VideoVie
                       videoId={streamId}
                       postId={post.id}
                       sequence={video.sequence}
-                      isActive={index === activeIndex}
+                      isActive={index === activeIndex && !showResumeModal}
                       onEnded={handleVideoEnd}
                       className="w-full h-full"
                       userLanguage="KOREAN"

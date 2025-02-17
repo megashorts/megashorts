@@ -33,3 +33,25 @@ export function slugify(input: string): string {
     .replace(/ /g, "-")
     .replace(/[^a-z0-9-]/g, "");
 }
+
+// 현재 시간을 KST로 변환
+export function getKSTDate() {
+  const now = new Date();
+  return new Date(now.getTime() + (9 * 60 * 60 * 1000));
+}
+
+// 오늘 자정(00:00:00)을 KST로 반환
+export function getKSTMidnight() {
+  const kst = getKSTDate();
+  kst.setHours(0, 0, 0, 0);
+  return kst;
+}
+
+// 주어진 날짜에 일수를 더함
+export function addKSTDays(date: Date, days: number) {
+  const newDate = new Date(date);
+  newDate.setDate(newDate.getDate() + days);
+  return newDate;
+}
+
+export { formatDate };

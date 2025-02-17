@@ -13,7 +13,8 @@ interface BillingModalProps {
 
 export default function BillingModal({ type, amount, onClose }: BillingModalProps) {
   const session = useSession();
-  const user = session.user as AuthUser;
+  // const user = session.user as AuthUser;
+  const user = session.user as unknown as AuthUser;
   const now = new Date();
   const dateStr = now.toISOString().split('T')[0].replace(/-/g, '');
   const customerKey = `${user?.id}_${dateStr}_${amount}`;

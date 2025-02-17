@@ -16,8 +16,9 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { useEffect, useState } from "react";
-import { USER_ROLES } from "@/lib/roleType";
 import { useSession } from "@/components/SessionProvider";
+import { logActivity } from "@/lib/activity-logger/client";
+import { locationManager } from "@/lib/activity-logger/location-manager";
 
 interface UserButtonProps {
   className?: string;
@@ -30,35 +31,6 @@ export default function UserButton({ className }: UserButtonProps) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmenuOpen, setIsSubmenuOpen] = useState(false); // 서브메뉴 상태
-  // const [userRole, setUserRole] = useState<number>(0);
-
-  // https://lucide.dev/ 에서 아이콘 모양확인
-
-  // useEffect(() => {
-  //   async function fetchUserRole() {
-  //     if (user) {
-  //       try {
-  //         const response = await fetch("/api/users/role", {
-  //           headers: {
-  //             "x-user-id": user.id
-  //           }
-  //         });
-  //         const data = await response.json();
-  //         if (data.userRole) {
-  //           setUserRole(data.userRole);
-  //         }
-  //       } catch (error) {
-  //         console.error("Failed to fetch user role:", error);
-  //       }
-  //     }
-  //   }
-  //   fetchUserRole();
-  // }, [user]);
-
-  // if (!user) {
-  //   router.push("/login");
-  //   return null;
-  // }
 
   if (!user) {
     return (
@@ -86,7 +58,6 @@ export default function UserButton({ className }: UserButtonProps) {
 
   return (
     <>
-    {/* 전체 화면 블러 오버레이 */}
     {isOpen && (
       <div 
         className="fixed inset-0 bg-background/50 backdrop-blur-sm z-40"
@@ -97,20 +68,18 @@ export default function UserButton({ className }: UserButtonProps) {
     <DropdownMenu 
       onOpenChange={(isOpen) => {
         setIsOpen(isOpen);
-        setIsSubmenuOpen(false); // 서브메뉴 상태 초기화
+        setIsSubmenuOpen(false);
       }}
     >
-    {/* <DropdownMenu onOpenChange={setIsOpen}> */}
       <DropdownMenuTrigger asChild>
         <button className={cn("flex-none hover:bg-transparent", className)}>
-          {/* <UserAvatar avatarUrl={user.avatarUrl} size={30} /> */}
           <UserCircle className="size-6" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
-        sideOffset={20}  // sideOffset={isMobile ? 4 : 16} and side={isMobile ? "top" : "bottom"}
-        align="end"     // align={isMobile ? "start" : "end"}
-        className="z-50 w-64 lg:w-72 text-lg md:text-base " // 모바일과 데스크탑의 너비 다르게 설정
+        sideOffset={20}
+        align="end"
+        className="z-50 w-64 lg:w-72 text-lg md:text-base"
       >
         <DropdownMenuLabel>반가워요! @{user?.username}님.</DropdownMenuLabel>
 
@@ -163,11 +132,10 @@ export default function UserButton({ className }: UserButtonProps) {
         <div className="text-xs font-medium text-gray-600">분류별 바로보기</div>
         <DropdownMenuItem
           onClick={(e) => {
-            e.preventDefault(); // 기본 동작 방지 (메뉴 닫히지 않게)
-            e.stopPropagation(); // 이벤트 버블링 방지
-            setIsSubmenuOpen(!isSubmenuOpen); // 서브메뉴 상태 토글
+            e.preventDefault();
+            e.stopPropagation();
+            setIsSubmenuOpen(!isSubmenuOpen);
           }}
-          // className="flex justify-between items-center"
         >
           <TvMinimalPlay className="mr-2 w-4 h-4" />
           컨텐츠 카테고리
@@ -177,21 +145,18 @@ export default function UserButton({ className }: UserButtonProps) {
             <ChevronRight className="w-4 h-4" />
           )}
         </DropdownMenuItem>
-        {/* 서브메뉴 */}
         <div
           className={`pl-6 mt-2 space-y-1 ${
             isSubmenuOpen ? "block" : "hidden"
-          }`} // 상태에 따라 보이거나 숨김
+          }`}
         >
           <Link href={`/categories/recent`}>
             <DropdownMenuItem>
-              {/* <UserIcon className="mr-2 size-4" /> */}
               최신작
             </DropdownMenuItem>
           </Link>
           <Link href={`/categories/ROMANCE`}>
             <DropdownMenuItem>
-              {/* <UserIcon className="mr-2 size-4" /> */}
               로맨스
             </DropdownMenuItem>
           </Link>
@@ -233,9 +198,53 @@ export default function UserButton({ className }: UserButtonProps) {
         </div>
         <DropdownMenuSeparator className="h-[0.5px] bg-gray-600" />
         <DropdownMenuItem
-          onClick={() => {
+          onClick={async () => {
             queryClient.clear();
-            logout();
+            const { success, userInfo } = await logout();
+            const locationInfo = await locationManager.getInfo();
+
+            if (success) {
+              // 성공 로그
+              logActivity({
+                timestamp: new Date().toISOString(),
+                type: 'auth',
+                method: 'LOGOUT',
+                path: '',
+                status: 200,
+                ip: locationInfo.ip,
+                country: locationInfo.country,
+                city: locationInfo.city,
+                device: locationInfo.device,
+                request: {
+                  body: { username: userInfo?.username }
+                },
+                response: {
+                  status: 200,
+                  data: { success: true }
+                }
+              });
+              router.push('/login');
+            } else {
+              // 실패 로그
+              logActivity({
+                timestamp: new Date().toISOString(),
+                type: 'auth',
+                method: 'LOGOUT',
+                path: '',
+                status: 400,
+                ip: locationInfo.ip,
+                country: locationInfo.country,
+                city: locationInfo.city,
+                device: locationInfo.device,
+                request: {
+                  body: { username: userInfo?.username }
+                },
+                response: {
+                  status: 400,
+                  error: 'Session not found or invalid'
+                }
+              });
+            }
           }}
         >
           <LogOutIcon className="mr-2 size-4" />

@@ -1,35 +1,21 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client';
 
+// 기본 Prisma 클라이언트만 유지
+// DB 작업 로깅은 API 라우트에서 activity-logger를 통해 처리
 const prismaClientSingleton = () => {
   return new PrismaClient({
     log: process.env.NODE_ENV === 'development' 
-      ? ['error', 'warn']  // 개발 환경에서는 에러와 경고만
-      : []  // 프로덕션에서는 로그 비활성화
-  })
-}
+      ? ['error', 'warn']  // 개발 환경에서는 에러와 경고만 로깅
+      : ['error']          // 프로덕션에서는 에러만 로깅
+  });
+};
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
-}
+};
 
-const prisma = globalForPrisma.prisma ?? prismaClientSingleton()
+const prisma = globalForPrisma.prisma ?? prismaClientSingleton();
 
-export default prisma
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
-
-// import { PrismaClient } from "@prisma/client";
-
-// const prismaClientSingleton = () => {
-//   return new PrismaClient();
-// };
-
-// declare global {
-//   var prismaGlobal: undefined | ReturnType<typeof prismaClientSingleton>;
-// }
-
-// const prisma = globalThis.prismaGlobal ?? prismaClientSingleton();
-
-// export default prisma;
-
-// if (process.env.NODE_ENV !== "production") globalThis.prismaGlobal = prisma;
+export default prisma;

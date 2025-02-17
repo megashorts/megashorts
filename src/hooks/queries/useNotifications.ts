@@ -14,9 +14,8 @@ export function useUnreadCount() {
     staleTime: 0,
     refetchOnWindowFocus: true,
     refetchOnMount: true,
-    refetchOnReconnect: true,
-    refetchInterval: 1000 * 30,
-    refetchIntervalInBackground: false,
+    refetchOnReconnect: false,
+    refetchInterval: false  // 주기적 호출 제거
   });
 }
 
@@ -31,15 +30,22 @@ export function useNotificationsList() {
     staleTime: 0,
     refetchOnWindowFocus: true,
     refetchOnMount: true,
-    refetchOnReconnect: true,
-    refetchInterval: 1000 * 30,
-    refetchIntervalInBackground: false,
+    refetchOnReconnect: false,
+    refetchInterval: false  // 주기적 호출 제거
   });
 }
+
+// enabled: !!user,  // 로그인한 경우에만 API 호출
+// staleTime: 0,
+// refetchOnWindowFocus: true,
+// refetchOnMount: true,
+// refetchOnReconnect: true,
+// refetchInterval: 1000 * 30,
+// refetchIntervalInBackground: false,
 
 
 // refetchOnWindowFocus: true, // 탭 활성화될 때 체크
 // refetchInBackground: false, // 백그라운드 호출 방지
 // refetchOnMount: true, // 컴포넌트 마운트 시 체크
 // refetchInterval: 1000 * 60, // 활성 탭에서 1분마다 체크 (선택적)
-// refetchIntervalInBackground: false // 백그라운드에서는 주기적 호출 안 함
+// refetchIntervalInBackground: false // refetchInterval을 사용하면서 브라우져탭이 백그라운드에서는 주기적 호출 안 함

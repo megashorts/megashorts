@@ -12,7 +12,7 @@ export const videoTracking = {
     const { sequence, videoId, postId, timestamp } = params;
 
     if (timestamp < 5) {
-      console.log('Skipping: timestamp < 3');
+      console.log('Skipping: timestamp < 5');
       return;
     }
 
@@ -43,5 +43,6 @@ export const videoTracking = {
     } catch (error) {
       console.error('Error tracking view:', error);
     }
-  }
+  },
+
 };
