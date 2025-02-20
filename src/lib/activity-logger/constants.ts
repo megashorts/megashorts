@@ -8,16 +8,22 @@ export const STORAGE_KEYS = {
 export const CONFIG = {
   BATCH_INTERVAL: 5 * 60 * 1000,  // 5분
   MAX_BATCH_SIZE: 500000,         // 500KB
-  WORKER_URL: process.env.NEXT_PUBLIC_LOGS_WORKER_URL
+  WORKER_URL: process.env.NEXT_PUBLIC_LOGS_WORKER_URL || '/api/logs',  // 기본값 추가
+  SERVICE_LOG_ENABLED: process.env.SERVICE_LOG !== 'false'
 } as const;
+
+// 로그인 상태 확인
+export const isUserLoggedIn = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  return document.cookie.includes('auth_session');
+};
 
 // 로깅 제외 경로
 export const EXCLUDED_ROUTES = [
   '/_next',               // Next.js 내부 요청
   '/static',              // 정적 파일
-  // '/api/user/coinpay',    
-  // '/api/videos/view',     
-  '/api/admin/ip'          // 위치 정보 조회 (무한 루프 방지)
+  '/api/admin/ip',        // 위치 정보 조회 (무한 루프 방지)
+  '/api/logs'             // 로그 전송 요청 (무한 루프 방지)
 ];
 
 // HTTP 상태 코드 메시지

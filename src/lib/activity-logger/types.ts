@@ -1,38 +1,50 @@
-// 기본 로그 구조
-export interface ActivityLog {
-  // 기본 정보
-  timestamp: string;
-  type: LogType;
+// 커스텀 로그 구조 (보기 좋은 순서로 정렬)
+export interface CustomActivityLog {
+  // 주요 식별 정보
+  type: LogType;           // 로그 타입 (auth, video, post 등)
+  event: string;           // 이벤트 이름 (login_success, video_upload 등)
+  username?: string;       // 사용자명 (관리자 식별용)
+  
+  // 액션 상세
+  details?: {
+    action?: string;      // 수행된 작업
+    result?: string;      // 작업 결과
+    userId?: string;      // 사용자 ID
+    target?: string;      // 작업 대상
+    error?: string;       // 에러 메시지
+  }
+  
+  // 시간 정보
+  timestamp: string;       // 타임스탬프
+  
+  // 환경 정보
+  ip?: string;            // IP 주소
+  country?: string;       // 국가
+  city?: string;          // 도시
+  device?: DeviceInfo;    // 디바이스 정보
+}
+
+// 기존 호환성을 위한 ActivityLog 인터페이스
+export interface ActivityLog extends Omit<CustomActivityLog, 'details'> {
   method: string;      // HTTP 메서드 또는 커스텀 액션
   path: string;        // API 경로
   status: number;      // 상태 코드
-  event?: string;      // 이벤트 타입
   
-  // 사용자 정보
-  userId?: string;
-  username?: string;
-  
-  // 환경 정보
-  ip: string;
-  country: string;
-  city: string;
-  device: DeviceInfo;  // DeviceInfo 인터페이스 사용
-
   // 요청/응답 데이터
   request?: {
     query?: any;
     body?: any;
-    path?: string;     // 요청 경로
+    path?: string;
   };
   response?: {
     data?: any;
     error?: string;
-    status?: number;   // 응답 상태
+    status?: number;
   };
 
   // 이전 버전 호환성
-  requestId?: string;  // 기존 코드 호환용
-  details?: any;       // 추가 정보
+  requestId?: string;
+  details?: any;
 }
 
 // 로그 카테고리 (파일 관리용)

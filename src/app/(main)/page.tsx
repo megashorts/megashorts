@@ -1,6 +1,6 @@
 import MainContent from '@/components/MainContent';
+import AuthEventLogger from '@/components/AuthEventLogger';
 import { Suspense } from 'react'
-
 
 // 24시간마다 재생성
 export const revalidate = 86400;
@@ -9,6 +9,7 @@ export const revalidate = 86400;
 export default async function Home() {
   return (
     <Suspense>
+      <AuthEventLogger />
       <MainContent />
     </Suspense>
   )

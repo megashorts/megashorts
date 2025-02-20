@@ -12,6 +12,6 @@ interface PageProps {
   };
 }
 
-export default function ResetPasswordTokenPage({ params }: PageProps) {
+export default async function ResetPasswordTokenPage({ params }: PageProps) {
   return <ResetPasswordForm token={params.token} />;
 }

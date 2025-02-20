@@ -28,6 +28,8 @@ model User {
   postCount             Int                  @default(0)
   userRole              Int                  @default(10)
   mscoin                Int                  @default(0)
+  loginAttempts         Int                  @default(0)
+  blockedUntil          DateTime?
   myLanguage            Language             @default(KOREAN)
   payments              Payment[]
   billingKeys           BillingKey[]
@@ -357,12 +359,15 @@ model Payment {
 }
 
 model SystemSetting {
-  id        String   @id @default(cuid())
-  key       String   @unique
-  value     Json
-  updatedAt DateTime @default(now()) @updatedAt
-  updatedBy String?
-  user      User?    @relation(fields: [updatedBy], references: [id])
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       Json
+  valueType   String   @default("number")  // number, string, boolean
+  defaultValue Json?
+  description String?
+  updatedAt   DateTime @default(now()) @updatedAt
+  updatedBy   String?
+  user        User?    @relation(fields: [updatedBy], references: [id])
 
   @@map("system_settings")
 }

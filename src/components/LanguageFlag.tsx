@@ -1,25 +1,37 @@
-import { ReactNode } from 'react';
 import { Language } from '@prisma/client';
 
-interface LanguageFlagProps {
+export interface LanguageFlagProps {
   language: Language;
+  className?: string;
 }
 
-const languageFlags: Record<Language, ReactNode> = {
-  KOREAN: '🇰🇷',
-  ENGLISH: '🇺🇸',
-  CHINESE: '🇨🇳',
-  JAPANESE: '🇯🇵',
-  THAI: '🇹🇭',
-  SPANISH: '🇪🇸',
-  INDONESIAN: '🇮🇩',
-  VIETNAMESE: '🇻🇳'
-};
+export default function LanguageFlag({ language, className = '' }: LanguageFlagProps) {
+  const getFlag = (lang: Language) => {
+    switch (lang) {
+      case 'KOREAN':
+        return '🇰🇷';
+      case 'ENGLISH':
+        return '🇺🇸';
+      case 'CHINESE':
+        return '🇨🇳';
+      case 'JAPANESE':
+        return '🇯🇵';
+      case 'THAI':
+        return '🇹🇭';
+      case 'SPANISH':
+        return '🇪🇸';
+      case 'INDONESIAN':
+        return '🇮🇩';
+      case 'VIETNAMESE':
+        return '🇻🇳';
+      default:
+        return '🌐';
+    }
+  };
 
-export default function LanguageFlag({ language }: LanguageFlagProps) {
   return (
-    <span className="inline-flex items-center text-xl translate-y-[2px]">
-      {languageFlags[language] || language}
+    <span className={className}>
+      {getFlag(language)}
     </span>
   );
 }

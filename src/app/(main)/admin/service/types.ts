@@ -1,13 +1,19 @@
-import { ActivityLog } from '@/lib/activity-logger/types';
+import { Language } from '@prisma/client';
+
+export interface DateRange {
+  from: Date;
+  to: Date;
+}
 
 export interface LogFiltersState {
   startDate: Date;
   endDate: Date;
   userId: string;
-  types: string[];     // 타입 기반 필터링
-  country: string;
+  types: string[];
+  country: Language | '';
   page: number;
   perPage: number;
+  timestamp?: string;  // 강제 리프레시용
 }
 
 export interface LogFiltersProps {
@@ -16,15 +22,10 @@ export interface LogFiltersProps {
 }
 
 export interface LogTableProps {
-  logs: ActivityLog[];
+  logs: any[];
   loading: boolean;
-  onViewDetails: (log: ActivityLog) => void;
+  onViewDetails: (log: any) => void;
   onSort?: (field: string) => void;
   sortField?: string;
   sortOrder?: 'asc' | 'desc';
-}
-
-export interface FilterType {
-  id: string;
-  label: string;
 }

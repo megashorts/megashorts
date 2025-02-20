@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
+import { logActivity } from "@/lib/activity-logger/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import LoadingButton from "@/components/LoadingButton";
@@ -32,11 +33,37 @@ export default function ResetPasswordRequestForm() {
     setError(undefined);
     setSuccess(false);
 
+    const baseInfo = {
+      type: 'auth',
+      method: 'PASSWORD_RESET',
+      details: {
+        action: 'request_reset',
+        email: values.email
+      }
+    };
+
     startTransition(async () => {
       const { error } = await requestPasswordReset(values.email);
       if (error) {
+        logActivity({
+          ...baseInfo,
+          event: 'request_reset_failure',
+          details: {
+            ...baseInfo.details,
+            result: 'failure',
+            error
+          }
+        });
         setError(error);
       } else {
+        logActivity({
+          ...baseInfo,
+          event: 'request_reset_success',
+          details: {
+            ...baseInfo.details,
+            result: 'success'
+          }
+        });
         setSuccess(true);
         form.reset();
       }

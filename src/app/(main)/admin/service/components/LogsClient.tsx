@@ -10,7 +10,7 @@ import { LogFiltersState } from '../types';
 
 export function LogsClient() {
   const [logs, setLogs] = useState<ActivityLog[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [selectedLog, setSelectedLog] = useState<ActivityLog | null>(null);
   const [sortField, setSortField] = useState<string>('timestamp');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
@@ -19,22 +19,21 @@ export function LogsClient() {
     startDate: new Date(),
     endDate: new Date(),
     userId: '',
-    types: Object.keys(TYPE_DISPLAY_NAMES),  // 모든 타입 기본 선택
+    types: Object.keys(TYPE_DISPLAY_NAMES),
     country: '',
     page: 1,
-    perPage: 50  // 기본값 50으로 변경
+    perPage: 50
   });
 
-  useEffect(() => {
-    fetchLogs();
-  }, [filters, sortField, sortOrder]);
-
   const fetchLogs = async () => {
+    // timestamp가 없으면 조회하지 않음 (검색 버튼 클릭 전)
+    if (!filters.timestamp) return;
+
     setLoading(true);
     try {
       const searchParams = new URLSearchParams({
-        startDate: filters.startDate.toISOString().split('T')[0],
-        endDate: filters.endDate.toISOString().split('T')[0],
+        startDate: filters.startDate.toISOString(),
+        endDate: filters.endDate.toISOString(),
         ...(filters.userId && { userId: filters.userId }),
         ...(filters.types.length && { types: filters.types.join(',') }),
         ...(filters.country && { country: filters.country }),
@@ -48,13 +47,23 @@ export function LogsClient() {
       if (!response.ok) throw new Error('Failed to fetch logs');
       
       const data = await response.json();
-      setLogs(data);
+      // 중복 키 방지를 위해 타임스탬프와 인덱스 조합으로 고유 ID 생성
+      setLogs(data.map((log: ActivityLog, index: number) => ({
+        ...log,
+        uniqueId: `${log.timestamp}_${log.path}_${index}`
+      })));
     } catch (error) {
       console.error('Error fetching logs:', error);
+      setLogs([]);
     } finally {
       setLoading(false);
     }
   };
+
+  // filters.timestamp가 변경될 때만 fetchLogs 실행
+  useEffect(() => {
+    fetchLogs();
+  }, [filters.timestamp, sortField, sortOrder]);
 
   const handleViewDetails = (log: ActivityLog) => {
     setSelectedLog(log);
@@ -74,9 +83,13 @@ export function LogsClient() {
     setSortField(field);
   };
 
+  const handleFiltersChange = (newFilters: LogFiltersState) => {
+    setFilters(newFilters);
+  };
+
   return (
     <div className="space-y-4">
-      <LogFilters filters={filters} onFiltersChange={setFilters} />
+      <LogFilters filters={filters} onFiltersChange={handleFiltersChange} />
       <LogTable
         logs={logs}
         loading={loading}

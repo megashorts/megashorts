@@ -13,15 +13,17 @@ import { Input } from "@/components/ui/input";
 import LoadingButton from "@/components/LoadingButton";
 import { useRouter } from "next/navigation";
 import { toast } from "@/components/ui/use-toast";
-
+import { logActivity } from "@/lib/activity-logger/client";
 interface DeleteAccountDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  username: string;
 }
 
 export default function DeleteAccountDialog({
   open,
   onOpenChange,
+  username,
 }: DeleteAccountDialogProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [verificationCode] = useState(
@@ -52,6 +54,7 @@ export default function DeleteAccountDialog({
 
     // 인증번호가 일치하는 경우 회원탈퇴 진행
     setIsLoading(true);
+
     try {
       const response = await fetch("/api/user/delete", {
         method: "DELETE",
@@ -62,6 +65,17 @@ export default function DeleteAccountDialog({
       if (!response.ok) {
         throw new Error(data.error || "계정 삭제 중 오류가 발생했습니다");
       }
+
+      // 성공 로그 기록
+      logActivity({
+        type: 'auth',
+        event: 'delete_account_success',
+        username,
+        details: {
+          action: 'delete_account',
+          result: 'success'
+        }
+      });
 
       toast({
         description: "계정이 성공적으로 삭제되었습니다"
@@ -74,6 +88,18 @@ export default function DeleteAccountDialog({
       // 루트 페이지로 이동하고 새로고침
       window.location.href = "/";
     } catch (error) {
+      // 실패 로그 기록
+      logActivity({
+        type: 'auth',
+        event: 'delete_account_failure',
+        username,
+        details: {
+          action: 'delete_account',
+          result: 'failure',
+          error: error instanceof Error ? error.message : "계정 삭제 실패"
+        }
+      });
+
       toast({
         variant: "destructive",
         description: error instanceof Error ? error.message : "계정 삭제 실패"

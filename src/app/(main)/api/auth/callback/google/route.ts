@@ -85,18 +85,31 @@ export async function GET(req: NextRequest) {
 
       return new Response(null, {
         status: 302,
-        headers: { Location: "/" },
+        headers: { Location: `/?event=google_login&username=${existingUser.username}` },
       });
       // 로그인에 성공하면 홈페이지로 리다이렉트.
     }
 
+    // 이메일이 있는 경우 중복 체크
+    if (googleUser.email) {
+      const existingEmail = await prisma.user.findUnique({
+        where: { email: googleUser.email }
+      });
+
+      if (existingEmail) {
+        return new Response(null, {
+          status: 302,
+          headers: {
+            Location: `/?event=error&error=${encodeURIComponent('This email is already registered')}`
+          }
+        });
+      }
+    }
+
     const userId = generateIdFromEntropySize(10);
-    // 새로운 사용자를 위한 고유한 사용자 ID 생성. 10비트 크기의 난수를 사용해 고유한 ID를 만듦.
-
     const username = slugify(googleUser.name) + "-" + userId.slice(0, 4);
-    // 구글 사용자 이름을 URL-friendly한 형식으로 변환하고, 고유성을 위해 ID의 일부를 추가해 사용자명을 생성.
-    // src/lib/utils.ts : export function slugify(input: string): string {
 
+    // 이메일이 있는 경우에만 저장, 없으면 null로 저장
     await prisma.$transaction(async (tx) => {
       await tx.user.create({
         data: {
@@ -138,7 +151,7 @@ export async function GET(req: NextRequest) {
 
     return new Response(null, {
       status: 302,
-      headers: { Location: "/" },
+      headers: { Location: `/?event=google_signup&username=${username}` },
     });
     // 성공적으로 로그인하면 메인 페이지로 리다이렉트.
   } catch (error) {
@@ -158,17 +171,13 @@ export async function GET(req: NextRequest) {
     // return new Response(null, { status: 500 });
     // 그 외의 오류는 서버 오류로 처리하고 500 상태 반환.
 
-    return new Response(
-      JSON.stringify({ 
-        error: error instanceof Error ? error.message : 'Internal Server Error'
-      }), 
-      { 
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json'
-        }
+    const errorMessage = error instanceof Error ? error.message : 'Internal Server Error';
+    return new Response(null, {
+      status: 302,
+      headers: {
+        Location: `/?event=error&error=${encodeURIComponent(errorMessage)}`
       }
-    );
+    });
 
   }
 }

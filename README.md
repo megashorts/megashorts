@@ -6,10 +6,10 @@ Watch the free tutorial on YouTube: https://www.youtube.com/watch?v=TyV12oBDsYI
 
 ![thumbnail 7](https://github.com/user-attachments/assets/686b37e4-3d16-4bc4-a7f2-9d152c3addf5)
 
-npm i --legacy-peer-deps
+npm i  
 --legacy-peer-deps
 
-npm i --legacy-peer-deps
+npm i  v
 
 
 https://megashorts.vercel.app/

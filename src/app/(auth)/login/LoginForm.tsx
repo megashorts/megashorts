@@ -15,9 +15,11 @@ import { loginSchema, LoginValues } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
 import { login } from "./actions";
 import { logActivity } from "@/lib/activity-logger/client";
 import { locationManager } from "@/lib/activity-logger/location-manager";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function LoginForm() {
   const [error, setError] = useState<string>();
@@ -25,6 +27,8 @@ export default function LoginForm() {
   const [loginAttempt, setLoginAttempt] = useState<{
     identifier: string;
   } | null>(null);
+  const router = useRouter();
+  const { toast } = useToast();
 
   const form = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
@@ -44,56 +48,38 @@ export default function LoginForm() {
 
     startTransition(async () => {
       try {
-        const { error } = await login(values);
-        const locationInfo = await locationManager.getInfo();
+        const result = await login(values);
         
-        if (error) {
-          setError(error);
+        if (result.error) {
+          setError(result.error);
           // 로그인 실패 로그
           logActivity({
-            timestamp: new Date().toISOString(),
             type: 'auth',
-            method: 'LOGIN',
-            path: '',
-            status: 400,
-            ip: locationInfo.ip,
-            country: locationInfo.country,
-            city: locationInfo.city,
-            device: locationInfo.device,
-            request: {
-              body: { username: loginAttempt?.identifier || values.username }
-            },
-            response: {
-              status: 400,
-              error: error
+            event: 'login_failure',
+            username: loginAttempt?.identifier || values.username,
+            details: {
+              action: 'login',
+              result: 'failure',
+              error: result.error
             }
           });
         }
       } catch (error) {
         // NEXT_REDIRECT는 정상적인 리다이렉션이므로 성공 로그 저장
         if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
-          const locationInfo = await locationManager.getInfo();
-          
+          // 로그인 성공 로그
           logActivity({
-            timestamp: new Date().toISOString(),
             type: 'auth',
-            method: 'LOGIN',
-            path: '',
-            status: 200,
-            ip: locationInfo.ip,
-            country: locationInfo.country,
-            city: locationInfo.city,
-            device: locationInfo.device,
-            request: {
-              body: { username: loginAttempt?.identifier || values.username }
-            },
-            response: {
-              status: 200,
-              data: { success: true }
+            event: 'login_success',
+            username: loginAttempt?.identifier || values.username,
+            details: {
+              action: 'login',
+              result: 'success'
             }
           });
         } else {
           console.error('Login error:', error);
+          setError("Something went wrong. Please try again.");
         }
       }
     });

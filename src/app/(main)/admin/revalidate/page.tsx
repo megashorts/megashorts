@@ -17,7 +17,7 @@ export default function RevalidatePage() {
         '/categories/drama',
         '/categories/comic',
         '/categories/thriller',
-        '/categories/period',
+        '/categories/periodplay',
         '/categories/fantasy',
         '/categories/highteen',
         '/categories/adult',

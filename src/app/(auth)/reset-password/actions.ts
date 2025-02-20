@@ -15,7 +15,7 @@ function generateToken(length: number): string {
 // 비밀번호 재설정 요청
 export async function requestPasswordReset(
   email: string
-): Promise<{ error?: string }> {
+): Promise<{ error?: string; success?: boolean }> {
   try {
     const { email: validatedEmail } = resetPasswordRequestSchema.parse({ email });
 
@@ -99,7 +99,7 @@ export async function requestPasswordReset(
 export async function resetPassword(
   token: string,
   values: { password: string; confirmPassword: string }
-): Promise<{ error?: string }> {
+): Promise<{ error?: string; success?: boolean }> {
   try {
     const { password } = resetPasswordSchema.parse(values);
 
@@ -136,11 +136,8 @@ export async function resetPassword(
       })
     ]);
 
-    return redirect("/login");
+    return { success: true };
   } catch (error) {
-    if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
-      throw error;
-    }
     console.error(error);
     return {
       error: "비밀번호 재설정 중 오류가 발생했습니다",

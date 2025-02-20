@@ -2,6 +2,8 @@
 
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
+import { logActivity } from "@/lib/activity-logger/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import LoadingButton from "@/components/LoadingButton";
 import { PasswordInput } from "@/components/PasswordInput";
@@ -22,6 +24,7 @@ interface ResetPasswordFormProps {
 export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   const [error, setError] = useState<string>();
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   const form = useForm<ResetPasswordValues>({
     resolver: zodResolver(resetPasswordSchema),
@@ -34,9 +37,38 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   async function onSubmit(values: ResetPasswordValues) {
     setError(undefined);
 
+    const baseInfo = {
+      type: 'auth',
+      method: 'PASSWORD_RESET',
+      details: {
+        action: 'reset_password'
+      }
+    };
+
     startTransition(async () => {
-      const { error } = await resetPassword(token, values);
-      if (error) setError(error);
+      const { error, success } = await resetPassword(token, values);
+      if (error) {
+        logActivity({
+          ...baseInfo,
+          event: 'reset_password_failure',
+          details: {
+            ...baseInfo.details,
+            result: 'failure',
+            error
+          }
+        });
+        setError(error);
+      } else if (success) {
+        logActivity({
+          ...baseInfo,
+          event: 'reset_password_success',
+          details: {
+            ...baseInfo.details,
+            result: 'success'
+          }
+        });
+        router.push('/login');
+      }
     });
   }
 

@@ -8,14 +8,69 @@
 - 위치 정보 수집
 - 로그 일괄 전송
 
-### B. 주요 파일
+### B. 로그 환경 구분
+1. 시스템 로그
+   - 개발 환경에서만 기록
+   - API 요청/응답, 에러 등 시스템 동작 관련 로그
+   - 환경변수 SYSTEM_LOG=true 일 때만 활성화
+
+2. 서비스 로그
+   - 프로덕션 환경에서 기록되는 주요 로그
+   - 사용자 행동, 비즈니스 로직 관련 로그
+   - 환경변수 SERVICE_LOG=true 일 때만 활성화
+   - 시도-결과 세트 패턴으로 기록
+
+### C. 주요 파일
 - `src/lib/activity-logger/client.ts`: 로그 생성/전송 클라이언트
 - `src/lib/activity-logger/constants.ts`: 설정값
 - `src/lib/activity-logger/types.ts`: 타입 정의
 - `src/lib/activity-logger/location-manager.ts`: 위치 정보 관리
 - `src/lib/logging-wrapper.ts`: API 요청 인터셉터
 
-## 2. 로그 타입 정의
+## 2. 로그 구조 및 패턴
+
+### A. 시도-결과 세트 패턴
+1. 기본 구조
+   ```typescript
+   // 1) 기본 정보 저장 (로그로 기록하지 않음)
+   const baseInfo = {
+     type: 'auth',
+     username: string,
+     details: {
+       action: string,    // 수행하는 작업
+       target?: string    // 작업 대상 (예: 추천인)
+     }
+   };
+
+   // 2) 결과에 따라 로그 기록
+   // 성공 시
+   logActivity({
+     ...baseInfo,
+     event: `${action}_success`,
+     details: {
+       ...baseInfo.details,
+       result: 'success'
+     }
+   });
+
+   // 실패 시
+   logActivity({
+     ...baseInfo,
+     event: `${action}_failure`,
+     details: {
+       ...baseInfo.details,
+       result: 'failure',
+       error: string
+     }
+   });
+   ```
+
+2. 주의사항
+   - 시도 정보는 저장만 하고 로그로 기록하지 않음
+   - 결과(성공/실패)에 따라 한 번만 로그 기록
+   - 리다이렉트가 필요한 경우 로그 기록 완료 후 실행
+
+### B. 로그 타입 정의
 
 ### A. 기본 로그 구조
 ```typescript
@@ -118,6 +173,8 @@ logActivity({
 });
 
 // 2. 실제 사용 예시
+
+// 2.1 기본 로깅
 // 비디오 시청 시작
 logActivity({
   type: 'video',
@@ -138,6 +195,70 @@ logActivity({
     videoId: '123',
     progress: 0.5,
     currentTime: 30
+  }
+});
+
+// 2.2 시도-결과 세트 패턴
+// 회원가입 예시:
+// 1) 기본 정보 저장 (로그로 기록하지 않음)
+const baseInfo = {
+  type: 'auth',
+  username: 'user123',
+  details: {
+    action: 'signup',
+    target: 'referrer123'  // 추천인 ID
+  }
+};
+
+// 2) 실패 시 - 기본 정보에 실패 결과 추가
+logActivity({
+  ...baseInfo,
+  event: 'signup_failure',
+  details: {
+    ...baseInfo.details,
+    result: 'failure',
+    error: 'Username already taken'
+  }
+});
+
+// 3) 성공 시 - 기본 정보에 성공 결과 추가
+logActivity({
+  ...baseInfo,
+  event: 'signup_success',
+  details: {
+    ...baseInfo.details,
+    result: 'success'
+  }
+});
+
+// 회원 탈퇴 예시:
+// 1) 기본 정보 저장 (로그로 기록하지 않음)
+const baseInfo = {
+  type: 'auth',
+  username: 'user123',
+  details: {
+    action: 'delete_account'
+  }
+};
+
+// 2) 실패 시
+logActivity({
+  ...baseInfo,
+  event: 'delete_account_failure',
+  details: {
+    ...baseInfo.details,
+    result: 'failure',
+    error: 'Authentication failed'
+  }
+});
+
+// 3) 성공 시
+logActivity({
+  ...baseInfo,
+  event: 'delete_account_success',
+  details: {
+    ...baseInfo.details,
+    result: 'success'
   }
 });
 ```

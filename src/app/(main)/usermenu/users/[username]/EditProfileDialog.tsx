@@ -200,6 +200,7 @@ export default function EditProfileDialog({
             <hr className="my-4 border-t" />
               <ProfileActionButtons
                 subscriptionStatus={user.subscription?.status}
+                username={user.username}
               />
           
           </form>

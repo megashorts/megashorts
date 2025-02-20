@@ -206,41 +206,24 @@ export default function UserButton({ className }: UserButtonProps) {
             if (success) {
               // 성공 로그
               logActivity({
-                timestamp: new Date().toISOString(),
                 type: 'auth',
-                method: 'LOGOUT',
-                path: '',
-                status: 200,
-                ip: locationInfo.ip,
-                country: locationInfo.country,
-                city: locationInfo.city,
-                device: locationInfo.device,
-                request: {
-                  body: { username: userInfo?.username }
-                },
-                response: {
-                  status: 200,
-                  data: { success: true }
+                event: 'logout_success',
+                username: userInfo?.username,
+                details: {
+                  action: 'logout',
+                  result: 'success'
                 }
               });
               router.push('/login');
             } else {
               // 실패 로그
               logActivity({
-                timestamp: new Date().toISOString(),
                 type: 'auth',
-                method: 'LOGOUT',
-                path: '',
-                status: 400,
-                ip: locationInfo.ip,
-                country: locationInfo.country,
-                city: locationInfo.city,
-                device: locationInfo.device,
-                request: {
-                  body: { username: userInfo?.username }
-                },
-                response: {
-                  status: 400,
+                event: 'logout_failure',
+                username: userInfo?.username,
+                details: {
+                  action: 'logout',
+                  result: 'failure',
                   error: 'Session not found or invalid'
                 }
               });

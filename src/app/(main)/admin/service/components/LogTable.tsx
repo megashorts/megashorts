@@ -103,8 +103,8 @@ export function LogTable({ logs, loading, onViewDetails, onSort, sortField, sort
               </TableCell>
             </TableRow>
           ) : (
-            logs.map((log) => (
-              <TableRow key={log.timestamp}>
+            logs.map((log: ActivityLog & { uniqueId?: string }) => (
+              <TableRow key={log.uniqueId}>
                 <TableCell className="font-mono">
                   {format(new Date(log.timestamp), 'HH:mm:ss', { locale: ko })}
                 </TableCell>

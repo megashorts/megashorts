@@ -1,11 +1,12 @@
 import "server-only";
-
+import { Resend } from 'resend';
 import { EmailVerificationTemplate } from "./templates/email-verification";
 import { ResetPasswordTemplate } from "./templates/reset-password";
 import { render } from "@react-email/render";
 import { getEmailSender } from "../../lib/constants";
-import { createTransport, type TransportOptions } from "nodemailer";
 import type { ComponentProps } from "react";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export enum EmailTemplate {
   EmailVerification = "EmailVerification",
@@ -38,17 +39,6 @@ const getEmailTemplate = async <T extends EmailTemplate>(template: T, props: Pro
   }
 };
 
-const smtpConfig = {
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT),
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASSWORD,
-  },
-};
-
-const transporter = createTransport(smtpConfig as TransportOptions);
-
 export const sendMail = async <T extends EmailTemplate>(
   to: string,
   template: T,
@@ -62,32 +52,17 @@ export const sendMail = async <T extends EmailTemplate>(
   const { subject, body } = await getEmailTemplate(template, props);
 
   try {
-    const info = await transporter.sendMail({
+    const data = await resend.emails.send({
       from: getEmailSender(),
       to,
       subject,
       html: body,
     });
 
-    console.log('Email sent successfully:', info);
-    return info;
+    console.log('Email sent successfully:', data);
+    return data;
   } catch (error) {
     console.error('Error sending email:', error);
     throw error;
   }
 };
-
-// export const sendMail = async <T extends EmailTemplate>(
-//   to: string,
-//   template: T,
-//   props: PropsMap[NoInfer<T>],
-// ) => {
-//   if (env.MOCK_SEND_EMAIL) {
-//     logger.info("📨 Email sent to:", to, "with template:", template, "and props:", props);
-//     return;
-//   }
-
-//   const { subject, body } = getEmailTemplate(template, props);
-
-//   return transporter.sendMail({ from: getEmailSender(), to, subject, html: body });
-// };

@@ -28,12 +28,14 @@ export default function LoginPage() {
       </div>
       <div className="grid grid-cols-3 gap-4">
         <GoogleSignInButton />
-        <div onClick={handleSocialClick} className="cursor-pointer">
+        <NaverSignInButton />
+        {/* <div onClick={handleSocialClick} className="cursor-pointer">
           <NaverSignInButton />
-        </div>
-        <div onClick={handleSocialClick} className="cursor-pointer">
+        </div> */}
+        <KakaoSignInButton />
+        {/* <div onClick={handleSocialClick} className="cursor-pointer">
           <KakaoSignInButton />
-        </div>
+        </div> */}
       </div>
       <div className="text-center">
         <div className="text-gray-500 text-xs mb-2">

@@ -8,10 +8,12 @@ import DeleteAccountDialog from "./DeleteAccountDialog";
 
 interface ProfileActionButtonsProps {
   subscriptionStatus?: string;
+  username: string;
 }
 
 export default function ProfileActionButtons({
   subscriptionStatus,
+  username,
 }: ProfileActionButtonsProps) {
   const [showPasswordReset, setShowPasswordReset] = useState(false);
   const [showCancelSubscription, setShowCancelSubscription] = useState(false);
@@ -55,6 +57,7 @@ export default function ProfileActionButtons({
       <DeleteAccountDialog
         open={showDeleteAccount}
         onOpenChange={setShowDeleteAccount}
+        username={username}
       />
     </>
   );

@@ -9,16 +9,10 @@ const nextConfig = {
     turbo: {
       enabled: true
     },
-    // runtime: 'edge'
   },
   serverExternalPackages: ["@node-rs/argon2"],
   images: {
     remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "utfs.io",
-        pathname: `/a/${process.env.NEXT_PUBLIC_UPLOADTHING_APP_ID}/*`,
-      },
       {
         protocol: "https",
         hostname: "images.unsplash.com",
@@ -30,7 +24,7 @@ const nextConfig = {
         pathname: "/**",
       }
     ],
-    dangerouslyAllowSVG: true,  // SVG 허용
+    dangerouslyAllowSVG: true,
   },
   rewrites: () => {
     return [
@@ -42,6 +36,29 @@ const nextConfig = {
   },
   typescript: {
     ignoreBuildErrors: true,
+  },
+  webpack: (config, { dev }) => {
+    if (!dev) {
+      // 프로덕션 빌드에서 개발용 래퍼 제외
+      config.module.rules.push({
+        test: /logging-wrapper\.dev\.ts$/,
+        loader: 'ignore-loader',
+      });
+    }
+    return config;
+  },
+  env: {
+    // 서비스 로그 설정
+    SERVICE_LOG: process.env.SYSTEM_SERVICELOGENABLED || 'true',
+    
+    // 코인 관련 설정
+    COIN_PAY: process.env.SYSTEM_VIEWCOINAMOUNT || '2',
+    EVENT_COIN1: process.env.SYSTEM_EVENTCOIN1AMOUNT || '10',
+    EVENT_COIN2: process.env.SYSTEM_EVENTCOIN2AMOUNT || '20',
+    
+    // 기타 시스템 설정
+    MIN_WITHDRAW: process.env.SYSTEM_MINWITHDRAWPOINT || '100000',
+    REFERRAL_COIN: process.env.SYSTEM_REFERRALCOINAMOUNT || '2',
   },
 };
 
