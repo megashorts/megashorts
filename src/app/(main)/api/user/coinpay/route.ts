@@ -108,11 +108,11 @@ export async function POST(req: Request) {
         }
       });
 
-      toast({
-        description: "2코인 사용",
-        variant: "default",
-        duration: 1000,
-      });
+      // toast({
+      //   description: "2코인 사용",
+      //   variant: "default",
+      //   duration: 1000,
+      // });
       
       console.log('Created new view record:', {
         userId: user.id,

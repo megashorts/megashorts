@@ -19,6 +19,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "@/components/SessionProvider";
 import { logActivity } from "@/lib/activity-logger/client";
 import { locationManager } from "@/lib/activity-logger/location-manager";
+import { USER_ROLE } from "@/lib/constants";
 
 interface UserButtonProps {
   className?: string;
@@ -127,6 +128,25 @@ export default function UserButton({ className }: UserButtonProps) {
             나의 컨텐츠 관리
           </DropdownMenuItem>
         </Link>
+
+        { user?.userRole && user.userRole >= USER_ROLE.OPERATION1 && (
+          <>
+            <DropdownMenuSeparator />
+            <div className="text-xs font-medium text-gray-600">관리자 섹션</div>
+            <Link href={`/admin/service`}>
+              <DropdownMenuItem>
+                <NotebookPen className="mr-2 size-4" />
+                서비스관리
+              </DropdownMenuItem>
+            </Link>
+            <Link href={`/admin/system`}>
+              <DropdownMenuItem>
+                <NotebookPen className="mr-2 size-4" />
+                운영시스템
+              </DropdownMenuItem>
+            </Link>
+          </>
+        )}
 
         <DropdownMenuSeparator />
         <div className="text-xs font-medium text-gray-600">분류별 바로보기</div>

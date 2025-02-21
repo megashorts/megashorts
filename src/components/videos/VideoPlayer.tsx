@@ -3,14 +3,16 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import dynamic from 'next/dynamic';
-import { videoTracking } from '@/lib/videoTracking';
+// import { videoTracking } from '@/lib/videoTracking';
 import { useSession } from '@/components/SessionProvider';
 import { videoDB } from '@/lib/indexedDB';
+import { logActivity } from '@/lib/activity-logger/client';
 
 const VideoPlayer = dynamic(() => Promise.resolve(({ 
   videoId, 
   postId,
   sequence,
+  title, 
   isActive = false, 
   onEnded, 
   onTimeUpdate,
@@ -19,10 +21,12 @@ const VideoPlayer = dynamic(() => Promise.resolve(({
   initialTime = 0,
   controls = true,
   muted,
+  isPremium,
 }: {
   videoId: string;
   postId: string;
   sequence: number;
+  title: string;
   isActive?: boolean;
   onEnded?: () => void;
   onTimeUpdate?: (time: number) => void;
@@ -31,12 +35,14 @@ const VideoPlayer = dynamic(() => Promise.resolve(({
   initialTime?: number;  
   controls?: boolean;
   muted: boolean;
+  isPremium: boolean;
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<any>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const lastTrackedTimeRef = useRef<number>(0);
   const { user } = useSession();
+  const isProcessingRef = useRef(false);
   const [isMuted, setIsMuted] = useState(true);
   
   const thumbnailUrl = `https://customer-2cdfxbmja64x0pqo.cloudflarestream.com/${videoId}/thumbnails/thumbnail.jpg?time=&height=600`;
@@ -65,52 +71,108 @@ const VideoPlayer = dynamic(() => Promise.resolve(({
 
   // 시청 시간 추적
   // const handleTimeUpdate = () => {
-  const handleTimeUpdate = useCallback(() => {
+  const handleTimeUpdate = useCallback(async () => {  // async 추가
     const video = videoRef.current;
     if (!video || !isActive || !user?.id) return;
     
     const currentTime = Math.floor(video.currentTime);
     if (currentTime === 0) return;
     
-    // 현재 시간 전달
     onTimeUpdate?.(currentTime);
+  
+    if (sequence > 1) {
+      // 5초 도달 시 첫 저장
+      if (currentTime >= 5 && lastTrackedTimeRef.current === 0) {
+        // 이미 API 호출 중이면 스킵
+        if (isProcessingRef.current) return;
+        isProcessingRef.current = true;
 
-    // 5초 도달 시 첫 저장
-    if (currentTime >= 5 && lastTrackedTimeRef.current === 0) {
-      console.log('First tracking at 5 seconds:', {
-        videoId,
-        sequence,
-        currentTime
-      });
-      
-      videoTracking.trackView({
-        videoId,
-        postId,
-        sequence,
-        timestamp: currentTime
-      });
-      
-      lastTrackedTimeRef.current = currentTime;
-      return;
-    }
+        try {
+          // 브라우저 저장
+          
+            await Promise.all([
+              videoDB.saveWatchedVideo(videoId),
+              videoDB.saveLastView(postId, sequence, currentTime)
+            ]).catch(error => {
+              console.error('IndexedDB error:', error);
+            });
+          
+            // 유료 동영상일 때만 서버 저장
+            if (isPremium) {
+              const response = await fetch('/api/videos/view', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  videoId,
+                  postId,
+                  sequence,
+                  timestamp: currentTime
+                })
+              });
+
+              const result = await response.json();
+              
+              // 로그 기록
+              logActivity({
+                type: 'video',
+                event: result.message === "SUBSCRIPTION view save" 
+                  ? `SubsView_${title}_${sequence}`
+                  : `coinview_${title}_${sequence}`,
+                  username: user?.username,
+                  details: {
+                    action: videoId,
+                    target: `${postId}_${sequence}`,
+                    result: 'success'
+                  }
+              });
+          
+          }
     
-    // 이후 10초 단위로 저장
-    if (lastTrackedTimeRef.current >= 10) {
-      const nextCheckpoint = Math.floor(currentTime / 10) * 10;
-      
-      if (nextCheckpoint > lastTrackedTimeRef.current) {
-        console.log('Tracking at 10s checkpoint:', {
-          videoId,
-          sequence,
-          currentTime,
-          nextCheckpoint
-        });
-        
-        // trackProgress 대신 브라우저 저장만
-        videoDB.saveLastView(postId, sequence, nextCheckpoint)
-          .catch(error => console.error('IndexedDB saveLastView error:', error));
+          console.log('First tracking at 5 seconds:', {
+            videoId,
+            sequence,
+            currentTime
+          });
+    
+          lastTrackedTimeRef.current = currentTime;
+        } catch (error) {
+          console.error('Error tracking view:', error);
+          logActivity({
+            type: 'video',
+            event: 'view_error',
+            username: user?.username,
+            details: {
+              action: videoId,
+              target: `${postId}_${sequence}`,
+              result: 'error',
+              error: error instanceof Error ? error.message : 'Unknown error'
+            }
+          });
+        } finally {
+          isProcessingRef.current = false;
+        }
+        return;
+      }
 
-        lastTrackedTimeRef.current = nextCheckpoint;
+    
+      // 이후 10초 단위로 저장
+      if (currentTime >= 10) {
+        const nextCheckpoint = Math.floor(currentTime / 10) * 10;
+        
+        if (nextCheckpoint > lastTrackedTimeRef.current) {
+          console.log('Tracking at 10s checkpoint:', {
+            videoId,
+            sequence,
+            currentTime,
+            nextCheckpoint
+          });
+          
+          // trackProgress 대신 브라우저 저장만
+          videoDB.saveLastView(postId, sequence, nextCheckpoint)
+            .catch(error => console.error('IndexedDB saveLastView error:', error));
+
+          lastTrackedTimeRef.current = nextCheckpoint;
+        }
       }
     }
   }, [videoId, sequence, isActive, postId, user?.id, onTimeUpdate]);

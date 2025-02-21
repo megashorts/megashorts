@@ -30,11 +30,9 @@ export default function PaymentSuccessModal({
     const queryClient = useQueryClient();
 
     useEffect(() => {
-      // 결제 완료 시 관련된 모든 쿼리 무효화
+      // 결제 완료 시 구독페이지에서 사용하는 구독정보 훅과 시청시 재생권한체크에서 사용하는 훅의 캐시 무효화
       queryClient.invalidateQueries({ queryKey: ['subscription-info'] });
-      queryClient.invalidateQueries({ queryKey: ['subscription-history'] });
-      queryClient.invalidateQueries({ queryKey: ['subscription-expiration'] });
-      queryClient.invalidateQueries({ queryKey: ['active-sessions'] });
+      queryClient.invalidateQueries({ queryKey: ['userAuth'] });
     }, [queryClient]);
 
   return (

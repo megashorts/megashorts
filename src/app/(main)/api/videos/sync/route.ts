@@ -15,9 +15,9 @@ export async function GET(req: Request) {
     const watchedVideos = await prisma.videoView.findMany({
       where: {
         userId: user.id,
-        video: {
-          sequence: { gt: 1 }  // 첫 번째 영상 제외
-        }
+        // video: {
+        //   sequence: { gt: 1 }  // 첫 번째 영상 제외
+        // }
       },
       select: {
         videoId: true

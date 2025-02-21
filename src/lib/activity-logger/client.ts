@@ -83,11 +83,7 @@ export async function logActivity(log: Partial<CustomActivityLog>) {
   try {
     // 로그 활성화 여부 체크
     if (!CONFIG.SERVICE_LOG_ENABLED) {
-      return;
-    }
-
-    // 로그인 상태 체크 (auth 타입 제외)
-    if (log.type !== 'auth' && !isUserLoggedIn()) {
+      console.log('Service log is disabled');
       return;
     }
 

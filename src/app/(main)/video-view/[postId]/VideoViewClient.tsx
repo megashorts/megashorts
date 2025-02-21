@@ -298,6 +298,7 @@ export function VideoViewClient({ post, initialSequence, initialTime }: VideoVie
                       videoId={streamId}
                       postId={post.id}
                       sequence={video.sequence}
+                      title={post.title || ''}
                       isActive={index === activeIndex && !showResumeModal}
                       onEnded={handleVideoEnd}
                       className="w-full h-full"
@@ -312,6 +313,7 @@ export function VideoViewClient({ post, initialSequence, initialTime }: VideoVie
                               : 0
                       }
                       muted={isMuted}
+                      isPremium={video.isPremium}
                     />
 
                     {index === activeIndex && (

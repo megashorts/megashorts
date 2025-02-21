@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { validateRequest } from '@/auth';
+import { revalidateTag } from 'next/cache';
 
 export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams
@@ -87,6 +88,8 @@ export async function GET(req: NextRequest) {
         status: 'active'
       }
     })
+
+    revalidateTag('user-auth')  // 해당 사용자의 캐시만 무효화
 
     // 3. 결제 정보 저장
     const orderId = `${customerKey}_${Date.now()}`

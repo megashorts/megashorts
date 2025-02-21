@@ -220,9 +220,10 @@ export function RecommendedVideosClient({ posts: initialPosts }: RecommendedVide
                     onTimeUpdate={setCurrentTime}
                     className="w-full h-full aspect-[9/16]"
                     userLanguage="KOREAN"
-                    muted={isMuted}
+                    muted={isMuted} 
+                    title={''} 
+                    isPremium={false}                  
                   />
-
                   <div 
                     className={cn(
                       "relative right-4 bottom-32 md:right-[-5.5rem] md:bottom-30 z-10 transition-opacity duration-300",
