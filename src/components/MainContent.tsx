@@ -4,18 +4,9 @@ import { CategoryType } from "@prisma/client";
 import FeaturedPostSlider from "./slider/FeaturedPostSlider";
 import PostSlider from "./slider/PostSlider";
 import RankedPostSlider from "./slider/RankedPostSlider";
-
-
-// 컨텐츠 부분만 정적으로 설정
-// export const dynamic = 'force-static'
-// export const revalidate = 0
-// 위 주석처리후 ISR변경
-// export const revalidate = 86400; // 24시간마다 재생성
+import { SliderSetting } from "@/lib/sliderSettings";
 
 export const dynamic = 'force-static';
-
-// 관리자가 선택한 드라마 포스트 번호들
-const FEATURED_DRAMA_POST_NUMS = [1, 2, 3]; // 예시 포스트 번호
 
 const postSelect = {
   id: true,
@@ -38,7 +29,6 @@ const postSelect = {
     where: { sequence: 1 },
     take: 1
   },
-  // PostModal에 필요한 필드들 추가
   likes: {
     select: {
       userId: true
@@ -65,48 +55,7 @@ const postSelect = {
   }
 };
 
-async function getFeaturedPosts() {
-  const posts = await prisma.post.findMany({
-    where: {
-      status: 'PUBLISHED',
-      NOT: {
-        categories: {
-          hasSome: [CategoryType.MSPOST, CategoryType.NOTIFICATION]
-        }
-      }
-    },
-    select: postSelect,
-    orderBy: {
-      priority: 'desc'
-    },
-    take: 20,
-  });
-  
-  return posts as PostData[];
-}
-
-async function getRomancePosts() {
-  return await prisma.post.findMany({
-    where: {
-      status: 'PUBLISHED',
-      NOT: {
-        categories: {
-          hasSome: [CategoryType.MSPOST, CategoryType.NOTIFICATION]
-        }
-      },
-      categories: {
-        has: CategoryType.ROMANCE
-      }
-    },
-    select: postSelect,
-    orderBy: {
-      priority: 'desc'
-    },
-    take: 20
-  }) as PostData[];
-}
-
-async function getLatestPosts() {
+async function getLatestPosts(take: number = 20) {
   return await prisma.post.findMany({
     where: {
       status: 'PUBLISHED',
@@ -120,34 +69,29 @@ async function getLatestPosts() {
     orderBy: {
       publishedAt: 'desc'
     },
-    take: 20
+    take
   }) as PostData[];
 }
 
-async function getFeaturedDramaPosts() {
-  return await prisma.post.findMany({
-    where: {
-      status: 'PUBLISHED',
-      NOT: {
-        categories: {
-          hasSome: [CategoryType.MSPOST, CategoryType.NOTIFICATION]
-        }
+async function getRankedPosts(take: number = 10, rankingType: 'likes' | 'views' = 'likes') {
+  if (rankingType === 'views') {
+    return await prisma.post.findMany({
+      where: {
+        status: 'PUBLISHED',
+        NOT: {
+          categories: {
+            hasSome: [CategoryType.MSPOST, CategoryType.NOTIFICATION]
+          }
+        },
       },
-      categories: {
-        has: CategoryType.DRAMA
+      select: postSelect,
+      orderBy: {
+        viewCount: 'desc'
       },
-      // postNum: {
-      //   in: FEATURED_DRAMA_POST_NUMS
-      // }
-    },
-    select: postSelect,
-    orderBy: {
-      postNum: 'asc'
-    }
-  }) as PostData[];
-}
+      take
+    }) as PostData[];
+  }
 
-async function getMostLikedPosts() {
   return await prisma.post.findMany({
     where: {
       status: 'PUBLISHED',
@@ -163,11 +107,11 @@ async function getMostLikedPosts() {
         _count: 'desc'
       }
     },
-    take: 10
+    take
   }) as PostData[];
 }
 
-async function getActionPosts() {
+async function getCategoryPosts(categories: CategoryType[], take: number = 20) {
   return await prisma.post.findMany({
     where: {
       status: 'PUBLISHED',
@@ -177,67 +121,86 @@ async function getActionPosts() {
         }
       },
       categories: {
-        has: CategoryType.ACTION
+        hasEvery: categories
       }
     },
     select: postSelect,
-    orderBy: {
-      priority: 'desc'
-    },
-    take: 20
+    orderBy: [
+      { featured: 'desc' },
+      { priority: 'desc' },
+      { publishedAt: 'desc' }
+    ],
+    take
   }) as PostData[];
 }
 
-
 export default async function MainContent() {
-    const [getFeaturedPost, romancePosts, latestPosts, featuredDramaPosts, mostLikedPosts, actionPosts] = await Promise.all([
-      getFeaturedPosts(),
-      getRomancePosts(),
-      getLatestPosts(),
-      getFeaturedDramaPosts(),
-      getMostLikedPosts(),
-      getActionPosts()
-    ]);
+  // 슬라이더 설정 가져오기
+  const settings = await prisma.systemSetting.findUnique({
+    where: { key: 'main_sliders' }
+  });
   
-    return (
-      <div className="container mx-auto px-4 py-4 z-5">
-        <FeaturedPostSlider posts={getFeaturedPost} />
-        <div className="space-y-6 py-12 md:py-12">
-           <PostSlider
-            posts={latestPosts}
-            title="최신 업데이트 ⚡️"
-            category={null}
-            viewAllHref={"/categories/recent"}
-            sliderId="latest-updates"  // 추가
-          />
-          <RankedPostSlider
-            posts={mostLikedPosts}
-            title="TOP 10 인기작품 🎉"
-            viewAllHref={""}
-            sliderId="ranked-posts"  // 추가
-          />
-          <PostSlider
-            posts={romancePosts}
-            title="인기 로맨스 ❤️"
-            category={CategoryType.ROMANCE}
-            viewAllHref={"/categories/ROMANCE"}
-            sliderId="romance-posts"  // 추가
-          />
-          <PostSlider
-            posts={featuredDramaPosts}
-            title="감동적인 드라마 😭"
-            category={CategoryType.DRAMA}
-            viewAllHref={"/categories/DRAMA"}
-            sliderId="drama-posts"  // 추가
-          />
-          <PostSlider
-            posts={actionPosts}
-            title="숨막히는 액션 ⚔️"
-            category={CategoryType.ACTION}
-            viewAllHref={"/categories/ACTION"}
-            sliderId="action-posts"  // 추가
-          />
-        </div>
+  const sliderSettings = (settings?.value as SliderSetting[]) || [];
+
+  // 각 슬라이더의 포스트 데이터 가져오기
+  const sliderDataPromises = sliderSettings.map(async (slider) => {
+    switch (slider.type) {
+      case 'latest':
+        return {
+          ...slider,
+          posts: await getLatestPosts(slider.postCount)
+        };
+      case 'ranked':
+        return {
+          ...slider,
+          posts: await getRankedPosts(slider.postCount, slider.rankingType)
+        };
+      case 'category':
+        return {
+          ...slider,
+          posts: await getCategoryPosts(slider.categories || [], slider.postCount)
+        };
+      default:
+        return {
+          ...slider,
+          posts: []
+        };
+    }
+  });
+
+  const slidersWithData = await Promise.all(sliderDataPromises);
+
+  // 슬라이더 순서대로 정렬
+  const sortedSliders = slidersWithData.sort((a, b) => a.order - b.order);
+
+  return (
+    <div className="container mx-auto px-4 py-4 z-5">
+      <FeaturedPostSlider posts={sortedSliders[0]?.posts || []} />
+      <div className="space-y-6 py-12 md:py-12">
+        {sortedSliders.map((slider) => {
+          if (slider.type === 'ranked') {
+            return (
+              <RankedPostSlider
+                key={slider.id}
+                posts={slider.posts}
+                title={slider.title}
+                viewAllHref={slider.viewAllHref}
+                sliderId={slider.id}
+              />
+            );
+          }
+          return (
+            <PostSlider
+              key={slider.id}
+              posts={slider.posts}
+              title={slider.title}
+              category={slider.categories?.[0] || null}
+              viewAllHref={slider.viewAllHref}
+              sliderId={slider.id}
+            />
+          );
+        })}
       </div>
-    )
-  }
+    </div>
+  );
+}
