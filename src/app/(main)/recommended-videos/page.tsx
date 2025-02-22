@@ -3,7 +3,6 @@ import { CategoryType } from '@prisma/client';
 import { RecommendedVideosClient } from "./RecommendedVideosClient";
 import { Metadata } from "next";
 
-// 5분마다 재렌더링
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
@@ -38,6 +37,8 @@ export default async function RecommendedVideosPage() {
     select: {
       id: true,
       title: true,
+      featured: true,
+      priority: true,
       videos: {
         where: {
           sequence: 1,
@@ -51,52 +52,12 @@ export default async function RecommendedVideosPage() {
     },
     orderBy: [
       { featured: 'desc' },
-      { postNum: 'asc' },
+      { priority: 'asc' },
       { createdAt: 'desc' }
     ],
-    take: 5  // 초기 5개만 로드
+    take: 15  // 다시 15개로
   });
 
   const validPosts = posts.filter(post => post.videos.length > 0);
   return <RecommendedVideosClient posts={validPosts} />;
 }
-
-// import prisma from "@/lib/prisma";
-// import { RecommendedVideosClient } from "./RecommendedVideosClient";
-
-// // 5분마다 재렌더링
-// export const revalidate = 300;
-
-// // SSR + ISR
-// export default async function RecommendedVideosPage() {
-//   const posts = await prisma.post.findMany({
-//     where: {
-//       videos: {
-//         some: {
-//           sequence: 1
-//         }
-//       }
-//     },
-//     select: {
-//       id: true,
-//       title: true,
-//       videos: {
-//         where: {
-//           sequence: 1
-//         },
-//         select: {
-//           id: true,
-//           url: true,
-//           sequence: true,
-//         }
-//       }
-//     },
-//     orderBy: {
-//       createdAt: 'desc'
-//     }
-//   });
-
-//   const validPosts = posts.filter(post => post.videos.length > 0);
-
-//   return <RecommendedVideosClient posts={validPosts} />;
-// }

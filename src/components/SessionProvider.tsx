@@ -36,7 +36,7 @@ export default function SessionProvider({
           if (data.watchedVideos) {
             await videoDB.syncWithServer({
               watchedVideos: data.watchedVideos,
-              lastViews: []
+              lastViews: data.lastViews
             });
           }
         } catch (error) {

@@ -13,6 +13,13 @@ import 'swiper/css/virtual';
 import { videoDB } from '@/lib/indexedDB';
 import { useSession } from '@/components/SessionProvider';
 
+const MS_RECOMMENDED_VIEW_INFO = 'ms_recommended_view_info';
+
+interface RecommendedViewInfo {
+  recommendedViewIndex: number;
+  recommendedViewPostId: string;
+}
+
 interface RecommendedVideosClientProps {
   posts: {
     id: string;
@@ -40,9 +47,36 @@ export function RecommendedVideosClient({ posts: initialPosts }: RecommendedVide
     if (savedMuteState === 'false') {
       setIsMuted(false);
     }
+
+    // 이전 시청 위치 복원
+    const savedViewInfo = localStorage.getItem(MS_RECOMMENDED_VIEW_INFO);
+    if (savedViewInfo) {
+      const { recommendedViewIndex } = JSON.parse(savedViewInfo) as RecommendedViewInfo;
+      setActiveIndex(recommendedViewIndex);
+      swiperRef.current?.slideTo(recommendedViewIndex);
+    }
+  }, []);
+
+  // 시청하지 않은 포스트 필터링
+  useEffect(() => {
+  const loadViewHistory = async () => {
+    try {
+      // lastViews에서 sequence > 1인 포스트 ID 가져오기
+      const watchingPosts = await videoDB.getWatchingPostIds();
+      
+      // 시청하지 않은 포스트만 필터링
+      const unwatchedPosts = loadedPosts.filter(
+        post => !watchingPosts.includes(post.id)
+      );
+        setLoadedPosts(unwatchedPosts);
+      } catch (error) {
+        console.error('Failed to load view history:', error);
+      }
+    };
+    loadViewHistory();
   }, []);
   
-  const handleMuteToggle = useCallback(() => {  // 이름 통일
+  const handleMuteToggle = useCallback(() => {
     setIsMuted(prev => {
       const newState = !prev;
       if (!newState) {
@@ -54,90 +88,87 @@ export function RecommendedVideosClient({ posts: initialPosts }: RecommendedVide
     });
   }, []);
 
-    const updateButtonsVisibility = useCallback((event: React.MouseEvent | React.TouchEvent) => {
-      event.stopPropagation();
-      setShowButtons(true);
+  const updateButtonsVisibility = useCallback((event: React.MouseEvent | React.TouchEvent) => {
+    event.stopPropagation();
+    setShowButtons(true);
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    timeoutRef.current = setTimeout(() => {
+      setShowButtons(false);
+    }, 3000);
+  }, []);
+
+  const loadMorePosts = useCallback(async () => {
+    try {
+      const response = await fetch(`/api/posts/recommended?skip=${loadedPosts.length}&take=15`);
+      const newPosts = await response.json();
+      
+      if (Array.isArray(newPosts) && newPosts.length > 0) {
+        setLoadedPosts(prev => [...prev, ...newPosts]);
+      }
+    } catch (error) {
+      console.error('Failed to load more posts:', error);
+    }
+  }, [loadedPosts.length]);
+
+  useEffect(() => {
+    if (loadedPosts.length - activeIndex <= 5) {
+      loadMorePosts();
+    }
+  }, [activeIndex, loadedPosts.length, loadMorePosts]);
+
+  const handleSlideChange = useCallback((swiper: SwiperType) => {
+    setActiveIndex(swiper.activeIndex);
+
+    // 현재 위치 저장
+    const viewInfo: RecommendedViewInfo = {
+      recommendedViewIndex: swiper.activeIndex,
+      recommendedViewPostId: loadedPosts[swiper.activeIndex].id
+    };
+    localStorage.setItem(MS_RECOMMENDED_VIEW_INFO, JSON.stringify(viewInfo));
+  }, [loadedPosts]);
+
+  const filterUnwatchedPosts = useCallback(async () => {
+    // lastViews에서 sequence > 1인 포스트 ID 가져오기
+    const watchingPosts = await videoDB.getWatchingPostIds();
+    
+    // 시청하지 않은 포스트만 필터링
+    const unwatchedPosts = loadedPosts.filter(
+      post => !watchingPosts.includes(post.id)
+    );
+
+    if (unwatchedPosts.length === 0) {
+      // 모든 포스트를 시청했으면 처음부터 다시 시작
+      localStorage.removeItem(MS_RECOMMENDED_VIEW_INFO);
+      setLoadedPosts(initialPosts);
+      setActiveIndex(0);
+      swiperRef.current?.slideTo(0);
+    } else {
+      setLoadedPosts(unwatchedPosts);
+      setActiveIndex(0);
+      swiperRef.current?.slideTo(0);
+    }
+  }, [loadedPosts, initialPosts]);
+
+  const handleVideoEnd = useCallback(() => {
+    // 시청 기록 저장 제거 (sequence=1인 영상은 저장하지 않음)
+
+    // 마지막 포스트인 경우
+    if (activeIndex === loadedPosts.length - 1) {
+      filterUnwatchedPosts();
+    } else {
+      swiperRef.current?.slideNext();
+    }
+  }, [activeIndex, loadedPosts, user, filterUnwatchedPosts]);
+
+  useEffect(() => {
+    return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
-      timeoutRef.current = setTimeout(() => {
-        setShowButtons(false);
-      }, 3000);
-    }, []);
-  
-    // 시청 기록 로드
-    useEffect(() => {
-      const loadViewHistory = async () => {
-        try {
-          const watchedVideos = await videoDB.getWatchedVideos();
-          setViewedVideos(new Set(watchedVideos));
-        } catch (error) {
-          console.error('Failed to load view history:', error);
-        }
-      };
-      loadViewHistory();
-    }, []);
-
-    const handleSlideChange = useCallback((swiper: SwiperType) => {
-      const newIndex = swiper.activeIndex;
-      console.log('Slide changed:', {
-        newIndex,
-        video: loadedPosts[newIndex].videos[0],
-        sequence: loadedPosts[newIndex].videos[0].sequence,
-        streamId: loadedPosts[newIndex].videos[0].id
-      });
-  
-      setActiveIndex(newIndex);
-  
-      // 로그인한 사용자만 시청 기록 체크
-      if (user) {
-        const currentVideoId = loadedPosts[newIndex].videos[0].id;
-        if (viewedVideos.has(currentVideoId)) {
-          // 다음 미시청 비디오 찾기
-          let nextIndex = newIndex;
-          for (let i = newIndex + 1; i < loadedPosts.length; i++) {
-            if (!viewedVideos.has(loadedPosts[i].videos[0].id)) {
-              nextIndex = i;
-              break;
-            }
-          }
-          // 모든 비디오를 시청했다면 처음부터 다시 시작
-          if (nextIndex === newIndex && newIndex === loadedPosts.length - 1) {
-            setViewedVideos(new Set());
-            swiper.slideTo(0);
-            return;
-          }
-          // 다음 미시청 비디오로 이동
-          if (nextIndex !== newIndex) {
-            swiper.slideTo(nextIndex);
-          }
-        }
-      }
-  
-      // 1개 시청 후 슬라이드 시 자동 추가 로딩
-      if (loadedPosts.length - newIndex <= 2) {
-        fetch(`/api/posts/recommended?skip=${loadedPosts.length}&take=5`)
-          .then(res => res.json())
-          .then(newPosts => {
-            if (newPosts.length > 0) {
-              setLoadedPosts(prev => [...prev, ...newPosts]);
-            }
-          })
-          .catch(error => {
-            console.error('Failed to load more posts:', error);
-          });
-      }
-    }, [loadedPosts, viewedVideos, user]); // user 의존성 추가
-  
-    // handleVideoEnd도 수정
-    const handleVideoEnd = useCallback(() => {
-      // 로그인한 사용자만 시청 기록 추가
-      if (user) {
-        const currentVideoId = loadedPosts[activeIndex].videos[0].id;
-        setViewedVideos(prev => new Set(prev).add(currentVideoId));
-      }
-      swiperRef.current?.slideNext();
-    }, [activeIndex, loadedPosts, user]); // user 의존성 추가
+    };
+  }, []);
 
   return (
     <div 
@@ -150,37 +181,19 @@ export function RecommendedVideosClient({ posts: initialPosts }: RecommendedVide
         direction="vertical"
         slidesPerView={1}
         spaceBetween={0}
-        speed={400}
+        speed={300}
         mousewheel={{
           enabled: true,
           sensitivity: 1,
-          thresholdDelta: 20,
-          forceToAxis: true,
-          releaseOnEdges: false,
-          eventsTarget: '.swiper-container'
+          thresholdDelta: 10,
+          forceToAxis: true
         }}
-        virtual
         className="h-full w-full swiper-container aspect-[9/16]"
         onSwiper={(swiper) => {
-          console.log('onSwiper called');
           swiperRef.current = swiper;
         }}
         onSlideChange={handleSlideChange}
-        onReachBeginning={(swiper) => {
-          console.log('reachBeginning');
-          swiper.allowSlidePrev = false;
-        }}
-        onReachEnd={(swiper) => {
-          console.log('reachEnd');
-          swiper.allowSlideNext = false;
-        }}
-        onFromEdge={(swiper) => {
-          console.log('fromEdge');
-          swiper.allowSlidePrev = true;
-          swiper.allowSlideNext = true;
-        }}
         initialSlide={0}
-        watchSlidesProgress={true}
         observer={true}
         observeParents={true}
       >
@@ -188,7 +201,7 @@ export function RecommendedVideosClient({ posts: initialPosts }: RecommendedVide
           const video = post.videos[0];
           const streamId = video.id;
           return (
-            <SwiperSlide key={`${post.id}-${index}`} virtualIndex={index}>
+            <SwiperSlide key={post.id}>
               <div className="w-full h-full flex items-center justify-center bg-black pt-[48px] md:pt-[70px] pb-1">
                 <div className="relative aspect-[9/16] h-full mx-auto">
                   <div 
@@ -200,7 +213,6 @@ export function RecommendedVideosClient({ posts: initialPosts }: RecommendedVide
                     <div className="pl-4 md:pl-4 pt-4 text-white flex items-center relative">
                       <div className="bg-gradient-to-r from-black/70 to-transparent px-4 py-2 rounded-lg">
                         <Link 
-                          // href={`/video-view/${post.id}`}
                           href={`/video-view/${post.id}?t=${currentTime}`}
                           className="hover:text-primary transition-colors"
                         >
@@ -220,10 +232,11 @@ export function RecommendedVideosClient({ posts: initialPosts }: RecommendedVide
                     onTimeUpdate={setCurrentTime}
                     className="w-full h-full aspect-[9/16]"
                     userLanguage="KOREAN"
-                    muted={isMuted} 
-                    title={''} 
-                    isPremium={false}                  
+                    muted={isMuted}
+                    title={post.title || ''}
+                    isPremium={false}
                   />
+
                   <div 
                     className={cn(
                       "relative right-4 bottom-32 md:right-[-5.5rem] md:bottom-30 z-10 transition-opacity duration-300",
@@ -240,19 +253,20 @@ export function RecommendedVideosClient({ posts: initialPosts }: RecommendedVide
                         likes: 0,
                         isLikedByUser: false
                       }}
-                      hasNextVideo={true}
-                      hasPrevVideo={true}
+                      hasNextVideo={index < loadedPosts.length - 1}
+                      hasPrevVideo={index > 0}
                       onNavigate={(direction) => {
                         if (direction === "next") {
                           swiperRef.current?.slideNext();
                         } else {
                           swiperRef.current?.slidePrev();
                         }
-                      } }
-                      visible={showButtons} videos={[]}     
-                      onMuteToggle={handleMuteToggle}  // 이름 통일
-                      isMuted={isMuted} 
-                      />
+                      }}
+                      visible={showButtons}
+                      videos={[]}
+                      onMuteToggle={handleMuteToggle}
+                      isMuted={isMuted}
+                    />
                   </div>
                 </div>
               </div>

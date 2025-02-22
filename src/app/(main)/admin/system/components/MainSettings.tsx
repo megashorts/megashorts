@@ -187,7 +187,12 @@ export function MainSettings() {
         <div className="space-y-6">
           {/* 슬라이더 설정 섹션 */}
           <div>
-            <h5 className="text-lg font-medium mb-2 mt-4">슬라이더 관리</h5>
+            <h5 className="text-lg font-medium mb-2 mt-4">
+              슬라이더 관리
+              <p className="text-xs text-muted-foreground">
+                드래그앤드롭으로 슬라이더 순서와 추가/삭제 및 변경이 가능합니다.
+              </p>
+            </h5>
             <div className="space-y-2">
               <DndContext
                 sensors={sensors}

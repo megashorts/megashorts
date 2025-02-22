@@ -9,44 +9,25 @@ export async function GET(req: Request) {
     }
 
     const { searchParams } = new URL(req.url);
-    const cursor = searchParams.get('cursor');
-    const limit = 20;
+    const ids = searchParams.get('ids')?.split(',');
 
-    // 시청 중인 포스트 조회 (2화 이상 본 포스트만)
+    if (!ids?.length) {
+      return Response.json({ posts: [], nextCursor: null });
+    }
+
+    // videos 정보 추가
     const posts = await prisma.post.findMany({
       where: {
-        videos: {
-          some: {
-            AND: [
-              { sequence: { gt: 1 } },  // 2화 이상인 영상이 있는 포스트
-              {
-                views: {
-                  some: {
-                    userId: user.id
-                  }
-                }
-              }
-            ]
-          }
-        }
+        id: { in: ids }
       },
       include: {
         user: true,
-        videos: {
-          where: {
-            views: {
-              some: {
-                userId: user.id
-              }
-            }
-          },
-          include: {
-            views: {
-              where: {
-                userId: user.id
-              }
-            }
-          }
+        videos: true,  // 비디오 정보 추가
+        bookmarks: {
+          where: { userId: user.id }
+        },
+        likes: {
+          where: { userId: user.id }
         },
         _count: {
           select: {
@@ -55,23 +36,12 @@ export async function GET(req: Request) {
             videos: true
           }
         }
-      },
-      orderBy: {
-        createdAt: 'desc'
-      },
-      take: limit + 1,
-      ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
+      }
     });
-
-    let nextCursor: string | null = null;
-    if (posts.length > limit) {
-      const nextItem = posts.pop();
-      nextCursor = nextItem?.id || null;
-    }
 
     return Response.json({
       posts,
-      nextCursor,
+      nextCursor: null
     });
   } catch (error) {
     console.error('Watching error:', error);

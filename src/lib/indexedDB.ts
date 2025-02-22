@@ -85,6 +85,8 @@ class VideoDBManager {
     await this.init();
     if (!this.db) throw new Error('Database not initialized');
 
+    console.log('Saving last view:', { postId, sequence, timestamp });  // 디버깅 로그 추가
+
     return new Promise<void>((resolve, reject) => {
       const transaction = this.db!.transaction(['lastViews'], 'readwrite');
       const store = transaction.objectStore('lastViews');
@@ -95,27 +97,36 @@ class VideoDBManager {
         timestamp
       });
 
-      request.onerror = () => reject(request.error);
-      request.onsuccess = () => resolve();
+      request.onerror = () => {
+        console.error('Failed to save last view:', request.error);  // 디버깅 로그 추가
+        reject(request.error);
+      };
+      request.onsuccess = () => {
+        console.log('Last view saved successfully');  // 디버깅 로그 추가
+        resolve();
+      };
     });
   }
 
-  // 서버 데이터로 동기화 (브라우저에 없는 동영상 ID만 추가)
+  // 서버 데이터로 동기화 (브라우저에 없는 정보만 추가)
   async syncWithServer(serverData: VideoViewStore) {
     await this.init();
     if (!this.db) throw new Error('Database not initialized');
 
-    // 현재 브라우저의 시청 기록 가져오기
-    const transaction = this.db.transaction(['watchedVideos'], 'readwrite');
-    const store = transaction.objectStore('watchedVideos');
-    
-    return new Promise<void>((resolve, reject) => {
+    console.log('Starting sync with server data:', serverData);  // 디버깅 로그 추가
+
+    // 1. watchedVideos 동기화
+    const watchedVideosSync = new Promise<void>((resolve, reject) => {
+      const transaction = this.db!.transaction(['watchedVideos'], 'readwrite');
+      const store = transaction.objectStore('watchedVideos');
       const request = store.getAll();
       
       request.onerror = () => reject(request.error);
       request.onsuccess = async () => {
         const currentRecords = request.result || [];
         const currentVideoIds = new Set(currentRecords.map(record => record.videoId));
+        
+        console.log('Current watched videos:', currentVideoIds);  // 디버깅 로그 추가
         
         // 브라우저에 없는 동영상 ID만 추가
         const newWatchedPromises = serverData.watchedVideos
@@ -124,12 +135,46 @@ class VideoDBManager {
         
         try {
           await Promise.all(newWatchedPromises);
+          console.log('Watched videos sync completed');  // 디버깅 로그 추가
           resolve();
         } catch (error) {
+          console.error('Failed to sync watched videos:', error);  // 디버깅 로그 추가
           reject(error);
         }
       };
     });
+
+    // 2. lastViews 동기화
+    const lastViewsSync = new Promise<void>((resolve, reject) => {
+      const transaction = this.db!.transaction(['lastViews'], 'readwrite');
+      const store = transaction.objectStore('lastViews');
+      const request = store.getAll();
+
+      request.onerror = () => reject(request.error);
+      request.onsuccess = async () => {
+        const currentViews = request.result || [];
+        const currentPostIds = new Set(currentViews.map(view => view.postId));
+
+        console.log('Current last views:', currentViews);  // 디버깅 로그 추가
+
+        // 브라우저에 없는 포스트의 시청 정보만 추가
+        const newLastViewPromises = serverData.lastViews
+          .filter(view => !currentPostIds.has(view.postId))
+          .map(view => this.saveLastView(view.postId, view.sequence, view.timestamp));
+
+        try {
+          await Promise.all(newLastViewPromises);
+          console.log('Last views sync completed');  // 디버깅 로그 추가
+          resolve();
+        } catch (error) {
+          console.error('Failed to sync last views:', error);  // 디버깅 로그 추가
+          reject(error);
+        }
+      };
+    });
+
+    // 두 동기화 작업을 병렬로 실행
+    return Promise.all([watchedVideosSync, lastViewsSync]);
   }
 
   async getWatchedVideos() {

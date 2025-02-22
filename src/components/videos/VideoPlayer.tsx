@@ -47,7 +47,6 @@ const VideoPlayer = dynamic(() => Promise.resolve(({
   
   const thumbnailUrl = `https://customer-2cdfxbmja64x0pqo.cloudflarestream.com/${videoId}/thumbnails/thumbnail.jpg?time=&height=600`;
   const videoUrl = `https://customer-2cdfxbmja64x0pqo.cloudflarestream.com/${videoId}/manifest/video.m3u8`;
-  // const videoUrl = `https://customer-2cdfxbmja64x0pqo.cloudflarestream.com/${videoId}/manifest/video.m3u8?subtitleSize=200`;  // subtitleSize 파라미터 추가
 
   // 컴포넌트 마운트 시 localStorage에서 뮤트 상태 확인
   useEffect(() => {
@@ -65,13 +64,8 @@ const VideoPlayer = dynamic(() => Promise.resolve(({
     video.muted = isMuted;
   }, [isMuted]);
 
-  // const handleMuteToggle = (newMuteState: boolean) => {
-  //   setIsMuted(newMuteState);
-  // };
-
   // 시청 시간 추적
-  // const handleTimeUpdate = () => {
-  const handleTimeUpdate = useCallback(async () => {  // async 추가
+  const handleTimeUpdate = useCallback(async () => {
     const video = videoRef.current;
     if (!video || !isActive || !user?.id) return;
     
@@ -89,43 +83,41 @@ const VideoPlayer = dynamic(() => Promise.resolve(({
 
         try {
           // 브라우저 저장
+          await Promise.all([
+            videoDB.saveWatchedVideo(videoId),
+            videoDB.saveLastView(postId, sequence, currentTime)
+          ]).catch(error => {
+            console.error('IndexedDB error:', error);
+          });
           
-            await Promise.all([
-              videoDB.saveWatchedVideo(videoId),
-              videoDB.saveLastView(postId, sequence, currentTime)
-            ]).catch(error => {
-              console.error('IndexedDB error:', error);
+          // 유료 동영상일 때만 서버 저장
+          if (isPremium) {
+            const response = await fetch('/api/videos/view', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                videoId,
+                postId,
+                sequence,
+                timestamp: currentTime
+              })
             });
-          
-            // 유료 동영상일 때만 서버 저장
-            if (isPremium) {
-              const response = await fetch('/api/videos/view', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  videoId,
-                  postId,
-                  sequence,
-                  timestamp: currentTime
-                })
-              });
 
-              const result = await response.json();
-              
-              // 로그 기록
-              logActivity({
-                type: 'video',
-                event: result.message === "SUBSCRIPTION view save" 
-                  ? `SubsView_${title}_${sequence}`
-                  : `coinview_${title}_${sequence}`,
-                  username: user?.username,
-                  details: {
-                    action: videoId,
-                    target: `${postId}_${sequence}`,
-                    result: 'success'
-                  }
-              });
-          
+            const result = await response.json();
+            
+            // 로그 기록
+            logActivity({
+              type: 'video',
+              event: result.message === "SUBSCRIPTION view save" 
+                ? `SubsView_${title}_${sequence}`
+                : `coinview_${title}_${sequence}`,
+                username: user?.username,
+                details: {
+                  action: videoId,
+                  target: `${postId}_${sequence}`,
+                  result: 'success'
+                }
+            });
           }
     
           console.log('First tracking at 5 seconds:', {
@@ -154,7 +146,6 @@ const VideoPlayer = dynamic(() => Promise.resolve(({
         return;
       }
 
-    
       // 이후 10초 단위로 저장
       if (currentTime >= 10) {
         const nextCheckpoint = Math.floor(currentTime / 10) * 10;
@@ -193,12 +184,11 @@ useEffect(() => {
           enableWorker: true,
           lowLatencyMode: true,
           backBufferLength: 90,
-          // 자막 관련 설정
           enableWebVTT: true,
           enableIMSC1: true,
           enableCEA708Captions: true,
           subtitlePreference: {
-            lang: 'ko'  // 한국어 자막 선호
+            lang: 'ko'
           },
         });
         hlsRef.current = hls;
@@ -237,7 +227,6 @@ useEffect(() => {
                   });
                 }
               }
-
             }
           }
         });
@@ -294,8 +283,6 @@ useEffect(() => {
     isActive
   });
 
-  // 이전 리스너 제거 후 새로 등록
-  // video.removeEventListener('timeupdate', handleTimeUpdate);
   video.addEventListener('timeupdate', handleTimeUpdate);
 
   return () => {
@@ -317,10 +304,8 @@ useEffect(() => {
 
   if (isActive) {
     if (initialTime > 0) {
-      // 이어보기인 경우 lastTrackedTimeRef도 해당 시점으로 설정
       lastTrackedTimeRef.current = Math.floor(initialTime / 10) * 10;
     } else if (video.currentTime === 0) {
-      // 처음부터 보는 경우에만 초기화
       lastTrackedTimeRef.current = 0;
     }
     
@@ -328,25 +313,21 @@ useEffect(() => {
       hlsRef.current.startLoad(-1);
     }
     
-    // initialTime이 있을 때만 적용
     if (initialTime > 0) {
       video.currentTime = initialTime;
     } else {
       video.currentTime = 0;
     }
 
-    // play() 호출 전에 현재 상태 확인
     if (!video.paused) {
-      return; // 이미 재생 중이면 스킵
+      return;
     }
 
     const playPromise = video.play();
     if (playPromise !== undefined) {
       playPromise.catch(error => {
-        // AbortError는 의도된 동작이므로 무시
         if (error.name !== 'AbortError') {
           console.error('Error playing video:', error);
-          // 실제 에러일 경우만 재시도
           setTimeout(() => {
             if (isActive && video.paused) {
               video.play().catch(e => {
@@ -373,13 +354,8 @@ useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    // const handleEnded = () => {
-    //   onEnded?.();
-    // };
-
     const handleEnded = () => {
       try {
-        // 모든 가능한 전체화면 체크 및 해제 시도
         if (document.fullscreenElement) {
           document.exitFullscreen();
         } else if ((document as any).webkitFullscreenElement) {
@@ -390,15 +366,12 @@ useEffect(() => {
           (document as any).msExitFullscreen();
         }
   
-        // video 요소에서도 시도
         if ((video as any).webkitEnterFullscreen) {
           (video as any).webkitExitFullscreen();
         }
       } catch (error) {
-        // 에러 무시 (이미 전체화면이 아닌 경우 등)
       }
   
-      // 기존 onEnded 콜백 실행
       onEnded?.();
     };
 
@@ -414,19 +387,13 @@ useEffect(() => {
     const handleCueChange = (event: Event) => {
       const track = event.target as TextTrack;
       if (track.cues) {
-
-        // 화면 크기 체크
         const isDesktop = window.matchMedia('(min-width: 1024px)').matches;
-
-        // 전체화면 상태 확인
         const isFullscreen = !!(
           document.fullscreenElement ||
           (document as any).webkitFullscreenElement ||
           (document as any).mozFullScreenElement ||
           (document as any).msFullscreenElement
         );
-        
-        // iOS 체크
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
     
         for (let i = 0; i < track.cues.length; i++) {
@@ -436,26 +403,22 @@ useEffect(() => {
           
           if (isIOS) {
             if (isDesktop) {
-              cue.line = 18;  // iOS 데스크톱
+              cue.line = 18;
             } else {
-              cue.line = 16;  // iOS 모바일
+              cue.line = 16;
             }
           } else {
-        // 아이폰이 아닌 경우
             if (isFullscreen) {
-              // 전체화면일 때만 다른 위치 적용
               if (isDesktop) {
-                cue.line = 24;  // 일반 데스크톱
+                cue.line = 24;
               } else {
-                cue.line = 16;  // 일반 모바일
+                cue.line = 16;
               }
-
             } else {
-              // 일반 화면일 때는 기존 위치 유지
               if (isDesktop) {
-                cue.line = 21;  // 일반 데스크톱
+                cue.line = 21;
               } else {
-                cue.line = 11;  // 일반 모바일
+                cue.line = 11;
               }
             }
           }
@@ -482,11 +445,8 @@ useEffect(() => {
     };
   }, []);
 
-
   return (
     <div className={cn('relative w-full h-full', className)}>
-
-    {/* iOS가 아닌 경우에만 스타일 적용 */}
     {!/iPad|iPhone|iPod/.test(navigator.userAgent) && (
       <style jsx global>{`
         video::cue {
