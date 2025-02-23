@@ -12,12 +12,16 @@ import 'swiper/css/navigation';
 import { useState } from 'react';
 import PostModal from '../posts/PostModal';
 import { getThumbnailUrl } from '@/lib/constants';
+import Link from 'next/link';
 
 interface FeaturedPostSliderProps {
   posts: PostData[];
+  title?: string;
+  viewAllHref?: string;
+  sliderId: string;
 }
 
-const FeaturedPostSlider = ({ posts }: FeaturedPostSliderProps) => {
+const FeaturedPostSlider = ({ posts, title, viewAllHref, sliderId }: FeaturedPostSliderProps) => {
   const [hoveredIndex, setHoveredIndex] = useState<string | null>(null);
   const [selectedPost, setSelectedPost] = useState<PostData | null>(null);
 
@@ -35,6 +39,18 @@ const FeaturedPostSlider = ({ posts }: FeaturedPostSliderProps) => {
   
   return (
     <div className="relative w-full h-[42vh] min-h-[400px] flex flex-col items-center">
+      {/* 타이틀 섹션 */}
+      {/* {title && (
+        <div className="w-full flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-bold">{title}</h2>
+          {viewAllHref && (
+            <Link href={viewAllHref} className="text-sm text-muted-foreground hover:text-primary">
+              더보기
+            </Link>
+          )}
+        </div>
+      )} */}
+
       <div className="swiper-container-1 h-full w-full mb-8">
         <Swiper
           modules={[Pagination, Autoplay, Navigation, EffectCoverflow]}
@@ -68,9 +84,12 @@ const FeaturedPostSlider = ({ posts }: FeaturedPostSliderProps) => {
           }}
           className="h-full !px-[2%]"
         >
-          {posts.slice(0, 10).map((post) => (
+          {[...posts]
+            .sort((a, b) => (b.priority || 0) - (a.priority || 0))
+            .slice(0, 10)
+            .map((post, index) => (
             <SwiperSlide
-              key={post.id}
+              key={`${sliderId}-${index}`}
               className="relative z-0 aspect-[2/3]"
               style={{
                 width: 'calc(33.333% - 20px)',
@@ -90,9 +109,6 @@ const FeaturedPostSlider = ({ posts }: FeaturedPostSliderProps) => {
                       : isVisible
                       ? 'linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3))'
                       : '',
-                    // boxShadow: isActive
-                    //   ? '0 0 6px 6px rgba(255, 255, 255, 0.15), 0 0 8px 8px rgba(255, 255, 255, 0.1), 0 0 16px 16px rgba(255, 255, 255, 0.05)'
-                    //   : '',
                     boxShadow: 'none',
                     aspectRatio: '2/3',
                     borderRadius: '15px',
@@ -112,7 +128,7 @@ const FeaturedPostSlider = ({ posts }: FeaturedPostSliderProps) => {
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       className={`object-cover transition-transform duration-300 ${
                         hoveredIndex === post.id ? 'scale-105' : 'scale-100'
-                      }`} // 마우스 올리면 썸네일만 확대
+                      }`}
                       priority
                     />
                     {/* 비활성 슬라이드에 대한 어두운 오버레이 */}

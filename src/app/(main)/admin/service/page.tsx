@@ -25,13 +25,13 @@ export default function LogsPage() {
           <div className="flex items-center justify-center rounded-xl bg-card p-2 md:p-3 mx-auto shadow-sm hidden md:block">
             <h1 className="text-center text-base sm:text-xl font-bold">Service</h1>
           </div>
-          <Tabs defaultValue="tracking">
+          <Tabs defaultValue="noticemodal">
             <TabsList>
-              <TabsTrigger value="modal"><PartyPopper className="w-6 h-6" /></TabsTrigger>
+              <TabsTrigger value="noticemodal"><PartyPopper className="w-6 h-6" /></TabsTrigger>
               <TabsTrigger value="inquiry"><Headset className="w-6 h-6" /></TabsTrigger>
               <TabsTrigger value="logs"><ClipboardList className="w-6 h-6" /><p className="pl-1 hidden md:block">Logs</p></TabsTrigger>
             </TabsList>
-            <TabsContent value="tracking">
+            <TabsContent value="noticemodal">
               {/* <Bookmarks /> */}
             </TabsContent>
             <TabsContent value="inquiry">

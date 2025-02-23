@@ -25,16 +25,19 @@ import { getThumbnailUrl } from "@/lib/constants";
 type PostFormData = z.infer<typeof postSchema>;
 
 const CATEGORIES: Record<CategoryType, string> = {
-  COMIC: "만화",
+  COMEDY: "즐거운",
   ROMANCE: "로맨스",
   ACTION: "액션",
   THRILLER: "스릴러",
-  DRAMA: "드라마",
-  PERIOD: "시대물",
-  FANTASY: "판타지",
+  DRAMA: "감동적인",
+  PERIODPLAY: "시대극",
+  FANTASY: "환타지",
   HIGHTEEN: "하이틴",
-  ADULT: "성인", 
-  NOTIFICATION: "안내", 
+  ADULT: "성인",
+  HUMANE: "인간적인",
+  CALM: "잔잔한",
+  VARIETYSHOW: "예능",
+  NOTIFICATION: "안내",
   MSPOST: "블로그",
 } as const;
 

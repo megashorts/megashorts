@@ -2,16 +2,24 @@ import { CategoryType } from "@prisma/client";
 
 export type SliderSetting = {
   id: string;
-  title: string;
+  title?: string; // Featured 슬라이더는 title 불필요
   postCount: number;
   categories?: CategoryType[];
-  type: 'latest' | 'ranked' | 'category';
+  type: 'featured' | 'latest' | 'ranked' | 'category';
   rankingType?: 'likes' | 'views';
   order: number;
   viewAllHref: string;
+  manualPosts?: string[]; // Featured 슬라이더용 수동 추가 포스트 ID 배열
 };
 
 export const defaultSliderSettings = {
+  featured: {
+    postCount: 10,
+    title: "추천 작품",
+    viewAllHref: "",
+    order: 0, // 항상 최상단
+    manualPosts: []
+  },
   latest: {
     postCount: 20,
     title: "최신 업데이트",
@@ -67,6 +75,7 @@ export function generateCategoryViewAllHref(categories: CategoryType[]): string 
 }
 
 export function generateSliderId(type: string, categories?: CategoryType[], order?: number): string {
+  if (type === 'featured') return `featured-posts${order !== undefined ? `-${order}` : ''}`;
   if (type === 'latest') return 'latest-updates';
   if (type === 'ranked') return 'ranked-posts';
   if (type === 'category' && categories) {

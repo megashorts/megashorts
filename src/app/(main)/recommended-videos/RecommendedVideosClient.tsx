@@ -201,7 +201,7 @@ export function RecommendedVideosClient({ posts: initialPosts }: RecommendedVide
           const video = post.videos[0];
           const streamId = video.id;
           return (
-            <SwiperSlide key={post.id}>
+            <SwiperSlide key={`${post.id}-${index}`}>
               <div className="w-full h-full flex items-center justify-center bg-black pt-[48px] md:pt-[70px] pb-1">
                 <div className="relative aspect-[9/16] h-full mx-auto">
                   <div 

@@ -79,7 +79,7 @@ export function SliderSettingsForm({ slider, onUpdate, onDelete, isFixed }: Slid
         {...listeners}
         className="absolute right-2 top-5 cursor-move"
       >
-        <GripVertical className="h-4 w-4 text-muted-foreground" />
+        <GripVertical className="h-3 w-3 text-muted-foreground" />
       </div>
 
       <div className="space-y-2 pr-5">
@@ -88,13 +88,14 @@ export function SliderSettingsForm({ slider, onUpdate, onDelete, isFixed }: Slid
           value={slider.title}
           onChange={(e) => handleTitleChange(e.target.value)}
           placeholder="슬라이더 제목"
+          className="text-sm"
         />
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 flex-1 min-w-0">
             {/* 포스트 수 입력 */}
             <div className="flex items-center gap-1">
-              <Hash className="h-4 w-4 text-muted-foreground shrink-0" />
+              <Hash className="h-3 w-3 text-muted-foreground shrink-0" />
               <Input
                 type="text"
                 inputMode="numeric"
@@ -106,7 +107,7 @@ export function SliderSettingsForm({ slider, onUpdate, onDelete, isFixed }: Slid
                     handlePostCountChange(value);
                   }
                 }}
-                className="w-12 text-center"
+                className="w-10 text-xs text-center"
               />
             </div>
 
@@ -135,7 +136,7 @@ export function SliderSettingsForm({ slider, onUpdate, onDelete, isFixed }: Slid
                   onClick={() => setCategoryModalOpen(true)}
                   className="shrink-0"
                 >
-                  <Tags className="h-4 w-4" />
+                  <Tags className="h-3 w-3" />
                 </Button>
                 <div className="flex flex-wrap gap-1 min-w-0 overflow-hidden">
                   {slider.categories?.map((category) => (
@@ -165,7 +166,7 @@ export function SliderSettingsForm({ slider, onUpdate, onDelete, isFixed }: Slid
               onClick={onDelete}
               className="text-destructive hover:text-destructive shrink-0 h-8 w-8 ml-2"
             >
-              <Trash2 className="h-4 w-4" />
+              <Trash2 className="h-3 w-3" />
             </Button>
           )}
         </div>
