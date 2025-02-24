@@ -372,6 +372,19 @@ model SystemSetting {
   @@map("system_settings")
 }
 
+model NoticeModal {
+  id            Int      @id @default(autoincrement())
+  title         String   // 관리자용 식별 제목
+  priority      Int      // 우선순위
+  isActive      Boolean  @default(true)
+  hideOption    String   @default("NONE") // NONE, TODAY, FOREVER
+  i18nData      Json     // 다국어 데이터 (imageId, buttonText)
+  linkUrl       String?  // 클릭시 이동 URL
+  buttonUrl     String?  // 버튼 클릭시 이동 URL
+  createdBy     String   // 생성자
+  createdAt     DateTime @default(now())
+}
+
 enum AccessMethod {
   FREE
   SUBSCRIPTION
