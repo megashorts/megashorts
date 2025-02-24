@@ -72,9 +72,10 @@ export function MainPopupModal() {
           return (
             <div 
               key={modal.id}
-              className="bg-white shadow-xl absolute top-1/2 left-1/2 overflow-hidden rounded-lg"
+              className="bg-slate-600 shadow-2xl absolute top-1/2 left-1/2 overflow-hidden rounded-lg"
               style={{ 
-                width: isMobile ? '90vw' : '600px',
+                width: isMobile ? 'min(80vw, calc(70vh * 0.667))' : 'min(500px, calc(70vh * 0.667))',
+                // width: isMobile ? '90vw' : '600px',
                 transform: `translate(-50%, -50%) translate(${idx * 8}px, ${idx * 8}px)`,
                 zIndex: modals.length - idx
               }}

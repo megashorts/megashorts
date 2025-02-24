@@ -155,7 +155,7 @@ export function NoticeModalClient() {
   return (
     <div className="space-y-2">
       <div className="flex justify-between items-center">
-        <h2 className="text-base font-semibold ml-2 mt-1">공지 모달</h2>
+        <h2 className="text-base font-semibold ml-2 mt-1">메인팝업 운영</h2>
         <Button
           variant="outline"
           size="icon"
