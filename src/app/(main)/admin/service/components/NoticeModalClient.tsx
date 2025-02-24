@@ -30,6 +30,7 @@ export function NoticeModalClient() {
       toast({
         variant: "destructive",
         description: "모달 목록을 불러오는데 실패했습니다.",
+        duration: 1500,
       });
     }
   };
@@ -69,12 +70,14 @@ export function NoticeModalClient() {
         description: editingModal 
           ? "모달이 수정되었습니다."
           : "새 모달이 추가되었습니다.",
+        duration: 1500,
       });
     } catch (error) {
       console.error('Failed to save modal:', error);
       toast({
         variant: "destructive",
         description: "모달 저장에 실패했습니다.",
+        duration: 1500,
       });
     }
   };
@@ -99,12 +102,14 @@ export function NoticeModalClient() {
 
       toast({
         description: "모달이 업데이트되었습니다.",
+        duration: 1500,
       });
     } catch (error) {
       console.error('Failed to update modal:', error);
       toast({
         variant: "destructive",
         description: "모달 업데이트에 실패했습니다.",
+        duration: 1500,
       });
     }
   };
@@ -148,9 +153,9 @@ export function NoticeModalClient() {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       <div className="flex justify-between items-center">
-        <h2 className="text-lg font-semibold">공지 모달</h2>
+        <h2 className="text-base font-semibold ml-2 mt-1">공지 모달</h2>
         <Button
           variant="outline"
           size="icon"
@@ -158,7 +163,7 @@ export function NoticeModalClient() {
             setEditingModal(null);
             setFormOpen(true);
           }}
-          className="h-8 w-8"
+          className="h-8 w-12"
         >
           <Plus className="h-4 w-4" />
         </Button>

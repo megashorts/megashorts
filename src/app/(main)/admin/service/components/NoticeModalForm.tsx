@@ -99,7 +99,7 @@ export function NoticeModalForm({ open, onClose, onSubmit, initialData }: Notice
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="w-[calc(100vw-2rem)] sm:w-[425px] p-6">
+      <DialogContent className="w-[calc(100vw-2rem)] sm:w-[425px] p-6 max-h-[90vh] overflow-y-auto">
         <DialogHeader className="mb-4">
           <DialogTitle className="text-base">
             {initialData ? '모달 수정' : '새 모달'}

@@ -1,7 +1,7 @@
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { LogsClient } from './components/LogsClient';
 import { NoticeModalClient } from './components/NoticeModalClient';
-import { Binoculars, CircleDollarSign, ClipboardList, Headset, PartyPopper } from 'lucide-react';
+import { Binoculars, CircleDollarSign, ClipboardList, Headset, SquareStack } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function ServicePage() {
@@ -15,7 +15,7 @@ export default function ServicePage() {
           <Tabs defaultValue="noticemodal">
             <TabsList>
               <TabsTrigger value="noticemodal">
-                <PartyPopper className="w-6 h-6" />
+                <SquareStack className="w-6 h-6" />
                 <p className="pl-1 hidden md:block">Notice Modal</p>
               </TabsTrigger>
               <TabsTrigger value="inquiry">
