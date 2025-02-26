@@ -1,0 +1,30 @@
+.led-indicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.led-yellow {
+  background-color: #fbbf24;
+  box-shadow: 0 0 4px #fbbf24;
+}
+
+.led-blue {
+  background-color: #3b82f6;
+  box-shadow: 0 0 4px #3b82f6;
+}
+
+.led-green {
+  background-color: #22c55e;
+  box-shadow: 0 0 4px #22c55e;
+}
+
+.inquiry-table {
+  table-layout: fixed;
+}
+
+.table-cell-icon {
+  width: 20px;
+  height: 20px;
+}

@@ -20,6 +20,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { AuthButton } from './AuthButton';
 import PaymentHistory from './PaymentHistory';
+import UserTabsClient from './UserTabsClient';
 
 
 interface PageProps {
@@ -72,35 +73,14 @@ export default async function Page({ params }: PageProps) {
   return (
     <main className="flex w-full min-w-0 gap-5">
       <div className="w-full min-w-0 space-y-2 mx-5 md:mx-1 lg:mx-1 xl:mx-1">
-        {/* <div className="rounded-2xl bg-card p-3 sm:p-3 mx-auto shadow-sm">
-          <h1 className="text-center text-lg sm:text-2xl font-bold">나의 컨텐츠</h1>
-        </div> */}
         <UserProfile user={user} loggedInUserId={loggedInUser.id} />
         <div className="rounded-2xl bg-card p-3 shadow-sm">
           <h2 className="text-center text-base text-zinc-400 font-bold">
             {user.displayName}&apos;의 이용내역
           </h2>
         </div>
-        {/* <UserPosts userId={user.id} /> */}
-        <Tabs defaultValue="notification">
-          <TabsList>
-            <TabsTrigger value="notification">알림</TabsTrigger>
-            <TabsTrigger value="pay">코인 & 결제 기록</TabsTrigger>
-          </TabsList>
-          <TabsContent value="notification">
-            <Notifications />
-          </TabsContent>
-          <TabsContent value="pay">
-            {/* <PaymentHistory userId={''} /> */}
-            {/* <YourPosts status="DRAFT" /> */}
-            <p className="text-center text-muted-foreground mt-8">
-              {/* You don&apos;t have any notifications yet. */}
-              결제 사업자 등록 후 조회됩니다.
-            </p>
-          </TabsContent>
-        </Tabs>
+        <UserTabsClient />
       </div>
-      {/* <TrendsSidebar /> */}
     </main>
   );
 }

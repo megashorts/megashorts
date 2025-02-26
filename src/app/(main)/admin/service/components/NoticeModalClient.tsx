@@ -8,7 +8,11 @@ import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 
-export function NoticeModalClient() {
+interface NoticeModalClientProps {
+  currentUser?: { displayName: string };
+}
+
+export default function NoticeModalClient({ currentUser }: NoticeModalClientProps) {
   const [modals, setModals] = useState<NoticeModal[]>([]);
   const [formOpen, setFormOpen] = useState(false);
   const [editingModal, setEditingModal] = useState<NoticeModal | null>(null);

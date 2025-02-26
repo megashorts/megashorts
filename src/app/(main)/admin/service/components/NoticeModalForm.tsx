@@ -99,8 +99,8 @@ export function NoticeModalForm({ open, onClose, onSubmit, initialData }: Notice
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="w-[calc(100vw-2rem)] sm:w-[425px] p-6 max-h-[90vh] overflow-y-auto">
-        <DialogHeader className="mb-4">
+      <DialogContent className="w-[calc(100vw-2rem)] sm:w-[425px] px-6 py-8 max-h-[90vh] overflow-y-auto">
+        <DialogHeader className="mb-6">
           <DialogTitle className="text-base">
             {initialData ? '모달 수정' : '새 모달'}
           </DialogTitle>
@@ -190,7 +190,7 @@ export function NoticeModalForm({ open, onClose, onSubmit, initialData }: Notice
           </div>
         </div>
 
-        <div className="flex justify-end gap-2 mt-6">
+        <div className="flex justify-end gap-2 mt-8">
           <Button
             variant="ghost"
             size="icon"

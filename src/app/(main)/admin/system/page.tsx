@@ -11,7 +11,6 @@ export default function SettingsPage() {
           <h1 className="text-center text-base sm:text-xl font-bold">System</h1>
         </div>
         <Tabs defaultValue="mainpage">
-
           <TabsList>
             <TabsTrigger value="mainpage" className="flex items-center gap-2">
               <Layout className="w-5 h-5 md:w-6 md:h-6" />

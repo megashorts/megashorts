@@ -13,14 +13,15 @@ interface ReportDialogProps {
   type: InquiryType;
   postId?: string;
   postTitle?: string | null;   
-  title: string;
+  title: string;  // 문의 유형 제목
 }
 
-export default function ReportDialog({ type, postId, postTitle, title }: ReportDialogProps) {
+export default function ReportDialog({ type, postId, postTitle, title: typeTitle }: ReportDialogProps) {
   const router = useRouter();
   const { user } = useSession();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [content, setContent] = useState("");
+  const [title, setTitle] = useState("");  // 사용자 입력 제목
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const { toast } = useToast();
@@ -41,21 +42,21 @@ export default function ReportDialog({ type, postId, postTitle, title }: ReportD
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!content.trim()) {
-      alert("내용을 입력해주세요.");
+    if (!content.trim() || !title.trim()) {
       toast({
         variant: "default",
-        description: "내용을 입력해주세요.",
+        description: "제목과 내용을 입력해주세요.",
+        duration: 1500,
       });
       return;
     }
 
     setIsSubmitting(true);
     try {
-      await kyInstance.post('/api/inquiry', {
+      await kyInstance.post('/api/admin/inquiry', {
         json: {
           type,
-          title,
+          title,  // 사용자가 입력한 제목
           content,
           ...(postId && { postId }),
           userEmail,
@@ -65,13 +66,16 @@ export default function ReportDialog({ type, postId, postTitle, title }: ReportD
       toast({
         variant: "default",
         description: "접수되었습니다.",
+        duration: 1500,
       });
       setContent("");
+      setTitle("");
       dialogRef.current?.close();
     } catch (error) {
       toast({
         variant: "destructive",
         description: "접수중 오류가 발생하였습니다.",
+        duration: 1500,
       });
     } finally {
       setIsSubmitting(false);
@@ -80,38 +84,48 @@ export default function ReportDialog({ type, postId, postTitle, title }: ReportD
 
   return (
     <>
-    <div className="text-left md:text-right ">
-      <button
-        onClick={handleOpen}
-        className="inline-flex items-center justify-center gap-2 py-3 text-xs md:text-sm rounded-md hover:text-red-500 bg-slate-950 w-[100px]"
-      >
-        <Flag className="w-4 h-4" />
-        {title}
-      </button>
-    </div>
+      <div className="text-left md:text-right">
+        <button
+          onClick={handleOpen}
+          className="inline-flex items-center justify-center gap-2 py-3 text-xs md:text-sm rounded-md hover:text-red-500 bg-slate-950 w-[100px]"
+        >
+          <Flag className="w-4 h-4" />
+          {typeTitle}
+        </button>
+      </div>
 
       <dialog
         ref={dialogRef}
         className="p-4 rounded-lg shadow-lg border backdrop:bg-black/50 dark:bg-black"
-        onClose={() => setContent("")}
+        onClose={() => {
+          setContent("");
+          setTitle("");
+        }}
       >
         <form onSubmit={handleSubmit} className="w-[320px] md:w-[400px]">
-          <h2 className="text-lg font-semibold mb-4 ml-2 mt-3">{title}</h2>
+          <h2 className="text-lg font-semibold mb-4 ml-2 mt-3">{typeTitle}</h2>
 
           <div className="w-[315px] md:w-[395px] mx-auto border-t border-gray-300 dark:border-gray-600 my-4"></div>
 
           <div className="space-y-5 text-sm">
-            <div className="text-muted-foreground ml-2 ">{user?.displayName}</div>
-            <div className="text-muted-foreground ml-2 ">{userEmail}</div>
+            <div className="text-muted-foreground ml-2">{user?.displayName}</div>
+            <div className="text-muted-foreground ml-2">{userEmail}</div>
     
             {postTitle && <div className="ml-2">{postTitle}</div>}
 
             <div>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="제목을 입력하세요"
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+              />
               <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 rows={4}
-                placeholder="내용을 기입하세요"
+                placeholder="내용을 입력하세요"
                 className="w-full px-3 py-2 border rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>

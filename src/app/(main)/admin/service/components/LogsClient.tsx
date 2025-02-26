@@ -8,7 +8,7 @@ import { ActivityLog } from '@/lib/activity-logger/types';
 import { CONFIG, TYPE_DISPLAY_NAMES } from '@/lib/activity-logger/constants';
 import { LogFiltersState } from '../types';
 
-export function LogsClient() {
+export default function LogsClient() {
   const [logs, setLogs] = useState<ActivityLog[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedLog, setSelectedLog] = useState<ActivityLog | null>(null);
