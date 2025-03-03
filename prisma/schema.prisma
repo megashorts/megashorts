@@ -52,6 +52,8 @@ model User {
   referrer              User?                @relation("Referrals", fields: [referredBy], references: [username])
   referrals             User[]               @relation("Referrals")
   videoViews            VideoView[]
+  agencyRoles           AgencyMemberRole[] // 사용자가 속한 역할
+  managedAgencyRoles    AgencyMemberRole[] @relation("AgencyMembers") // 사용자가 마스터인 역할
 
   @@index([adultauth])
   @@index([mscoin])
@@ -383,6 +385,21 @@ model NoticeModal {
   buttonUrl     String?  // 버튼 클릭시 이동 URL
   createdBy     String   // 생성자
   createdAt     DateTime @default(now())
+}
+
+model AgencyMemberRole {
+  id              String   @id @default(cuid())
+  userId          String   
+  masterId        String   // 소속 마스터 ID
+  role            String   // MEMBER, AGENCY, MANAGER 등
+  level           Int      @default(1) // 단계
+  commissionRate  Float    @default(0) // 수수료 비율
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  user            User     @relation(fields: [userId], references: [id])
+  master          User     @relation("AgencyMembers", fields: [masterId], references: [id])
+
+  @@unique([userId, masterId])
 }
 
 enum AccessMethod {

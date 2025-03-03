@@ -101,7 +101,7 @@ export async function GET(req: NextRequest) {
         amount: parseInt(amount),
         orderId,
         billingKey: authKey,
-        method: 'card',
+        method: type,
         requestedAt: new Date(),
         approvedAt: new Date(),
         metadata: {

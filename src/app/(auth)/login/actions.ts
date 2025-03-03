@@ -1,15 +1,17 @@
+// src/app/(auth)/login/actions.ts
 "use server";
 
 import { lucia } from '@/auth';
 import prisma from "@/lib/prisma";
 import { loginSchema, LoginValues } from "@/lib/validation";
 import { verify } from "@node-rs/argon2";
-import { cookies, headers } from "next/headers";
-import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
+// redirect 제거
 
 export async function login(
   credentials: LoginValues,
 ): Promise<{ 
+  success: boolean;
   error?: string; 
   identifier?: string;
 }> {
@@ -27,6 +29,7 @@ export async function login(
 
     if (!existingUser || !existingUser.passwordHash) {
       return {
+        success: false,
         error: "Incorrect username or password",
         identifier: username
       };
@@ -38,6 +41,7 @@ export async function login(
         (existingUser.blockedUntil.getTime() - new Date().getTime()) / (1000 * 60)
       );
       return {
+        success: false,
         error: `계정이 잠겼습니다. ${remainingMinutes}분 후에 다시 시도해주세요.`,
         identifier: username
       };
@@ -57,6 +61,7 @@ export async function login(
       });
 
       return {
+        success: false,
         error: "Incorrect username or password",
         identifier: username
       };
@@ -89,20 +94,15 @@ export async function login(
       sessionCookie.attributes
     );
 
-    // 리다이렉트
-    redirect('/');
-
-    // TypeScript를 위한 더미 리턴
+    // 리다이렉트 대신 성공 반환
     return {
+      success: true,
       identifier: existingUser?.email || existingUser?.username || username
     };
   } catch (error) {
-    if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
-      throw error;
-    }
-
     console.error(error);
     return {
+      success: false,
       error: "Something went wrong. Please try again.",
       identifier: credentials.username
     };

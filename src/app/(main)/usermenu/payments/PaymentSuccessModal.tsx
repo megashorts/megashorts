@@ -1,7 +1,10 @@
 'use client'
 
+import { useSession } from "@/components/SessionProvider";
 import { Button } from "@/components/ui/button";
+import { logActivity } from "@/lib/activity-logger/client";
 import Image from "next/image";
+import { useEffect } from "react";
 
 interface PaymentSuccessModalProps {
   coins: number;
@@ -16,6 +19,24 @@ export default function PaymentSuccessModal({
   onConfirm,
   onClose
 }: PaymentSuccessModalProps) {
+
+    const session = useSession();
+    const currentUser = session?.user?.username ? { username: session.user.username, id: session.user.id } : undefined;
+
+    useEffect(() => {
+      // 코인 결제 완료 시 로그 기록
+      logActivity({
+        type: 'payment',
+        event: `${coins}-coin-${amount}`,
+        username: currentUser?.username,
+        details: {
+          action: 'coin',
+          result: 'success',
+          // error: result.error
+        }
+      });
+    }, [coins, amount, currentUser]);
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div 

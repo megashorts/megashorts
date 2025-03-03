@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { logout } from "@/app/(auth)/actions";
 import { cn } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
-import { Building, ChevronDown, ChevronRight, FolderOpen, LogOutIcon, Megaphone, Monitor, NotebookPen, PencilRuler, TvMinimalPlay, UserCircle, UserIcon, Users, WalletCards } from "lucide-react";
+import { Building, ChevronDown, ChevronRight, FolderOpen, LogOutIcon, Megaphone, Monitor, Network, NotebookPen, PencilRuler, TvMinimalPlay, UserCircle, UserIcon, Users, WalletCards } from "lucide-react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import {
@@ -145,6 +145,12 @@ export default function UserButton({ className }: UserButtonProps) {
                 운영시스템
               </DropdownMenuItem>
             </Link>
+            <Link href={`/admin/agency`}>
+              <DropdownMenuItem>
+                <Network className="mr-2 size-4" />
+                영업시스템
+              </DropdownMenuItem>
+            </Link>
           </>
         )}
 
@@ -219,7 +225,7 @@ export default function UserButton({ className }: UserButtonProps) {
         <DropdownMenuSeparator className="h-[0.5px] bg-gray-600" />
         <DropdownMenuItem
           onClick={async () => {
-            queryClient.clear();
+            queryClient.clear(); // React Query 캐시를 초기화합니다
             const { success, userInfo } = await logout();
             const locationInfo = await locationManager.getInfo();
 

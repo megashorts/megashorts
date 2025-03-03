@@ -1,7 +1,7 @@
 import { NotificationData } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { NotificationType } from "@prisma/client";
-import { Heart, MessageCircle, User2, Coins, Star } from "lucide-react";
+import { Heart, MessageCircle, User2, Star, Gem } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -30,11 +30,11 @@ export default function Notification({ notification }: NotificationProps) {
         return reason ? `${reason}` : '';
       },
       // icon: <MessageCircle className="size-4 fill-primary text-primary" />,
-      icon: <Image src="/MS Logo emblem.svg" alt="MEGASHORTS logo emblem" width={40} height={40} />,
+      icon: <Image src="/MS Logo emblem.svg" alt="MEGASHORTS logo emblem" width={20} height={20} />,
       href: `/usermenu/users/${notification.issuer.username}`,
     },
     LIKE: {
-      getMessage: (n) => `님이 당신의 컨텐츠를 좋아합니다!`,
+      getMessage: (n) => `님이 컨텐츠를 좋아합니다!`,
       icon: <Heart className="size-4 fill-red-500 text-red-500" />,
       href: `/posts/${notification.postId}`,
     },
@@ -47,9 +47,9 @@ export default function Notification({ notification }: NotificationProps) {
       getMessage: (n) => {
         const amount = n.metadata?.amount;
         const reason = n.metadata?.reason;
-        return amount ? `${reason}(으)로 ${amount}코인이 지급되었습니다` : '코인이 지급되었습니다';
+        return amount ? `${reason}(으)로 ${amount}코인이 지급!` : '코인이 지급!';
       },
-      icon: <Coins className="size-4 fill-yellow-500 text-yellow-500" />,
+      icon: <Gem className="size-4 fill-emerald-300" />,
       href: `/usermenu/users/${notification.issuer.username}`,
     },
     POINT: {
@@ -62,7 +62,7 @@ export default function Notification({ notification }: NotificationProps) {
       href: `/usermenu/users/${notification.issuer.username}`,
     },
     BOOKMARK: {
-      getMessage: (n) => `님이 당신의 컨텐츠를 북마크했습니다!`,
+      getMessage: (n) => `님이 컨텐츠를 북마크했습니다!`,
       icon: <Heart className="size-4 fill-red-500 text-red-500" />,
       href: `/posts/${notification.postId}`,
     }

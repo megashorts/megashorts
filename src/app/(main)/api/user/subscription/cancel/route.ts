@@ -1,3 +1,5 @@
+// subscripton cancel DB update
+
 import { validateRequest } from "@/auth";
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";

@@ -20,6 +20,7 @@ import { login } from "./actions";
 import { logActivity } from "@/lib/activity-logger/client";
 import { locationManager } from "@/lib/activity-logger/location-manager";
 import { useToast } from "@/components/ui/use-toast";
+import { queryClient } from "@/lib/queryClient";
 
 export default function LoginForm() {
   const [error, setError] = useState<string>();
@@ -63,10 +64,7 @@ export default function LoginForm() {
               error: result.error
             }
           });
-        }
-      } catch (error) {
-        // NEXT_REDIRECT는 정상적인 리다이렉션이므로 성공 로그 저장
-        if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
+        } else if (result.success) {
           // 로그인 성공 로그
           logActivity({
             type: 'auth',
@@ -77,10 +75,16 @@ export default function LoginForm() {
               result: 'success'
             }
           });
-        } else {
-          console.error('Login error:', error);
-          setError("Something went wrong. Please try again.");
+          
+          // 세션 데이터 캐시 무효화
+          queryClient.invalidateQueries({ queryKey: ['session'] });
+          
+          // 페이지 완전 새로고침으로 리다이렉트
+          window.location.href = '/';
         }
+      } catch (error) {
+        console.error('Login error:', error);
+        setError("Something went wrong. Please try again.");
       }
     });
   }

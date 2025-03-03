@@ -312,7 +312,7 @@ export default function AdminInquiryList({ isAdmin = true }: { isAdmin?: boolean
                   className="cursor-pointer hover:bg-muted/50"
                   onClick={() => {
                     setSelectedInquiry(inquiry);
-                    queryClient.invalidateQueries({ queryKey: ["admin-inquiries"] });
+                    // queryClient.invalidateQueries({ queryKey: ["admin-inquiries"] });
                   }}
                 >
                 <TableCell className="pl-3">

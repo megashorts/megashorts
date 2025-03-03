@@ -247,7 +247,7 @@ export function SystemSettings() {
                     );
                   }
 
-                  if (key === 'masterFeeRatio') {
+                  if (key === 'coinToPoint') {
                     return (
                       <div key={key} className="flex items-center justify-between py-1 gap-4">
                         <Label className="text-xs flex-1">

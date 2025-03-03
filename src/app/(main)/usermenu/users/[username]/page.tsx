@@ -21,6 +21,7 @@ import { Button } from '@/components/ui/button';
 import { AuthButton } from './AuthButton';
 import PaymentHistory from './PaymentHistory';
 import UserTabsClient from './UserTabsClient';
+import ReferralLinkButton from './ReferralLinkButton';
 
 
 interface PageProps {
@@ -123,83 +124,83 @@ async function UserProfile({ user, loggedInUserId }: UserProfileProps) {
           </div>
 
           <div className="space-y-4">
-            <div>
+            <div className="flex items-center gap-2">
               <LanguageFlag language={user.myLanguage} />{"  /  "}{user.userRole === 10 ? "사용자 계정" : user.userRole === 15 ? "크리에이터 계정" : ""}
+              {user.id === loggedInUserId && user.userRole >= 20 && (
+                <ReferralLinkButton username={user.username} userRole={user.userRole} />
+              )}
             </div>
             
-          {/* <div className="flex items-center">
-            {" "} <LanguageFlag language={user.myLanguage} />
-          </div> */}
+            {/* <div className="flex items-center">
+              {" "} <LanguageFlag language={user.myLanguage} />
+            </div> */}
 
-          <div className="flex items-center">
-              💎 {formatNumber(user.mscoin)} MS코인
-              {/* <svg 
-                className="w-4 h-4 ml-2 mr-1" 
-                viewBox="0 0 24 24" 
-                fill="gold"
-              >
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
-                <circle cx="12" cy="12" r="5" fill="gold"/>
-              </svg> */}
-            {/* <WalletCards className="mr-2 size-4" /> */}
-            {/* {formatNumber(user.points)} */}
-          </div>
-
-          <div className="flex items-center">
-            <span className={`led-indicator ${user.adultauth ? 'led-blue' : 'led-red'}`}></span>
-            {user.adultauth ? '성인인증 완료' : '성인인증 미완료'}
-            <AuthButton isAuthenticated={user.adultauth} />
-          </div>
-
-          <div className="flex items-center">
-            <span className={`led-indicator ${user.subscription ? 'led-blue' : 'led-red'}`}></span>
-              {user.subscription ? '현재 구독중' : '현재 미구독중'}
-              {user.subscription && user.subscription.status === 'active' && user.subscriptionEndDate && (
-                <span className="ml-2">/ 구독갱신 {formatDate(user.subscriptionEndDate, "yyyy-MM-dd")}</span>
-              )}
-              {user.subscription && user.subscription.status === 'cancelled' && user.subscriptionEndDate && (
-                <span className="ml-2">/ 구독만료 {formatDate(user.subscriptionEndDate, "yyyy-MM-dd")}</span>
-              )}
-              {!user.subscription && (
-                <Link href="/subscription">
-                  <Button 
-                    variant="outline" 
-                    className='ml-2'
-                    size="sm"
-                  >
-                    구독신청
-                  </Button>
-                </Link>
-              )}
+            <div className="flex items-center">
+                💎 {formatNumber(user.mscoin)} MS코인
+                {/* <svg 
+                  className="w-4 h-4 ml-2 mr-1" 
+                  viewBox="0 0 24 24" 
+                  fill="gold"
+                >
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                  <circle cx="12" cy="12" r="5" fill="gold"/>
+                </svg> */}
+              {/* <WalletCards className="mr-2 size-4" /> */}
+              {/* {formatNumber(user.points)} */}
             </div>
+
+            <div className="flex items-center">
+              <span className={`led-indicator ${user.adultauth ? 'led-blue' : 'led-red'}`}></span>
+              {user.adultauth ? '성인인증 완료' : '성인인증 미완료'}
+              <AuthButton isAuthenticated={user.adultauth} />
+            </div>
+
+            <div className="flex items-center">
+              <span className={`led-indicator ${user.subscription ? 'led-blue' : 'led-red'}`}></span>
+                {user.subscription ? '현재 구독중' : '현재 미구독중'}
+                {user.subscription && user.subscription.status === 'active' && user.subscriptionEndDate && (
+                  <span className="ml-2">/ 구독갱신 {formatDate(user.subscriptionEndDate, "yyyy-MM-dd")}</span>
+                )}
+                {user.subscription && user.subscription.status === 'cancelled' && user.subscriptionEndDate && (
+                  <span className="ml-2">/ 구독만료 {formatDate(user.subscriptionEndDate, "yyyy-MM-dd")}</span>
+                )}
+                {!user.subscription && (
+                  <Link href="/subscription">
+                    <Button 
+                      variant="outline" 
+                      className='ml-2'
+                      size="sm"
+                    >
+                      구독신청
+                    </Button>
+                  </Link>
+                )}
+              </div>
+            </div>
+
+            {user.bio && (
+              <>
+                <hr />
+                <Linkify>
+                  <div className="overflow-hidden whitespace-pre-line break-words">
+                    {user.bio}
+                  </div>
+                </Linkify>
+              </>
+            )}
           </div>
 
-          {/* <div className="flex items-center gap-3">
-            <span>
-              나의 컨텐츠 :{" "}
-              <span className="font-semibold">
-                {formatNumber(user._count.posts)}
-              </span>
-            </span>
-          </div> */}
+        
+          {user.id === loggedInUserId ? (
+            <div className="flex items-start">
+              <EditProfileButton user={user} />
+              {/* 추천인 링크 모달 버튼 추가 */}
+            </div>
+          ) : (
+            // <FollowButton userId={user.id} initialState={followerInfo} />
+            <Label></Label>
+          )}
         </div>
-        {user.id === loggedInUserId ? (
-          <EditProfileButton user={user} />
-        ) : (
-          // <FollowButton userId={user.id} initialState={followerInfo} />
-          <Label></Label>
-        )}
       </div>
-      {user.bio && (
-        <>
-          <hr />
-          <Linkify>
-            <div className="overflow-hidden whitespace-pre-line break-words">
-              {user.bio}
-            </div>
-          </Linkify>
-        </>
-      )}
-    </div>
   );
 }

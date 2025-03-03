@@ -7,18 +7,25 @@ import { Session, User } from 'lucia';
 import MenuBar from './MenuBar';
 import Footer from '@/components/footer';
 import { MainPopupModal } from '@/components/MainPopupModal';
+import { useQuery } from '@tanstack/react-query';
 
 export default function Layout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [sessionData, setSessionData] = useState<{
-    user: User | null;
-    session: Session | null;
-  }>({
-    user: null,
-    session: null
+  // React Query를 사용하여 세션 데이터 가져오기 (최적화 설정 추가)
+  const { data: sessionData = { user: null, session: null } } = useQuery({
+    queryKey: ['session'],
+    queryFn: async () => {
+      const res = await fetch('/api/auth/session');
+      return res.json();
+    },
+    // 불필요한 API 호출 방지 설정
+    refetchOnMount: false,      // 컴포넌트 마운트 시 자동 갱신 비활성화
+    refetchOnWindowFocus: false, // 윈도우 포커스 시 자동 갱신 비활성화
+    refetchOnReconnect: false,   // 네트워크 재연결 시 자동 갱신 비활성화
+    staleTime: Infinity,         // 데이터가 절대 오래된 것으로 간주되지 않도록 설정
   });
 
   // 모바일에서 불필요한 포커스 방지
@@ -51,11 +58,11 @@ export default function Layout({
     };
   }, []);
 
-  useEffect(() => {
-    fetch('/api/auth/session')
-      .then(res => res.json())
-      .then(data => setSessionData(data));
-  }, []);
+  // useEffect(() => {
+  //   fetch('/api/auth/session')
+  //     .then(res => res.json())
+  //     .then(data => setSessionData(data));
+  // }, []);
 
   return (
     <SessionProvider value={sessionData}>

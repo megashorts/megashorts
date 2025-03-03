@@ -113,7 +113,7 @@ export async function GET(req: NextRequest) {
     );
 
     return new Response(null, {
-      status: 302,
+      status: 303,
       headers: { Location: `/?event=naver_signup&username=${username}` },
     });
   } catch (error) {

@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useSession } from "@/components/SessionProvider";
+import { logActivity } from "@/lib/activity-logger/client";
 import {
   Dialog,
   DialogContent,
@@ -26,6 +28,7 @@ export default function CancelSubscriptionDialog({
 }: CancelSubscriptionDialogProps) {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const session = useSession();
 
   const getStatusMessage = () => {
     switch (subscriptionStatus) {
@@ -46,6 +49,17 @@ export default function CancelSubscriptionDialog({
   const handleCancel = async () => {
     if (subscriptionStatus !== "active") return;
 
+    // 기본 로그 정보 (시도-결과 세트 패턴)
+    const baseLogInfo = {
+      type: 'payment',
+      username: session?.user?.username,
+      details: {
+        action: 'subscription_cancel',
+        subscriptionStatus: subscriptionStatus,
+        userId: session?.user?.id
+      }
+    };
+
     setIsLoading(true);
     try {
       const response = await fetch("/api/user/subscription/cancel", {
@@ -53,8 +67,20 @@ export default function CancelSubscriptionDialog({
       });
 
       if (!response.ok) {
-        throw new Error("구독 취소 중 오류가 발생했습니다.");
+        const errorData = await response.json();
+        const errorMessage = errorData.error || "구독 취소 중 오류가 발생했습니다.";
+        throw new Error(errorMessage);
       }
+
+      // 성공 로그 기록
+      logActivity({
+        ...baseLogInfo,
+        event: 'subscription_cancel_success',
+        details: {
+          ...baseLogInfo.details,
+          result: 'success'
+        }
+      });
 
       toast({
         description: "구독이 성공적으로 취소되었습니다."
@@ -63,6 +89,17 @@ export default function CancelSubscriptionDialog({
       // 페이지 새로고침
       window.location.reload();
     } catch (error) {
+      // 실패 로그 기록
+      logActivity({
+        ...baseLogInfo,
+        event: 'subscription_cancel_failure',
+        details: {
+          ...baseLogInfo.details,
+          result: 'failure',
+          error: error instanceof Error ? error.message : "구독 취소 실패"
+        }
+      });
+
       toast({
         variant: "destructive",
         description: error instanceof Error ? error.message : "구독 취소 실패"

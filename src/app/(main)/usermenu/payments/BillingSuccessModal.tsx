@@ -1,6 +1,8 @@
 'use client'
 
+import { useSession } from "@/components/SessionProvider";
 import { Button } from "@/components/ui/button";
+import { logActivity } from "@/lib/activity-logger/client";
 import { useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import { useEffect } from "react";
@@ -29,11 +31,26 @@ export default function PaymentSuccessModal({
 
     const queryClient = useQueryClient();
 
+    const session = useSession();
+    const currentUser = session?.user?.username ? { username: session.user.username, id: session.user.id } : undefined;
+
     useEffect(() => {
-      // 결제 완료 시 구독페이지에서 사용하는 구독정보 훅과 시청시 재생권한체크에서 사용하는 훅의 캐시 무효화
+      // 결제 완료 시 로그 기록 및 캐시 무효화
+      logActivity({
+        type: 'payment',
+        event: `${type}-subscription`,
+        username: currentUser?.username,
+        details: {
+          action: amount,
+          result: 'success',
+          // error: result.error
+        }
+      });
+      
+      // 구독페이지에서 사용하는 구독정보 훅과 시청시 재생권한체크에서 사용하는 훅의 캐시 무효화
       queryClient.invalidateQueries({ queryKey: ['subscription-info'] });
       queryClient.invalidateQueries({ queryKey: ['userAuth'] });
-    }, [queryClient]);
+    }, [queryClient, type, currentUser]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">

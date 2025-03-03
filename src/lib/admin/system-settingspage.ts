@@ -42,7 +42,7 @@ export interface SystemSettings {
   
   // 업로더 레벨 설정
   uploaderQualification: SystemSettingValue<UploaderLevel[]>; // 업로더 자격 기준
-  masterFeeRatio: SystemSettingValue<number>;                 // 팀마스터 수수료 비율
+  coinToPoint: SystemSettingValue<number>;                 // 코인의 포인트 변환비율
 }
 
 // 기본 구독 패키지
@@ -91,11 +91,11 @@ export const SECTIONS: Record<string, SectionInfo> = {
     ]
   },
   UPLOADER_CONFIG: {
-    title: '업로더 레벨 설정',
+    title: '업로더 및 정산 설정',
     description: '레벨별 조회수 기준 및 수익 분배율 관리',
     keys: [
       'uploaderQualification',
-      'masterFeeRatio'
+      'coinToPoint'
     ]
   },
   SYSTEM_CONFIG: {
@@ -120,7 +120,7 @@ export const SETTING_KEYS = {
   viewCoinAmount: 'viewCoinAmount',
   referralCoinAmount: 'referralCoinAmount',
   uploaderQualification: 'uploaderQualification',
-  masterFeeRatio: 'masterFeeRatio',
+  coinToPoint: 'coinToPoint',
   serviceLogEnabled: 'serviceLogEnabled'
 } as const;
 
@@ -134,7 +134,7 @@ export const SETTING_LABELS = {
   viewCoinAmount: '시청 코인 소모량',
   referralCoinAmount: '추천인 코인 지급량',
   uploaderQualification: '업로더 자격',
-  masterFeeRatio: '팀마스터 수수료 (%)',
+  coinToPoint: '1코인 포인트 변환비율',
   serviceLogEnabled: '서비스 로그'
 } as const;
 
@@ -156,6 +156,6 @@ export const DEFAULT_SETTINGS: SystemSettings = {
   viewCoinAmount: { enabled: true, value: 2 },
   referralCoinAmount: { enabled: true, value: 2 },
   uploaderQualification: { enabled: true, value: DEFAULT_UPLOADER_LEVELS },
-  masterFeeRatio: { enabled: true, value: 5.00 },
+  coinToPoint: { enabled: true, value: 120 },
   serviceLogEnabled: { enabled: true, value: true }
 };

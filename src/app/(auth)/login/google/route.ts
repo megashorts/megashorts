@@ -6,9 +6,12 @@ export async function GET() {
   const state = generateState();
   const codeVerifier = generateCodeVerifier();
 
-  const url = await google.createAuthorizationURL(state, codeVerifier, {
-    scopes: ["profile", "email"],
-  });
+  // const url = await google.createAuthorizationURL(state, codeVerifier, {
+  //   scopes: ["profile", "email"],
+  // });
+
+  const url = await google.createAuthorizationURL(state, codeVerifier, ["profile", "email"]);
+
   
   (await cookies()).set("state", state, {
   // cookies().set("state", state, {

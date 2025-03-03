@@ -150,7 +150,7 @@ export async function GET(req: NextRequest) {
     // 새로운 사용자에 대한 세션을 생성하고, 세션 쿠키를 설정해 로그인 상태를 유지.
 
     return new Response(null, {
-      status: 302,
+      status: 303,
       headers: { Location: `/?event=google_signup&username=${username}` },
     });
     // 성공적으로 로그인하면 메인 페이지로 리다이렉트.

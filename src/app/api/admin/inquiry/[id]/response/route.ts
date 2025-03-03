@@ -86,7 +86,7 @@ export async function POST(
           issuerId: inquiry.userId,
           type: 'COMMENT',
           metadata: {
-            reason: `${respondedBy} 문의응답이 등록되었습니다.`,
+            reason: `문의응답이 등록되었습니다.`,
             inquiryId: inquiry.id,
             title: inquiry.title,
             type: inquiry.type,
