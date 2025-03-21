@@ -16,13 +16,14 @@ model User {
   email                 String?              @unique
   passwordHash          String?
   googleId              String?              @unique
-  avatarUrl             String?
   bio                   String?
   referredBy            String?
+  teamMaster            String?   
   points                Int                  @default(0)
   subscriptionEndDate   DateTime?
   createdAt             DateTime             @default(now())
   adultauth             Boolean              @default(false)
+  emailVerified         Boolean              @default(false)
   kakaoId               String?              @unique
   naverId               String?              @unique
   postCount             Int                  @default(0)
@@ -34,8 +35,6 @@ model User {
   payments              Payment[]
   billingKeys           BillingKey[]
   bookmarks             Bookmark[]
-  receivedCoinUsages    CoinUsage[]          @relation("ReceivedCoins")
-  sentCoinUsages        CoinUsage[]          @relation("SentCoins")
   comments              Comment[]
   following             Follow[]             @relation("Following")
   followers             Follow[]             @relation("Followers")
@@ -49,11 +48,12 @@ model User {
   subscription          Subscription?
   SystemSetting         SystemSetting[]
   videoProgress         UserVideoProgress[]
-  referrer              User?                @relation("Referrals", fields: [referredBy], references: [username])
+  referrer              User?                @relation("Referrals", fields: [referredBy], references: [id])
   referrals             User[]               @relation("Referrals")
   videoViews            VideoView[]
-  agencyRoles           AgencyMemberRole[] // 사용자가 속한 역할
-  managedAgencyRoles    AgencyMemberRole[] @relation("AgencyMembers") // 사용자가 마스터인 역할
+  emailVerifications    EmailVerification[]
+  pointWithdrawals       PointWithdrawal[]
+  processedWithdrawals   PointWithdrawal[] @relation("ProcessedWithdrawals")
 
   @@index([adultauth])
   @@index([mscoin])
@@ -61,6 +61,8 @@ model User {
   @@index([username])
   @@index([subscriptionEndDate])
   @@map("users")
+
+  // AgencyMemberRole AgencyMemberRole[] @relation("AgencyMembers")
 }
 
 model Session {
@@ -126,7 +128,6 @@ model Video {
   filename        String
   createdAt       DateTime         @default(now())
   subtitle        Language[]
-  coinUsages      CoinUsage[]
   VideoSettlement VideoSettlement?
   views           VideoView[]
   post            Post             @relation(fields: [postId], references: [id], onDelete: Cascade)
@@ -137,7 +138,7 @@ model Video {
 }
 
 model VideoView {
-  id           String       @id @default(cuid())
+  id           String       @id
   userId       String
   videoId      String
   createdAt    DateTime     @default(now())
@@ -151,24 +152,6 @@ model VideoView {
   @@index([userId, videoId])
   @@index([videoId, accessMethod, createdAt])
   @@map("video_views")
-}
-
-model CoinUsage {
-  id           String   @id @default(cuid())
-  userId       String
-  videoId      String?
-  recipientId  String?
-  coins        Int      @default(2)
-  createdAt    DateTime @default(now())
-  eventMessage String?
-  type         String   @default("VIDEO_VIEW")
-  recipient    User?    @relation("ReceivedCoins", fields: [recipientId], references: [id])
-  user         User     @relation("SentCoins", fields: [userId], references: [id])
-  video        Video?   @relation(fields: [videoId], references: [id])
-
-  @@index([userId, videoId])
-  @@index([createdAt])
-  @@map("coin_usages")
 }
 
 model VideoSettlement {
@@ -351,12 +334,12 @@ model Payment {
   paymentKey    String?   @unique
   billingKey    String?
   method        String?
-  requestedAt   DateTime
+  // requestedAt   DateTime
   approvedAt    DateTime?
   metadata      Json?
   failureReason String?
   createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  updatedAt     DateTime?  @updatedAt
   user          User      @relation(fields: [userId], references: [id])
 }
 
@@ -387,19 +370,53 @@ model NoticeModal {
   createdAt     DateTime @default(now())
 }
 
-model AgencyMemberRole {
-  id              String   @id @default(cuid())
-  userId          String   
-  masterId        String   // 소속 마스터 ID
-  role            String   // MEMBER, AGENCY, MANAGER 등
-  level           Int      @default(1) // 단계
-  commissionRate  Float    @default(0) // 수수료 비율
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  user            User     @relation(fields: [userId], references: [id])
-  master          User     @relation("AgencyMembers", fields: [masterId], references: [id])
+// model AgencyMemberRole {
+//   id              String   @id @default(cuid())
+//   userId          String   
+//   masterId        String   // 소속 마스터 ID
+//   agencyRole      String   // MEMBER, AGENCY, MANAGER 등
+//   level           Int      @default(1) // 단계
+//   // commissionRate  Float    @default(0) // 수수료 비율
+//   createdAt       DateTime @default(now())
+//   updatedAt       DateTime @updatedAt
+//   master          User     @relation("AgencyMembers", fields: [masterId], references: [id])
 
-  @@unique([userId, masterId])
+//   @@unique([userId, masterId])
+// }
+
+model PointWithdrawal {
+  id              String    @id @default(cuid())
+  userId          String
+  amount          Int
+  status          String    @default("PENDING") // PENDING, APPROVED, REJECTED
+  bankInfo        Json      // 은행 정보 (예금주, 국가, 은행, 계좌번호, 스위프트코드, 주소, 전화번호, 페이팔 정보 등)
+  requestedAt     DateTime  @default(now())
+  processedAt     DateTime?
+  processedBy     String?   // 처리한 관리자 ID
+  reason          String?   // 신청 사유 또는 거부 사유
+  paymentAmount   Float?    // 실제 지급 금액 (원화 또는 달러)
+  exchangeRate    Float?    // 환율 정보
+  memo            String?   // 관리자 메모
+  user            User      @relation(fields: [userId], references: [id])
+  processor       User?     @relation("ProcessedWithdrawals", fields: [processedBy], references: [id])
+
+  @@index([userId, status])
+  @@index([status, requestedAt])
+  @@map("point_withdrawals")
+}
+
+model EmailVerification {
+  id              String    @id @default(cuid())
+  userId          String
+  email           String
+  code            String
+  expiresAt       DateTime
+  createdAt       DateTime  @default(now())
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, email])
+  @@index([code, expiresAt])
+  @@map("email_verifications")
 }
 
 enum AccessMethod {

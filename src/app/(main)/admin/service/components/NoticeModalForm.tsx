@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { NoticeModalFormData, HideOption, LowerCaseLanguage } from './types';
+import { NoticeModalFormData, HideOption, LowerCaseLanguage, NoticeModalI18nData } from './types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowUpDown, Link as LinkIcon, Timer, Save, X, Image as ImageIcon, Square } from 'lucide-react';
 import { MultiLanguageImageUploader } from '@/components/MultiLanguageImageUploader';
@@ -28,16 +28,36 @@ export function NoticeModalForm({ open, onClose, onSubmit, initialData }: Notice
   const [linkUrl, setLinkUrl] = useState('');
   const [buttonUrl, setButtonUrl] = useState('');
   const [i18nData, setI18nData] = useState<NoticeModalFormData['i18nData']>({});
+  const [isUploading, setIsUploading] = useState(false);
 
+  // 컴포넌트 마운트 시 한 번만 실행되는 useEffect
+  const initialDataRef = useRef(initialData);
+  
   useEffect(() => {
-    if (initialData) {
-      console.log('Setting form data:', initialData);
-      setTitle(initialData.title);
-      setPriority(initialData.priority);
-      setHideOption(initialData.hideOption);
-      setLinkUrl(initialData.linkUrl || '');
-      setButtonUrl(initialData.buttonUrl || '');
-      setI18nData(initialData.i18nData);
+    // 컴포넌트가 마운트될 때만 초기 데이터 설정
+    if (initialDataRef.current) {
+      console.log('Setting form data:', initialDataRef.current);
+      setTitle(initialDataRef.current.title);
+      setPriority(initialDataRef.current.priority);
+      setHideOption(initialDataRef.current.hideOption);
+      setLinkUrl(initialDataRef.current.linkUrl || '');
+      setButtonUrl(initialDataRef.current.buttonUrl || '');
+      
+      // i18nData가 문자열인 경우 파싱
+      let parsedI18nData: NoticeModalFormData['i18nData'] = {};
+      
+      if (typeof initialDataRef.current.i18nData === 'string') {
+        try {
+          parsedI18nData = JSON.parse(initialDataRef.current.i18nData);
+        } catch (error) {
+          console.error('Failed to parse i18nData:', error);
+        }
+      } else if (initialDataRef.current.i18nData && typeof initialDataRef.current.i18nData === 'object') {
+        // 객체인 경우 그대로 사용 (복사하여 사용)
+        parsedI18nData = JSON.parse(JSON.stringify(initialDataRef.current.i18nData));
+      }
+      
+      setI18nData(parsedI18nData);
     } else {
       // 새 모달 생성 시 초기화
       setTitle('');
@@ -47,38 +67,97 @@ export function NoticeModalForm({ open, onClose, onSubmit, initialData }: Notice
       setButtonUrl('');
       setI18nData({});
     }
-  }, [initialData]);
+    // 컴포넌트 마운트 시 한 번만 실행
+  }, []);
 
   const handleImagesUploaded = async (files: { file: File; locale: Language }[]) => {
-    const newI18nData = { ...i18nData };
+    if (isUploading) return; // 이미 업로드 중이면 중복 실행 방지
     
-    for (const { file, locale } of files) {
-      try {
-        // Cloudflare에 이미지 업로드하고 ID 받기
-        const imageId = await uploadImage(file);
-        
-        const localeKey = locale.toLowerCase() as Lowercase<Language>;
-        newI18nData[localeKey] = {
-          ...newI18nData[localeKey],
-          imageId, // 파일명 대신 Cloudflare 이미지 ID 저장
-        };
-      } catch (error) {
-        console.error('Failed to upload image:', error);
+    setIsUploading(true);
+    try {
+      const newI18nData = { ...i18nData };
+      
+      for (const { file, locale } of files) {
+        try {
+          // Cloudflare에 이미지 업로드하고 ID 받기
+          const imageId = await uploadImage(file);
+          console.log(`Image uploaded: ${imageId} for locale: ${locale}`);
+          
+          // 파일명에서 언어 코드 확인
+          const hasLanguageCode = file.name.match(/_([a-z]{2})\./i);
+          
+          if (!hasLanguageCode) {
+            // 언어 코드가 없는 경우 (공통 이미지)
+            // defaultImageId로만 저장
+            newI18nData.defaultImageId = imageId;
+            console.log(`Set defaultImageId: ${imageId}`);
+          } else {
+            // 특정 언어용 이미지인 경우
+            const localeKey = locale.toLowerCase() as LowerCaseLanguage;
+            
+            // 해당 언어 데이터가 없으면 초기화
+            if (!newI18nData[localeKey]) {
+              newI18nData[localeKey] = { imageId };
+              console.log(`Created new locale data for ${localeKey}: ${imageId}`);
+            } else {
+              newI18nData[localeKey] = {
+                ...newI18nData[localeKey],
+                imageId
+              };
+              console.log(`Updated locale data for ${localeKey}: ${imageId}`);
+            }
+          }
+        } catch (error) {
+          console.error('Failed to upload image:', error);
+        }
       }
+      
+      console.log('Updated i18nData:', JSON.stringify(newI18nData, null, 2));
+      setI18nData(newI18nData);
+    } finally {
+      setIsUploading(false);
     }
-    
-    setI18nData(newI18nData);
+  };
+
+  const handleImageRemove = (locale: string) => {
+    setI18nData(prev => {
+      const newI18nData = { ...prev };
+      
+      if (locale === 'default') {
+        // 디폴트 이미지 삭제
+        delete newI18nData.defaultImageId;
+      } else {
+        // 특정 언어 이미지 삭제
+        // imageId는 필수 속성이므로 해당 언어 데이터를 완전히 삭제
+        delete newI18nData[locale as LowerCaseLanguage];
+      }
+      
+      return newI18nData;
+    });
   };
 
   const handleButtonTextChange = (locale: string, text: string) => {
-    const localeKey = locale as keyof NoticeModalFormData['i18nData'];
-    setI18nData(prev => ({
-      ...prev,
-      [localeKey]: {
-        ...prev[localeKey],
-        buttonText: text
+    const localeKey = locale as LowerCaseLanguage;
+    
+    setI18nData(prev => {
+      const newI18nData = { ...prev };
+      
+      // 해당 언어 데이터가 없으면 초기화 (imageId는 필수이므로 임시 값 설정)
+      if (!newI18nData[localeKey]) {
+        // 이미지 ID가 없으면 버튼 텍스트만 설정할 수 없음
+        return newI18nData;
       }
-    }));
+      
+      // 이미 해당 언어 데이터가 있는 경우
+      if (newI18nData[localeKey]) {
+        newI18nData[localeKey] = {
+          ...newI18nData[localeKey],
+          buttonText: text
+        };
+      }
+      
+      return newI18nData;
+    });
   };
 
   const handleSubmit = () => {
@@ -86,15 +165,66 @@ export function NoticeModalForm({ open, onClose, onSubmit, initialData }: Notice
       alert('제목을 입력해주세요.');
       return;
     }
-
-    onSubmit({
+  
+    // 최종 데이터 로깅
+    const formData = {
       title,
       priority,
       hideOption,
       linkUrl: linkUrl || undefined,
       buttonUrl: buttonUrl || undefined,
-      i18nData
+      i18nData: JSON.parse(JSON.stringify(i18nData)) // 깊은 복사를 통해 참조 문제 방지
+    };
+    
+    console.log('Submitting data:', formData);
+  
+    // 중요: 여기서 i18nData를 직접 전달합니다.
+    // 이렇게 하면 업데이트된 i18nData가 API로 전송됩니다.
+    onSubmit(formData);
+  };
+
+  // 디폴트 이미지에 대한 버튼 텍스트 처리 함수 추가
+  const handleDefaultButtonTextChange = (text: string) => {
+    setI18nData(prev => ({
+      ...prev,
+      defaultButtonText: text
+    }));
+  };
+
+  // 버튼 텍스트 및 이미지 ID 추출 함수 수정
+  const getButtonTexts = (): Record<string, string> => {
+    const result: Record<string, string> = {};
+    
+    Object.entries(i18nData).forEach(([locale, data]) => {
+      if (locale !== 'defaultImageId' && locale !== 'defaultButtonText' && data && typeof data === 'object' && 'buttonText' in data) {
+        result[locale] = data.buttonText || '';
+      }
     });
+    
+    // 디폴트 버튼 텍스트가 있으면 추가
+    if ('defaultButtonText' in i18nData && i18nData.defaultButtonText) {
+      result.default = i18nData.defaultButtonText;
+    }
+    
+    return result;
+  };
+  
+  const getInitialImages = (): Record<string, { imageId: string }> => {
+    const result: Record<string, { imageId: string }> = {};
+    
+    // 각 언어별 이미지 ID 추가
+    Object.entries(i18nData).forEach(([locale, data]) => {
+      if (locale !== 'defaultImageId' && locale !== 'defaultButtonText' && data && typeof data === 'object' && 'imageId' in data) {
+        result[locale] = { imageId: data.imageId };
+      }
+    });
+    
+    // 기본 이미지 ID가 있으면 추가
+    if (i18nData.defaultImageId) {
+      result.default = { imageId: i18nData.defaultImageId };
+    }
+    
+    return result;
   };
 
   return (
@@ -177,14 +307,10 @@ export function NoticeModalForm({ open, onClose, onSubmit, initialData }: Notice
             <MultiLanguageImageUploader
               onImagesUploaded={handleImagesUploaded}
               onButtonTextChange={handleButtonTextChange}
-              buttonTexts={Object.entries(i18nData).reduce((acc, [locale, data]) => ({
-                ...acc,
-                [locale]: data?.buttonText
-              }), {})}
-              initialImages={Object.entries(i18nData).reduce((acc, [locale, data]) => ({
-                ...acc,
-                [locale]: { imageId: data?.imageId }
-              }), {})}
+              onDefaultButtonTextChange={handleDefaultButtonTextChange}
+              onImageRemove={handleImageRemove}
+              buttonTexts={getButtonTexts()}
+              initialImages={getInitialImages()}
               username={user?.username}
             />
           </div>
@@ -203,6 +329,7 @@ export function NoticeModalForm({ open, onClose, onSubmit, initialData }: Notice
             size="icon"
             onClick={handleSubmit}
             className="h-8 w-8"
+            disabled={isUploading}
           >
             <Save className="h-4 w-4" />
           </Button>

@@ -1,0 +1,107 @@
+{"en": "A bittersweet love story of youth", "zh": "青春期甜蜜苦涩的爱情故事"}
+{"en": "A fantasy drama set in Joseon Dynasty", "zh": "以朝鲜时代为背景的奇幻剧"}
+{"en": "A fantasy world full of magic and adventure", "zh": "充满魔法和冒险的奇幻世界"}
+{"en": "A fun daily life story of college students", "zh": "愉快的大学生日常故事"}
+{"en": "A historical drama set in the Joseon Dynasty", "zh": "以朝鲜时代为背景的历史剧"}
+{"en": "A love story blooming in magic school", "zh": "在魔法学校绽放的爱情故事"}
+{"en": "A mysterious story of a cursed wizard", "zh": "被诅咒的魔法师的神秘故事"}
+{"en": "A mystery thriller about a girl's disappearance", "zh": "调查一个女孩失踪的神秘惊悚片"}
+{"en": "A romance drama set in the royal palace", "zh": "以宫廷为背景的爱情剧"}
+{"en": "A romance drama with mysterious atmosphere", "zh": "充满神秘气氛的爱情剧"}
+{"en": "A sweet love story blooming in the office", "zh": "在公司绽放的甜蜜爱情故事"}
+{"en": "A touching drama about beautiful first love", "zh": "讲述美丽初恋故事的感人电视剧"}
+{"en": "Adventures of a high school secret detective", "zh": "高中生秘密侦探的活跃表现"}
+{"en": "Agent", "zh": "特工"}
+{"en": "An action thriller unfolding in the city darkness", "zh": "在城市黑暗中展开的动作惊悚片"}
+{"en": "Battle of warriors with supernatural powers", "zh": "超能力战士的对决"}
+{"en": "College", "zh": "大学"}
+{"en": "Comic investigation of a Joseon detective", "zh": "朝鲜时代名侦探的搞笑破案剧"}
+{"en": "Comical action of a clumsy special agent", "zh": "笨手笨脚的特工的搞笑动作"}
+{"en": "Curse", "zh": "诅咒"}
+{"en": "Danger", "zh": "危险"}
+{"en": "Destined love across time", "zh": "跨越时间的命中注定之爱"}
+{"en": "Detective", "zh": "侦探"}
+{"en": "Diary", "zh": "日记"}
+{"en": "Event", "zh": "活动"}
+{"en": "First Love", "zh": "初恋"}
+{"en": "First love starting in high school", "zh": "高中开始的初恋"}
+{"en": "Flutter", "zh": "心动"}
+{"en": "Ghost", "zh": "怪谈"}
+{"en": "Girl", "zh": "少女"}
+{"en": "Growth story of Joseon youth", "zh": "朝鲜时代青年的成长故事"}
+{"en": "Growth story of a young inspector in Joseon", "zh": "朝鲜时代年轻巡察的成长记"}
+{"en": "Guide", "zh": "指南"}
+{"en": "Hilarious stories happening in magic school", "zh": "魔法学校发生的搞笑故事"}
+{"en": "Important notice from MS Making", "zh": "MS Making的重要公告"}
+{"en": "Joseon", "zh": "朝鲜"}
+{"en": "Judge", "zh": "检察"}
+{"en": "Magic", "zh": "魔法"}
+{"en": "Maze", "zh": "迷宫"}
+{"en": "Missing", "zh": "失踪"}
+{"en": "Mistake", "zh": "失误"}
+{"en": "Multiple Samples", "zh": "多个样本"}
+{"en": "Mysteries occurring in Joseon palace", "zh": "朝鲜宫廷中发生的谜案"}
+{"en": "Mysterious ghost stories happening in high school", "zh": "高中发生的神秘怪谈"}
+{"en": "Mysterious incidents happening at university", "zh": "发生在大学的神秘事件"}
+{"en": "Mystery", "zh": "推理"}
+{"en": "New concept drama mixing comedy and thriller", "zh": "喜剧与惊悚相遇的新概念剧"}
+{"en": "New content release notice", "zh": "新内容发布通知"}
+{"en": "New event notice", "zh": "新活动通知"}
+{"en": "News from MS Making", "zh": "MS Making的新闻"}
+{"en": "News", "zh": "新闻"}
+{"en": "Night", "zh": "夜晚"}
+{"en": "Notice", "zh": "公告"}
+{"en": "Office", "zh": "职场"}
+{"en": "Palace", "zh": "宫廷"}
+{"en": "Record of fun high school life", "zh": "愉快的高中生活记录"}
+{"en": "Release", "zh": "发布"}
+{"en": "Sample post containing 70 videos", "zh": "包含70个视频的样本帖子"}
+{"en": "Scholar", "zh": "书生"}
+{"en": "School", "zh": "学校"}
+{"en": "Secret", "zh": "秘密"}
+{"en": "Service usage guide", "zh": "服务使用指南"}
+{"en": "Sleuth", "zh": "名探"}
+{"en": "Spectacular action of Joseon swordsmen", "zh": "朝鲜剑客展现的华丽动作"}
+{"en": "Story of lovers working as secret agents", "zh": "特工情侣的故事"}
+{"en": "Sword", "zh": "剑客"}
+{"en": "System update notice", "zh": "系统更新通知"}
+{"en": "Time", "zh": "时间"}
+{"en": "Transformation story of an ordinary high school girl", "zh": "普通女高中生的魔法少女变身记"}
+{"en": "Twenty", "zh": "二十岁"}
+{"en": "Update", "zh": "更新"}
+{"en": "Warrior", "zh": "战士"}
+{"en": "Wizard", "zh": "道士"}
+{"en": "Wizard", "zh": "魔法师"}
+{ACTION,COMIC}
+{ACTION,DRAMA,PERIOD}
+{ACTION,FANTASY}
+{ACTION,HIGHTEEN}
+{ACTION,ROMANCE}
+{ACTION,THRILLER}
+{COMIC,HIGHTEEN}
+{COMIC,THRILLER}
+{DRAMA}
+{FANTASY,ACTION}
+{FANTASY,COMIC}
+{FANTASY,HIGHTEEN}
+{FANTASY,PERIOD}
+{FANTASY,ROMANCE}
+{FANTASY,THRILLER}
+{HIGHTEEN,COMIC}
+{HIGHTEEN,PERIOD}
+{HIGHTEEN,THRILLER}
+{MSPOST}
+{NOTIFICATION}
+{PERIOD,ACTION}
+{PERIOD,COMIC}
+{PERIOD,DRAMA}
+{PERIOD,HIGHTEEN}
+{PERIOD,ROMANCE}
+{PERIOD,THRILLER}
+{ROMANCE,COMIC}
+{ROMANCE,DRAMA}
+{ROMANCE,FANTASY}
+{ROMANCE,HIGHTEEN}
+{ROMANCE,THRILLER}
+{THRILLER,DRAMA}
+{THRILLER,HIGHTEEN}

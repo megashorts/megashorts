@@ -1,6 +1,6 @@
 import type { CustomActivityLog } from './types';
 import { locationManager } from './location-manager';
-import { CONFIG, STORAGE_KEYS, isUserLoggedIn } from './constants';
+import { CONFIG, STORAGE_KEYS } from './constants';
 
 // 배치 전송 타이머
 let batchTimer: NodeJS.Timeout | null = null;
@@ -10,13 +10,35 @@ const RETRY_DELAY = 1000; // 1초
 
 // 브라우저 종료 시 로그 전송
 if (typeof window !== 'undefined') {
-  window.addEventListener('beforeunload', async () => {
+  // window.addEventListener('beforeunload', async () => {
+  //   if (batchTimer) {
+  //     clearTimeout(batchTimer);
+  //     batchTimer = null;
+  //   }
+  //   await sendPendingLogs();
+  // });
+
+  window.addEventListener('beforeunload', (event) => {
     if (batchTimer) {
-      clearTimeout(batchTimer);
+      clearInterval(batchTimer);
       batchTimer = null;
     }
-    await sendPendingLogs();
+    
+    const pendingLogsStr = localStorage.getItem(STORAGE_KEYS.PENDING_LOGS);
+    if (pendingLogsStr && pendingLogsStr !== '[]') {
+      if (navigator.sendBeacon && CONFIG.WORKER_URL) {
+        const pendingLogs = JSON.parse(pendingLogsStr);
+        const blob = new Blob([JSON.stringify(pendingLogs)], { type: 'application/json' });
+        const success = navigator.sendBeacon(CONFIG.WORKER_URL, blob);
+        
+        if (success) {
+          localStorage.setItem(STORAGE_KEYS.PENDING_LOGS, '[]');
+          localStorage.setItem(STORAGE_KEYS.LAST_SENT, new Date().toISOString());
+        }
+      }
+    }
   });
+
 }
 
 // 보류 중인 로그 전송
@@ -79,6 +101,26 @@ function getStorageSize(): number {
   return new Blob([pendingLogsStr]).size;
 }
 
+// 로그 해시 생성 함수
+function generateLogHash(log: CustomActivityLog): string {
+  // 중복 체크에 사용할 필드 선택
+  const hashFields = {
+    type: log.type,
+    event: log.event,
+    username: log.username,
+    action: log.details?.action,
+    target: log.details?.target,
+    userId: log.details?.userId
+  };
+  
+  // 객체를 문자열로 변환하여 해시 생성
+  return JSON.stringify(hashFields);
+}
+
+// 최근 로그 해시 저장 (중복 방지용)
+const recentLogHashes = new Map<string, number>();
+const LOG_DEDUPLICATION_WINDOW = 3000; // 3초 내 중복 로그 무시
+
 export async function logActivity(log: Partial<CustomActivityLog>) {
   try {
     // 로그 활성화 여부 체크
@@ -110,10 +152,42 @@ export async function logActivity(log: Partial<CustomActivityLog>) {
       device: locationInfo.device
     };
 
+    // 로그 해시 생성
+    const logHash = generateLogHash(fullLog);
+    const now = Date.now();
+    
+    // 중복 로그 체크
+    const lastLogTime = recentLogHashes.get(logHash);
+    if (lastLogTime && (now - lastLogTime) < LOG_DEDUPLICATION_WINDOW) {
+      // 최근에 동일한 로그가 있으면 무시
+      console.log('Duplicate log detected, ignoring:', fullLog.event);
+      return;
+    }
+    
+    // 해시 저장 (중복 체크용)
+    recentLogHashes.set(logHash, now);
+    
+    // 오래된 해시 제거 (메모리 관리)
+    for (const [hash, time] of recentLogHashes.entries()) {
+      if (now - time > LOG_DEDUPLICATION_WINDOW) {
+        recentLogHashes.delete(hash);
+      }
+    }
+
     try {
       // 현재 저장된 로그 가져오기
       const pendingLogsStr = localStorage.getItem(STORAGE_KEYS.PENDING_LOGS) || '[]';
       const pendingLogs = JSON.parse(pendingLogsStr);
+      
+      // 로컬 스토리지에서도 중복 체크
+      const isDuplicate = pendingLogs.some((existingLog: CustomActivityLog) => 
+        generateLogHash(existingLog) === logHash
+      );
+      
+      if (isDuplicate) {
+        console.log('Duplicate log found in pending logs, ignoring:', fullLog.event);
+        return;
+      }
       
       // 새 로그 추가
       pendingLogs.push(fullLog);

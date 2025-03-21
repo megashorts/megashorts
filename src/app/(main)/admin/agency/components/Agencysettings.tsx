@@ -39,7 +39,7 @@ export default function Agencysettings() {
     id: user.id, 
     userRole: user.userRole || USER_ROLE.USER,
     username: user.username,
-    avatarUrl: user.avatarUrl
+    // avatarUrl: user.avatarUrl
   } : undefined;
   
   const { toast } = useToast();

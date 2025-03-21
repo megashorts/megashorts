@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
@@ -10,6 +11,40 @@ export default function PaymentFailPage() {
   
   const message = searchParams.get('message') || '결제 처리 중 오류가 발생했습니다.'
   const code = searchParams.get('code')
+
+  useEffect(() => {
+    const updatePaymentStatus = async () => {
+      const orderId = searchParams.get('orderId');
+      
+      if (!orderId) {
+        console.error('결제 실패: orderId가 없습니다.');
+        return;
+      }
+      
+      try {
+        // 결제 실패 상태 업데이트
+        const response = await fetch('/api/payments/statusdb', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            orderId: orderId,
+            status: 'fail',
+            failureReason: message || '알 수 없는 오류',
+          }),
+        });
+        
+        if (!response.ok) {
+          console.error('결제 실패 상태 업데이트 실패:', await response.text());
+        }
+      } catch (error) {
+        console.error('결제 실패 상태 업데이트 중 오류:', error);
+      }
+    };
+    
+    updatePaymentStatus();
+  }, [searchParams, message]);
 
   const handleClose = () => {
     router.push('/subscription?error=' + encodeURIComponent(message))

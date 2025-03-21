@@ -5,6 +5,8 @@ import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk"
 import { nanoid } from 'nanoid'
 import { useSession } from '@/components/SessionProvider'
 import { AuthUser } from '@/lib/types'
+import { useUser } from '@/hooks/queries/useUser'
+import kyInstance from '@/lib/ky'
 
 interface PaymentModalProps {
   paymentAmount: number
@@ -17,6 +19,7 @@ export default function PaymentModal({ paymentAmount: paymentAmount, coins, onCl
   const [ready, setReady] = useState(false)
   const [widgets, setWidgets] = useState<any>(null)
   const [error, setError] = useState<string | null>(null)
+  const [userEmail, setUserEmail] = useState<string | null>(null)
   const orderId = `order_${nanoid()}_${coins}`
   const session = useSession();
   // const user = session.user as AuthUser;
@@ -25,6 +28,16 @@ export default function PaymentModal({ paymentAmount: paymentAmount, coins, onCl
   const dateStr = now.toISOString().split('T')[0].replace(/-/g, '');
   // const customerKey = `${user?.id}_${dateStr}_${paymentAmount}`;
   const customerKey = `${user?.id}`;
+  
+  // useUser 훅을 사용하여 사용자 정보 가져오기
+  const { data: userData } = useUser();
+  
+  // 사용자 이메일 정보 설정
+  useEffect(() => {
+    if (userData && userData.email) {
+      setUserEmail(userData.email);
+    }
+  }, [userData]);
 
   useEffect(() => {
     async function fetchPaymentWidgets() {
@@ -51,14 +64,16 @@ export default function PaymentModal({ paymentAmount: paymentAmount, coins, onCl
   useEffect(() => {
     async function renderPaymentWidgets() {
       if (!widgets) return
-
+  
       try {
         // 금액 설정
         await widgets.setAmount({
           value: paymentAmount,
           currency: 'KRW'
         })
-
+  
+        console.log('결제 위젯 렌더링 시작');
+        
         // DOM id를 토스 문서와 일치시킴
         await Promise.all([
           widgets.renderPaymentMethods({
@@ -70,14 +85,15 @@ export default function PaymentModal({ paymentAmount: paymentAmount, coins, onCl
             variantKey: "AGREEMENT",
           })
         ])
-
+  
+        console.log('결제 위젯 렌더링 완료');
         setReady(true)
       } catch (err) {
         console.error('결제 위젯 렌더링 실패:', err)
         setError('결제 수단을 불러오는데 실패했습니다.')
       }
     }
-
+  
     renderPaymentWidgets()
   }, [widgets, paymentAmount]);
 
@@ -88,25 +104,69 @@ export default function PaymentModal({ paymentAmount: paymentAmount, coins, onCl
     }
   }, [])
 
-  const handlePayment = async () => {
-    if (!widgets || !ready) return
-
-    try {
       // ------ '결제하기' 버튼 누르면 결제창 띄우기 ------
       // 결제를 요청하기 전에 orderId, amount를 서버에 저장하세요.
       // 결제 과정에서 악의적으로 결제 금액이 바뀌는 것을 확인하는 용도입니다.
-      await widgets.requestPayment({
+
+  const handlePayment = async () => {
+    if (!widgets || !ready) return
+  
+    try {
+      console.log('결제 요청 시작');
+      
+    // session.user가 null인지 확인
+    if (!session.user) {
+      setError('사용자 정보를 찾을 수 없습니다.');
+      return;
+    }
+
+      // 결제 시도 정보 저장
+      try {
+        const statusResponse = await fetch('/api/payments/statusdb', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            orderId: orderId,
+            status: 'try',
+            amount: paymentAmount,
+            type: 'coin',
+            method: 'card', // 실제 결제 후 업데이트됨
+            metadata: {
+              coins: coins,
+              currency: 'KRW'
+            }
+          }),
+        });
+
+        if (!statusResponse.ok) {
+          const errorData = await statusResponse.json();
+          throw new Error(errorData.error || '결제 시도 정보 저장 중 오류가 발생했습니다.');
+        }
+      } catch (tryError) {
+        console.error('결제 시도 정보 저장 실패:', tryError);
+        // 실패해도 결제는 계속 진행 (로깅만 함)
+      }
+
+      // 결제 요청 파라미터
+      const paymentParams = {
         orderId: orderId,
         orderName: coins + "MS코인",
         successUrl: `${window.location.origin}/usermenu/payments/result/coin/success`,
         failUrl: `${window.location.origin}/usermenu/payments/result/coin/fail`,
-        customerEmail: user.email,
+        customerEmail: userEmail || "", // 실제 사용자 이메일만 사용
         customerName: user.username,
-        customerMobilePhone: "01012341234",
-      })
+        // customerMobilePhone: "01012341234", // 필수 파라미터 추가
+      };
+      
+      console.log('결제 요청 파라미터:', paymentParams);
+      
+      // 결제 요청
+      await widgets.requestPayment(paymentParams);
     } catch (err) {
       console.error('결제 요청 실패:', err)
-      setError('결제 처리 중 모달페이지에서 오류가 발생했습니다. ')
+      setError((err instanceof Error ? err.message : ''))
     }
   }
 

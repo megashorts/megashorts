@@ -22,6 +22,7 @@ import { AuthButton } from './AuthButton';
 import PaymentHistory from './PaymentHistory';
 import UserTabsClient from './UserTabsClient';
 import ReferralLinkButton from './ReferralLinkButton';
+import EmailVerificationButton from './EmailVerificationButton';
 
 
 interface PageProps {
@@ -126,9 +127,10 @@ async function UserProfile({ user, loggedInUserId }: UserProfileProps) {
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <LanguageFlag language={user.myLanguage} />{"  /  "}{user.userRole === 10 ? "사용자 계정" : user.userRole === 15 ? "크리에이터 계정" : ""}
-              {user.id === loggedInUserId && user.userRole >= 20 && (
+              {/* {user.id === loggedInUserId && user.userRole >= 20 && (
                 <ReferralLinkButton username={user.username} userRole={user.userRole} />
-              )}
+              )} */}
+              추천인 정보영역
             </div>
             
             {/* <div className="flex items-center">
@@ -154,6 +156,12 @@ async function UserProfile({ user, loggedInUserId }: UserProfileProps) {
               {user.adultauth ? '성인인증 완료' : '성인인증 미완료'}
               <AuthButton isAuthenticated={user.adultauth} />
             </div>
+
+            {/* <div className="flex items-center">
+              <span className={`led-indicator ${user.emailVerified ? 'led-blue' : 'led-red'}`}></span>
+              {user.emailVerified ? '이메일 인증 완료' : '이메일 인증 필요'}
+              <EmailVerificationButton email={user.email || ''} isVerified={!!user.emailVerified} />
+            </div> */}
 
             <div className="flex items-center">
               <span className={`led-indicator ${user.subscription ? 'led-blue' : 'led-red'}`}></span>

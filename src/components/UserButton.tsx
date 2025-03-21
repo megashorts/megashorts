@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { logout } from "@/app/(auth)/actions";
 import { cn } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
-import { Building, ChevronDown, ChevronRight, FolderOpen, LogOutIcon, Megaphone, Monitor, Network, NotebookPen, PencilRuler, TvMinimalPlay, UserCircle, UserIcon, Users, WalletCards } from "lucide-react";
+import { BarChart3, Building, ChevronDown, ChevronRight, FolderOpen, LogOutIcon, Megaphone, Monitor, Network, NotebookPen, PencilRuler, TvMinimalPlay, UserCircle, UserIcon, Users, WalletCards } from "lucide-react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import {
@@ -92,6 +92,23 @@ export default function UserButton({ className }: UserButtonProps) {
             나의 정보
           </DropdownMenuItem>
         </Link>
+          
+        {user?.userRole && user.userRole >= USER_ROLE.CREATOR_Lv1 && (
+          <>
+            <Link href={`/usermenu/earnings`}>
+              <DropdownMenuItem>
+                <BarChart3 className="mr-2 size-4" />
+                수익관리
+              </DropdownMenuItem>
+            </Link>
+            <Link href={`/usermenu/agency-earnings`}>
+              <DropdownMenuItem>
+                <BarChart3 className="mr-2 size-4" />
+                영업수익 관리
+              </DropdownMenuItem>
+            </Link>
+          </>
+        )}
 
         <DropdownMenuSeparator />
         <div className="text-xs font-medium text-gray-600">메가쇼츠 안내</div>

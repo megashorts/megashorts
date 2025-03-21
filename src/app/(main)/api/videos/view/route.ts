@@ -1,6 +1,7 @@
 import { validateRequest } from '@/auth';
 import prisma from '@/lib/prisma';
 import { AccessMethod } from '@prisma/client';
+import { uuidv7 } from "uuidv7";
 
 export async function POST(req: Request) {
   try {
@@ -85,6 +86,7 @@ export async function POST(req: Request) {
         if (!existingView) {
           await tx.videoView.create({
             data: {
+              id: uuidv7(),
               userId: user.id,
               videoId: video.id,
               accessMethod

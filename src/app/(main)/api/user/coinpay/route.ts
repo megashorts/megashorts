@@ -4,6 +4,7 @@
 import { validateRequest } from '@/auth';
 import { toast } from '@/components/ui/use-toast';
 import prisma from '@/lib/prisma';
+import { uuidv7 } from 'uuidv7';
 
 export async function POST(req: Request) {
   try {
@@ -100,6 +101,7 @@ export async function POST(req: Request) {
       // 5. 새 시청 기록 생성
       const newView = await tx.videoView.create({
         data: {
+          id: uuidv7(),
           userId: user.id,
           videoId,
           accessMethod: 'COIN',

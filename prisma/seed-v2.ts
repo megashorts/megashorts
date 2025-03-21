@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 const prisma = new PrismaClient();
 
-const SAMPLE_USER_ID = 'wwjvsnxz6dtns7lo';
+const SAMPLE_USER_ID = 'lzhb7xbyggmjrevn';
 
 // Cloudflare 관련 인터페이스
 interface CloudflareVideo {

@@ -20,7 +20,8 @@ export async function POST() {
         status: "active",
       },
       data: {
-        status: "cancelled",
+        // status는 변경하지 않고 현재 구독 기간 동안 유지
+        // 구독 기간 종료 시 자동으로 취소되도록 설정
         cancelAtPeriodEnd: true,
       },
     });

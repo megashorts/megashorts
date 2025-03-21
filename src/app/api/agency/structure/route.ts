@@ -67,36 +67,36 @@ export async function GET(request: NextRequest) {
       );
     }
     
-    // 에이전시 역할 정보 조회
-    const agencyRoles = await prisma.agencyMemberRole.findMany({
-      where: {
-        OR: [
-          { userId: userId },
-          { masterId: userId }
-        ]
-      }
-    });
+    // // 에이전시 역할 정보 조회
+    // const agencyRoles = await prisma.agencyMemberRole.findMany({
+    //   where: {
+    //     OR: [
+    //       { userId: userId },
+    //       { masterId: userId }
+    //     ]
+    //   }
+    // });
     
-    // 추천인 구조 구성
-    const referralStructure: ReferralNode = {
-      userId: userInfo.id,
-      username: userInfo.username,
-      referredBy: userInfo.referredBy,
-      userRole: userInfo.userRole,
-      agencyRoles: agencyRoles
-        .filter(role => role.userId === userInfo.id)
-        .map(role => ({
-          masterId: role.masterId,
-          role: role.role,
-          level: role.level,
-          commissionRate: role.commissionRate
-        })),
-      children: await buildReferralTree(userInfo.referrals, agencyRoles)
-    };
+    // // 추천인 구조 구성
+    // const referralStructure: ReferralNode = {
+    //   userId: userInfo.id,
+    //   username: userInfo.username,
+    //   referredBy: userInfo.referredBy,
+    //   userRole: userInfo.userRole,
+    //   agencyRoles: agencyRoles
+    //     .filter(role => role.userId === userInfo.id)
+    //     .map(role => ({
+    //       masterId: role.masterId,
+    //       role: role.role,
+    //       level: role.level,
+    //       commissionRate: role.commissionRate
+    //     })),
+    //   children: await buildReferralTree(userInfo.referrals, agencyRoles)
+    // };
     
     return Response.json({
       success: true,
-      data: referralStructure
+      // data: referralStructure
     });
   } catch (error) {
     console.error("Error fetching referral structure:", error);

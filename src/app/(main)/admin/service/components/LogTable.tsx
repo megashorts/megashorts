@@ -3,7 +3,7 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { LogTableProps } from "../types";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, Info, LogIn, CreditCard, FileText, Video, Settings2, User2, Globe } from 'lucide-react';
+import { ArrowUpDown, Info, LogIn, CreditCard, FileText, Video, Settings2, User2, Globe, MapPin, Laptop, Timer, Pen } from 'lucide-react';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -25,6 +25,12 @@ function isValidLogType(type: string): type is LogType {
 }
 
 function getLogDescription(log: ActivityLog): string {
+  // 커스텀 로그 형식 처리 (event 필드가 있는 경우)
+  if (log.event) {
+    return log.event;
+  }
+  
+  // 기존 API 로그 형식 처리
   const method = log.method || '-';
   const path = log.path || '';
   const status = log.status ? `(${log.status})` : '';
@@ -59,22 +65,41 @@ export function LogTable({ logs, loading, onViewDetails, onSort, sortField, sort
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[180px]">
+            <TableHead className="w-[80px] md:w-[120px]">
               <Button
                 variant="ghost"
                 onClick={() => handleSort('timestamp')}
                 className="h-8 px-2 -ml-4"
               >
-                시간
+                <Timer className="ml-2 h-4 w-4" />
                 <ArrowUpDown className="ml-2 h-4 w-4" />
               </Button>
             </TableHead>
-            <TableHead className="w-[120px]">
+            <TableHead className="hidden md:table-cell w-[60px]">
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div className="flex items-center gap-2">
+                  <div className="flex justify-center">
+                    <span className="sr-only">타입</span>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>로그 타입</TooltipContent>
+              </Tooltip>
+            </TableHead>
+            <TableHead className="hidden md:table-cell w-[60px]">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex justify-center">
+                    <MapPin className="h-4 w-4" />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>국가</TooltipContent>
+              </Tooltip>
+            </TableHead>
+            <TableHead className="hidden md:table-cell w-[100px]">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex justify-center">
                     <Globe className="h-4 w-4" />
-                    <span className="hidden sm:inline">IP</span>
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>IP 주소</TooltipContent>
@@ -85,70 +110,88 @@ export function LogTable({ logs, loading, onViewDetails, onSort, sortField, sort
                 <TooltipTrigger asChild>
                   <div className="flex items-center gap-2">
                     <User2 className="h-4 w-4" />
-                    <span className="hidden sm:inline">사용자</span>
                   </div>
                 </TooltipTrigger>
-                <TooltipContent>사용자 정보</TooltipContent>
+                <TooltipContent>사용자</TooltipContent>
               </Tooltip>
             </TableHead>
-            <TableHead>활동</TableHead>
-            <TableHead className="w-[100px] text-right">상세</TableHead>
+            <TableHead>
+              <Pen className="h-4 w-4" />
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {logs.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={5} className="text-center">
-                로그가 없습니다.
+              <TableCell colSpan={6} className="text-center">
+                No data.
               </TableCell>
             </TableRow>
           ) : (
             logs.map((log: ActivityLog & { uniqueId?: string }) => (
-              <TableRow key={log.uniqueId}>
-                <TableCell className="font-mono">
+              <TableRow 
+                key={log.uniqueId}
+                className="cursor-pointer hover:bg-muted/50"
+                onClick={() => onViewDetails(log)}
+              >
+                <TableCell className="font-mono whitespace-nowrap">
                   {format(new Date(log.timestamp), 'HH:mm:ss', { locale: ko })}
                 </TableCell>
-                <TableCell>
+                <TableCell className="hidden md:table-cell text-center">
                   <Tooltip>
                     <TooltipTrigger>
-                      <span className="truncate max-w-[120px] block">
-                        {log.ip || '-'}
-                      </span>
+                      <div className="flex justify-center">
+                        {getTypeIcon(log.type)}
+                      </div>
                     </TooltipTrigger>
                     <TooltipContent>
-                      {log.ip || '알 수 없음'}
+                      {isValidLogType(log.type) ? typeIcons[log.type as LogType].label : TYPE_DISPLAY_NAMES.system}
                     </TooltipContent>
                   </Tooltip>
                 </TableCell>
-                <TableCell>
+                <TableCell className="hidden md:table-cell text-center">
                   <Tooltip>
                     <TooltipTrigger>
-                      <span className="truncate max-w-[120px] block">
-                        {log.username || '-'}
-                      </span>
+                      <div className="flex justify-center">
+                        {log.country ? (
+                          <span className="text-xs">{log.country.slice(0, 2)}</span>
+                        ) : (
+                          <MapPin className="h-3 w-3 text-muted-foreground" />
+                        )}
+                      </div>
                     </TooltipTrigger>
                     <TooltipContent>
-                      {log.username || '비로그인 사용자'}
+                      {log.country || '알 수 없음'}
+                      {log.city ? ` (${log.city})` : ''}
                     </TooltipContent>
                   </Tooltip>
                 </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    {getTypeIcon(log.type)}
-                    <span className="hidden sm:inline">{getLogDescription(log)}</span>
-                    <span className="sm:hidden">
-                      {getLogDescription(log).slice(0, 10)}...
-                    </span>
+                <TableCell className="hidden md:table-cell">
+                  <div className="text-xs font-mono truncate">
+                    {log.ip || '-'}
                   </div>
                 </TableCell>
-                <TableCell className="text-right">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => onViewDetails(log)}
-                  >
-                    <Info className="h-4 w-4" />
-                  </Button>
+                <TableCell>
+                  <div className="flex items-center gap-1">
+                    <span className="md:hidden">
+                      {getTypeIcon(log.type)}
+                    </span>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <span className="truncate max-w-[120px] block">
+                          {log.username || '-'}
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        {log.username || '비로그인 사용자'}
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="truncate">
+                    {getLogDescription(log)}
+                  </div>
                 </TableCell>
               </TableRow>
             ))

@@ -32,5 +32,8 @@ export interface NoticeModalFormData {
   buttonUrl?: string;
   i18nData: {
     [K in LowerCaseLanguage]?: NoticeModalI18nData;
+  } & {
+    defaultImageId?: string;
+    defaultButtonText?: string;
   };
 }

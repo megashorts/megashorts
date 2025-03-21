@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
@@ -9,6 +10,44 @@ export default function BillingFailPage() {
   const searchParams = useSearchParams()
   const message = searchParams.get('message') || '결제 중 문제가 발생했습니다.'
   const code = searchParams.get('code')
+  const orderId = searchParams.get('orderId')
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const updatePaymentStatus = async () => {
+      if (!orderId) {
+        console.error('결제 실패: orderId가 없습니다.');
+        return;
+      }
+      
+      try {
+        // 결제 실패 상태 업데이트
+        const response = await fetch('/api/payments/statusdb', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            orderId: orderId,
+            status: 'fail',
+            failureReason: message || '알 수 없는 오류',
+          }),
+        });
+        
+        if (!response.ok) {
+          console.error('결제 실패 상태 업데이트 실패:', await response.text());
+          setError('결제 상태 업데이트에 실패했습니다.');
+        }
+      } catch (error) {
+        console.error('결제 실패 상태 업데이트 중 오류:', error);
+        setError('결제 상태 업데이트 중 오류가 발생했습니다.');
+      }
+    };
+    
+    if (orderId) {
+      updatePaymentStatus();
+    }
+  }, [orderId, message]);
 
   const handleClose = () => {
     router.push('/subscription?error=' + encodeURIComponent(message))

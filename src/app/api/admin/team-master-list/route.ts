@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
         email: true,
         displayName: true,
         userRole: true,
-        avatarUrl: true
+        // avatarUrl: true
       },
       orderBy: {
         displayName: 'asc'

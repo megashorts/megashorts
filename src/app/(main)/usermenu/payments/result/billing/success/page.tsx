@@ -19,7 +19,7 @@ export default function BillingSuccessPage() {
   useEffect(() => {
     const processPayment = async () => {
       // const paymentKey = searchParams.get('paymentKey')
-      // const orderId = searchParams.get('orderId')
+      const orderId = searchParams.get('orderId')
       // const amount = searchParams.get('amount')
     
       try {
@@ -28,6 +28,7 @@ export default function BillingSuccessPage() {
           amount: amount || '',
           customerKey: customerKey || '',
           authKey: authKey || '',
+          orderId: orderId || '',
         }))
     
         if (!response.ok) {

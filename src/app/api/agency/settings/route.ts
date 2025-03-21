@@ -33,48 +33,15 @@ export async function GET(request: NextRequest) {
       }
     });
     
-    // 기본 설정 데이터
+    // 기본 설정 데이터 - 사용자가 처음 설정할 때 UI에 표시될 초기값
+    // 실제 저장 시에는 사용자가 설정한 값으로 대체됨
+    // 단계는 무한 확장 가능하며, 이 기본값은 단지 초기 UI 표시용임
     const defaultSettings = {
       userId,
-      masterType: "HEADQUARTERS",
+      masterType: "HEADQUARTERS", // 기본 타입
       settings: {
-        defaultCommissionRate: 10,
-        headquarters: {
-          levels: [
-            { name: "본부", level: 1, commissionRate: 5 },
-            { name: "대리점", level: 2, commissionRate: 3 },
-            { name: "멤버", level: 3, commissionRate: 1 }
-          ]
-        },
-        network: {
-          levels: [
-            { name: "1단계", level: 1, commissionRate: 5 },
-            { name: "2단계", level: 2, commissionRate: 3 },
-            { name: "3단계", level: 3, commissionRate: 1 }
-          ],
-          autoQualification: {
-            enabled: false,
-            memberCount: 10,
-            chargeAmount: 100000,
-            usageAmount: 50000,
-            useCondition: "memberCount"
-          }
-        },
-        binaryNetwork: {
-          levels: [
-            { name: "1단계", level: 1, commissionRate: 5 },
-            { name: "2단계", level: 2, commissionRate: 3 },
-            { name: "3단계", level: 3, commissionRate: 1 }
-          ],
-          autoQualification: {
-            enabled: false,
-            memberCount: 10,
-            chargeAmount: 100000,
-            usageAmount: 50000,
-            useCondition: "memberCount"
-          },
-          requireBothLegs: true
-        }
+        defaultCommissionRate: 10, // 기본 수수료율
+        // 각 타입별 기본 설정은 UI에서 동적으로 생성/수정 가능
       },
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
@@ -158,6 +125,114 @@ export async function POST(request: NextRequest) {
         updatedBy: user.id
       }
     });
+    
+    // // 사용자 정보 가져오기
+    // const userInfo = await prisma.user.findUnique({
+    //   where: { id: data.userId },
+    //   select: { username: true, displayName: true, email: true }
+    // });
+    
+    // if (!userInfo) {
+    //   throw new Error(`사용자 정보를 찾을 수 없음: ${data.userId}`);
+    // }
+    
+    // // 설정 데이터에 username 추가
+    // const settingsWithUsername = {
+    //   ...data,
+    //   username: userInfo.username,
+    //   displayName: userInfo.displayName || userInfo.username,
+    //   email: userInfo.email
+    // };
+    
+    // // 팀마스터 설정 워커 호출
+    // try {
+    //   console.log('팀마스터 설정 워커 호출 시도...');
+      
+    //   // 워커 URL 설정
+    //   const workerUrl = process.env.TEAM_MASTER_SETTINGS_WORKER_URL || 'https://team-master-settings.msdevcm.workers.dev';
+    //   console.log(`워커 URL: ${workerUrl}`);
+      
+    //   // API 키 확인
+    //   const apiKey = process.env.WORKER_API_KEY;
+    //   if (!apiKey) {
+    //     console.error('환경 변수 WORKER_API_KEY가 설정되지 않았습니다.');
+    //     throw new Error('환경 변수 WORKER_API_KEY가 설정되지 않았습니다.');
+    //   }
+      
+    //   // 워커 호출
+    //   const workerResponse = await fetch(`${workerUrl}/update-settings`, {
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //       'Authorization': `Bearer ${apiKey}`
+    //     },
+    //     body: JSON.stringify({
+    //       masterName: userInfo.username,
+    //       settings: settingsWithUsername
+    //     })
+    //   });
+      
+    //   if (workerResponse.ok) {
+    //     const workerResult = await workerResponse.json();
+    //     console.log('워커 호출 성공:', workerResult);
+    //   } else {
+    //     console.error('워커 호출 실패:', await workerResponse.text());
+    //   }
+    // } catch (workerError) {
+    //   console.error('팀마스터 설정 워커 호출 오류:', workerError);
+    //   // 워커 호출 실패는 무시하고 계속 진행
+    // }
+    
+    // // 추천인 구조 업데이트 호출
+    // try {
+    //   console.log('추천인 구조 업데이트 시도...');
+      
+    //   // 워커 URL 설정
+    //   const referralWorkerUrl = process.env.REFERRAL_STRUCTURE_WORKER_URL || 'https://referral-structure.msdevcm.workers.dev';
+    //   console.log(`추천인 구조 워커 URL: ${referralWorkerUrl}`);
+      
+    //   // API 키 확인
+    //   const apiKey = process.env.WORKER_API_KEY;
+    //   if (!apiKey) {
+    //     console.error('환경 변수 WORKER_API_KEY가 설정되지 않았습니다.');
+    //     throw new Error('환경 변수 WORKER_API_KEY가 설정되지 않았습니다.');
+    //   }
+      
+    //   // 추천인 구조 워커의 settings-update 엔드포인트 직접 호출
+    //   const referralStructureResponse = await fetch(`${referralWorkerUrl}/event/settings-update`, {
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //       'Authorization': `Bearer ${apiKey}`
+    //     },
+    //     body: JSON.stringify({
+    //       masterUserId: data.userId,
+    //       settings: data.settings,
+    //       userInfo: {
+    //         username: userInfo.username,
+    //         displayName: userInfo.displayName,
+    //         email: userInfo.email
+    //       }
+    //     })
+    //   });
+      
+    //   if (referralStructureResponse.ok) {
+    //     const referralResult = await referralStructureResponse.json();
+    //     console.log('추천인 구조 업데이트 성공:', referralResult);
+        
+    //     // 워커 응답 반환
+    //     return Response.json({
+    //       success: true,
+    //       data: { saved: true },
+    //       referralResult
+    //     });
+    //   } else {
+    //     console.error('추천인 구조 업데이트 실패:', await referralStructureResponse.text());
+    //   }
+    // } catch (workerError) {
+    //   console.error('워커 호출 오류:', workerError);
+    //   // 워커 호출 실패는 무시하고 계속 진행 (데이터는 여전히 반환)
+    // }
     
     return Response.json({
       success: true,

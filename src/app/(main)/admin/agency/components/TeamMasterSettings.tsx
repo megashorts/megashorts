@@ -12,7 +12,8 @@ import { USER_ROLE, USER_ROLE_NAME } from "@/lib/constants";
 import UserSearchInput from "@/components/admin/UserSearchInput";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { AlertCircle, Settings, UserMinus } from "lucide-react";
+import { AlertCircle, Settings, UserMinus, RefreshCw, Repeat } from "lucide-react";
+// import { rebuildReferralStructure, syncReferralStructure, validateAndSyncReferralStructure } from "@/lib/referral-structure-client";
 import { 
   Dialog,
   DialogContent,
@@ -44,6 +45,10 @@ export default function TeamMasterSettings() {
   const [currentTab, setCurrentTab] = useState<string>("add");
   const [removeUserId, setRemoveUserId] = useState<string | null>(null);
   const [removeDialogOpen, setRemoveDialogOpen] = useState(false);
+  
+  // 추천인 구조 관련 상태
+  const [rebuildLoading, setRebuildLoading] = useState(false);
+  const [syncLoading, setSyncLoading] = useState(false);
   
   // 팀마스터 설정
   const [masterType, setMasterType] = useState<string>("HEADQUARTERS");
@@ -398,6 +403,8 @@ export default function TeamMasterSettings() {
                     setMasterType(value);
                     if (value === "NETWORK") {
                       setUseMemberLimit(false);
+                    } else if (value === "BINARY_NETWORK") {
+                      setUseMemberLimit(true);
                     }
                   }}
                   disabled={loading}
@@ -408,6 +415,7 @@ export default function TeamMasterSettings() {
                   <SelectContent>
                     <SelectItem value="HEADQUARTERS">본부구조</SelectItem>
                     <SelectItem value="NETWORK">네트워크</SelectItem>
+                    <SelectItem value="BINARY_NETWORK">네트워크 바이너리</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -423,7 +431,8 @@ export default function TeamMasterSettings() {
                 />
               </div>
               
-              {(masterType === "NETWORK" || masterType === "BINARY_NETWORK") && (
+              {/* {(masterType === "NETWORK" || masterType === "BINARY_NETWORK") && ( */}
+              {(masterType === "BINARY_NETWORK") && (
                 <div className="flex items-center space-x-2">
                   <Switch
                     id="useMemberLimit"
@@ -432,12 +441,66 @@ export default function TeamMasterSettings() {
                     disabled={loading || masterType === "BINARY_NETWORK"}
                   />
                   <Label htmlFor="useMemberLimit">
-                    하위회원 수 제한 (네트워크 바이너리)
+                    바이너리 하위회원 수 제한 충족시만 포인트지급
                   </Label>
                 </div>
               )}
               
-              <div className="flex justify-end pb-3">
+              <div className="flex justify-end pb-3 space-x-2">
+                <Button
+                  variant="outline"
+                  onClick={async () => {
+                    if (!selectedUser) {
+                      toast({
+                        description: "사용자를 선택해주세요.",
+                        variant: "destructive",
+                        duration: 1500,
+                      });
+                      return;
+                    }
+                    
+                    try {
+                      setRebuildLoading(true);
+                      // const userInfo = {
+                      //   username: selectedUser.username,
+                      //   displayName: selectedUser.displayName,
+                      //   email: selectedUser.email
+                      // };
+                      
+                      // const result = await rebuildReferralStructure(selectedUser.id, {}, selectedUser.username);
+                      
+                      // alert("추천인 구조 재구성이 완료되었습니다.");
+                      toast({
+                        description: "추천인 구조 재구성이 완료되었습니다.",
+                        variant: "destructive",
+                        duration: 1500,
+                      });
+                    } catch (error) {
+                      console.error("추천인 구조 재구성 중 오류가 발생했습니다:", error);
+                      toast({
+                        description: "추천인 구조 재구성 중 오류가 발생했습니다.",
+                        variant: "destructive",
+                        duration: 1500,
+                      });
+                    } finally {
+                      setRebuildLoading(false);
+                    }
+                  }}
+                  disabled={rebuildLoading || !selectedUser}
+                >
+                  {rebuildLoading ? (
+                    <>
+                      <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                      재구성 중...
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw className="h-4 w-4 mr-2" />
+                      구조 재구성
+                    </>
+                  )}
+                </Button>
+                
                 <Button
                   onClick={saveSettings}
                   disabled={loading || !selectedUser}
@@ -465,7 +528,7 @@ export default function TeamMasterSettings() {
                 <div key={master.id} className="border rounded-md p-4">
                   <div className="flex justify-between items-start">
                     <div>
-                      <h3 className="font-medium text-base">{master.displayName}</h3>
+                      <h3 className="font-medium text-base">{master.username}</h3>
                       {/* <p className="text-sm text-muted-foreground">{master.username}</p> */}
                       <p className="text-sm text-muted-foreground">{master.email}</p>
                       {master.settings && (

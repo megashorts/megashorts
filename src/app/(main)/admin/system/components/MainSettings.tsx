@@ -226,16 +226,31 @@ export function MainSettings() {
 
   // 새 카테고리 슬라이더 추가
   const handleAddCategorySlider = () => {
-    const defaultCategory = CategoryType.ROMANCE;
     const order = sliders.length;
     const newSlider: SliderSetting = {
-      id: generateSliderId('category', [defaultCategory], order),
+      id: generateSliderId('category', [], order),
       type: 'category',
       title: "새 카테고리 슬라이더",
       postCount: defaultSliderSettings.category.postCount,
-      categories: [defaultCategory],
+      categories: [], // 빈 배열로 설정 (null 대신)
       order,
-      viewAllHref: `/categories/${defaultCategory}`
+      viewAllHref: "/categories/recent" // 카테고리가 없는 경우 최신 페이지로 연결
+    };
+  
+    setSliders(current => [...current, newSlider]);
+  };
+
+  // 랭킹 슬라이더 추가
+  const handleAddRankedSlider = () => {
+    const order = sliders.length;
+    const newSlider: SliderSetting = {
+      id: generateSliderId('ranked', undefined, order),
+      type: 'ranked',
+      title: "랭킹 슬라이더", // 기본 타이틀 (사용자가 변경 가능)
+      postCount: defaultSliderSettings.ranked.postCount,
+      rankingType: defaultSliderSettings.ranked.rankingType, // 'likes'로 기본 설정됨
+      order,
+      viewAllHref: defaultSliderSettings.ranked.viewAllHref
     };
 
     setSliders(current => [...current, newSlider]);
@@ -314,13 +329,22 @@ export function MainSettings() {
                 </SortableContext>
               </DndContext>
 
-              <Button
-                onClick={handleAddCategorySlider}
-                className="w-full text-2xl"
-                variant="outline"
-              >
-                +
-              </Button>
+              <div className="flex gap-2 mt-2">
+                <Button
+                  onClick={handleAddCategorySlider}
+                  className="flex-1"
+                  variant="outline"
+                >
+                  + 카테고리 슬라이더
+                </Button>
+                <Button
+                  onClick={handleAddRankedSlider}
+                  className="flex-1"
+                  variant="outline"
+                >
+                  + 랭킹 슬라이더
+                </Button>
+              </div>
             </div>
           </div>
 

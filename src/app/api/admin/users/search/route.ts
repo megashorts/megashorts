@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
         email: true,
         displayName: true,
         userRole: true,
-        avatarUrl: true
+        // avatarUrl: true
       },
       take: 10 // 최대 10명까지만 반환
     });

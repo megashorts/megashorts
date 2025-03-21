@@ -33,6 +33,41 @@ export default function BillingModal({ type, amount, onClose }: BillingModalProp
       try {
         if (!isSubscribed) return;
         
+        // 결제 시도 정보 저장 (orderId 생성)
+        const orderId = `billing_${customerKey}_${Date.now()}`;
+        
+        try {
+          // 결제 시도 정보 저장
+          const statusResponse = await fetch('/api/payments/statusdb', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              orderId: orderId,
+              status: 'try',
+              amount: amount,
+              type: 'subscription',
+              method: type, // weekly, yearly, upgrade 등
+              metadata: {
+                subscriptionType: type,
+                currency: 'KRW'
+              }
+            }),
+          });
+
+          if (!statusResponse.ok) {
+            const errorData = await statusResponse.json();
+            console.error('결제 시도 정보 저장 실패:', errorData);
+            // 실패해도 결제는 계속 진행 (로깅만 함)
+          }
+        } catch (tryError) {
+          console.error('결제 시도 정보 저장 실패:', tryError);
+          // 실패해도 결제는 계속 진행 (로깅만 함)
+        }
+        
+        if (!isSubscribed) return;
+        
         const tossPayments = await loadTossPayments(clientKey)
         if (!isSubscribed) return;
         
@@ -44,8 +79,8 @@ export default function BillingModal({ type, amount, onClose }: BillingModalProp
           // successUrl: `${window.location.origin}/api/payments/billing/success?type=${type}&amount=${amount}`,
           // failUrl: `${window.location.origin}/api/payments/billing/fail`,
           // successUrl: `${window.location.origin}/usermenu/payments/result/billing/success`,
-          successUrl: `${window.location.origin}/usermenu/payments/result/billing/success?type=${type}&amount=${amount}`,
-          failUrl: `${window.location.origin}/usermenu/payments/result/billing/fail`,
+          successUrl: `${window.location.origin}/usermenu/payments/result/billing/success?type=${type}&amount=${amount}&orderId=${orderId}`,
+          failUrl: `${window.location.origin}/usermenu/payments/result/billing/fail?orderId=${orderId}`,
           customerEmail: user.email || '',
           customerName: user.username,
         })

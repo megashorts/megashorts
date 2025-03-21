@@ -1,7 +1,9 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MainSettings } from "./components/MainSettings";
 import { SystemSettings } from "./components/SystemSettings";
-import { Settings, Layout, Headset } from 'lucide-react';
+import { Settings, Layout, BarChart, DollarSign } from 'lucide-react';
+import { SystemStats } from "./components/SystemStats";
+import { PointWithdrawalManagement } from "./components/PointWithdrawalManagement";
 
 export default function SettingsPage() {
   return (
@@ -20,6 +22,14 @@ export default function SettingsPage() {
               <Settings className="w-5 h-5 md:w-6 md:h-6" />
               <p className="pl-1 hidden md:block">Settings</p>
             </TabsTrigger>
+            <TabsTrigger value="stats" className="flex items-center gap-2">
+              <BarChart className="w-5 h-5 md:w-6 md:h-6" />
+              <p className="pl-1 hidden md:block">통계</p>
+            </TabsTrigger>
+            <TabsTrigger value="withdrawals" className="flex items-center gap-2">
+              <DollarSign className="w-5 h-5 md:w-6 md:h-6" />
+              <p className="pl-1 hidden md:block">포인트 출금</p>
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="mainpage">
@@ -30,6 +40,13 @@ export default function SettingsPage() {
             <SystemSettings />
           </TabsContent>
 
+          <TabsContent value="stats">
+            <SystemStats />
+          </TabsContent>
+          
+          <TabsContent value="withdrawals">
+            <PointWithdrawalManagement />
+          </TabsContent>
         </Tabs>
       </div>
     </main>

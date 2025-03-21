@@ -44,7 +44,7 @@ const postSelect = {
       id: true,
       username: true,
       displayName: true,
-      avatarUrl: true
+      // avatarUrl: true
     }
   },
   _count: {

@@ -10,7 +10,7 @@ export interface LogFiltersState {
   endDate: Date;
   userId: string;
   types: string[];
-  country: Language | '';
+  country: Language | null;
   page: number;
   perPage: number;
   timestamp?: string;  // 강제 리프레시용

@@ -37,10 +37,10 @@ export default function UserTabsClient() {
           <CircleDollarSign className="w-5 h-5 md:w-6 md:h-6" />
           <p className="pl-1 hidden md:block">결제내역</p>
         </TabsTrigger>
-        <TabsTrigger value="inquiry" className="flex items-center gap-2">
+        {/* <TabsTrigger value="inquiry" className="flex items-center gap-2">
           <Headset className="w-5 h-5 md:w-6 md:h-6" />
           <p className="pl-1 hidden md:block">문의</p>
-        </TabsTrigger>
+        </TabsTrigger> */}
       </TabsList>
       <TabsContent value="notification">
         {currentTab === "notification" && (

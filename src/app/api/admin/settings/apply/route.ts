@@ -71,6 +71,8 @@ export async function POST() {
       throw new Error('Failed to update Vercel environment variables');
     }
 
+    // 환경 변수 업데이트 성공
+
     return NextResponse.json({ 
       success: true,
       updated: envUpdates.map(env => env.key)

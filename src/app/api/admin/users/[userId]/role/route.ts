@@ -5,11 +5,13 @@ import prisma from '@/lib/prisma';
 import { USER_ROLE } from '@/lib/constants';
 import { NextRequest } from 'next/server';
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { userId: string } }
-) {
+export async function PATCH(request: NextRequest) {
   try {
+    // URL에서 직접 userId 추출
+    const url = request.url;
+    const urlParts = url.split('/');
+    const userId = urlParts[urlParts.length - 2]; // URL 형식: .../users/[userId]/role
+    
     const { user } = await validateRequest();
     
     // 권한 확인 (OPERATION3 이상)
@@ -19,8 +21,6 @@ export async function PATCH(
         { status: 401 }
       );
     }
-    
-    const userId = params.userId;
     
     if (!userId) {
       return Response.json(

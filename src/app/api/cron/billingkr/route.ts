@@ -9,16 +9,32 @@ export async function GET(req: Request) {
     kstMidnight.setHours(0, 0, 0, 0);
     const kstTomorrow = new Date(kstMidnight.getTime() + 24 * 60 * 60 * 1000);
 
+    // 1. 기간이 만료된 구독 중 cancelAtPeriodEnd가 true인 경우 상태를 cancelled로 변경
+    await prisma.subscription.updateMany({
+      where: {
+        status: 'active',
+        cancelAtPeriodEnd: true,
+        currentPeriodEnd: {
+          lt: kstMidnight // 오늘 자정 이전에 만료된 구독
+        }
+      },
+      data: {
+        status: 'cancelled'
+      }
+    });
+
+    // 2. 오늘 만료되는 활성 구독 중 자동 갱신이 필요한 구독만 조회
     const subscriptions = await prisma.subscription.findMany({
       where: {
         status: 'active',
+        cancelAtPeriodEnd: false, // 취소 예정이 아닌 구독만 처리
         currentPeriodEnd: {
           gte: kstMidnight,
           lt: kstTomorrow
         }
       },
       include: {
-        billingKey: true  // billingKeys -> billingKey
+        billingKey: true
       }
     });
 
@@ -68,7 +84,7 @@ export async function GET(req: Request) {
             orderId,
             billingKey: subscription.billingKey.billingKey,
             method: 'card',
-            requestedAt: new Date(),
+            // requestedAt: new Date(),
             metadata: metadata as Prisma.InputJsonValue  // 타입 캐스팅
           }
         });

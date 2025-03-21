@@ -30,6 +30,7 @@ export async function POST(request: Request) {
     const data = await request.json();
     console.log('Creating modal with data:', JSON.stringify(data, null, 2));
 
+    // i18nData를 문자열로 변환하지 않고 객체 그대로 저장
     const modal = await prisma.noticeModal.create({
       data: {
         ...data,
