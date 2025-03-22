@@ -113,6 +113,23 @@ export function SliderSettingsForm({ slider, onUpdate, onDelete, isFixed }: Slid
 
             {/* 랭킹 타입 선택 (랭킹 슬라이더인 경우) */}
             {slider.type === 'ranked' && (
+              <>
+                <Select
+                  value={slider.rankingType}
+                  onValueChange={handleRankingTypeChange}
+                >
+                  <SelectTrigger className="w-32">
+                    <SelectValue placeholder="랭킹 기준" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="likes">좋아요 순</SelectItem>
+                    <SelectItem value="views">조회수 순</SelectItem>
+                  </SelectContent>
+                </Select>
+              </>
+            )}
+            
+            {/* {slider.type === 'latest' && (
               <Select
                 value={slider.rankingType}
                 onValueChange={handleRankingTypeChange}
@@ -125,7 +142,7 @@ export function SliderSettingsForm({ slider, onUpdate, onDelete, isFixed }: Slid
                   <SelectItem value="views">조회수 순</SelectItem>
                 </SelectContent>
               </Select>
-            )}
+            )} */}
 
             {/* 카테고리 선택 (카테고리 슬라이더인 경우) */}
             {slider.type === 'category' && (

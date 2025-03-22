@@ -240,6 +240,22 @@ export function MainSettings() {
     setSliders(current => [...current, newSlider]);
   };
 
+  // 새 카테고리 슬라이더 추가
+  const handleAddLatestSlider = () => {
+    const order = sliders.length;
+    const newSlider: SliderSetting = {
+      id: generateSliderId('latest', [], order),
+      type: 'latest',
+      title: "새 최근포스트 슬라이더",
+      postCount: defaultSliderSettings.category.postCount,
+      categories: [], // 빈 배열로 설정 (null 대신)
+      order,
+      viewAllHref: "/categories/recent" // 카테고리가 없는 경우 최신 페이지로 연결
+    };
+  
+    setSliders(current => [...current, newSlider]);
+  };
+
   // 랭킹 슬라이더 추가
   const handleAddRankedSlider = () => {
     const order = sliders.length;
@@ -322,7 +338,8 @@ export function MainSettings() {
                         slider={slider}
                         onUpdate={handleSliderUpdate}
                         onDelete={() => handleSliderDelete(slider.id)}
-                        isFixed={slider.type === 'latest' || slider.type === 'ranked'}
+                        // isFixed={slider.type === 'latest' || slider.type === 'ranked'}
+                        isFixed={false}
                       />
                     )
                   ))}
@@ -343,6 +360,13 @@ export function MainSettings() {
                   variant="outline"
                 >
                   + 랭킹 슬라이더
+                </Button>
+                <Button
+                  onClick={handleAddLatestSlider}
+                  className="flex-1"
+                  variant="outline"
+                >
+                  + 최근포스트 슬라이더
                 </Button>
               </div>
             </div>
