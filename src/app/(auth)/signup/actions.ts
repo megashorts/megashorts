@@ -9,6 +9,7 @@ import { generateIdFromEntropySize } from "lucia";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { logActivity } from "@/lib/activity-logger/client";
+import { uuidv7 } from 'uuidv7';
 
 export async function signUp(
   credentials: SignUpValues,
@@ -25,7 +26,8 @@ export async function signUp(
       parallelism: 1,
     });
 
-    const userId = generateIdFromEntropySize(10);
+    // const userId = generateIdFromEntropySize(10);
+    const userId = uuidv7();
 
     const existingUsername = await prisma.user.findFirst({
       where: {
