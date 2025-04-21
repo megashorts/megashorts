@@ -10,6 +10,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { logActivity } from "@/lib/activity-logger/client";
 import { uuidv7 } from 'uuidv7';
+import { syncReferralStructure } from '@/lib/referral-structure-client';
 
 export async function signUp(
   credentials: SignUpValues,
@@ -63,6 +64,7 @@ export async function signUp(
     let referrer = null;
     let teamMasterId = null;
     let teamMasterType = null;
+    let joinUserRole = 10;
 
     if (referredBy) {
       // 추천인 정보 가져오기 (팀마스터 정보 포함)
@@ -75,7 +77,6 @@ export async function signUp(
         },
         select: {
           id: true,
-          username: true,
           teamMaster: true,
         },
       });
@@ -89,6 +90,8 @@ export async function signUp(
       // 추천인의 팀마스터 정보가 있는 경우
       if (referrer?.teamMaster) {
         teamMasterId = referrer.teamMaster;
+
+        joinUserRole = 40;
 
         // 팀마스터 정보 조회
         const teamMasterSettings = await prisma.systemSetting.findFirst({
@@ -107,9 +110,15 @@ export async function signUp(
           // 네트워크 바이너리 타입인 경우 직접 추천 가입자 수 확인
           if (teamMasterType === 'BINARY_NETWORK') {
             // 추천인의 직접 추천 가입자 수 조회
+            // const directReferrals = await prisma.user.count({
+            //   where: {
+            //     referredBy: referrer.username,
+            //   },
+            // });
+
             const directReferrals = await prisma.user.count({
               where: {
-                referredBy: referrer.username,
+                referredBy: referredBy,
               },
             });
 
@@ -118,7 +127,7 @@ export async function signUp(
               // 워커에서 로그를 기록하므로 클라이언트 측 로그는 제거
 
               return {
-                error: "해당 추천인은 추천가입자수(2명)가 완료되었습니다.",
+                error: "해당 추천인은 추천가입자수(2명) 완료로 추가할 수 없습니다.",
               };
             }
           }
@@ -138,6 +147,7 @@ export async function signUp(
           passwordHash,
           referredBy: referrer?.id || null,
           teamMaster: teamMasterId, // 추천인의 팀마스터 정보 설정
+          userRole: joinUserRole,
         },
       });
 
@@ -195,89 +205,19 @@ export async function signUp(
       });
     });
 
-    // // 추천인 구조 워커 호출 (팀마스터가 있는 경우)
-    // if (teamMasterId && referrer) {
-    //   try {
-    //     const apiKey = process.env.WORKER_API_KEY || process.env.CRON_SECRET;
-    //     const apiBaseUrl = 'https://referral-structure.msdevcm.workers.dev';
-        
-    //     // 팀마스터 정보는 이미 teamMaster으로 알고 있으므로 불필요한 DB 조회 제거
-    //     // 워커에서는 username만 사용하므로 직접 전달
-        
-    //     // 추천인 정보 가져오기 (추가 정보)
-    //     const referrerInfo = await prisma.user.findUnique({
-    //       where: { id: referrer.id },
-    //       select: {
-    //         id: true,
-    //         username: true,
-    //         displayName: true,
-    //         email: true
-    //       }
-    //     });
+    // 추천인 구조 워커 호출 (팀마스터가 있는 경우)
+    if (teamMasterId && referrer) {
+      try {     
+        await syncReferralStructure(referrer?.id, "add", teamMasterId);
 
-    //     // referrerInfo가 null인 경우 처리
-    //     if (!referrerInfo) {
-    //       console.error('추천인 정보를 찾을 수 없음:', referrer.id);
-    //       throw new Error('추천인 정보를 찾을 수 없습니다.');
-    //     }
-
-    //     // 워커로 전달하는 내용 로그 출력
-    //     const requestBody = {
-    //       masterUserId: teamMasterId,
-    //       // userInfo를 최상위 레벨로 이동 (SyncReferralStructureRequest 인터페이스와 일치)
-    //       userInfo: {
-    //         username: teamMasterId // teamMasterId가 실제로는 유저네임
-    //       },
-    //       options: {
-    //         // 추천인 정보도 함께 전달하여 structure.members에 추가될 수 있도록 함
-    //         members: {
-    //           added: [
-    //             {
-    //               userId: referrer.id,
-    //               username: referrerInfo.username,
-    //               displayName: referrerInfo.displayName || referrerInfo.username,
-    //               email: referrerInfo.email,
-    //               level: 0,
-    //               joinedAt: new Date().toISOString(),
-    //               status: 'active'
-    //             }
-    //           ],
-    //           updated: [],
-    //           removed: []
-    //         },
-    //         signupEvent: {
-    //           userId: userId,
-    //           username: username,
-    //           displayName: username,
-    //           email: email,
-    //           referrerId: referrer.id
-    //         }
-    //       }
-    //     };
+      } catch (error) {
+        console.error('신규회원 영업자 추가 워커 호출 오류:', error);
         
-    //     console.log('추천인 구조 워커로 전달하는 내용:', JSON.stringify(requestBody, null, 2));
-    //     console.log('팀마스터 유저네임:', teamMasterId);
-        
-    //     // 추천인 구조 워커 호출 (sync 엔드포인트 사용)
-    //     const response = await fetch(`${apiBaseUrl}/sync`, {
-    //       method: 'POST',
-    //       headers: {
-    //         'Content-Type': 'application/json',
-    //         'Authorization': `Bearer ${apiKey}`
-    //       },
-    //       body: JSON.stringify(requestBody)
-    //     });
-
-    //     const result = await response.json();
-    //     console.log('추천인 구조 워커 응답:', result);
-        
-    //     // 워커에서 로그를 기록하므로 클라이언트 측 로그는 제거
-    //   } catch (error) {
-    //     console.error('추천인 구조 워커 호출 오류:', error);
-        
-    //     // 워커에서 로그를 기록하므로 클라이언트 측 로그는 제거
-    //   }
-    // }
+        return {
+          error: "신규회원 영업자 워커 추가에 실패했습니다. 나중에 다시 시도해 주세요.",
+        };
+      }
+    }
 
     const session = await lucia.createSession(userId, {});
     const sessionCookie = lucia.createSessionCookie(session.id);

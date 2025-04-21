@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { validateRequest } from '@/auth';
 import prisma from '@/lib/prisma';
 
-// 인증 정보 저장 API
+// 포인트 인증 정보 저장 API
 export async function POST(
   request: NextRequest,
   { params }: { params: { userId: string } }

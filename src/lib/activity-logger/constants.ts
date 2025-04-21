@@ -8,8 +8,10 @@ export const STORAGE_KEYS = {
 export const CONFIG = {
   BATCH_INTERVAL: 5 * 60 * 1000,  // 5분
   MAX_BATCH_SIZE: 500000,         // 500KB
-  WORKER_URL: process.env.NEXT_PUBLIC_LOGS_WORKER_URL || '/api/logs',  // 기본값 추가
-  SERVICE_LOG_ENABLED: process.env.SERVICE_LOG !== 'false'
+  WORKER_URL: process.env.NEXT_PUBLIC_LOGS_WORKER_URL,  // 기본값 추가 NEXT_PUBLIC_LOGS_WORKER_URL
+  // WORKER_URL: 'http://localhost:8787',
+  SERVICE_LOG_ENABLED: process.env.NEXT_PUBLIC_SYSTEM_SERVICELOGENABLED !== 'false', 
+  WORKER_API_KEY: process.env.NEXT_PUBLIC_WORKER_API_KEY
 } as const;
 
 // 로그인 상태 확인

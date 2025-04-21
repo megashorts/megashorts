@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validateRequest } from '@/auth';
 
-// 지급 내역 조회 API
+// 포인트 지급 내역 조회 API
 export async function GET(request: NextRequest) {
   try {
     // 인증 확인

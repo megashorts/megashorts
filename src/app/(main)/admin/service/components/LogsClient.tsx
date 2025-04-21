@@ -61,15 +61,15 @@ export default function LogsClient() {
       console.log('Worker URL:', CONFIG.WORKER_URL);
       
       // 디버깅용 - 모든 파일 목록 조회 요청
-      try {
-        const debugResponse = await fetch(`${CONFIG.WORKER_URL}/debug-list-files`);
-        if (debugResponse.ok) {
-          const debugData = await debugResponse.json();
-          console.log('All files in bucket:', debugData);
-        }
-      } catch (debugError) {
-        console.error('Debug request failed:', debugError);
-      }
+      // try {
+      //   const debugResponse = await fetch(`${CONFIG.WORKER_URL}/debug-list-files`);
+      //   if (debugResponse.ok) {
+      //     const debugData = await debugResponse.json();
+      //     console.log('All files in bucket:', debugData);
+      //   }
+      // } catch (debugError) {
+      //   console.error('Debug request failed:', debugError);
+      // }
       
       // 타입이 선택되지 않았거나 모든 타입이 선택된 경우 단일 요청
       if (filters.types.length === 0 || filters.types.length === Object.keys(TYPE_DISPLAY_NAMES).length) {

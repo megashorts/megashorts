@@ -22,6 +22,7 @@ interface PageProps {
         id: true,
         ageLimit: true,
         title: true,
+        userId: true,
         videos: {
           select: {
             id: true,

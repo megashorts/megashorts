@@ -10,8 +10,11 @@ const getUserAuth = unstable_cache(
     const userData = await prisma.user.findUnique({
       where: { id: userId },
       select: {
+        referredBy: true,
+        teamMaster: true,
+        subscriptionEndDate: true,
         adultauth: true,
-        subscriptionEndDate: true
+
       }
     });
     return userData;
@@ -38,8 +41,10 @@ export async function GET(
     const userData = await prisma.user.findUnique({
       where: { id: userId },
       select: {
+        referredBy: true,
+        teamMaster: true,
+        subscriptionEndDate: true,
         adultauth: true,
-        subscriptionEndDate: true
       }
     });
 

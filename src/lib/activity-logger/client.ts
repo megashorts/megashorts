@@ -7,20 +7,23 @@ let batchTimer: NodeJS.Timeout | null = null;
 let retryCount = 0;
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000; // 1초
+const apiKey = CONFIG.WORKER_API_KEY ?? ''; // .env 파일에 있는 기본값 사용
+
+// if (typeof window !== 'undefined') {
+//   window.addEventListener('beforeunload', async () => {
+//     if (batchTimer) {
+//       clearTimeout(batchTimer);
+//       batchTimer = null;
+//     }
+//     await sendPendingLogs();
+//   });
+// }
 
 // 브라우저 종료 시 로그 전송
 if (typeof window !== 'undefined') {
-  // window.addEventListener('beforeunload', async () => {
-  //   if (batchTimer) {
-  //     clearTimeout(batchTimer);
-  //     batchTimer = null;
-  //   }
-  //   await sendPendingLogs();
-  // });
-
   window.addEventListener('beforeunload', (event) => {
     if (batchTimer) {
-      clearInterval(batchTimer);
+      clearTimeout(batchTimer);
       batchTimer = null;
     }
     
@@ -28,6 +31,8 @@ if (typeof window !== 'undefined') {
     if (pendingLogsStr && pendingLogsStr !== '[]') {
       if (navigator.sendBeacon && CONFIG.WORKER_URL) {
         const pendingLogs = JSON.parse(pendingLogsStr);
+        
+        // API 키를 URL 파라미터로 포함하지 않고 기본 URL 사용
         const blob = new Blob([JSON.stringify(pendingLogs)], { type: 'application/json' });
         const success = navigator.sendBeacon(CONFIG.WORKER_URL, blob);
         
@@ -38,7 +43,6 @@ if (typeof window !== 'undefined') {
       }
     }
   });
-
 }
 
 // 보류 중인 로그 전송
@@ -56,22 +60,36 @@ async function sendPendingLogs(retry: boolean = false) {
       return;
     }
 
+    console.log('📤 Sending logs to worker:', pendingLogs);
+
+
+    // API 키 추가 (환경 변수에서 가져오기)
+    const apiKey = CONFIG.WORKER_API_KEY ?? ''; // .env 파일에 있는 기본값 사용
+
     const response = await fetch(CONFIG.WORKER_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        // 'X-API-Key': apiKey, // API 키 헤더 추가
+        'Authorization': `Bearer ${apiKey}`
       },
+      credentials: 'omit',
       body: JSON.stringify(pendingLogs)
     });
 
+    const responseData = await response.json();
+
     if (!response.ok) {
-      throw new Error(`Failed to send logs: ${response.status}`);
+      throw new Error(`🚨 Failed to send logs: ${response.status} - ${JSON.stringify(responseData)}`);
     }
+
+    console.log('✅ Logs successfully sent!', responseData);
 
     // 전송 성공하면 로그 삭제
     localStorage.setItem(STORAGE_KEYS.PENDING_LOGS, '[]');
     localStorage.setItem(STORAGE_KEYS.LAST_SENT, new Date().toISOString());
     retryCount = 0; // 재시도 카운트 리셋
+    console.log('Browser Sending Log !');
 
   } catch (error) {
     console.error('Failed to send pending logs:', error);
@@ -85,6 +103,8 @@ async function sendPendingLogs(retry: boolean = false) {
     }
   }
 }
+
+export { sendPendingLogs };
 
 // 배치 전송 시작
 function startBatchTimer() {
@@ -119,13 +139,13 @@ function generateLogHash(log: CustomActivityLog): string {
 
 // 최근 로그 해시 저장 (중복 방지용)
 const recentLogHashes = new Map<string, number>();
-const LOG_DEDUPLICATION_WINDOW = 3000; // 3초 내 중복 로그 무시
+const LOG_DEDUPLICATION_WINDOW = 1000; // 3초 내 중복 로그 무시
 
 export async function logActivity(log: Partial<CustomActivityLog>) {
   try {
     // 로그 활성화 여부 체크
-    if (!CONFIG.SERVICE_LOG_ENABLED) {
-      console.log('Service log is disabled');
+    if (!CONFIG.SERVICE_LOG_ENABLED) { 
+      // console.log('Service log is disabled');
       return;
     }
 

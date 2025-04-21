@@ -29,6 +29,7 @@ interface VideoViewClientProps {
     id: string;
     ageLimit: number;
     title: string | null;
+    userId: string;
     videos: {
       id: string;
       sequence: number;
@@ -324,6 +325,7 @@ export function VideoViewClient({ post, initialSequence, initialTime }: VideoVie
                           playOrder={video.sequence}
                           ageLimit={post.ageLimit}
                           isPremium={video.isPremium}
+                          uploaderId={post.userId}
                           setIsActive={(active) => {
                             if (!active) setActiveIndex(-1);
                           }}

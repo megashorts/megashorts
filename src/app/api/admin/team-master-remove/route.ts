@@ -1,4 +1,4 @@
-// src/app/api/admin/team-master-remove/route.ts
+// src/app/api/admin/team-master-remove/route.ts 티마스터 자격 해제
 
 import { validateRequest } from '@/auth';
 import prisma from '@/lib/prisma';

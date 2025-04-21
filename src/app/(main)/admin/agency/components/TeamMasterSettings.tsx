@@ -13,7 +13,7 @@ import UserSearchInput from "@/components/admin/UserSearchInput";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { AlertCircle, Settings, UserMinus, RefreshCw, Repeat } from "lucide-react";
-// import { rebuildReferralStructure, syncReferralStructure, validateAndSyncReferralStructure } from "@/lib/referral-structure-client";
+// import { rebuildReferralStructure} from "@/lib/referral-structure-client";
 import { 
   Dialog,
   DialogContent,
@@ -24,6 +24,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Separator } from "@radix-ui/react-select";
+import { syncReferralStructure } from "@/lib/referral-structure-client";
 
 interface User {
   id: string;
@@ -300,6 +301,21 @@ export default function TeamMasterSettings() {
       } else {
         throw new Error(data.error || "설정 저장에 실패했습니다.");
       }
+
+
+      try {     
+        await syncReferralStructure(userId, "add", userId);
+
+      } catch (error) {
+        console.error('팀마스터 추가 워커 호출 오류:', error);
+        
+        return {
+          error: "팀마스터 추가 워커 호출에 실패했습니다. ",
+        };
+      }
+
+
+
     } catch (error) {
       console.error("설정 저장 중 오류가 발생했습니다:", error);
       toast({
@@ -447,13 +463,13 @@ export default function TeamMasterSettings() {
               )}
               
               <div className="flex justify-end pb-3 space-x-2">
-                <Button
+                {/* <Button
                   variant="outline"
                   onClick={async () => {
                     if (!selectedUser) {
                       toast({
                         description: "사용자를 선택해주세요.",
-                        variant: "destructive",
+                        variant: "default",
                         duration: 1500,
                       });
                       return;
@@ -461,18 +477,12 @@ export default function TeamMasterSettings() {
                     
                     try {
                       setRebuildLoading(true);
-                      // const userInfo = {
-                      //   username: selectedUser.username,
-                      //   displayName: selectedUser.displayName,
-                      //   email: selectedUser.email
-                      // };
-                      
-                      // const result = await rebuildReferralStructure(selectedUser.id, {}, selectedUser.username);
-                      
-                      // alert("추천인 구조 재구성이 완료되었습니다.");
+
+                      await rebuildReferralStructure(selectedUser.id);
+
                       toast({
                         description: "추천인 구조 재구성이 완료되었습니다.",
-                        variant: "destructive",
+                        variant: "default",
                         duration: 1500,
                       });
                     } catch (error) {
@@ -499,7 +509,7 @@ export default function TeamMasterSettings() {
                       구조 재구성
                     </>
                   )}
-                </Button>
+                </Button> */}
                 
                 <Button
                   onClick={saveSettings}

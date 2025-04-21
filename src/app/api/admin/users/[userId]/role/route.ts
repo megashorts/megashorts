@@ -1,4 +1,4 @@
-// src/app/api/admin/users/[userId]/role/route.ts
+// src/app/api/admin/users/[userId]/role/route.ts 팀마스터 지정설정에서 팀마스터 유저롤 권한 부여 라우터
 
 import { validateRequest } from '@/auth';
 import prisma from '@/lib/prisma';
@@ -39,14 +39,28 @@ export async function PATCH(request: NextRequest) {
       );
     }
     
+    // 현재 사용자의 username 가져오기
+    const targetUser = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { username: true }
+    });
+
+    if (!targetUser) {
+      return Response.json(
+        { success: false, error: "User not found" },
+        { status: 404 }
+      );
+    }
+
     // 사용자 역할 업데이트
     const updatedUser = await prisma.user.update({
       where: { id: userId },
-      data: { userRole },
+      data: { userRole, teamMaster: userId },
       select: {
         id: true,
         username: true,
-        userRole: true
+        userRole: true,
+        teamMaster: true
       }
     });
     

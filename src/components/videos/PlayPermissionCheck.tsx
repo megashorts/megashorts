@@ -10,6 +10,7 @@ interface PlayPermissionCheckProps {
   playOrder: number;
   ageLimit: number;
   isPremium: boolean;
+  uploaderId: string;
   setIsActive: (active: boolean) => void;
   onPermissionCheck: (code: number) => void;
 }
@@ -20,6 +21,7 @@ export default function PlayPermissionCheck({
   playOrder,
   ageLimit,
   isPremium,
+  uploaderId,
   setIsActive,
   onPermissionCheck 
 }: PlayPermissionCheckProps) {
@@ -78,12 +80,12 @@ export default function PlayPermissionCheck({
           }
 
           // 코인 결제 처리
-          console.log('Sending coin payment request:', { videoId });
+          console.log('Sending coin payment request:', { videoId, postId, uploaderId });
 
           const payResponse = await fetch('/api/user/coinpay', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ videoId })
+            body: JSON.stringify({ videoId, postId, uploaderId })
           });
 
           console.log('Coin payment response status:', payResponse.status);

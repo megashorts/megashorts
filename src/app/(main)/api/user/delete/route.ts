@@ -1,5 +1,6 @@
 import { validateRequest } from "@/auth";
 import prisma from "@/lib/prisma";
+import { syncReferralStructure } from "@/lib/referral-structure-client";
 import { NextResponse } from "next/server";
 
 export async function DELETE() {
@@ -33,53 +34,65 @@ export async function DELETE() {
 
     // 추천인 구조 워커 호출 (팀마스터가 있는 경우)
     if (userInfo.teamMaster) {
-      try {
-        const apiKey = process.env.WORKER_API_KEY || process.env.CRON_SECRET;
-        const apiBaseUrl = 'https://referral-structure.msdevcm.workers.dev';
-        
-        // 팀마스터 정보는 이미 teamMaster으로 알고 있으므로 불필요한 DB 조회 제거
-        // 워커에서는 username만 사용하므로 직접 전달
-        
-        // 워커로 전달하는 내용 로그 출력
-        const requestBody = {
-          masterUserId: userInfo.teamMaster,
-          // userInfo를 최상위 레벨로 이동 (SyncReferralStructureRequest 인터페이스와 일치)
-          userInfo: {
-            username: userInfo.teamMaster // teamMaster이 실제로는 유저네임
-          },
-          options: {
-            deleteMemberEvent: {
-              userId: user.id,
-              username: userInfo.username
-            }
-          }
-        };
-        
-        console.log('추천인 구조 워커로 전달하는 내용 (삭제):', JSON.stringify(requestBody, null, 2));
-        console.log('팀마스터 유저네임 (userInfo.teamMaster):', userInfo.teamMaster);
-        
-        // 추천인 구조 워커 호출 (sync 엔드포인트 사용)
-        const response = await fetch(`${apiBaseUrl}/sync`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`
-          },
-          body: JSON.stringify(requestBody)
-        });
+      try {     
+        await syncReferralStructure(userInfo.id, "remove", userInfo.teamMaster);
 
-        const result = await response.json();
-        console.log('추천인 구조 워커 응답:', result);
-        
-        // 워커에서 로그를 기록하므로 클라이언트 측 로그는 제거
       } catch (error) {
-        console.error('추천인 구조 워커 호출 오류:', error);
+        console.error('영업자 삭제 워커 호출 오류:', error);
         
-        // 워커에서 로그를 기록하므로 클라이언트 측 로그는 제거
-        
-        // 워커 호출 실패해도 계속 진행
+        return {
+          error: "영업자 워커 삭제에 실패했습니다.",
+        };
       }
     }
+
+      // try {
+      //   const apiKey = process.env.WORKER_API_KEY || process.env.CRON_SECRET;
+      //   const apiBaseUrl = 'https://referral-structure.msdevcm.workers.dev';
+        
+      //   // 팀마스터 정보는 이미 teamMaster으로 알고 있으므로 불필요한 DB 조회 제거
+      //   // 워커에서는 username만 사용하므로 직접 전달
+        
+      //   // 워커로 전달하는 내용 로그 출력
+      //   const requestBody = {
+      //     masterUserId: userInfo.teamMaster,
+      //     // userInfo를 최상위 레벨로 이동 (SyncReferralStructureRequest 인터페이스와 일치)
+      //     userInfo: {
+      //       username: userInfo.teamMaster // teamMaster이 실제로는 유저네임
+      //     },
+      //     options: {
+      //       deleteMemberEvent: {
+      //         userId: user.id,
+      //         username: userInfo.username
+      //       }
+      //     }
+      //   };
+        
+      //   console.log('추천인 구조 워커로 전달하는 내용 (삭제):', JSON.stringify(requestBody, null, 2));
+      //   console.log('팀마스터 유저네임 (userInfo.teamMaster):', userInfo.teamMaster);
+        
+      //   // 추천인 구조 워커 호출 (sync 엔드포인트 사용)
+      //   const response = await fetch(`${apiBaseUrl}/sync`, {
+      //     method: 'POST',
+      //     headers: {
+      //       'Content-Type': 'application/json',
+      //       'Authorization': `Bearer ${apiKey}`
+      //     },
+      //     body: JSON.stringify(requestBody)
+      //   });
+
+      //   const result = await response.json();
+      //   console.log('추천인 구조 워커 응답:', result);
+        
+      //   // 워커에서 로그를 기록하므로 클라이언트 측 로그는 제거
+      // } catch (error) {
+      //   console.error('추천인 구조 워커 호출 오류:', error);
+        
+      //   // 워커에서 로그를 기록하므로 클라이언트 측 로그는 제거
+        
+      //   // 워커 호출 실패해도 계속 진행
+      // }
+
 
     // 관련된 데이터를 트랜잭션으로 삭제
     await prisma.$transaction(async (tx) => {
@@ -163,32 +176,37 @@ export async function DELETE() {
         where: { userId: user.id },
       });
 
-      // 사용자 정보 업데이트 (완전 삭제 대신 필수 정보만 남기고 나머지 삭제)
-      await tx.user.update({
+      // 마지막으로 사용자 삭제
+      await tx.user.delete({
         where: { id: user.id },
-        data: {
-          // 유지할 필드: id, username(유니크한 값으로), referredBy, teamMaster, createdAt, subscriptionEndDate
-          username: `deleted_${user.id}_${Date.now()}`, // 유저네임은 유니크한 값으로 처리
-          displayName: "탈퇴한 사용자",
-          email: null,
-          passwordHash: null,
-          googleId: null,
-          // avatarUrl: null,
-          bio: null,
-          points: 0,
-          adultauth: false,
-          emailVerified: false,
-          kakaoId: null,
-          naverId: null,
-          postCount: 0,
-          userRole: 0,
-          mscoin: 0,
-          loginAttempts: 0,
-          blockedUntil: null,
-          // 탈퇴 날짜를 구독 종료일에 기록
-          subscriptionEndDate: new Date()
-        }
       });
+
+      // 사용자 정보 업데이트 (완전 삭제 대신 필수 정보만 남기고 나머지 삭제)
+      // await tx.user.update({
+      //   where: { id: user.id },
+      //   data: {
+      //     // 유지할 필드: id, username(유니크한 값으로), referredBy, teamMaster, createdAt, subscriptionEndDate
+      //     username: `deleted_${user.id}_${Date.now()}`, // 유저네임은 유니크한 값으로 처리
+      //     displayName: "탈퇴한 사용자",
+      //     email: null,
+      //     passwordHash: null,
+      //     googleId: null,
+      //     // avatarUrl: null,
+      //     bio: null,
+      //     points: 0,
+      //     adultauth: false,
+      //     emailVerified: false,
+      //     kakaoId: null,
+      //     naverId: null,
+      //     postCount: 0,
+      //     userRole: 0,
+      //     mscoin: 0,
+      //     loginAttempts: 0,
+      //     blockedUntil: null,
+      //     // 탈퇴 날짜를 구독 종료일에 기록
+      //     subscriptionEndDate: new Date()
+      //   }
+      // });
     });
 
     return NextResponse.json({ message: "계정이 삭제되었습니다" });

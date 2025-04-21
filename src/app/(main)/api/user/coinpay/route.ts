@@ -2,7 +2,6 @@
 
 // 중복 기록외 정상작동 버젼
 import { validateRequest } from '@/auth';
-import { toast } from '@/components/ui/use-toast';
 import prisma from '@/lib/prisma';
 import { uuidv7 } from 'uuidv7';
 
@@ -16,15 +15,15 @@ export async function POST(req: Request) {
       );
     }
 
-    const { videoId } = await req.json();
-    if (!videoId) {
+    // const { videoId } = await req.json();
+    const { videoId, postId, uploaderId } = await req.json();
+    console.log('Coin payment request:', { userId: user.id, videoId, postId, uploaderId });
+    if (!videoId || !postId || !uploaderId) {
       return new Response(
-        JSON.stringify({ success: false, error: "Video ID required" }), 
+        JSON.stringify({ success: false, error: "Missing post or uploader or VideoId info" }), 
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
-
-    console.log('Coin payment request:', { userId: user.id, videoId });
 
     // 트랜잭션 시작
     const result = await prisma.$transaction(async (tx) => {
@@ -71,7 +70,11 @@ export async function POST(req: Request) {
       // 3. 새로운 시청인 경우: 코인 잔액 확인
       const currentUser = await tx.user.findUnique({
         where: { id: user.id },
-        select: { mscoin: true }
+        select: { 
+          mscoin: true, 
+          referredBy: true,
+          teamMaster: true,
+        }
       });
 
       if (!currentUser || currentUser.mscoin < 2) {
@@ -100,22 +103,30 @@ export async function POST(req: Request) {
 
       // 5. 새 시청 기록 생성
       const newView = await tx.videoView.create({
+        // data: {
+        //   id: uuidv7(),
+        //   userId: user.id,
+        //   videoId,
+        //   accessMethod: 'COIN',
+        //   viewCount: 1,
+        //   createdAt: new Date()
+        // }
+
         data: {
           id: uuidv7(),
           userId: user.id,
           videoId,
           accessMethod: 'COIN',
           viewCount: 1,
+          postId: postId,
+          uploaderId: uploaderId,
+          referredBy: currentUser.referredBy,
+          teamMaster: currentUser.teamMaster,
           createdAt: new Date()
         }
+
       });
 
-      // toast({
-      //   description: "2코인 사용",
-      //   variant: "default",
-      //   duration: 1000,
-      // });
-      
       console.log('Created new view record:', {
         userId: user.id,
         videoId,

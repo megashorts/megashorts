@@ -143,8 +143,11 @@ model VideoView {
   videoId      String
   createdAt    DateTime     @default(now())
   accessMethod AccessMethod @default(FREE)
+  postId       String
+  uploaderId   String
+  referredBy   String?
+  teamMaster   String?
   viewCount    Int          @default(1)
-  deleteSet    Boolean      @default(false)
   updatedAt    DateTime?    @default(now())
   user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   video        Video        @relation(fields: [videoId], references: [id], onDelete: Cascade)

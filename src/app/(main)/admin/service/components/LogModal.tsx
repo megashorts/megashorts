@@ -198,6 +198,16 @@ export function LogModal({ log, onClose }: LogModalProps) {
           <div className="pt-2">
             {formatLogDetails(log)}
           </div>
+
+          {/* 전체 로그 정보 표시 섹션 추가 */}
+          <div className="rounded-md border overflow-hidden mt-4">
+            <div className="p-3">
+              <pre className="text-xs bg-muted p-2 rounded-md overflow-auto max-h-[300px]">
+                {JSON.stringify(log, null, 2)}
+              </pre>
+            </div>
+          </div>
+
         </div>
       </DialogContent>
     </Dialog>
