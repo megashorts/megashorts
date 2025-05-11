@@ -153,7 +153,9 @@ export function PostEditor({ initialData }: PostEditorProps) {
           filename: video.filename,
           sequence: video.sequence,
           isPremium: video.isPremium,
-          subtitle: video.subtitle || []
+          // subtitle: video.subtitle || []
+          // subtitle: Array.isArray(video.subtitle) ? video.subtitle : [],
+          subtitle: video.subtitle ?? [],
         }))
       };
   

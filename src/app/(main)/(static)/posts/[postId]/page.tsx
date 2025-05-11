@@ -298,7 +298,7 @@ export default async function PostPage({ params }: Props) {
             {/* 타이틀과 컨텐츠를 최상단에 */}
             <div className="mb-4">
               {/* <h1 className="text-2xl font-bold mb-2">{post.title}</h1> */}
-              <h1 className="text-2xl font-bold mb-2 flex items-end">{post.title}              
+              <h1 className="text-2xl font-bold mb-2 flex flex-wrap items-end">{post.title}              
                 {post.titleOriginal && post.titleOriginal !== post.title && (
                 <span className="block text-base text-muted-foreground text-end ml-2 self-end">( {post.titleOriginal} )</span>
                 )}

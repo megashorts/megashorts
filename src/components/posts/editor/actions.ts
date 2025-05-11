@@ -149,18 +149,24 @@ export async function submitPost(input: PostFormData) {
           });
         }
 
-        // 2. sequence 변경된 비디오 처리
+        // 2. sequence 또는 isPremium 변경된 비디오 처리
         const existingVideos = existingPost.videos;
         const updatedVideos = input.videos.filter(v => {
           const existingVideo = existingVideos.find(ev => ev.id === v.id);
-          return existingVideo && existingVideo.sequence !== v.sequence;
+          return existingVideo && (
+            existingVideo.sequence !== v.sequence || 
+            existingVideo.isPremium !== v.isPremium
+          );
         });
 
         // 순서대로 처리
         for (const video of updatedVideos) {
           await tx.video.update({
             where: { id: video.id },
-            data: { sequence: -video.sequence }  // 임시값
+            data: { 
+              sequence: -video.sequence,  // 임시값
+              isPremium: video.isPremium  // isPremium 값 업데이트
+            }
           });
         }
         for (const video of updatedVideos) {
