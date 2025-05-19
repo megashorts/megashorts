@@ -89,7 +89,7 @@ export function LogTable({ logs, loading, onViewDetails, onSort, sortField, sort
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="flex justify-center">
-                    <MapPin className="h-4 w-4" />
+                  <Globe className="h-4 w-4" />
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>국가</TooltipContent>
@@ -99,7 +99,7 @@ export function LogTable({ logs, loading, onViewDetails, onSort, sortField, sort
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="flex justify-center">
-                    <Globe className="h-4 w-4" />
+                    <MapPin className="h-4 w-4" />
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>IP 주소</TooltipContent>
@@ -134,7 +134,14 @@ export function LogTable({ logs, loading, onViewDetails, onSort, sortField, sort
                 className="cursor-pointer hover:bg-muted/50"
                 onClick={() => onViewDetails(log)}
               >
+                {/* <TableCell className="font-mono whitespace-nowrap">
+                  {format(new Date(log.timestamp), 'HH:mm:ss', { locale: ko })}
+                </TableCell> */}
                 <TableCell className="font-mono whitespace-nowrap">
+                  {/* <span className="text-xs text-gray-500 mr-1"> */}
+                  <span className="mr-2">
+                    {format(new Date(log.timestamp), 'MM-dd', { locale: ko })}
+                  </span>
                   {format(new Date(log.timestamp), 'HH:mm:ss', { locale: ko })}
                 </TableCell>
                 <TableCell className="hidden md:table-cell text-center">

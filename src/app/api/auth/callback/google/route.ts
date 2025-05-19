@@ -57,10 +57,15 @@ export async function GET(req: NextRequest) {
 
     console.log('Tokens received:', !!tokens);
 
+    const accessToken = typeof tokens.accessToken === 'function' 
+    ? tokens.accessToken() 
+    : tokens.accessToken;
+
     const googleUser = await kyInstance
       .get("https://www.googleapis.com/oauth2/v1/userinfo", {
         headers: {
-          Authorization: `Bearer ${tokens.accessToken}`,
+          // Authorization: `Bearer ${tokens.accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       })
       .json<{ id: string; name: string; email: string  }>();
