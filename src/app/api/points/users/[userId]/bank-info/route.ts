@@ -5,8 +5,8 @@ import prisma from '@/lib/prisma';
 // 포인트 인증 정보 저장 API
 export async function POST(
   request: NextRequest,
-  { params }: { params: { userId: string } }
-) {
+  context: { params: Promise<{ userId: string }> }) {
+  const params = await context.params;
   try {
     // 인증 확인
     const { user: authUser, session } = await validateRequest();

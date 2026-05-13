@@ -3,9 +3,9 @@ import prisma from "@/lib/prisma";
 
 export async function POST(
   request: NextRequest,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await context.params;
+  const { id } = await (await context.params);
   const { content, respondedBy, isUserResponse } = await request.json();
 
   if (!content) {

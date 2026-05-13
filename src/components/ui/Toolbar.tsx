@@ -24,25 +24,25 @@ export default function Toolbar({ editor }: ToolbarProps) {
         <Italic className="w-5 h-5" />
       </button>
       <button
-        onClick={() => editor.chain().focus().toggleUnderline().run()}
+        onClick={() => (editor.chain().focus() as any).toggleUnderline().run()}
         className={editor.isActive("underline") ? "bg-gray-200" : ""}
       >
         <Underline className="w-5 h-5" />
       </button>
       <button
-        onClick={() => editor.chain().focus().setTextAlign("left").run()}
+        onClick={() => (editor.chain().focus() as any).setTextAlign("left").run()}
         className={editor.isActive({ textAlign: "left" }) ? "bg-gray-200" : ""}
       >
         <AlignLeft className="w-5 h-5" />
       </button>
       <button
-        onClick={() => editor.chain().focus().setTextAlign("center").run()}
+        onClick={() => (editor.chain().focus() as any).setTextAlign("center").run()}
         className={editor.isActive({ textAlign: "center" }) ? "bg-gray-200" : ""}
       >
         <AlignCenter className="w-5 h-5" />
       </button>
       <button
-        onClick={() => editor.chain().focus().setTextAlign("right").run()}
+        onClick={() => (editor.chain().focus() as any).setTextAlign("right").run()}
         className={editor.isActive({ textAlign: "right" }) ? "bg-gray-200" : ""}
       >
         <AlignRight className="w-5 h-5" />

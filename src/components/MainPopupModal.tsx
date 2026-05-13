@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { NoticeModal } from '@/app/(main)/admin/service/components/types';
+import { NoticeModal } from '@/app/[locale]/(main)/admin/service/components/types';
 import { getThumbnailUrl } from '@/lib/constants';
 import { useRouter } from 'next/navigation';
 
@@ -39,19 +39,37 @@ export function MainPopupModal() {
   const handleLinkClick = (url: string | null | undefined) => {
     if (!url) return;
     
-    // 내부 링크인지 확인 (NEXT_PUBLIC_BASE_URL로 시작하는지)
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || '';
-    const path = url.startsWith(baseUrl) ? url.substring(baseUrl.length) : url;
+    let path = url;
+    
+    // 1. baseUrl을 포함하는 경우 (localhost 등)
+    if (baseUrl && url.includes(baseUrl.replace(/^https?:\/\//, ''))) {
+      const cleanBaseUrl = baseUrl.replace(/^https?:\/\//, '');
+      const idx = url.indexOf(cleanBaseUrl);
+      path = url.substring(idx + cleanBaseUrl.length);
+      if (!path.startsWith('/')) path = '/' + path;
+      router.push(path);
+      return;
+    }
+    
+    // 2. 운영 도메인(megashorts.com)을 포함하는 경우 (DB에 http 없이 저장되었을 때 대비)
+    if (url.includes('megashorts.com')) {
+      const idx = url.indexOf('megashorts.com');
+      path = url.substring(idx + 'megashorts.com'.length);
+      if (!path.startsWith('/')) path = '/' + path;
+      router.push(path);
+      return;
+    }
+    
+    // 3. 외부 도메인인 경우
+    if (url.startsWith('http://') || url.startsWith('https://') || url.includes('.com') || url.includes('.net') || url.includes('.co.kr')) {
+      window.location.href = url.startsWith('http') ? url : `https://${url}`;
+      return;
+    }
+    
+    // 4. 그 외 순수 내부 상대 경로인 경우 (/notice/...)
+    if (!path.startsWith('/')) path = '/' + path;
     router.push(path);
-    // if (url.startsWith(baseUrl) || (!url.startsWith('http://') && !url.startsWith('https://'))) {
-    //   // 내부 링크는 Next.js 라우터 사용
-    //   // URL에서 baseUrl 부분 제거하여 경로만 추출
-    //   const path = url.startsWith(baseUrl) ? url.substring(baseUrl.length) : url;
-    //   router.push(path);
-    // } else {
-    //   // 외부 링크는 새 창으로 열기
-    //   window.open(url, '_blank', 'noopener,noreferrer');
-    // }
   };
 
   const handleClose = (modalId: number) => {

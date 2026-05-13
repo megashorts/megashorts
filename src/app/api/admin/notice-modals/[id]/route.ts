@@ -5,7 +5,7 @@ import { NextRequest } from 'next/server';
 
 export async function GET(
   request: NextRequest,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const { user } = await validateRequest();
@@ -13,7 +13,7 @@ export async function GET(
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const params = await context.params;
+    const params = await (await context.params);
     const modalId = parseInt(params.id);
     const modal = await prisma.noticeModal.findUnique({
       where: { id: modalId },
@@ -38,7 +38,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const { user } = await validateRequest();
@@ -46,7 +46,7 @@ export async function PUT(
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const params = await context.params;
+    const params = await (await context.params);
     const modalId = parseInt(params.id);
     const data = await request.json();
     
@@ -170,7 +170,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const { user } = await validateRequest();
@@ -178,7 +178,7 @@ export async function DELETE(
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const params = await context.params;
+    const params = await (await context.params);
     const modalId = parseInt(params.id);
 
     // 모달 정보 가져오기

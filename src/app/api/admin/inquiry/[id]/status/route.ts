@@ -4,9 +4,9 @@ import { InquiryStatus } from "@prisma/client";
 
 export async function PATCH(
   request: NextRequest,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await context.params;
+  const { id } = await (await context.params);
   const { status, respondedBy } = await request.json();
 
   if (!status || !Object.values(InquiryStatus).includes(status)) {

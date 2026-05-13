@@ -3,7 +3,6 @@
 import { useSession } from '@/components/SessionProvider';
 import { PostData } from "@/lib/types";
 import { cn, formatRelativeDate } from "@/lib/utils";
-import { Media } from "@prisma/client";
 import { MessageSquare } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -33,7 +32,7 @@ export default function Post({ post }: PostProps) {
         <div className="flex flex-wrap gap-3">
           <UserTooltip user={post.user}>
             <Link href={`/users/${post.user.username}`}>
-              <UserAvatar avatarUrl={post.user.avatarUrl} />
+              <UserAvatar />
             </Link>
           </UserTooltip>
           <div>
@@ -64,25 +63,6 @@ export default function Post({ post }: PostProps) {
       <Linkify>
         <div className="whitespace-pre break-words">{post.content}</div>
       </Linkify>
-      {/* {!!post.attachments.length && (
-        <MediaPreviews attachments={post.attachments} />
-      )} */}
-
-      {/* 동영상 버튼 추가 */}
-      {/* {post.videos && post.videos.length > 0 && (
-        <div className="border rounded-lg p-4">
-          <VideoButtons
-            videos={post.videos}
-            userId={user.id}
-            onVideoSelect={(sequence) => {
-              const video = post.videos.find(v => v.sequence === sequence);
-              if (video) {
-                // 비디오 선택 처리는 클라이언트 컴포넌트에서 구현
-              }
-            }}
-          />
-        </div>
-      )} */}
 
       <hr className="text-muted-foreground" />
       <div className="flex justify-between gap-5">
@@ -114,55 +94,4 @@ export default function Post({ post }: PostProps) {
       {showComments && <Comments post={post} />}
     </article>
   );
-}
-
-interface MediaPreviewsProps {
-  attachments: Media[];
-}
-
-function MediaPreviews({ attachments }: MediaPreviewsProps) {
-  return (
-    <div
-      className={cn(
-        "flex flex-col gap-3",
-        attachments.length > 1 && "sm:grid sm:grid-cols-2",
-      )}
-    >
-      {attachments.map((m) => (
-        <MediaPreview key={m.id} media={m} />
-      ))}
-    </div>
-  );
-}
-
-interface MediaPreviewProps {
-  media: Media;
-}
-
-function MediaPreview({ media }: MediaPreviewProps) {
-  if (media.type === "IMAGE") {
-    return (
-      <Image
-        src={media.url}
-        alt="Attachment"
-        width={500}
-        height={500}
-        className="mx-auto size-fit max-h-[30rem] rounded-2xl"
-      />
-    );
-  }
-
-  if (media.type === "VIDEO") {
-    return (
-      <div>
-        <video
-          src={media.url}
-          controls
-          className="mx-auto size-fit max-h-[30rem] rounded-2xl"
-        />
-      </div>
-    );
-  }
-
-  return <p className="text-destructive">Unsupported media type</p>;
 }

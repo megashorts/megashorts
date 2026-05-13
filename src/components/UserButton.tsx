@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { logout } from "@/app/(auth)/actions";
+import { logout } from "@/app/[locale]/(auth)/actions";
 import { cn } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { BarChart3, Building, ChevronDown, ChevronRight, FolderOpen, LogOutIcon, Megaphone, Monitor, Network, NotebookPen, PencilRuler, TvMinimalPlay, UserCircle, UserIcon, Users, WalletCards } from "lucide-react";

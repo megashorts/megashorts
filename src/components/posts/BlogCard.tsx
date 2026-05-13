@@ -9,7 +9,11 @@ import { getThumbnailUrl } from "@/lib/constants";
 
 type BlogPost = Prisma.PostGetPayload<{
   include: {
-    user: true;
+    user: {
+      select: {
+        displayName: true;
+      };
+    };
   }
 }>;
 

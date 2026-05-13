@@ -1,0 +1,18 @@
+{
+  "Common": {
+    "login": "Login",
+    "logout": "Logout",
+    "home": "Home",
+    "search": "Search",
+    "profile": "Profile"
+  },
+  "Video": {
+    "adultWarning": "This video contains adult content. Please verify your age.",
+    "subscriptionRequired": "This is a premium video. Subscription required.",
+    "coinRequired": "This video requires coins to unlock.",
+    "purchase": "Unlock for 1 Coin",
+    "alreadyPurchased": "Already Purchased",
+    "verifyAge": "Verify Age",
+    "subscribe": "Subscribe Now"
+  }
+}

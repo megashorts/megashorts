@@ -1,0 +1,139 @@
+.next/types/validator.ts(432,31): error TS2344: Type 'typeof import("/Users/kimryan/Desktop/megas/src/app/api/admin/inquiry/[id]/response/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/admin/inquiry/[id]/response">'.
+  Types of property 'POST' are incompatible.
+    Type '(request: NextRequest, context: { params: { id: string; }; }) => Promise<NextResponse<unknown>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ id: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters 'context' and 'context' are incompatible.
+        Type '{ params: Promise<{ id: string; }>; }' is not assignable to type '{ params: { id: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'id' is missing in type 'Promise<{ id: string; }>' but required in type '{ id: string; }'.
+.next/types/validator.ts(441,31): error TS2344: Type 'typeof import("/Users/kimryan/Desktop/megas/src/app/api/admin/inquiry/[id]/status/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/admin/inquiry/[id]/status">'.
+  Types of property 'PATCH' are incompatible.
+    Type '(request: NextRequest, context: { params: { id: string; }; }) => Promise<NextResponse<unknown>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ id: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters 'context' and 'context' are incompatible.
+        Type '{ params: Promise<{ id: string; }>; }' is not assignable to type '{ params: { id: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'id' is missing in type 'Promise<{ id: string; }>' but required in type '{ id: string; }'.
+.next/types/validator.ts(468,31): error TS2344: Type 'typeof import("/Users/kimryan/Desktop/megas/src/app/api/admin/notice-modals/[id]/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/admin/notice-modals/[id]">'.
+  Types of property 'GET' are incompatible.
+    Type '(request: NextRequest, context: { params: { id: string; }; }) => Promise<Response>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ id: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters 'context' and 'context' are incompatible.
+        Type '{ params: Promise<{ id: string; }>; }' is not assignable to type '{ params: { id: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'id' is missing in type 'Promise<{ id: string; }>' but required in type '{ id: string; }'.
+.next/types/validator.ts(566,39): error TS2306: File '/Users/kimryan/Desktop/megas/src/app/api/agency/settings-export/route.ts' is not a module.
+.next/types/validator.ts(584,39): error TS2306: File '/Users/kimryan/Desktop/megas/src/app/api/agency/structure/route.ts' is not a module.
+.next/types/validator.ts(593,39): error TS2306: File '/Users/kimryan/Desktop/megas/src/app/api/agency/views-export/route.ts' is not a module.
+.next/types/validator.ts(629,39): error TS2306: File '/Users/kimryan/Desktop/megas/src/app/api/auth/route.ts' is not a module.
+.next/types/validator.ts(648,31): error TS2344: Type 'typeof import("/Users/kimryan/Desktop/megas/src/app/api/creator-info/[userId]/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/creator-info/[userId]">'.
+  Types of property 'POST' are incompatible.
+    Type '(request: NextRequest, { params }: { params: { userId: string; }; }) => Promise<NextResponse<{ success: boolean; error: string; }> | NextResponse<{ success: boolean; data: { id: string; ... 13 more ...; idCheck: boolean; }; }>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ userId: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters '__1' and 'context' are incompatible.
+        Type '{ params: Promise<{ userId: string; }>; }' is not assignable to type '{ params: { userId: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'userId' is missing in type 'Promise<{ userId: string; }>' but required in type '{ userId: string; }'.
+.next/types/validator.ts(774,31): error TS2344: Type 'typeof import("/Users/kimryan/Desktop/megas/src/app/api/points/admin/withdrawals/[id]/approve/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/points/admin/withdrawals/[id]/approve">'.
+  Types of property 'POST' are incompatible.
+    Type '(request: NextRequest, { params }: { params: { id: string; }; }) => Promise<NextResponse<{ success: boolean; error: string; }> | NextResponse<{ success: boolean; message: string; withdrawal: { ...; }; }>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ id: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters '__1' and 'context' are incompatible.
+        Type '{ params: Promise<{ id: string; }>; }' is not assignable to type '{ params: { id: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'id' is missing in type 'Promise<{ id: string; }>' but required in type '{ id: string; }'.
+.next/types/validator.ts(783,31): error TS2344: Type 'typeof import("/Users/kimryan/Desktop/megas/src/app/api/points/admin/withdrawals/[id]/memo/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/points/admin/withdrawals/[id]/memo">'.
+  Types of property 'POST' are incompatible.
+    Type '(request: NextRequest, { params }: { params: { id: string; }; }) => Promise<NextResponse<{ success: boolean; error: string; }> | NextResponse<{ success: boolean; message: string; withdrawal: { ...; }; }>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ id: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters '__1' and 'context' are incompatible.
+        Type '{ params: Promise<{ id: string; }>; }' is not assignable to type '{ params: { id: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'id' is missing in type 'Promise<{ id: string; }>' but required in type '{ id: string; }'.
+.next/types/validator.ts(792,31): error TS2344: Type 'typeof import("/Users/kimryan/Desktop/megas/src/app/api/points/admin/withdrawals/[id]/reject/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/points/admin/withdrawals/[id]/reject">'.
+  Types of property 'POST' are incompatible.
+    Type '(request: NextRequest, { params }: { params: { id: string; }; }) => Promise<NextResponse<{ success: boolean; error: string; }> | NextResponse<{ success: boolean; message: string; withdrawal: { ...; }; }>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ id: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters '__1' and 'context' are incompatible.
+        Type '{ params: Promise<{ id: string; }>; }' is not assignable to type '{ params: { id: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'id' is missing in type 'Promise<{ id: string; }>' but required in type '{ id: string; }'.
+.next/types/validator.ts(837,31): error TS2344: Type 'typeof import("/Users/kimryan/Desktop/megas/src/app/api/points/users/[userId]/bank-info/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/points/users/[userId]/bank-info">'.
+  Types of property 'POST' are incompatible.
+    Type '(request: NextRequest, { params }: { params: { userId: string; }; }) => Promise<NextResponse<{ success: boolean; error: string; }> | NextResponse<{ success: boolean; message: string; }>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ userId: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters '__1' and 'context' are incompatible.
+        Type '{ params: Promise<{ userId: string; }>; }' is not assignable to type '{ params: { userId: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'userId' is missing in type 'Promise<{ userId: string; }>' but required in type '{ userId: string; }'.
+.next/types/validator.ts(882,31): error TS2344: Type 'typeof import("/Users/kimryan/Desktop/megas/src/app/api/posts/[postId]/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/posts/[postId]">'.
+  Types of property 'PUT' are incompatible.
+    Type '(request: Request, { params }: { params: { postId: string; }; }) => Promise<Response>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ postId: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters '__1' and 'context' are incompatible.
+        Type '{ params: Promise<{ postId: string; }>; }' is not assignable to type '{ params: { postId: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'postId' is missing in type 'Promise<{ postId: string; }>' but required in type '{ postId: string; }'.
+.next/types/validator.ts(962,39): error TS2306: File '/Users/kimryan/Desktop/megas/src/app/api/referral-structure/rebuild/route.ts' is not a module.
+.next/types/validator.ts(1089,31): error TS2344: Type 'typeof import("/Users/kimryan/Desktop/megas/src/app/api/user/delete/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/user/delete">'.
+  The types returned by 'DELETE(...)' are incompatible between these types.
+    Type 'Promise<NextResponse<{ error: string; }> | NextResponse<{ message: string; }> | { error: string; }>' is not assignable to type 'void | Response | Promise<void | Response>'.
+      Type 'Promise<NextResponse<{ error: string; }> | NextResponse<{ message: string; }> | { error: string; }>' is not assignable to type 'Promise<void | Response>'.
+        Type 'NextResponse<{ error: string; }> | NextResponse<{ message: string; }> | { error: string; }' is not assignable to type 'void | Response'.
+          Type '{ error: string; }' is not assignable to type 'void | Response'.
+.next/types/validator.ts(1143,31): error TS2344: Type 'typeof import("/Users/kimryan/Desktop/megas/src/app/api/users/[userId]/followers/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/users/[userId]/followers">'.
+  Types of property 'GET' are incompatible.
+    Type '(req: Request, { params: { userId } }: { params: { userId: string; }; }) => Promise<Response>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ userId: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters '__1' and 'context' are incompatible.
+        Type '{ params: Promise<{ userId: string; }>; }' is not assignable to type '{ params: { userId: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'userId' is missing in type 'Promise<{ userId: string; }>' but required in type '{ userId: string; }'.
+.next/types/validator.ts(1152,31): error TS2344: Type 'typeof import("/Users/kimryan/Desktop/megas/src/app/api/users/[userId]/payments/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/users/[userId]/payments">'.
+  Types of property 'GET' are incompatible.
+    Type '(req: Request, { params }: { params: { userId: string; }; }) => Promise<Response>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ userId: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters '__1' and 'context' are incompatible.
+        Type '{ params: Promise<{ userId: string; }>; }' is not assignable to type '{ params: { userId: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'userId' is missing in type 'Promise<{ userId: string; }>' but required in type '{ userId: string; }'.
+.next/types/validator.ts(1160,39): error TS2306: File '/Users/kimryan/Desktop/megas/src/app/api/users/[userId]/posts/route.ts' is not a module.
+.next/types/validator.ts(1179,31): error TS2344: Type 'typeof import("/Users/kimryan/Desktop/megas/src/app/api/users/username/[username]/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/users/username/[username]">'.
+  Types of property 'GET' are incompatible.
+    Type '(req: Request, { params: { username } }: { params: { username: string; }; }) => Promise<Response>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ username: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters '__1' and 'context' are incompatible.
+        Type '{ params: Promise<{ username: string; }>; }' is not assignable to type '{ params: { username: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'username' is missing in type 'Promise<{ username: string; }>' but required in type '{ username: string; }'.
+.next/types/validator.ts(1188,31): error TS2344: Type 'typeof import("/Users/kimryan/Desktop/megas/src/app/api/videos/[postId]/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/videos/[postId]">'.
+  Types of property 'GET' are incompatible.
+    Type '(request: NextRequest, { params }: { params: { postId: string; }; }) => Promise<NextResponse<unknown>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ postId: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters '__1' and 'context' are incompatible.
+        Type '{ params: Promise<{ postId: string; }>; }' is not assignable to type '{ params: { postId: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'postId' is missing in type 'Promise<{ postId: string; }>' but required in type '{ postId: string; }'.
+.next/types/validator.ts(1205,39): error TS2306: File '/Users/kimryan/Desktop/megas/src/app/api/videos/progress/route.ts' is not a module.
+.next/types/validator.ts(1214,39): error TS2306: File '/Users/kimryan/Desktop/megas/src/app/api/videos/route.ts' is not a module.
+src/app/[locale]/(main)/(static)/subscription/Subscription.tsx(6,26): error TS2307: Cannot find module '@/app/(main)/usermenu/payments/PaymentModal' or its corresponding type declarations.
+src/app/[locale]/(main)/(static)/subscription/Subscription.tsx(7,26): error TS2307: Cannot find module '@/app/(main)/usermenu/payments/BillingModal' or its corresponding type declarations.
+src/app/[locale]/(main)/usermenu/agency-earnings/AgencyEarningsTabsClient.tsx(6,28): error TS2307: Cannot find module '@/app/(main)/admin/service/components/LoadingSpinner' or its corresponding type declarations.
+src/app/[locale]/(main)/usermenu/earnings/EarningsTabsClient.tsx(6,28): error TS2307: Cannot find module '@/app/(main)/admin/service/components/LoadingSpinner' or its corresponding type declarations.
+src/app/[locale]/(main)/usermenu/users/[username]/UserInquiryList.tsx(7,68): error TS2307: Cannot find module '@/app/(main)/admin/service/components/inquiry/types' or its corresponding type declarations.
+src/app/[locale]/(main)/usermenu/users/[username]/UserInquiryList.tsx(8,27): error TS2307: Cannot find module '@/app/(main)/admin/service/components/inquiry/InquiryDialog' or its corresponding type declarations.
+src/app/[locale]/(main)/usermenu/users/[username]/UserInquiryList.tsx(12,29): error TS2307: Cannot find module '@/app/(main)/admin/service/components/inquiry/InquiryTypeIcon' or its corresponding type declarations.
+src/app/[locale]/(main)/usermenu/users/[username]/UserInquiryList.tsx(238,30): error TS7006: Parameter 'status' implicitly has an 'any' type.
+src/app/[locale]/(main)/usermenu/users/[username]/UserTabsClient.tsx(6,28): error TS2307: Cannot find module '@/app/(main)/admin/service/components/LoadingSpinner' or its corresponding type declarations.
+src/app/[locale]/(main)/videos/VideoFeed.tsx(5,16): error TS2307: Cannot find module '../../../lib/ky' or its corresponding type declarations.
+src/app/[locale]/(main)/videos/VideoFeed.tsx(6,29): error TS2307: Cannot find module '../../../components/videos/FullScreenVideo' or its corresponding type declarations.
+src/app/[locale]/(main)/videos/VideoFeed.tsx(7,37): error TS2307: Cannot find module '../../../lib/types' or its corresponding type declarations.
+src/app/api/posts/next/route.ts(35,11): error TS2353: Object literal may only specify known properties, and 'url' does not exist in type 'VideoSelect<DefaultArgs>'.
+src/app/api/posts/next/route.ts(65,13): error TS2353: Object literal may only specify known properties, and 'url' does not exist in type 'VideoSelect<DefaultArgs>'.
+src/components/MainPopupModal.tsx(7,29): error TS2307: Cannot find module '@/app/(main)/admin/service/components/types' or its corresponding type declarations.
+src/components/posts/editor/mutations.ts(65,28): error TS2707: Generic type 'QueryFilters<TQueryKey>' requires between 0 and 1 type arguments.
+src/components/posts/Post.tsx(6,10): error TS2305: Module '"@prisma/client"' has no exported member 'Media'.
+src/components/posts/Post.tsx(36,48): error TS2339: Property 'avatarUrl' does not exist on type '{ id: string; createdAt: Date; _count: { followers: number; posts: number; }; subscription: { id: string; status: string; userId: string; createdAt: Date; updatedAt: Date; type: string; ... 5 more ...; nextRetryAt: Date | null; } | null; ... 14 more ...; followers: { ...; }[]; }'.
+src/components/TrendsSidebar.tsx(55,43): error TS2339: Property 'avatarUrl' does not exist on type '{ id: string; createdAt: Date; _count: { followers: number; posts: number; }; subscription: { id: string; status: string; userId: string; createdAt: Date; updatedAt: Date; type: string; ... 5 more ...; nextRetryAt: Date | null; } | null; ... 14 more ...; followers: { ...; }[]; }'.
+src/components/ui/Toolbar.tsx(27,47): error TS2339: Property 'toggleUnderline' does not exist on type 'ChainedCommands'.
+src/components/ui/Toolbar.tsx(33,47): error TS2339: Property 'setTextAlign' does not exist on type 'ChainedCommands'.
+src/components/ui/Toolbar.tsx(39,47): error TS2339: Property 'setTextAlign' does not exist on type 'ChainedCommands'.
+src/components/ui/Toolbar.tsx(45,47): error TS2339: Property 'setTextAlign' does not exist on type 'ChainedCommands'.
+src/components/UserButton.tsx(4,24): error TS2307: Cannot find module '@/app/(auth)/actions' or its corresponding type declarations.
+src/components/UserTooltip.tsx(40,55): error TS2339: Property 'avatarUrl' does not exist on type '{ id: string; createdAt: Date; _count: { followers: number; posts: number; }; subscription: { id: string; status: string; userId: string; createdAt: Date; updatedAt: Date; type: string; ... 5 more ...; nextRetryAt: Date | null; } | null; ... 14 more ...; followers: { ...; }[]; }'.
+src/components/videos/FullScreenVideo.tsx(166,22): error TS2339: Property 'url' does not exist on type '{ id: string; createdAt: Date; sequence: number; isPremium: boolean; filename: string; subtitle: Language[]; postId: string; } & { views: { id: string; userId: string; viewCount: number; ... 7 more ...; uploaderId: string; }[]; subtitle: Language[]; }'.
+src/components/videos/FullScreenVideo.tsx(167,43): error TS2339: Property 'url' does not exist on type '{ id: string; createdAt: Date; sequence: number; isPremium: boolean; filename: string; subtitle: Language[]; postId: string; } & { views: { id: string; userId: string; viewCount: number; ... 7 more ...; uploaderId: string; }[]; subtitle: Language[]; }'.
+src/components/videos/FullScreenVideo.tsx(185,10): error TS2739: Type '{ videoId: string; postId: string; sequence: number; isActive: boolean; onEnded: (() => void) | undefined; className: string; }' is missing the following properties from type '{ videoId: string; postId: string; sequence: number; title: string; isActive?: boolean | undefined; onEnded?: (() => void) | undefined; onTimeUpdate?: ((time: number) => void) | undefined; className?: string | undefined; ... 4 more ...; isPremium: boolean; }': title, muted, isPremium
+src/components/videos/FullScreenVideo.tsx(253,61): error TS2339: Property 'url' does not exist on type '{ id: string; createdAt: Date; sequence: number; isPremium: boolean; filename: string; subtitle: Language[]; postId: string; } & { views: { id: string; userId: string; viewCount: number; ... 7 more ...; uploaderId: string; }[]; subtitle: Language[]; }'.
+src/components/videos/FullScreenVideo.tsx(265,32): error TS2339: Property 'url' does not exist on type '{ id: string; createdAt: Date; sequence: number; isPremium: boolean; filename: string; subtitle: Language[]; postId: string; } & { views: { id: string; userId: string; viewCount: number; ... 7 more ...; uploaderId: string; }[]; subtitle: Language[]; }'.
+src/components/videos/FullScreenVideo.tsx(266,55): error TS2339: Property 'url' does not exist on type '{ id: string; createdAt: Date; sequence: number; isPremium: boolean; filename: string; subtitle: Language[]; postId: string; } & { views: { id: string; userId: string; viewCount: number; ... 7 more ...; uploaderId: string; }[]; subtitle: Language[]; }'.
+src/components/videos/FullScreenVideo.tsx(339,35): error TS2339: Property 'url' does not exist on type '{ id: string; createdAt: Date; sequence: number; isPremium: boolean; filename: string; subtitle: Language[]; postId: string; } & { views: { id: string; userId: string; viewCount: number; ... 7 more ...; uploaderId: string; }[]; subtitle: Language[]; }'.
+src/components/videos/FullScreenVideo.tsx(340,58): error TS2339: Property 'url' does not exist on type '{ id: string; createdAt: Date; sequence: number; isPremium: boolean; filename: string; subtitle: Language[]; postId: string; } & { views: { id: string; userId: string; viewCount: number; ... 7 more ...; uploaderId: string; }[]; subtitle: Language[]; }'.
+src/components/videos/VideoNavigation.tsx(4,23): error TS2307: Cannot find module 'sonner' or its corresponding type declarations.

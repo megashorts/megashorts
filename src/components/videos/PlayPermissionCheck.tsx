@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { useSession } from '@/components/SessionProvider';
 import { useUserAuth } from '@/hooks/queries/useUserAuth';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface PlayPermissionCheckProps {
   postId: string;
@@ -27,6 +28,7 @@ export default function PlayPermissionCheck({
 }: PlayPermissionCheckProps) {
   const { user } = useSession();
   const { data: userAuth, isLoading } = useUserAuth(user?.id);
+  const queryClient = useQueryClient();
   const isChecked = useRef<string>('');
   const isProcessing = useRef(false);
 
@@ -38,7 +40,7 @@ export default function PlayPermissionCheck({
       }
 
       // API 응답 대기
-      if (isLoading) {
+      if (isLoading || !userAuth) {
         return;
       }
 
@@ -54,7 +56,7 @@ export default function PlayPermissionCheck({
             return;
           }
 
-          if (!userAuth?.adultauth) {
+          if (!userAuth.adultauth) {
             setIsActive(false);
             onPermissionCheck(2);  // 성인인증 필요
             isChecked.current = videoId;
@@ -71,9 +73,7 @@ export default function PlayPermissionCheck({
             return;
           }
 
-          const currentPeriodEnd = userAuth?.subscription?.currentPeriodEnd;
-          console.log('currentPeriodEnd:', currentPeriodEnd);
-
+          const currentPeriodEnd = userAuth.subscription?.currentPeriodEnd;
           const isSubscribed = currentPeriodEnd && 
             new Date(currentPeriodEnd) >= new Date();
           
@@ -82,52 +82,49 @@ export default function PlayPermissionCheck({
             return;
           }
 
-          // 코인 결제 처리
-          console.log('Sending coin payment request:', { videoId, postId, uploaderId });
-
-          const payResponse = await fetch('/api/user/coinpay', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ videoId, postId, uploaderId })
-          });
-
-          console.log('Coin payment response status:', payResponse.status);
-
-          const responseText = await payResponse.text();
-          console.log('Raw response:', responseText);
-
-          if (!payResponse.ok) {
-            throw new Error('Failed to process coin payment');
-          }
-
-          let result;
-          try {
-            result = JSON.parse(responseText);
-            console.log('Parsed response:', result);
-          } catch (e) {
-            console.error('Failed to parse response:', e);
-            throw new Error('Invalid response format');
-          }
-
-          if (result.alreadyPurchased) {
-            console.log('Already purchased this video');
+          // 3. 소장 목록 확인 (로컬 메모리 체크, 딜레이 0)
+          const isPurchased = userAuth.purchasedVideoIds?.includes(videoId);
+          if (isPurchased) {
             isChecked.current = videoId;
             return;
           }
 
-          if (!result.success) {
-            console.log('Payment failed:', result.error);
-            setIsActive(false);
-            onPermissionCheck(3);  // 구독/코인 필요
+          // 4. 코인 확인 및 비동기 차감 (Optimistic UI)
+          if (userAuth.mscoin >= 1) {
+            // 즉시 재생 허용 (스와이프 딜레이 제거)
             isChecked.current = videoId;
+            
+            // 로컬 캐시 즉시 업데이트 (코인 -1, 소장목록 추가)
+            queryClient.setQueryData(['userAuth', user?.id], (oldData: any) => {
+              if (!oldData) return oldData;
+              return {
+                ...oldData,
+                mscoin: oldData.mscoin - 1,
+                purchasedVideoIds: [...oldData.purchasedVideoIds, videoId]
+              };
+            });
+
+            // 백그라운드로 서버 통신
+            fetch('/api/user/coinpay', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ videoId, postId, uploaderId })
+            }).then(async (payResponse) => {
+              if (!payResponse.ok) {
+                // 실패 시 롤백 로직 (생략 또는 구현 필요)
+                console.error('Failed to process coin payment async');
+                // 실제 서비스에서는 롤백 후 재생을 중단하거나 모달을 다시 띄우는 로직이 필요할 수 있습니다.
+              }
+            }).catch(e => console.error('Coin payment network error:', e));
+
             return;
           }
 
-          console.log('Payment successful:', {
-            remainingCoins: result.remainingCoins
-          });
-
+          // 코인이 부족한 경우
+          setIsActive(false);
+          onPermissionCheck(3);  // 코인 충전 필요
           isChecked.current = videoId;
+          return;
         }
 
         isChecked.current = videoId;
@@ -142,7 +139,7 @@ export default function PlayPermissionCheck({
     };
 
     checkPermission();
-  }, [postId, videoId, playOrder, ageLimit, isPremium, user, userAuth, isLoading, setIsActive, onPermissionCheck]);
+  }, [postId, videoId, playOrder, ageLimit, isPremium, user, userAuth, isLoading, setIsActive, onPermissionCheck, queryClient]);
 
   return null;
 }

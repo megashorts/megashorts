@@ -8,8 +8,8 @@ const prisma = new PrismaClient();
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { userId: string } }
-) {
+  context: { params: Promise<{ userId: string }> }) {
+  const params = await context.params;
   try {
     const { userId } = params;
     const data = await request.json();

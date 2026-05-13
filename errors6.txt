@@ -1,0 +1,23 @@
+.next/types/validator.ts(548,39): error TS2307: Cannot find module '../../src/app/api/agency/distributions/route.js' or its corresponding type declarations.
+.next/types/validator.ts(557,39): error TS2307: Cannot find module '../../src/app/api/agency/points-apply/route.js' or its corresponding type declarations.
+.next/types/validator.ts(566,39): error TS2307: Cannot find module '../../src/app/api/agency/settings-export/route.js' or its corresponding type declarations.
+.next/types/validator.ts(575,39): error TS2307: Cannot find module '../../src/app/api/agency/settings/route.js' or its corresponding type declarations.
+.next/types/validator.ts(584,39): error TS2307: Cannot find module '../../src/app/api/agency/structure/route.js' or its corresponding type declarations.
+.next/types/validator.ts(593,39): error TS2307: Cannot find module '../../src/app/api/agency/views-export/route.js' or its corresponding type declarations.
+.next/types/validator.ts(602,39): error TS2307: Cannot find module '../../src/app/api/auth/callback/google/route.js' or its corresponding type declarations.
+.next/types/validator.ts(611,39): error TS2307: Cannot find module '../../src/app/api/auth/callback/kakao/route.js' or its corresponding type declarations.
+.next/types/validator.ts(620,39): error TS2307: Cannot find module '../../src/app/api/auth/callback/naver/route.js' or its corresponding type declarations.
+.next/types/validator.ts(629,39): error TS2307: Cannot find module '../../src/app/api/auth/route.js' or its corresponding type declarations.
+.next/types/validator.ts(638,39): error TS2307: Cannot find module '../../src/app/api/auth/session/route.js' or its corresponding type declarations.
+.next/types/validator.ts(962,39): error TS2307: Cannot find module '../../src/app/api/referral-structure/rebuild/route.js' or its corresponding type declarations.
+.next/types/validator.ts(971,39): error TS2307: Cannot find module '../../src/app/api/referral-structure/route.js' or its corresponding type declarations.
+.next/types/validator.ts(980,39): error TS2307: Cannot find module '../../src/app/api/referral-structure/sync/route.js' or its corresponding type declarations.
+.next/types/validator.ts(1089,31): error TS2344: Type 'typeof import("/Users/kimryan/Desktop/megas/src/app/api/user/delete/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/user/delete">'.
+  The types returned by 'DELETE(...)' are incompatible between these types.
+    Type 'Promise<NextResponse<{ error: string; }> | NextResponse<{ message: string; }> | { error: string; }>' is not assignable to type 'void | Response | Promise<void | Response>'.
+      Type 'Promise<NextResponse<{ error: string; }> | NextResponse<{ message: string; }> | { error: string; }>' is not assignable to type 'Promise<void | Response>'.
+        Type 'NextResponse<{ error: string; }> | NextResponse<{ message: string; }> | { error: string; }' is not assignable to type 'void | Response'.
+          Type '{ error: string; }' is not assignable to type 'void | Response'.
+.next/types/validator.ts(1160,39): error TS2307: Cannot find module '../../src/app/api/users/[userId]/posts/route.js' or its corresponding type declarations.
+.next/types/validator.ts(1205,39): error TS2307: Cannot find module '../../src/app/api/videos/progress/route.js' or its corresponding type declarations.
+.next/types/validator.ts(1214,39): error TS2307: Cannot find module '../../src/app/api/videos/route.js' or its corresponding type declarations.

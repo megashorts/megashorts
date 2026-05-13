@@ -1,0 +1,18 @@
+{
+  "Common": {
+    "login": "登录",
+    "logout": "登出",
+    "home": "首页",
+    "search": "搜索",
+    "profile": "个人主页"
+  },
+  "Video": {
+    "adultWarning": "此视频包含成人内容，请验证您的年龄。",
+    "subscriptionRequired": "这是高级视频，需要订阅。",
+    "coinRequired": "此视频需要使用金币解锁。",
+    "purchase": "花费1金币解锁",
+    "alreadyPurchased": "已购买",
+    "verifyAge": "验证年龄",
+    "subscribe": "立即订阅"
+  }
+}

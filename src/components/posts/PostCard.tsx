@@ -107,7 +107,7 @@ export default function PostCard({ post }: PostProps) {
 
 // "use client";
 
-// import { useSession } from "@/app/(main)/SessionProvider";
+// import { useSession } from "@/app/[locale]/(main)/SessionProvider";
 // import { PostData } from "@/lib/types";
 // import { Media } from "@prisma/client";
 // import Image from "next/image";

@@ -2,54 +2,29 @@
 
 > 최종 업데이트: 2026-05-13
 
-## 2026-05-13 — 최초 프로젝트 분석
+## 2026-05-13 — 플랫폼 고도화 (다국어, PWA, 권한 최적화, 성인인증)
 
-### 프로젝트 핵심 구조
-- **Auth**: Lucia v3 + Arctic (Google/Kakao/Naver OAuth) + 이메일 인증
-- **DB**: Supabase PostgreSQL + Prisma ORM + Cloudflare D1(워커용)
-- **결제**: 토스페이먼츠(테스트모드) - billing/coin 두 가지 유형
-- **스트리밍**: Cloudflare Stream (HLS) + @cloudflare/stream-react
-- **로그**: Cloudflare R2 + Workers (커스텀 활동 로그)
-- **시청기록**: IndexedDB(클라이언트) + Supabase(서버) 이중 관리
-- **상태관리**: Zustand + TanStack Query
-- **UI**: Radix UI + Tailwind CSS + Framer Motion
+### 1. 다국어(next-intl) 및 라우팅 구조 변경
+- **URL 구조**: 영어(기본, prefix 없음), 한국어(`/ko`), 중국어(`/zh`)
+- **API 경로 주의**: `src/app/[locale]/(main)/api` 폴더가 있으면 `/en/api/...` 처럼 접두사가 붙어 프론트엔드 fetch 호출이 깨짐. 따라서 모든 API를 `src/app/api`로 이동 완료.
+- **Middleware**: `next-intl` 미들웨어를 기존 CORS 설정과 통합.
 
-### msworker 구조 (정리 완료)
-- `src/index.ts` — 메인 로그 워커 (megashorts-logs, R2 기반 로그 수집/압축)
-- 🗑️ `src/agency/`, `src/stats/`, `src/uploader/` — 기존 프론트엔드 통신용 워커였으나 Next.js API로 이관됨에 따라 **완전 삭제** 완료 (2026-05-13)
-- 🗑️ `src/d1-test/`, `test-cloudflare-stream/` — 테스트 스크립트 삭제 완료
-- `src/dailywork/workers/viewgroup/` — 시청기록 그룹화 (스케줄)
-- `src/dailywork/workers/postdata/` — 유료시청 포스트 카운트 (Queue 기반)
-- `src/dailywork/workers/viewcountteam/` — 영업팀 시청카운트
-- `src/dailywork/workers/cfstats-admin/` — CF 스트림 통계(관리자)
-- `src/dailywork/workers/cfstats-creator/` — CF 스트림 통계(크리에이터)
-- `src/dailywork/workers/commission/` — 커미션 정산
-- `src/dailywork/workers/payments-collector-worker/` — 결제 수집
-- `src/dailywork/workers/referral-structure-worker/` — 추천인 구조
-- `src/dailywork/workers/system-settings/` — 시스템 설정
-- `src/dailywork/workers/team-master-settings/` — 팀마스터 설정
-- `src/dailywork/workers/workersmanager/` — 워커 관리자
-- `test-cloudflare-stream/` — ⚠️ 테스트 스크립트 폴더 (미사용, 삭제 대상)
+### 2. 시청 권한 최적화 (Two-track Caching)
+- **Problem**: 스와이프 시마다 `/api/user/coinpay`를 동기적으로 기다려 1~2초 딜레이 발생.
+- **Solution**: 
+    1. `useUserAuth`에서 `mscoin`과 `purchasedVideoIds`(소장목록)를 함께 로드.
+    2. `PlayPermissionCheck`에서 소장목록 확인 시 0초 즉시 재생.
+    3. 미구매 영상이나 코인 보유 시, **Optimistic UI**로 로컬 캐시(QueryData)를 먼저 차감하고 서버 통신은 비동기로 처리하여 딜레이 제거.
 
-### 시청 권한 검사 현황
-- `PlayPermissionCheck.tsx`가 활성 사용 중
-- `VideoPermissionCheck.tsx`는 전체 주석처리 (미사용)
-- 검사 순서: 성인인증 → 구독확인 → 코인결제(자동차감)
-- `useUserAuth` 훅이 `/api/users/[userId]/auth`에서 adultauth + subscription 정보 가져옴
-- staleTime 12시간으로 설정 → 결제 직후 반영 지연 가능성 있음
+### 3. 글로벌 성인인증 (Self-Declaration)
+- **UI**: Framer Motion을 사용한 모바일 친화적 바텀시트 모달(`AgeVerificationModal.tsx`) 구현.
+- **Logic**: 생년월일 입력 및 만 18세 이상 확인 체크. 성공 시 `/api/user/verify-age` 호출 및 `userAuth` 캐시 갱신.
 
-### 결제 시스템 현황
-- 토스페이먼츠: billing(구독) + coin(일회성) 두 가지 결제 경로
-- billing: authKey(빌링키) 기반 → subscription upsert + payment 기록
-- coin: paymentKey 기반 → 토스 confirm API 호출 → user mscoin 증가
-- webhook: 결제 상태 변경 시 subscription/coin 자동 처리
-- 가격: 주간 8,500원, 연간 190,000원, 코인 10/70/350/700개
-
-### 주요 환경변수
-- NEXT_PUBLIC_LOGS_WORKER_URL → megashorts-logs 워커 연결
-- REFERRAL_STRUCTURE_WORKER_URL → referral-structure 워커 연결
-- TOSS_PAYMENTS_SECRET_KEY → 토스 서버 인증
-- NEXT_PUBLIC_TOSS_PAYMENTS_CLIENT_KEY → 토스 클라이언트
-
-### 아키텍처 공식 문서화
-- 플랫폼 전체 아키텍처(비디오 재생 권한, KV 캐싱, 다국어 SEO, 결제 구조 등)의 단일 소스 해설을 위해 `04_architecture.md` 파일 생성 (2026-05-13)
+### 4. TypeScript 에러 및 MCP 경고 해결 (2026-05-14)
+- **MCP 에러**: `~/.gemini/antigravity/mcp_config.json`의 잘못된 MCP 서버 설정(Vercel, Cloudflare CLI 등)으로 인한 에디터 경고를 설정 초기화하여 해결.
+- **TypeScript 에러 해결 (약 97개)**:
+    - **Next.js 15 Route Handlers**: API 라우트의 `params` 타입이 Promise로 변경됨에 따라, `await context.params` 방식으로 15여 개 라우트 파일 일괄 업데이트.
+    - **Prisma Schema 동기화**: `FullScreenVideo.tsx` 등에서 삭제된 `Media` 객체와 `url` 속성 참조 에러를 `filename`으로 수정.
+    - **경로 의존성 복구**: `(main)`이 `[locale]/(main)`으로 이동하면서 깨진 컴포넌트 import(`@/app/(main)/...`)들을 현재 구조에 맞게 복구.
+    - **미사용 워커 라우트 잔재 제거**: `agency`, `auth`, `referral-structure` 등의 잔여 빈 API 라우트 폴더를 삭제하고 `.next` 캐시 초기화하여 유령 모듈 참조 에러 제거.
+- **현재 상태**: `tsc --noEmit` 통과 (에러 0건). 로컬 개발 서버 정상 동작 가능 상태 진입.

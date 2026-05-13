@@ -1,0 +1,18 @@
+{
+  "Common": {
+    "login": "로그인",
+    "logout": "로그아웃",
+    "home": "홈",
+    "search": "검색",
+    "profile": "프로필"
+  },
+  "Video": {
+    "adultWarning": "성인용 콘텐츠입니다. 연령 인증을 진행해 주세요.",
+    "subscriptionRequired": "유료 콘텐츠입니다. 구독이 필요합니다.",
+    "coinRequired": "코인을 사용하여 잠금을 해제해야 합니다.",
+    "purchase": "1코인으로 잠금 해제",
+    "alreadyPurchased": "소장 중",
+    "verifyAge": "성인인증 하기",
+    "subscribe": "구독하기"
+  }
+}

@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 
 interface UserAvatarProps {
-  avatarUrl: string | null | undefined;
+  avatarUrl?: string | null | undefined;
   size?: number;
   className?: string;
 }

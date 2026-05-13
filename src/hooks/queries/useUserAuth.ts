@@ -3,16 +3,12 @@
 import { useQuery } from '@tanstack/react-query';
 import kyInstance from '@/lib/ky';
 
-// interface UserAuthData {
-//   adultauth: boolean;
-//   // subscriptionEndDate: Date | null;
-//   currentPeriodEnd: Date | null;
-// }
-
 interface UserAuthData {
   adultauth: boolean;
   referredBy: string | null;
   teamMaster: boolean;
+  mscoin: number;
+  purchasedVideoIds: string[];
   subscription: {
     currentPeriodEnd: Date | null;
   } | null;

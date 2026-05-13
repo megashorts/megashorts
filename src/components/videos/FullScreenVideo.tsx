@@ -163,8 +163,8 @@ function VideoSlide({ post, isActive, onVideoEnd }: VideoSlideProps) {
     }
   }, [isFullscreen]);
 
-  if (!currentVideo?.url) return null;
-  const videoId = getVideoId(currentVideo.url);
+  if (!currentVideo?.filename) return null;
+  const videoId = getVideoId(currentVideo.filename) || currentVideo.filename;
   if (!videoId) return null;
 
 
@@ -184,10 +184,13 @@ function VideoSlide({ post, isActive, onVideoEnd }: VideoSlideProps) {
         <div className="relative w-full h-full">
         <VideoPlayer
         videoId={videoId}
-        postId={post.id}  // url 대신 postId 전달
-        sequence={currentVideo.sequence || 1}  // sequence 추가
+        postId={post.id}
+        sequence={currentVideo.sequence || 1}
         isActive={isActive}
         onEnded={onVideoEnd}
+        title={post.title || ''}
+        isPremium={currentVideo.isPremium || false}
+        muted={false}
         className={cn(
             'w-full h-full',
             isFullscreen ? 'object-contain' : 'object-cover'
@@ -250,7 +253,7 @@ export default function FullScreenVideo({ posts, className }: FullScreenVideoPro
   useEffect(() => {
     const videoId = searchParams.get('v');
     if (videoId) {
-      const index = posts.findIndex(post => post.videos[0]?.url?.includes(videoId));
+      const index = posts.findIndex(post => post.videos[0]?.filename?.includes(videoId));
       if (index !== -1) {
         setActiveIndex(index);
         swiperRef.current?.slideTo(index);
@@ -262,8 +265,8 @@ export default function FullScreenVideo({ posts, className }: FullScreenVideoPro
     const preloadNextVideo = (index: number) => {
       const nextIndex = (index + 1) % posts.length;
       const nextPost = posts[nextIndex];
-      if (nextPost?.videos[0]?.url) {
-        const videoId = getVideoId(nextPost.videos[0].url);
+      if (nextPost?.videos[0]?.filename) {
+        const videoId = getVideoId(nextPost.videos[0].filename) || nextPost.videos[0].filename;
         if (videoId) {
           const img = new Image();
           img.src = `https://videodelivery.net/${videoId}/thumbnails/thumbnail.jpg`;
@@ -336,8 +339,8 @@ export default function FullScreenVideo({ posts, className }: FullScreenVideoPro
       
       // URL 업데이트
       const currentPost = posts[newIndex];
-      if (currentPost?.videos[0]?.url) {
-        const videoId = getVideoId(currentPost.videos[0].url);
+      if (currentPost?.videos[0]?.filename) {
+        const videoId = getVideoId(currentPost.videos[0].filename) || currentPost.videos[0].filename;
         if (videoId) {
           const params = new URLSearchParams(searchParams.toString());
           params.set('v', videoId);

@@ -5,8 +5,8 @@ import prisma from '@/lib/prisma';
 // 관리자 메모 저장 API
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+  context: { params: Promise<{ id: string }> }) {
+  const params = await context.params;
   try {
     // 인증 확인
     const { user: authUser, session } = await validateRequest();
