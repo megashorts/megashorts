@@ -1,3 +1,5 @@
+// src/app/(main)/admin/agency/components/TeamMasterSettings.tsx
+
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
@@ -241,8 +243,8 @@ export default function TeamMasterSettings() {
             autoQualification: {
               enabled: false,
               memberCount: 10,
-              chargeAmount: 100000,
-              usageAmount: 50000,
+              // chargeAmount: 100000,
+              viewCount: 50,
               useCondition: "memberCount"
             }
           }
@@ -254,8 +256,8 @@ export default function TeamMasterSettings() {
             autoQualification: {
               enabled: false,
               memberCount: 10,
-              chargeAmount: 100000,
-              usageAmount: 50000,
+              // chargeAmount: 100000,
+              viewCount: 50,
               useCondition: "memberCount"
             }
           },

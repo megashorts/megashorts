@@ -35,7 +35,8 @@ export async function POST(request: NextRequest) {
     
     // 팀마스터 설정 삭제
     await prisma.systemSetting.delete({
-      where: { key: `agencySettings_${userId}` }
+      // where: { key: `agencySettings_${userId}` }
+      where: { id: userId }
     }).catch(() => {
       // 설정이 없는 경우 무시
       console.log(`No settings found for user ${userId}`);

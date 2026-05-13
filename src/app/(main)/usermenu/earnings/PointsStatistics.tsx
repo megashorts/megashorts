@@ -38,8 +38,8 @@ export default function PointsStatistics({ userId, userRole }: PointsStatisticsP
     try {
       // 업로더 또는 에이전시 통계 API 호출
       const endpoint = isUploader 
-        ? `${process.env.NEXT_PUBLIC_STATS_API_URL}/api/stats/uploader` 
-        : `${process.env.NEXT_PUBLIC_STATS_API_URL}/api/stats/agency`;
+        ? `/api/stats/uploader` 
+        : `/api/stats/agency`;
       
       const response = await fetch(`${endpoint}?userId=${userId}&period=${week}`);
       
@@ -94,7 +94,7 @@ export default function PointsStatistics({ userId, userRole }: PointsStatisticsP
         if (week !== 'current') {
           try {
             // 주간 정산 데이터 조회
-            const weeklyEndpoint = `${process.env.NEXT_PUBLIC_STATS_API_URL}/api/stats/weekly`;
+            const weeklyEndpoint = `/api/stats/weekly`;
             const weeklyResponse = await fetch(`${weeklyEndpoint}?userId=${userId}&period=${week}&type=${isUploader ? 'uploader' : 'agency'}`);
             
             if (weeklyResponse.ok) {
@@ -137,7 +137,7 @@ export default function PointsStatistics({ userId, userRole }: PointsStatisticsP
       
       // Cloudflare 통계 데이터 조회 (글로벌 접속자 지도 등)
       try {
-        const cloudflareEndpoint = `${process.env.NEXT_PUBLIC_STATS_API_URL}/api/stats/cloudflare`;
+        const cloudflareEndpoint = `/api/stats/cloudflare`;
         
         const cloudflareResponse = await fetch(`${cloudflareEndpoint}?userId=${userId}`);
         
@@ -407,7 +407,7 @@ export default function PointsStatistics({ userId, userRole }: PointsStatisticsP
                   onClick={() => {
                     // Cloudflare 통계 데이터 조회
                     try {
-                      fetch(`${process.env.NEXT_PUBLIC_STATS_API_URL}/api/stats/cloudflare?userId=${userId}`)
+                      fetch(`/api/stats/cloudflare?userId=${userId}`)
                         .then(response => {
                           if (response.ok) return response.json();
                           throw new Error(`API 오류: ${response.status}`);

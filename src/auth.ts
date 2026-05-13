@@ -1,3 +1,4 @@
+// src/auth.ts
 import prisma from "@/lib/prisma";
 import { PrismaAdapter } from "@lucia-auth/adapter-prisma";
 import { Google, Kakao, Naver } from "arctic";

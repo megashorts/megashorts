@@ -1,3 +1,5 @@
+// src/app/api/points/users/[userId]/route.ts
+
 import { NextRequest, NextResponse } from 'next/server';
 import { validateRequest } from '@/auth';
 import prisma from '@/lib/prisma';
@@ -5,7 +7,7 @@ import prisma from '@/lib/prisma';
 // 사용자 정보 조회 API
 export async function GET(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  context: { params: Promise<{ userId: string }> } // ✅ params는 Promise 타입
 ) {
   try {
     // 인증 확인
@@ -17,10 +19,13 @@ export async function GET(
       );
     }
 
+    // ✅ params를 await 해서 꺼내야 함
+    const { userId } = await context.params;
+
     // 요청한 사용자 ID와 로그인한 사용자 ID가 일치하는지 확인
     // 또는 관리자 권한이 있는지 확인
     const isAdmin = authUser.userRole >= 90;
-    const isSameUser = authUser.id === params.userId;
+    const isSameUser = authUser.id === userId;
 
     if (!isAdmin && !isSameUser) {
       return NextResponse.json(
@@ -29,16 +34,18 @@ export async function GET(
       );
     }
 
-    // 사용자 정보 조회
+    // 사용자 정보 조회 (CreatorInfo 포함으로 수정)
     const user = await prisma.user.findUnique({
-      where: { id: params.userId },
+      where: { id: userId },
       select: {
         id: true,
         username: true,
+        displayName: true, // 추가
         email: true,
         emailVerified: true,
         points: true,
         userRole: true,
+        CreatorInfo: true, // 새로 추가
       },
     });
 
@@ -49,22 +56,12 @@ export async function GET(
       );
     }
 
-    // 은행 정보 조회
-    const bankInfo = await prisma.pointWithdrawal.findFirst({
-      where: { 
-        userId: params.userId,
-        status: { in: ['APPROVED', 'PENDING'] }
-      },
-      orderBy: { requestedAt: 'desc' },
-      select: { bankInfo: true }
-    });
-
-    // 응답 반환
+    // 응답 반환 (CreatorInfo 추가)
     return NextResponse.json({
       success: true,
       data: {
         ...user,
-        bankInfo: bankInfo?.bankInfo || null
+        creatorInfo: user.CreatorInfo, // 새로 추가된 필드
       },
     });
   } catch (error) {

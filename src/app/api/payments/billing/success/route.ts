@@ -79,10 +79,26 @@ export async function GET(req: NextRequest) {
     })
 
     // 2. 빌링키 생성 (구독 ID 포함)
-    await prisma.billingKey.create({
-      data: {
+    // await prisma.billingKey.create({
+    //   data: {
+    //     userId,
+    //     subscriptionId: subscription.id,  // 구독 ID 연결
+    //     billingKey: authKey,
+    //     customerKey,
+    //     status: 'active'
+    //   }
+    // })
+
+    await prisma.billingKey.upsert({
+      where: { subscriptionId: subscription.id },
+      update: {
+        billingKey: authKey,
+        customerKey,
+        status: 'active'
+      },
+      create: {
         userId,
-        subscriptionId: subscription.id,  // 구독 ID 연결
+        subscriptionId: subscription.id,
         billingKey: authKey,
         customerKey,
         status: 'active'

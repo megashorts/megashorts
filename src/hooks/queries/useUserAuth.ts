@@ -1,9 +1,21 @@
+// src/hooks/queries/useUserAuth.ts
+
 import { useQuery } from '@tanstack/react-query';
 import kyInstance from '@/lib/ky';
 
+// interface UserAuthData {
+//   adultauth: boolean;
+//   // subscriptionEndDate: Date | null;
+//   currentPeriodEnd: Date | null;
+// }
+
 interface UserAuthData {
   adultauth: boolean;
-  subscriptionEndDate: Date | null;
+  referredBy: string | null;
+  teamMaster: boolean;
+  subscription: {
+    currentPeriodEnd: Date | null;
+  } | null;
 }
 
 export function useUserAuth(userId: string | undefined) {

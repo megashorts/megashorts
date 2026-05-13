@@ -1,3 +1,5 @@
+// sample projext ImageUploader
+// src/components/ImageUploader.tsx
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { CropImageDialog } from "@/components/CropImageDialog";

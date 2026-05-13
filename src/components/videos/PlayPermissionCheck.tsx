@@ -71,8 +71,11 @@ export default function PlayPermissionCheck({
             return;
           }
 
-          const isSubscribed = userAuth?.subscriptionEndDate && 
-            new Date(userAuth.subscriptionEndDate) >= new Date();
+          const currentPeriodEnd = userAuth?.subscription?.currentPeriodEnd;
+          console.log('currentPeriodEnd:', currentPeriodEnd);
+
+          const isSubscribed = currentPeriodEnd && 
+            new Date(currentPeriodEnd) >= new Date();
           
           if (isSubscribed) {
             isChecked.current = videoId;

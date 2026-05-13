@@ -5,6 +5,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { CircleMinus, CirclePlus } from "lucide-react";
 
 interface Level {
   name: string;
@@ -80,14 +81,14 @@ export default function NetworkLevelSettings({
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h3 className="text-sm font-medium"># 네트워크 단계 및 수수료 설정</h3>
+        <h3 className="text-sm font-medium">네트워크 단계 및 수수료 설정</h3>
         <Button
-          variant="outline"
+          variant="ghost"
           size="sm"
           onClick={addLevel}
           disabled={loading}
         >
-          +
+          <CirclePlus className="h-6 w-6" />
         </Button>
       </div>
       
@@ -136,9 +137,9 @@ export default function NetworkLevelSettings({
                 size="sm"
                 onClick={() => removeLevel(index)}
                 disabled={loading}
-                className="mx-auto"
+                className="px-2"
               >
-                x
+                <CircleMinus className="h-5 w-5" />
               </Button>
             ) : (
               <div className="h-4"></div> // 최상위와 최하위 단계는 삭제 버튼 대신 빈 공간

@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
   try {
     const { user } = await validateRequest();
     
-    if (!user || user.userRole < USER_ROLE.TEAM_MEMBER) {
+    if (!user || user.userRole < USER_ROLE.TEAM_OPERATOR) {
       return Response.json(
         { success: false, error: 'Unauthorized' },
         { status: 401 }
@@ -26,10 +26,10 @@ export async function GET(request: NextRequest) {
       );
     }
     
-    // 시스템 설정에서 에이전시 설정 조회
-    const settings = await prisma.systemSetting.findFirst({
+    // 유저 ID와 일치하는 systemSetting 조회
+    const settings = await prisma.systemSetting.findUnique({
       where: {
-        key: `agencySettings_${userId}`,
+        id: userId, // ID 컬럼에 유저 ID가 들어간다
       }
     });
     
@@ -111,14 +111,17 @@ export async function POST(request: NextRequest) {
     // 시스템 설정에 에이전시 설정 저장
     await prisma.systemSetting.upsert({
       where: {
-        key: `agencySettings_${data.userId}`
+        // key: `agencySettings_${data.userId}`
+        id: data.userId // 유저 ID를 기본키로 사용
       },
       update: {
         value: data,
         updatedAt: new Date()
       },
       create: {
+        id: data.userId,
         key: `agencySettings_${data.userId}`,
+        // key: `agencySettings`,
         value: data,
         valueType: "json",
         description: "Agency settings",

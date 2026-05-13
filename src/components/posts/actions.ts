@@ -1,3 +1,5 @@
+// 딜리트 포스트시의 썸네일 이미지, 비디오, 자막, 포스트 삭제 
+
 "use server";
 
 import { validateRequest } from '@/auth';

@@ -166,11 +166,17 @@ async function UserProfile({ user, loggedInUserId }: UserProfileProps) {
             <div className="flex items-center">
               <span className={`led-indicator ${user.subscription ? 'led-blue' : 'led-red'}`}></span>
                 {user.subscription ? '현재 구독중' : '현재 미구독중'}
-                {user.subscription && user.subscription.status === 'active' && user.subscriptionEndDate && (
+                {/* {user.subscription && user.subscription.status === 'active' && user.subscriptionEndDate && (
                   <span className="ml-2">/ 구독갱신 {formatDate(user.subscriptionEndDate, "yyyy-MM-dd")}</span>
                 )}
                 {user.subscription && user.subscription.status === 'cancelled' && user.subscriptionEndDate && (
                   <span className="ml-2">/ 구독만료 {formatDate(user.subscriptionEndDate, "yyyy-MM-dd")}</span>
+                )} */}
+                {user.subscription && user.subscription.status === 'active' && user.subscription.currentPeriodEnd && (
+                  <span className="ml-2">/ 구독갱신 {formatDate(user.subscription.currentPeriodEnd, "yyyy-MM-dd")}</span>
+                )}
+                {user.subscription && user.subscription.status === 'cancelled' && user.subscription.currentPeriodEnd && (
+                  <span className="ml-2">/ 구독만료 {formatDate(user.subscription.currentPeriodEnd, "yyyy-MM-dd")}</span>
                 )}
                 {!user.subscription && (
                   <Link href="/subscription">

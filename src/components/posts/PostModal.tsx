@@ -144,23 +144,6 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
                   className="object-cover"
                 />
               </div>
-{/* 
-              {(showPreview && firstVideoId) && (
-                <div 
-                  className={`absolute inset-0 transition-opacity duration-500 ${
-                    isVideoReady ? 'opacity-100' : 'opacity-0'
-                  }`}
-                >
-                  <iframe
-                    src={`https://iframe.videodelivery.net/${firstVideoId}/watch?autoplay=1&controls=0&fit=cover&preload=auto&startTime=0&monitoring=false&customerMonitoring=false`}
-                    className="w-full h-full translate-x-2"
-                    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    onLoad={() => setIsVideoReady(true)}
-                  />
-                </div>
-              )}
-            </div> */}
 
               {(showPreview && firstVideoId) && (
                 <div 
@@ -168,14 +151,6 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
                     isVideoReady ? 'opacity-100' : 'opacity-0'
                   }`}
                 >
-                  {/* <VideoPlayer
-                    videoId={firstVideoId}
-                    postId={post.id}
-                    sequence={1}
-                    isActive={true}
-                    className="w-full h-full"
-                    controls={false}
-                  /> */}
                   <video
                     ref={videoRef}
                     playsInline

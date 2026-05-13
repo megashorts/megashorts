@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validateRequest } from '@/auth';
+import prisma from '@/lib/prisma';
 
 // 포인트 지급 내역 조회 API
 export async function GET(request: NextRequest) {
   try {
-    // 인증 확인
+    // 1. 인증 확인
     const { user: authUser, session } = await validateRequest();
     if (!authUser || !session) {
       return NextResponse.json(
@@ -13,16 +14,14 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // 쿼리 파라미터 파싱
+    // 2. 쿼리 파라미터
     const url = new URL(request.url);
     const userId = url.searchParams.get('userId');
     const period = url.searchParams.get('period') || 'all';
 
-    // 요청한 사용자 ID와 로그인한 사용자 ID가 일치하는지 확인
-    // 또는 관리자 권한이 있는지 확인
+    // 3. 권한 확인 (본인 또는 관리자만 가능)
     const isAdmin = authUser.userRole >= 90;
     const isSameUser = authUser.id === userId;
-
     if (!isAdmin && !isSameUser) {
       return NextResponse.json(
         { success: false, error: '권한이 없습니다.' },
@@ -30,30 +29,34 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Cloudflare Worker API 호출
-    const workerUrl = process.env.NEXT_PUBLIC_STATS_API_URL || 'https://stats-api.msdevcm.workers.dev';
-    const response = await fetch(`${workerUrl}/api/points/payments?userId=${userId}&period=${period}`, {
-      headers: {
-        'Content-Type': 'application/json'
+    // 4. 기간 필터링 (예시: all, 30d, 90d, 1y 등 지원 가능)
+    let dateFilter: Date | undefined;
+    if (period !== 'all') {
+      const now = new Date();
+      if (period === '30d') {
+        dateFilter = new Date(now.setDate(now.getDate() - 30));
+      } else if (period === '90d') {
+        dateFilter = new Date(now.setDate(now.getDate() - 90));
+      } else if (period === '1y') {
+        dateFilter = new Date(now.setFullYear(now.getFullYear() - 1));
       }
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: errorData.error || '지급 내역 조회 중 오류가 발생했습니다.',
-          status: response.status
-        },
-        { status: response.status }
-      );
     }
 
-    const data = await response.json();
-    
-    // 응답 반환
-    return NextResponse.json(data);
+    // 5. DB 조회
+    const withdrawals = await prisma.pointWithdrawal.findMany({
+      where: {
+        userId: userId!,
+        ...(dateFilter ? { requestedAt: { gte: dateFilter } } : {})
+      },
+      orderBy: { requestedAt: 'desc' }
+    });
+
+    // 6. 응답 반환
+    return NextResponse.json({
+      success: true,
+      withdrawals
+    });
+
   } catch (error) {
     console.error('지급 내역 조회 오류:', error);
     return NextResponse.json(

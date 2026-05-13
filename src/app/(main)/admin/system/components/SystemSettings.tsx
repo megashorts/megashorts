@@ -264,6 +264,23 @@ export function SystemSettings() {
                     );
                   }
 
+                  // if (key === 'noteamReffererPointRatio') {
+                  //   return (
+                  //     <div key={key} className="flex items-center justify-between py-1 gap-4">
+                  //       <Label className="text-xs flex-1">
+                  //         {SETTING_LABELS[key as keyof typeof SETTING_LABELS]}
+                  //       </Label>
+                  //       <Input
+                  //         type="text"
+                  //         value={formatNumber(settings[key].value)}
+                  //         onChange={(e) => handleSettingChange(key, parseFormattedNumber(e.target.value))}
+                  //         className="w-28 h-7 text-xs appearance-none"
+                  //         step="0.01"
+                  //       />
+                  //     </div>
+                  //   );
+                  // }
+
                   if (key === 'subscriptionPackages') {
                     const allPackages = [
                       ...settings.subscriptionPackages.value,

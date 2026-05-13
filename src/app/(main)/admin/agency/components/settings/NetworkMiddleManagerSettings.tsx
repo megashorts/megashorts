@@ -5,22 +5,24 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { CircleMinus } from "lucide-react";
 
 // 중간관리자 타입 정의
 export interface MiddleManager {
-  id: string;
+  level: number;
   enabled: boolean;
   name: string;
+  // level: number;
   commissionRate: number;
   conditions: {
     memberCount: boolean;
-    chargeAmount: boolean;
-    usageAmount: boolean;
+    // chargeAmount: boolean;
+    viewCount: boolean;
   };
   thresholds: {
     memberCount: number;
-    chargeAmount: number;
-    usageAmount: number;
+    // chargeAmount: number;
+    viewCount: number;
   };
   duplicateDistribution: string; // 쉼표로 구분된 비율 값 (예: "60,40")
 }
@@ -80,16 +82,16 @@ export default function NetworkMiddleManagerSettings({
   return (
     <div className="space-y-4">
       {managers.map((manager, index) => (
-        <div key={manager.id} className="space-y-4 border p-4 rounded-md">
+        <div key={manager.level} className="space-y-4 border p-4 rounded-md">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-2">
               <Switch
-                id={`manager-enabled-${manager.id}`}
+                id={`manager-enabled-${manager.level}`}
                 checked={manager.enabled}
                 onChange={(e) => updateManager(index, "enabled", e.target.checked)}
                 disabled={loading}
               />
-              <Label htmlFor={`manager-enabled-${manager.id}`}></Label>
+              <Label htmlFor={`manager-enabled-${manager.level}`}></Label>
             </div>
             
             {index > 0 && (
@@ -100,7 +102,7 @@ export default function NetworkMiddleManagerSettings({
                 disabled={loading}
                 className="items-center"
               >
-                x
+                <CircleMinus className="h-5 w-5" />
               </Button>
             )}
           </div>
@@ -109,7 +111,7 @@ export default function NetworkMiddleManagerSettings({
             <div className="space-y-2">
               {/* <Label htmlFor={`manager-name-${manager.id}`}>중간관리자 이름</Label> */}
               <Input
-                id={`manager-name-${manager.id}`}
+                id={`manager-name-${manager.level}`}
                 value={manager.name}
                 onChange={(e) => updateManager(index, "name", e.target.value)}
                 disabled={loading || !manager.enabled}
@@ -121,7 +123,7 @@ export default function NetworkMiddleManagerSettings({
               {/* <Label htmlFor={`manager-rate-${manager.id}`}>수수료 비율</Label> */}
               <div className="relative">
                 <Input
-                  id={`manager-rate-${manager.id}`}
+                  id={`manager-rate-${manager.level}`}
                   type="number"
                   value={manager.commissionRate}
                   onChange={(e) => updateManager(index, "commissionRate", Number(e.target.value))}
@@ -137,7 +139,7 @@ export default function NetworkMiddleManagerSettings({
             </div>
           </div>
           
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <Label className="text-muted-foreground text-xs">* 매니져 설정 자동화 옵션</Label>
             <div className="flex flex-wrap gap-4">
               <div className="flex items-center space-x-2">
@@ -158,52 +160,32 @@ export default function NetworkMiddleManagerSettings({
                   className="w-20"
                 />
               </div>
-              
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id={`manager-condition-charge-${manager.id}`}
-                  checked={manager.conditions.chargeAmount}
-                  onChange={(e) => updateCondition(index, "chargeAmount", e.target.checked)}
-                  disabled={loading || !manager.enabled}
-                />
-                <Label htmlFor={`manager-condition-charge-${manager.id}`}>산하 사용포인트</Label>
-                <Input
-                  id={`manager-threshold-charge-${manager.id}`}
-                  type="number"
-                  value={manager.thresholds.chargeAmount}
-                  onChange={(e) => updateThreshold(index, "chargeAmount", Number(e.target.value))}
-                  disabled={loading || !manager.enabled || !manager.conditions.chargeAmount}
-                  style={{ appearance: "textfield" }}
-                  className="w-40"
-                />
-              </div>
-              
               <div className="flex items-center space-x-2">
                 <Switch
                   id={`manager-condition-usage-${manager.id}`}
-                  checked={manager.conditions.usageAmount}
-                  onChange={(e) => updateCondition(index, "usageAmount", e.target.checked)}
+                  checked={manager.conditions.viewCount}
+                  onChange={(e) => updateCondition(index, "viewCount", e.target.checked)}
                   disabled={loading || !manager.enabled}
                 />
-                <Label htmlFor={`manager-condition-usage-${manager.id}`}>산하 결제금액</Label>
+                <Label htmlFor={`manager-condition-usage-${manager.id}`}>산하 유료시청</Label>
                 <Input
                   id={`manager-threshold-usage-${manager.id}`}
                   type="number"
-                  value={manager.thresholds.usageAmount}
-                  onChange={(e) => updateThreshold(index, "usageAmount", Number(e.target.value))}
-                  disabled={loading || !manager.enabled || !manager.conditions.usageAmount}
+                  value={manager.thresholds.viewCount}
+                  onChange={(e) => updateThreshold(index, "viewCount", Number(e.target.value))}
+                  disabled={loading || !manager.enabled || !manager.conditions.viewCount}
                   style={{ appearance: "textfield" }}
                   className="w-40"
                 />
               </div>
             </div>
-          </div>
+          </div> */}
           
           <div className="space-y-2">
-            <Label className="text-muted-foreground text-xs" htmlFor={`manager-duplicate-${manager.id}`}># 동일자격 매니져 중복처리 (미입력시 근접 1인 지급)</Label>
+            <Label className="text-muted-foreground text-xs" htmlFor={`manager-duplicate-${manager.level}`}># 동일자격 매니져 중복처리 (미입력시 근접 1인 지급)</Label>
             <div className="flex space-x-2">
               <Input
-                id={`manager-duplicate-${manager.id}`}
+                id={`manager-duplicate-${manager.level}`}
                 value={manager.duplicateDistribution}
                 onChange={(e) => updateManager(index, "duplicateDistribution", e.target.value)}
                 placeholder="예: 60, 40 (가까운 순서대로 60%, 40% 지급)"

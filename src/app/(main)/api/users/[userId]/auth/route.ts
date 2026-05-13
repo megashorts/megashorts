@@ -1,4 +1,4 @@
-// 클라이언트의 성인인증(adultauth)과 구독상태(subscriptionEndDate) 확인에 사용. 비디오 시청 권한 체크에 필수적인 API
+// 클라이언트의 성인인증(adultauth)과 구독상태(subscriptionEndDate) 확인에 사용. 비디오 시청 권한 체크에 필수적인 API인 src/app/(main)/api/users/[userId]/auth/route.ts
 
 import { validateRequest } from '@/auth';
 import prisma from '@/lib/prisma';
@@ -12,9 +12,13 @@ const getUserAuth = unstable_cache(
       select: {
         referredBy: true,
         teamMaster: true,
-        subscriptionEndDate: true,
+        // subscriptionEndDate: true,
         adultauth: true,
-
+        subscription: {
+          select: {
+            currentPeriodEnd: true
+          }
+        }
       }
     });
     return userData;
@@ -43,8 +47,13 @@ export async function GET(
       select: {
         referredBy: true,
         teamMaster: true,
-        subscriptionEndDate: true,
+        // subscriptionEndDate: true,
         adultauth: true,
+        subscription: {
+          select: {
+            currentPeriodEnd: true,
+          },
+        },
       }
     });
 

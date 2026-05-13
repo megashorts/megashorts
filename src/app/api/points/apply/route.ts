@@ -1,5 +1,9 @@
+// src/app/api/points/apply/route.ts
+
 import { NextRequest, NextResponse } from 'next/server';
 import { validateRequest } from '@/auth';
+import { sendTelegramNotification } from '@/lib/telegram';
+import prisma from '@/lib/prisma';
 
 // 포인트 지급 신청 API
 export async function POST(request: NextRequest) {
@@ -37,45 +41,94 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 필수 파라미터 확인
-    if (!userId || !amount || !reason) {
-      return NextResponse.json(
-        { success: false, error: '필수 파라미터가 누락되었습니다.' },
-        { status: 400 }
-      );
+    // 유효성 검사
+    if (!userId || !amount || amount <= 0) {
+      return NextResponse.json({
+        success: false,
+        error: '필수 정보가 누락되었습니다.'
+      }, { status: 400 });
     }
 
-    // Cloudflare Worker API 호출
-    const workerUrl = process.env.NEXT_PUBLIC_STATS_API_URL || 'https://stats-api.msdevcm.workers.dev';
-    const response = await fetch(`${workerUrl}/api/points/apply`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        userId,
-        amount,
-        reason,
-        requestedBy: authUser.id
-      })
+    // 사용자 및 CreatorInfo 조회
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        CreatorInfo: true
+      }
     });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: errorData.error || '포인트 지급 신청 중 오류가 발생했습니다.',
-          status: response.status
-        },
-        { status: response.status }
-      );
+    if (!user) {
+      return NextResponse.json({
+        success: false,
+        error: '사용자를 찾을 수 없습니다.'
+      }, { status: 404 });
     }
 
-    const data = await response.json();
-    
-    // 응답 반환
-    return NextResponse.json(data);
+    // CreatorInfo 및 idCheck 확인
+    if (!user.CreatorInfo || !user.CreatorInfo.idCheck) {
+      return NextResponse.json({
+        success: false,
+        error: '포인트 지급을 위한 정보 제출이나 확인이 완료되지 않았습니다.'
+      }, { status: 400 });
+    }
+
+    // 사용자 포인트 잔액 확인
+    if (user.points < amount) {
+      return NextResponse.json({
+        success: false,
+        error: '신청 금액이 사용 가능한 포인트를 초과합니다.'
+      }, { status: 400 });
+    }
+
+    // CreatorInfo에서 bankInfo 생성
+    const bankInfo = {
+      accountHolder: user.CreatorInfo.accountHolder,
+      country: user.CreatorInfo.country,
+      bankName: user.CreatorInfo.bankName,
+      accountNumber: user.CreatorInfo.accountNumber,
+      swiftCode: user.CreatorInfo.swiftCode,
+      address: user.CreatorInfo.address,
+      phoneNumber: user.CreatorInfo.phoneNumber,
+      paypalEmail: user.CreatorInfo.paypalEmail
+    };
+
+    // PointWithdrawal 생성
+    const pointWithdrawal = await prisma.pointWithdrawal.create({
+      data: {
+        userId,
+        amount,
+        bankInfo,
+        reason: reason || null,
+        status: 'PENDING'
+      }
+    });
+
+    // 텔레그램 알림 발송
+    try {
+      const message = `💰 포인트 지급 신청\n\n` +
+        `📋 사용자: ${user.displayName} (${user.username})\n` +
+        `💵 신청 금액: ${amount.toLocaleString()} 포인트\n` +
+        `💳 예금주: ${bankInfo.accountHolder}\n` +
+        `🏦 은행: ${bankInfo.bankName}\n` +
+        `💰 계좌: ${bankInfo.accountNumber}\n` +
+        `🌍 국가: ${bankInfo.country}\n` +
+        `📧 이메일: ${user.email || 'N/A'}\n` +
+        `📞 전화: ${bankInfo.phoneNumber || 'N/A'}\n` +
+        `🏠 주소: ${bankInfo.address || 'N/A'}\n` +
+        `💬 신청 사유: ${reason || 'N/A'}\n` +
+        `🆔 신청 ID: ${pointWithdrawal.id}\n\n` +
+        `⚠️ 관리자 승인이 필요합니다.`;
+
+      await sendTelegramNotification(message);
+    } catch (telegramError) {
+      console.error('텔레그램 알림 발송 실패:', telegramError);
+      // 텔레그램 실패해도 API는 성공으로 처리
+    }
+
+    return NextResponse.json({
+      success: true,
+      data: pointWithdrawal
+    });
   } catch (error) {
     console.error('포인트 지급 신청 오류:', error);
     return NextResponse.json(

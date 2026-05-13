@@ -10,9 +10,9 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/use-toast";
 import { USER_ROLE, USER_ROLE_NAME } from "@/lib/constants";
-import { AlertCircle, IdCard, Info, Save } from "lucide-react";
+import { AlertCircle, CirclePlus, IdCard, Info, Save } from "lucide-react";
 import UserSearchInput from "@/components/admin/UserSearchInput";
-import NetworkMiddleManagerSettings, { MiddleManager } from "./NetworkMiddleManagerSettings";
+import NetworkMiddleManagerSettings, { MiddleManager } from "./settings/NetworkMiddleManagerSettings";
 import HeadquartersLevelSettings from "./settings/HeadquartersLevelSettings";
 import NetworkLevelSettings from "./settings/NetworkLevelSettings";
 import { Separator } from "@/components/ui/separator";
@@ -72,19 +72,20 @@ export default function Agencysettings() {
   // 중간관리자 설정
   const [networkMiddleManagers, setNetworkMiddleManagers] = useState<MiddleManager[]>([
     {
-      id: "mm1",
+      // id: "mm1",
+      level: 1001,
       enabled: false,
       name: "매니져 1",
       commissionRate: 3,
       conditions: {
         memberCount: false,
-        chargeAmount: false,
-        usageAmount: false
+        // chargeAmount: false,
+        viewCount: false
       },
       thresholds: {
         memberCount: 10,
-        chargeAmount: 100000,
-        usageAmount: 50000
+        // chargeAmount: 100000,
+        viewCount: 50
       },
       duplicateDistribution: ""
     }
@@ -277,19 +278,20 @@ export default function Agencysettings() {
           } else {
             // 기본값 설정
             setNetworkMiddleManagers([{
-              id: "mm1",
+              // id: "mm1",
+              level: 1001,
               enabled: false,
               name: "매니져 1",
               commissionRate: 3,
               conditions: {
                 memberCount: false,
-                chargeAmount: false,
-                usageAmount: false
+                // chargeAmount: false,
+                viewCount: false
               },
               thresholds: {
                 memberCount: 10,
-                chargeAmount: 100000,
-                usageAmount: 50000
+                // chargeAmount: 100000,
+                viewCount: 50
               },
               duplicateDistribution: ""
             }]);
@@ -450,21 +452,47 @@ export default function Agencysettings() {
   
   
   // 중간관리자 추가
+  // const addMiddleManager = () => {
+  //   const newManager: MiddleManager = {
+  //     id: `mm${networkMiddleManagers.length + 1}`,
+  //     enabled: false,
+  //     name: `매니져${networkMiddleManagers.length + 1}`,
+  //     commissionRate: 3,
+  //     conditions: {
+  //       memberCount: false,
+  //       // chargeAmount: false,
+  //       viewCount: false
+  //     },
+  //     thresholds: {
+  //       memberCount: 10,
+  //       // chargeAmount: 100000,
+  //       viewCount: 50
+  //     },
+  //     duplicateDistribution: ""
+  //   };
+  //   setNetworkMiddleManagers([...networkMiddleManagers, newManager]);
+  // };
+
   const addMiddleManager = () => {
+    // 현재 중간관리자 중 가장 높은 level 찾기
+    const maxLevel = networkMiddleManagers.length > 0 
+      ? Math.max(...networkMiddleManagers.map(m => m.level))
+      : 1000;
+    
     const newManager: MiddleManager = {
-      id: `mm${networkMiddleManagers.length + 1}`,
+      level: maxLevel + 1,
       enabled: false,
-      name: `매니져${networkMiddleManagers.length + 1}`,
+      name: `매니져 ${maxLevel - 1000 + 1}`,
       commissionRate: 3,
       conditions: {
         memberCount: false,
-        chargeAmount: false,
-        usageAmount: false
+        // chargeAmount: false,
+        viewCount: false
       },
       thresholds: {
         memberCount: 10,
-        chargeAmount: 100000,
-        usageAmount: 50000
+        // chargeAmount: 100000,
+        viewCount: 50
       },
       duplicateDistribution: ""
     };
@@ -579,14 +607,14 @@ export default function Agencysettings() {
 
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <h3 className="text-sm font-medium"># 매니져 설정</h3>
+                    <h3 className="text-sm font-medium">매니져 설정</h3>
                     <Button
-                      variant="outline"
+                      variant="ghost"
                       size="sm"
                       onClick={addMiddleManager}
                       disabled={loading}
                     >
-                      +
+                      <CirclePlus className="h-5 w-5" />
                     </Button>
                   </div>
                   

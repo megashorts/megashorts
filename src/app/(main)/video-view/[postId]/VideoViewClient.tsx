@@ -10,6 +10,7 @@ import 'swiper/css/virtual';
 import { toast } from '@/components/ui/use-toast';
 import { AlertModal } from '@/components/ui/AlertModal';
 import PlayPermissionCheck from '@/components/videos/PlayPermissionCheck';
+import AgeVerificationModal from '@/components/AgeVerificationModal';
 import { cn } from '@/lib/utils';
 import VideoControls from '@/components/videos/VideoControls';
 import { useSearchParams } from 'next/navigation';
@@ -59,6 +60,7 @@ export function VideoViewClient({ post, initialSequence, initialTime }: VideoVie
   const [isMuted, setIsMuted] = useState(true);
   const resumeHandledRef = useRef(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [showAgeVerification, setShowAgeVerification] = useState(false);
 
   useEffect(() => {
     const savedMuteState = localStorage.getItem('videoMuted');
@@ -341,14 +343,7 @@ export function VideoViewClient({ post, initialSequence, initialTime }: VideoVie
                                 });
                                 break;
                               case 2:
-                                setModalState({
-                                  isOpen: true,
-                                  message: '성인인증이 필요한 컨텐츠입니다.',
-                                  imageUrl: '/MS Logo emblem.svg',
-                                  // redirectUrl: `/usermenu/users/${user?.username}`,
-                                  redirectUrl: '/',
-                                  buttonText: '홈으로 이동'
-                                });
+                                setShowAgeVerification(true);
                                 break;
                               case 3:
                                 setModalState({
@@ -416,6 +411,17 @@ export function VideoViewClient({ post, initialSequence, initialTime }: VideoVie
         </Swiper>
       </div>
       <AlertModal {...modalState} onClose={() => setModalState(prev => ({ ...prev, isOpen: false }))} />
+      <AgeVerificationModal
+        isOpen={showAgeVerification}
+        onClose={() => setShowAgeVerification(false)}
+        onVerified={() => {
+          setShowAgeVerification(false);
+          // 인증 성공 후 현재 비디오 다시 체크하도록 activeIndex 리셋
+          const currentIndex = activeIndex;
+          setActiveIndex(-1);
+          setTimeout(() => setActiveIndex(currentIndex), 100);
+        }}
+      />
     </>
   );
 }

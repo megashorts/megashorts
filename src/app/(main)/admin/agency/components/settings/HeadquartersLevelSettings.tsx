@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Trash, Trash2, Plus, UsersRound, Wallet, CircleDollarSign, CircleMinus, CirclePlus } from "lucide-react";
+import { Trash, Trash2, Plus, UsersRound, Wallet, CircleDollarSign, CircleMinus, CirclePlus, Eye } from "lucide-react";
 
 interface SubLevel {
   id: string;
@@ -21,11 +21,11 @@ interface SubLevel {
       enabled: boolean;
       threshold: number;
     };
-    pointsGenerated: {
-      enabled: boolean;
-      threshold: number;
-    };
-    referralAmount: {
+    // pointsGenerated: {
+    //   enabled: boolean;
+    //   threshold: number;
+    // };
+    viewCount: {
       enabled: boolean;
       threshold: number;
     };
@@ -129,8 +129,8 @@ export default function HeadquartersLevelSettings({
       qualification: {
         enabled: false,
         memberCount: { enabled: false, threshold: 10 },
-        pointsGenerated: { enabled: false, threshold: 100000 },
-        referralAmount: { enabled: false, threshold: 50000 },
+        // pointsGenerated: { enabled: false, threshold: 100000 },
+        viewCount: { enabled: false, threshold: 50 },
         useCondition: 'any'
       }
     };
@@ -196,8 +196,8 @@ export default function HeadquartersLevelSettings({
         subLevel.qualification = {
           enabled: false,
           memberCount: { enabled: false, threshold: 10 },
-          pointsGenerated: { enabled: false, threshold: 100000 },
-          referralAmount: { enabled: false, threshold: 50000 },
+          // pointsGenerated: { enabled: false, threshold: 100000 },
+          viewCount: { enabled: false, threshold: 50 },
           useCondition: 'any'
         };
       }
@@ -220,7 +220,7 @@ export default function HeadquartersLevelSettings({
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h3 className="text-sm font-medium">본부구조 수직/수평 확장 및 수수료 설정</h3>
+        <h3 className="text-sm font-medium">본부구조 확장 및 수수료 설정</h3>
         <Button
           variant="ghost"
           size="sm"
@@ -273,7 +273,7 @@ export default function HeadquartersLevelSettings({
               {index !== 0 && index !== levels.length - 1 ? (
                 <>
                   {/* 서브레벨 추가 버튼 */}
-                  <Button
+                  {/* <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => addSubLevel(index)}
@@ -281,7 +281,7 @@ export default function HeadquartersLevelSettings({
                     className="px-2"
                   >
                     <CirclePlus className="h-5 w-5" />
-                  </Button>
+                  </Button> */}
                   
                   {/* 레벨 삭제 버튼 */}
                   <Button
@@ -349,7 +349,7 @@ export default function HeadquartersLevelSettings({
                   <div className="col-span-12 pl-6">
                     <details className="text-xs">
                       <summary className="cursor-pointer text-muted-foreground">
-                        자격 취득 조건 설정
+                      Automatic Level Change
                       </summary>
                       <div className="p-2 border rounded-md mt-1 space-y-2">
                         <div className="flex items-center space-x-2">
@@ -362,7 +362,7 @@ export default function HeadquartersLevelSettings({
                             disabled={loading}
                           />
                           <Label htmlFor={`qualification-enabled-${index}-${subIndex}`}>
-                            자동 자격 부여 활성화
+                            On / Off
                           </Label>
                         </div>
                         
@@ -390,66 +390,42 @@ export default function HeadquartersLevelSettings({
                                     updateSubLevelQualification(index, subIndex, ['memberCount', 'threshold'], Number(e.target.value));
                                   }}
                                   disabled={loading || !subLevel.qualification?.memberCount?.enabled}
-                                  className="w-full text-right ml-1"
+                                  className="w-30 text-right ml-1"
                                   style={{ appearance: "textfield" }}
                                 />
                                 <span className="text-xs ml-1 mr-6">명</span>
                               </div>
                               
-                              {/* 하위 시청 포인트 조건 */}
-                              <div className="flex items-center mb-2 md:mb-0 md:flex-1">
-                                <Switch
-                                  id={`points-generated-${index}-${subIndex}`}
-                                  checked={subLevel.qualification?.pointsGenerated?.enabled || false}
-                                  onChange={(e) => {
-                                    updateSubLevelQualification(index, subIndex, ['pointsGenerated', 'enabled'], e.target.checked);
-                                  }}
-                                  disabled={loading}
-                                  className="mr-2"
-                                />
-                                <Wallet className="h-8 w-8 text-muted-foreground mr-1" />
-                                <Input
-                                  type="number"
-                                  value={subLevel.qualification?.pointsGenerated?.threshold || 100000}
-                                  onChange={(e) => {
-                                    updateSubLevelQualification(index, subIndex, ['pointsGenerated', 'threshold'], Number(e.target.value));
-                                  }}
-                                  disabled={loading || !subLevel.qualification?.pointsGenerated?.enabled}
-                                  className="w-full text-right ml-1  mr-6"
-                                  style={{ appearance: "textfield" }}
-                                />
-                                <span className="text-xs ml-1">P</span>
-                              </div>
-                              
-                              {/* 하위 추천 금액 조건 */}
+                              {/* 하위 시청수 조건 */}
                               <div className="flex items-center md:flex-1">
                                 <Switch
                                   id={`referral-amount-${index}-${subIndex}`}
-                                  checked={subLevel.qualification?.referralAmount?.enabled || false}
+                                  checked={subLevel.qualification?.viewCount?.enabled || false}
                                   onChange={(e) => {
                                     updateSubLevelQualification(index, subIndex, ['referralAmount', 'enabled'], e.target.checked);
                                   }}
                                   disabled={loading}
                                   className="mr-2"
                                 />
-                                <CircleDollarSign className="h-8 w-8 text-muted-foreground mr-1" />
+                                <Eye className="h-8 w-8 text-muted-foreground mr-1" />
                                 <Input
                                   type="number"
-                                  value={subLevel.qualification?.referralAmount?.threshold || 50000}
+                                  value={subLevel.qualification?.viewCount?.threshold || 50}
                                   onChange={(e) => {
                                     updateSubLevelQualification(index, subIndex, ['referralAmount', 'threshold'], Number(e.target.value));
                                   }}
-                                  disabled={loading || !subLevel.qualification?.referralAmount?.enabled}
-                                  className="w-full text-right ml-1 mr-6"
+                                  disabled={loading || !subLevel.qualification?.viewCount?.enabled}
+                                  className="w-30 text-right ml-1 mr-1"
                                   style={{ appearance: "textfield" }}
                                 />
-                                <span className="text-xs ml-1">원</span>
+                                {/* <span className="text-xs ml-1">원</span> */}
+                                <span className="text-xs ml-1 mr-6">회</span>
                               </div>
                             </div>
                             
                             {/* 조건 적용 방식 */}
                             <div className="flex items-center space-x-2 pt-1">
-                              <Label className="text-xs">조건 적용:</Label>
+                              <Label className="text-xs">Condition :</Label>
                               <select
                                 value={subLevel.qualification?.useCondition || 'any'}
                                 onChange={(e) => {
@@ -458,8 +434,8 @@ export default function HeadquartersLevelSettings({
                                 disabled={loading}
                                 className="text-xs p-1 border rounded"
                               >
-                                <option value="any">하나라도 충족</option>
-                                <option value="all">모두 충족</option>
+                                <option value="any">Minimum 1</option>
+                                <option value="all">All</option>
                               </select>
                             </div>
                           </div>

@@ -27,6 +27,13 @@ export function formatNumber(n: number): string {
   }).format(n);
 }
 
+export function formatNumberFull(n: number): string {
+  return Intl.NumberFormat("en-US", {
+    maximumFractionDigits: 0, // 소수점 없이 정수만
+  }).format(n);
+}
+
+
 export function slugify(input: string): string {
   return input
     .toLowerCase()

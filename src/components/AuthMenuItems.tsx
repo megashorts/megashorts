@@ -1,3 +1,4 @@
+// src/components/AuthMenuItems.tsx
 'use client'
 
 import { 

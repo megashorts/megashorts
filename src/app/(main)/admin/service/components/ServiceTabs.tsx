@@ -1,3 +1,4 @@
+// src/app/(main)/admin/service/components/ServiceTabs.tsx
 "use client";
 
 import { lazy, Suspense, useState } from "react";

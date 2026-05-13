@@ -1,3 +1,4 @@
+// src/app/(auth)/actions.ts
 "use server";
 
 import { lucia, validateRequest } from '@/auth';

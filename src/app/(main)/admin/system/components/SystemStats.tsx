@@ -37,7 +37,7 @@ export function SystemStats() {
     setIsLoading(true);
     try {
       // 관리자 통계 API 호출
-      const response = await fetch(`${process.env.NEXT_PUBLIC_STATS_API_URL}/api/stats/admin`);
+      const response = await fetch(`/api/stats/admin`);
       
       if (!response.ok) {
         console.error(`API 호출 실패: ${response.status} ${response.statusText}`);
@@ -54,7 +54,7 @@ export function SystemStats() {
       
       // 주간 정산 데이터 조회 (현재가 아닌 경우)
       if (period !== 'current') {
-        const weeklyResponse = await fetch(`${process.env.NEXT_PUBLIC_STATS_API_URL}/api/stats/reports?period=${period}`);
+        const weeklyResponse = await fetch(`/api/stats/reports?period=${period}`);
         
         if (weeklyResponse.ok) {
           const weeklyResult = await weeklyResponse.json();
@@ -70,7 +70,7 @@ export function SystemStats() {
       
       // Cloudflare 통계 데이터 조회 (글로벌 접속자 지도 등)
       try {
-        const cloudflareResponse = await fetch(`${process.env.NEXT_PUBLIC_STATS_API_URL}/api/stats/cloudflare`);
+        const cloudflareResponse = await fetch(`/api/stats/cloudflare`);
         
         if (cloudflareResponse.ok) {
           const cloudflareResult = await cloudflareResponse.json();
@@ -99,7 +99,7 @@ export function SystemStats() {
   const invalidateCache = async () => {
     try {
       if (confirm('모든 통계 캐시를 무효화하시겠습니까? 다음 조회 시 최신 데이터를 가져옵니다.')) {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_STATS_API_URL}/api/stats/cache/invalidate`, {
+        const response = await fetch(`/api/stats/cache/invalidate`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

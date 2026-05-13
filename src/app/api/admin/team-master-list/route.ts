@@ -40,7 +40,8 @@ export async function GET(request: NextRequest) {
       teamMasters.map(async (master) => {
         // SystemSetting 모델에서 설정 정보 가져오기
         const settingRecord = await prisma.systemSetting.findFirst({
-          where: { key: `agencySettings_${master.id}` }
+          // where: { key: `agencySettings_${master.id}` }
+          where: { id: `${master.id}` }
         });
         
         let settings = null;

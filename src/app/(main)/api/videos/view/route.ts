@@ -64,11 +64,12 @@ export async function POST(req: Request) {
           return Response.json({ error: "Auth check failed" }, { status: response.status });
         }
 
-        const userData = await response.json();
+        // const userData = await response.json();
+        userData = await response.json();
         console.log('userData:', userData);
 
         
-        if (!userData.subscriptionEndDate || new Date(userData.subscriptionEndDate) < new Date()) {
+        if (!userData.subscription.currentPeriodEnd || new Date(userData.subscription.currentPeriodEnd) < new Date()) {
           accessMethod = AccessMethod.COIN;
           viewMessage = "COIN view save";
         } else {
@@ -100,8 +101,10 @@ export async function POST(req: Request) {
               accessMethod,
               postId: postId,
               uploaderId: post.userId,
-              referredBy: userData.referredBy,
-              teamMaster: userData.teamMaster,
+              // referredBy: userData.referredBy,
+              // teamMaster: userData.teamMaster,
+              referredBy: userData?.referredBy ?? null,
+              teamMaster: userData?.teamMaster ?? null,              
             }
           });
         }

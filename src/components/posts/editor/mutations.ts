@@ -1,7 +1,10 @@
+// src/components/posts/editor/mutations.ts : React Query로 액션티에스의 submitPost() 호출, 성공 시 UI 상태 업데이트 및 페이지 이동 등 후처리
+
 import { useSession } from "@/components/SessionProvider";
 import { PostsPage } from "@/lib/types";
 import {
   InfiniteData,
+  Query,
   QueryFilters,
   useMutation,
   useQueryClient,
@@ -48,16 +51,36 @@ export function useSubmitPostMutation() {
         router.refresh();
 
         // 3. 클라이언트 상태 업데이트
-        const queryFilter = {
-          queryKey: ["post-feed"],
-          predicate(query) {
-            return (
-              query.queryKey.includes("for-you") ||
-              (query.queryKey.includes("user-posts") &&
-               user?.id ? query.queryKey.includes(user.id) : false)
-            );
-          },
-        } satisfies QueryFilters;
+        // const queryFilter = {
+        //   queryKey: ["post-feed"],
+        //   predicate(query) {
+        //     return (
+        //       query.queryKey.includes("for-you") ||
+        //       (query.queryKey.includes("user-posts") &&
+        //        user?.id ? query.queryKey.includes(user.id) : false)
+        //     );
+        //   },
+        // } satisfies QueryFilters;
+
+        const queryFilter: QueryFilters<
+        InfiniteData<PostsPage, string | null>,
+        Error,
+        InfiniteData<PostsPage, string | null>,
+        readonly unknown[]
+      > = {
+        queryKey: ['posts'],
+        predicate: (
+          query: Query<
+            InfiniteData<PostsPage, string | null>,
+            Error,
+            InfiniteData<PostsPage, string | null>,
+            readonly unknown[]
+          >
+        ) => {
+          return true;
+        },
+      };
+
 
         await queryClient.cancelQueries(queryFilter);
 
@@ -68,17 +91,30 @@ export function useSubmitPostMutation() {
             const firstPage = oldData.pages[0];
             if (!firstPage) return oldData;
 
+            // if ('id' in newPost && newPost.id) {
+            //   return {
+            //     pageParams: oldData.pageParams,
+            //     pages: oldData.pages.map(page => ({
+            //       ...page,
+            //       posts: page.posts.map(post => 
+            //         post.id === newPost.id ? newPost : post
+            //       )
+            //     }))
+            //   };
+            // }
+
             if ('id' in newPost && newPost.id) {
               return {
                 pageParams: oldData.pageParams,
-                pages: oldData.pages.map(page => ({
+                pages: oldData.pages.map((page) => ({
                   ...page,
-                  posts: page.posts.map(post => 
+                  posts: page.posts.map((post) =>
                     post.id === newPost.id ? newPost : post
-                  )
-                }))
+                  ),
+                })),
               };
             }
+
             
             return {
               pageParams: oldData.pageParams,

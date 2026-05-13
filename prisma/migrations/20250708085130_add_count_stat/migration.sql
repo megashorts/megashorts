@@ -1,0 +1,6 @@
+-- AlterTable
+ALTER TABLE "posts" ADD COLUMN     "videoPaid" INTEGER NOT NULL DEFAULT 0;
+
+-- AlterTable
+ALTER TABLE "users" ADD COLUMN     "videoCountSum" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "videoPaidSum" INTEGER NOT NULL DEFAULT 0;

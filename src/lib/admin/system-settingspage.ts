@@ -1,3 +1,5 @@
+// src/lib/admin/system-settingspage.ts
+
 // 시스템 설정 타입 정의
 export interface SystemSettingValue<T = number | string | boolean> {
   enabled: boolean;
@@ -43,6 +45,7 @@ export interface SystemSettings {
   // 업로더 레벨 설정
   uploaderQualification: SystemSettingValue<UploaderLevel[]>; // 업로더 자격 기준
   coinToPoint: SystemSettingValue<number>;                 // 코인의 포인트 변환비율
+  noteamReffererPointRatio: SystemSettingValue<number>;                 // 코인의 포인트 변환비율
 }
 
 // 기본 구독 패키지
@@ -95,7 +98,8 @@ export const SECTIONS: Record<string, SectionInfo> = {
     description: '레벨별 조회수 기준 및 수익 분배율 관리',
     keys: [
       'uploaderQualification',
-      'coinToPoint'
+      'coinToPoint',
+      'noteamReffererPointRatio'
     ]
   },
   SYSTEM_CONFIG: {
@@ -121,6 +125,7 @@ export const SETTING_KEYS = {
   referralCoinAmount: 'referralCoinAmount',
   uploaderQualification: 'uploaderQualification',
   coinToPoint: 'coinToPoint',
+  noteamReffererPointRatio: 'noteamReffererPointRatio',
   serviceLogEnabled: 'serviceLogEnabled'
 } as const;
 
@@ -134,7 +139,8 @@ export const SETTING_LABELS = {
   viewCoinAmount: '시청 코인 소모량',
   referralCoinAmount: '추천인 코인 지급량',
   uploaderQualification: '업로더 자격',
-  coinToPoint: '1코인 포인트 변환비율',
+  coinToPoint: '1코인-포인트 정산변환 수량',
+  noteamReffererPointRatio: '미소속 추천인 포인트 비율(%)',
   serviceLogEnabled: '서비스 로그'
 } as const;
 
@@ -157,5 +163,6 @@ export const DEFAULT_SETTINGS: SystemSettings = {
   referralCoinAmount: { enabled: true, value: 2 },
   uploaderQualification: { enabled: true, value: DEFAULT_UPLOADER_LEVELS },
   coinToPoint: { enabled: true, value: 120 },
+  noteamReffererPointRatio: { enabled: true, value: 1 },
   serviceLogEnabled: { enabled: true, value: true }
 };
