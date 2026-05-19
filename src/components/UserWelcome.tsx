@@ -5,10 +5,13 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Users } from "lucide-react";
 import { useUnreadCount } from "@/hooks/queries/useNotifications";
+import { useTranslations } from 'next-intl';
 
 export default function UserWelcome() {
   const { user } = useSession();
   const { data: unreadData } = useUnreadCount();
+  const t = useTranslations('Common');
+  const tNav = useTranslations('Nav');
 
   const unreadCount = unreadData?.unreadCount ?? 0;
 
@@ -19,10 +22,10 @@ export default function UserWelcome() {
   return (
     <div className="relative items-center justify-start gap-3 hidden lg:inline mt-5">
       <div className="text-start ml-5 pb-6">
-        <span className="hidden lg:inline">반가워요!</span>
+        <span className="hidden lg:inline">{t('welcome')}</span>
         <br />
         {user && (
-          <span className="hidden lg:inline">@{user.username}님.</span>
+          <span className="hidden lg:inline">@{user.username}{t('userSuffix')}</span>
         )}
       </div>
       <hr className="mx-auto border-t border-gray-600 pb-4 ml-4 mr-4 pt-2" />
@@ -30,7 +33,7 @@ export default function UserWelcome() {
       {user && (
         <>
           <div key="welcome-user-info" className="text-xs font-medium text-gray-600 ml-4 hidden lg:inline pt-2">
-            사용자 정보
+            {tNav('sectionUser')}
           </div>
           <Button
             key="welcome-my-info"
@@ -50,7 +53,7 @@ export default function UserWelcome() {
                   </span>
                 )}
               </div>
-              <span className="hidden lg:inline">나의 정보</span>
+              <span className="hidden lg:inline">{tNav('myInfo')}</span>
             </Link>
           </Button>
         </>

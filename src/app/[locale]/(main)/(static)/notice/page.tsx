@@ -6,12 +6,13 @@ import { CategoryType } from "@prisma/client";
 import BlogCard from "@/components/posts/BlogCard";
 import NoticeSidebar from "@/components/NoticeSidebar";
 import { Pin } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
-export const dynamic = 'force-static';
-export const revalidate = false;
-export const fetchCache = 'force-cache';
+export const dynamic = 'force-dynamic';
 
 export default async function NoticePage() {
+  const t = await getTranslations('Notice');
+  
   const totalNoticeCount = await prisma.post.count({
     where: {
       status: "PUBLISHED",
@@ -71,13 +72,13 @@ export default async function NoticePage() {
         {/* 공지사항 섹션 */}
         <div className="space-y-1">
           <div className="rounded-2xl bg-card p-3 sm:p-3 mx-auto shadow-sm">
-            <h1 className="text-center text-lg sm:text-2xl font-bold">📢 메가쇼츠 소식</h1>
+            <h1 className="text-center text-lg sm:text-2xl font-bold">📢 {t('megashortsNews')}</h1>
           </div>
 
           <div className="flex flex-col sm:flex-row sm:items-center sm:pl-4 pt-4">
             <div className="relative flex justify-between items-center w-full">
               <h3 className="text-xl font-bold text-white relative w-fit">
-                공지사항
+                {t('notice')}
                 <span className="absolute bottom-0 left-0 h-[10px] bg-red-500 -z-10 w-[110%] translate-y-0.6"></span>
               </h3>
               {/* <Link 
@@ -95,9 +96,9 @@ export default async function NoticePage() {
             <Table>
               <TableHeader>
                 <TableRow className="h-6">
-                  <TableHead className="w-[120px]">게시일</TableHead>
-                  <TableHead>제목</TableHead>
-                  <TableHead className="w-[120px] text-end">작성자</TableHead>
+                  <TableHead className="w-[120px]">{t('date')}</TableHead>
+                  <TableHead>{t('postTitle')}</TableHead>
+                  <TableHead className="w-[120px] text-end">{t('author')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -126,7 +127,7 @@ export default async function NoticePage() {
                     </TableCell>
                     <TableCell className="text-end">
                       <Link href="/notice/list" className="text-xs hover:text-red-500 text-end">
-                        전체 목록보기
+                        {t('viewAllList')}
                       </Link>
                     </TableCell>
                   </TableRow>
@@ -163,7 +164,7 @@ export default async function NoticePage() {
                   href="/notice/list" 
                   className="text-xs hover:text-red-500"
                 >
-                  전체 목록보기
+                  {t('viewAllList')}
                 </Link>
               </div>
             )}
@@ -173,7 +174,7 @@ export default async function NoticePage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:pl-4 pt-3">
           <div className="flex justify-between items-center w-full">
             <h3 className="text-xl font-bold text-white relative w-fit">
-              MS블로그
+              {t('msBlog')}
               <span className="absolute bottom-0 left-0 h-[10px] bg-red-500 -z-10 w-[110%] translate-y-0.6"></span>
             </h3>
           </div>

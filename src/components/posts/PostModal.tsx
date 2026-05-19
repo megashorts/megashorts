@@ -9,7 +9,8 @@ import Link from "next/link";
 import BookmarkButton from "./BookmarkButton";
 import { cn } from "@/lib/utils";
 import LikeButton from "./LikeButtonOnly";
-import { getCategoryName, getThumbnailUrl } from "@/lib/constants";
+import { getThumbnailUrl } from "@/lib/constants";
+import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 
 interface PostModalProps {
@@ -20,6 +21,7 @@ interface PostModalProps {
 
 export default function PostModal({ post, handleClose }: PostModalProps) {
   const { user } = useSession();
+  const t = useTranslations('Category');
   const [showPreview, setShowPreview] = useState(true);
   const [isVideoReady, setIsVideoReady] = useState(false);
 
@@ -253,7 +255,7 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
                   key={category}
                   className="flex items-center py-2 rounded-sm text-muted-foreground text-xs"
                 >
-                  #{getCategoryName(category)}
+                  #{t(category)}
                 </span>
               ))}
             </div>
@@ -398,7 +400,7 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
                 key={category}
                 className="flex items-center py-2 rounded-sm text-muted-foreground text-xs"
               >
-                #{getCategoryName(category)}
+                #{t(category)}
               </span>
             ))}
           </div>

@@ -4,7 +4,7 @@ import {routing} from './routing';
 export default getRequestConfig(async ({requestLocale}) => {
   let locale = await requestLocale;
 
-  // Ensure that a valid locale is used
+  // config.ts에서 정의된 유효한 locale인지 확인
   if (!locale || !routing.locales.includes(locale as any)) {
     locale = routing.defaultLocale;
   }

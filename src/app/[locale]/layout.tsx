@@ -12,10 +12,12 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
+import { locales as localeConfigs, defaultLocale } from '@/i18n/config';
 
 const BMDOHYEON = localFont({
   src: '../fonts/BMDOHYEON.woff2',  // src/app/fonts 폴더 내의 폰트 파일
   display: 'swap',
+  variable: '--font-BMDOHYEON',
 });
 
 export const viewport: Viewport = {
@@ -109,10 +111,30 @@ export default async function RootLayout({
   // Providing all messages to the client
   // side is the easiest way to get started
   const messages = await getMessages();
+  const localeFontClass = locale === 'zh'
+    ? 'font-locale-zh'
+    : locale === 'en'
+      ? 'font-locale-en'
+      : 'font-locale-ko';
+
+  // SEO: 기본 URL 및 hreflang alternate 링크 생성
+  const baseUrl = 'https://megashorts.com';
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body className={BMDOHYEON.className}>
+      <head>
+        {/* SEO: hreflang alternate 링크 - Google이 각 언어 버전을 올바르게 인식 */}
+        {localeConfigs.map((loc) => (
+          <link
+            key={loc.code}
+            rel="alternate"
+            hrefLang={loc.code}
+            href={loc.code === defaultLocale ? baseUrl : `${baseUrl}/${loc.code}`}
+          />
+        ))}
+        <link rel="alternate" hrefLang="x-default" href={baseUrl} />
+      </head>
+      <body className={`${BMDOHYEON.variable} ${localeFontClass}`}>
         <NextIntlClientProvider messages={messages}>
           <ReactQueryProvider>
             <ThemeProvider

@@ -1,5 +1,8 @@
+'use client';
+
 import React from 'react';
-import Link from 'next/link';  // Link import 추가
+import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 interface FooterLinkProps {
   href: string;
@@ -78,6 +81,8 @@ const SocialLink: React.FC<SocialLinkProps> = ({ href, icon: Icon, label }) => (
 );
 
 const Footer: React.FC = () => {
+  const t = useTranslations('Footer');
+
   return (
     <footer className="w-full border-t border-border bg-background mt-4">
       <div className="container mx-auto px-4 py-6 md:pb-6 pb-20">
@@ -85,7 +90,7 @@ const Footer: React.FC = () => {
           {/* Company Info Section */}
           <div className="flex flex-col items-center md:items-start space-y-2">
             <p className="text-sm text-muted-foreground">
-              ©2024 All rights reserved by{' '}
+              {t('copyright')}{' '}
               <FooterLink href="/">MEGASHORTS</FooterLink>
             </p>
           </div>
@@ -93,9 +98,9 @@ const Footer: React.FC = () => {
           {/* Center Links Section */}
           <div className="flex items-center justify-center">
             <nav className="flex items-center">
-              <FooterLink href="/company/policy">이용약관</FooterLink>
+              <FooterLink href="/company/policy">{t('terms')}</FooterLink>
               <div className="h-4 w-px bg-border mx-4" />
-              <FooterLink href="/company/private">개인정보 처리방침</FooterLink>
+              <FooterLink href="/company/private">{t('privacy')}</FooterLink>
             </nav>
           </div>
 

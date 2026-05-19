@@ -5,15 +5,7 @@ import PostGrid from "@/components/PostGrid";
 
 // 디버깅을 위한 로그 추가
 export async function generateStaticParams() {
-  const categories = Object.values(CategoryType);
-  console.log('Generating static params for categories:', categories);
-  
-  return categories.map((category) => {
-    console.log('Processing category:', category);
-    return {
-      category: category.toString()
-    };
-  });
+  return [];
 }
 
 export default async function CategoryPage({

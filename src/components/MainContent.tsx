@@ -5,6 +5,8 @@ import FeaturedPostSlider from "./slider/FeaturedPostSlider";
 import PostSlider from "./slider/PostSlider";
 import RankedPostSlider from "./slider/RankedPostSlider";
 import { SliderSetting, defaultSliderSettings } from "@/lib/sliderSettings";
+import { getLocale } from 'next-intl/server';
+import { getDynamicContent } from '@/lib/i18n-utils';
 
 export const dynamic = 'force-static';
 
@@ -182,6 +184,7 @@ async function getCategoryPosts(categories: CategoryType[], take: number = 20) {
 }
 
 export default async function MainContent() {
+  const currentLocale = await getLocale();
   // 슬라이더 설정 가져오기
   const settings = await prisma.systemSetting.findUnique({
     where: { key: 'main_sliders' }
@@ -229,15 +232,23 @@ export default async function MainContent() {
     <div className="container mx-auto px-4 py-4 z-5">
       {/* Featured 슬라이더 */}
       {/* Featured 슬라이더는 항상 하나만 존재 */}
-      {sortedSliders.find(s => s.type === 'featured') && (
-        <FeaturedPostSlider 
-          key="featured"
-          posts={sortedSliders.find(s => s.type === 'featured')?.posts || []}
-          title={sortedSliders.find(s => s.type === 'featured')?.title || defaultSliderSettings.featured.title}
-          viewAllHref={sortedSliders.find(s => s.type === 'featured')?.viewAllHref}
-          sliderId="featured-slider"
-        />
-      )}
+      {sortedSliders.find(s => s.type === 'featured') && (() => {
+        const featuredSlider = sortedSliders.find(s => s.type === 'featured')!;
+        const title = getDynamicContent(
+          featuredSlider.title || defaultSliderSettings.featured.title,
+          featuredSlider.titleI18n,
+          currentLocale
+        );
+        return (
+          <FeaturedPostSlider 
+            key="featured"
+            posts={featuredSlider.posts || []}
+            title={title}
+            viewAllHref={featuredSlider.viewAllHref}
+            sliderId="featured-slider"
+          />
+        );
+      })()}
       
       {/* 나머지 슬라이더들 */}
       <div className="space-y-6 py-12 md:py-12">
@@ -245,7 +256,11 @@ export default async function MainContent() {
           .filter(slider => slider.type !== 'featured')
           .map((slider) => {
             // title이 없는 경우 기본값 설정
-            const title = slider.title || defaultSliderSettings[slider.type].title;
+            const title = getDynamicContent(
+              slider.title || defaultSliderSettings[slider.type].title,
+              slider.titleI18n,
+              currentLocale
+            );
 
             if (slider.type === 'ranked') {
               return (

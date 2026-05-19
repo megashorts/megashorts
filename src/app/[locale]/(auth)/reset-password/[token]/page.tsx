@@ -7,11 +7,12 @@ export const metadata: Metadata = {
 };
 
 interface PageProps {
-  params: {
+  params: Promise<{
     token: string;
-  };
+  }>;
 }
 
 export default async function ResetPasswordTokenPage({ params }: PageProps) {
-  return <ResetPasswordForm token={params.token} />;
+  const { token } = await params;
+  return <ResetPasswordForm token={token} />;
 }

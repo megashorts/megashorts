@@ -110,24 +110,19 @@ export default function Agencysearch() {
     
     try {
       setLoading(true);
-      // 실제 API가 구현되면 해당 API를 호출
-      // 현재는 더미 데이터 사용
-      setStatisticsData({
-        totalMembers: 120,
-        totalAgencies: 15,
-        totalManagers: 5,
-        totalPoints: 25000,
-        membersByLevel: [
-          { level: 1, count: 5 },
-          { level: 2, count: 15 },
-          { level: 3, count: 100 }
-        ],
-        pointsByLevel: [
-          { level: 1, points: 10000 },
-          { level: 2, points: 8000 },
-          { level: 3, points: 7000 }
-        ]
-      });
+      const response = await fetch(`/api/agency/statistics?userId=${currentUser?.id}`);
+
+      if (!response.ok) {
+        throw new Error(`API 호출 실패: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      if (data.success && data.data) {
+        setStatisticsData(data.data);
+      } else {
+        throw new Error(data.error || "데이터를 불러오는데 실패했습니다.");
+      }
     } catch (error) {
       console.error("통계 데이터를 불러오는 중 오류가 발생했습니다:", error);
       toast({

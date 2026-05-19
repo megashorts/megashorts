@@ -4,7 +4,8 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import VideoSection from "@/components/videos/VideoSection";
 import PostMoreButton from "@/components/posts/PostMoreButton";
-import { getCategoryName, getThumbnailUrl } from "@/lib/constants";
+import { getThumbnailUrl } from "@/lib/constants";
+import { getTranslations } from "next-intl/server";
 import LanguageFlag from "@/components/LanguageFlag";
 import PublicActions from "@/components/posts/PublicActions";
 import UserActions from "@/components/posts/UserActions";
@@ -22,8 +23,8 @@ type PageSearchParams = {
   [key: string]: string | string[] | undefined;
 };
 type Props = {
-  params: PageParams;
-  searchParams: PageSearchParams;
+  params: Promise<PageParams>;
+  searchParams: Promise<PageSearchParams>;
 };
 
 // 정적 페이지 생성 설정
@@ -100,20 +101,26 @@ export async function generateMetadata(
 export const revalidate = false;
 
 export async function generateStaticParams() {
-  const posts = await prisma.post.findMany({
-    select: { id: true },
-    where: {
-      status: 'PUBLISHED'
-    }
-  });
+  try {
+    const posts = await prisma.post.findMany({
+      select: { id: true },
+      where: {
+        status: 'PUBLISHED'
+      }
+    });
 
-  return posts.map((post) => ({
-    postId: post.id,
-  }));
+    return posts.map((post) => ({
+      postId: post.id,
+    }));
+  } catch (error) {
+    console.warn('Skipping post static params:', error);
+    return [];
+  }
 }
 
 export default async function PostPage({ params }: Props) {
   const resolvedParams = await params;
+  const tCat = await getTranslations('Category');
   console.log(`[Server] Rendering post page: ${resolvedParams.postId}`, new Date().toISOString());
   
   // const currentUser = user ? await prisma.user.findUnique({
@@ -276,7 +283,7 @@ export default async function PostPage({ params }: Props) {
                       key={category}
                       className="flex items-center py-2 text-muted-foreground text-sm"
                     >
-                      #{getCategoryName(category)}
+                      #{tCat(category)}
                     </span>
                   ))}
                 </div>
@@ -389,7 +396,7 @@ export default async function PostPage({ params }: Props) {
                       key={category}
                       className="flex items-center py-2 rounded-sm text-muted-foreground text-xs"
                     >
-                      #{getCategoryName(category)}
+                      #{tCat(category)}
                     </span>
                   ))}
                 </div>

@@ -8,7 +8,7 @@ import NoticeSidebar from '@/components/NoticeSidebar';
 import { USER_ROLE } from '@/lib/constants';
 
 interface PageProps {
-  params: { postId: string };
+  params: Promise<{ postId: string }>;
 }
 
 export default async function EditPostPage({ params }: PageProps) {
@@ -18,7 +18,7 @@ export default async function EditPostPage({ params }: PageProps) {
   }
 
   // params를 await로 감싸서 사용
-  const { postId } = await Promise.resolve(params);
+  const { postId } = await params;
 
   const post = await prisma.post.findUnique({
     where: { id: postId },

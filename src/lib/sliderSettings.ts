@@ -3,6 +3,7 @@ import { CategoryType } from "@prisma/client";
 export type SliderSetting = {
   id: string;
   title?: string; // Featured 슬라이더는 title 불필요
+  titleI18n?: Record<string, string>; // 다국어 제목
   postCount: number;
   categories?: CategoryType[];
   type: 'featured' | 'latest' | 'ranked' | 'category';

@@ -10,8 +10,9 @@ export const CONFIG = {
   MAX_BATCH_SIZE: 500000,         // 500KB
   WORKER_URL: process.env.NEXT_PUBLIC_LOGS_WORKER_URL,  // 기본값 추가 NEXT_PUBLIC_LOGS_WORKER_URL
   // WORKER_URL: 'http://localhost:8787',
+  LOG_PROXY_URL: '/api/logs',
   SERVICE_LOG_ENABLED: process.env.NEXT_PUBLIC_SYSTEM_SERVICELOGENABLED !== 'false', 
-  WORKER_API_KEY: process.env.NEXT_PUBLIC_WORKER_API_KEY
+  LOG_WRITE_KEY: process.env.NEXT_PUBLIC_LOG_WRITE_KEY
 } as const;
 
 // 로그인 상태 확인

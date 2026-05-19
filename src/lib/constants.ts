@@ -1,4 +1,4 @@
-import { CategoryType } from "@prisma/client";
+
 
 export const getEmailSender = () => {
   return process.env.SEND_EMAIL || 'noreply@example.com';
@@ -21,69 +21,7 @@ export const getThumbnailUrl = (thumbnailId: string | null | undefined, variant:
 //     : '"Acme" <noreply@acme.com>';
 // }
 
-export const CATEGORIES: Record<CategoryType, Record<string, string>> = {
-  COMEDY: {
-    ko: "즐거운",
-    en: "Comedy",
-    // 다른 언어 추가 가능
-  },
-  ROMANCE: {
-    ko: "로맨스",
-    en: "Romance",
-  },
-  ACTION: {
-    ko: "액션",
-    en: "Action",
-  },
-  THRILLER: {
-    ko: "스릴러",
-    en: "Thriller",
-  },
-  DRAMA: {
-    ko: "감동적인",
-    en: "Drama",
-  },
-  PERIODPLAY: {
-    ko: "시대극",
-    en: "PeriodPlay",
-  },
-  FANTASY: {
-    ko: "환타지",
-    en: "Fantasy",
-  },
-  HIGHTEEN: {
-    ko: "하이틴",
-    en: "Highteen",
-  },
-  ADULT: {
-    ko: "성인",
-    en: "Romance",          
-  },
-  HUMANE: {
-    ko: "인간적인",
-    en: "Humane",
-  },
-  CALM: {
-    ko: "잔잔한",
-    en: "Calm",
-  },
-  VARIETYSHOW: {
-    ko: "예능",
-    en: "VarietyShow",
-  },
-  NOTIFICATION: {
-    ko: "안내",
-    en: "Notificaiton",
-  },
-  MSPOST: {
-    ko: "블로그",
-    en: "MSPost",
-  },
-} as const;
 
-export const getCategoryName = (category: CategoryType, lang = 'ko') => {
-  return CATEGORIES[category]?.[lang] || category;
-};
 
 // src/lib/constants.ts에 추가
 export const USER_ROLE = {

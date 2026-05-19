@@ -21,6 +21,7 @@ import { logActivity } from "@/lib/activity-logger/client";
 import { locationManager } from "@/lib/activity-logger/location-manager";
 import { useToast } from "@/components/ui/use-toast";
 import { queryClient } from "@/lib/queryClient";
+import { useTranslations } from "next-intl";
 
 export default function LoginForm() {
   const [error, setError] = useState<string>();
@@ -30,6 +31,7 @@ export default function LoginForm() {
   } | null>(null);
   const router = useRouter();
   const { toast } = useToast();
+  const tAuth = useTranslations("Auth");
 
   const form = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
@@ -100,7 +102,7 @@ export default function LoginForm() {
             <FormItem>
               {/* <FormLabel>Username or Email</FormLabel> */}
               <FormControl>
-                <Input placeholder="Username or Email" {...field} />
+                <Input placeholder={tAuth("usernameOrEmailPlaceholder")} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -113,14 +115,14 @@ export default function LoginForm() {
             <FormItem>
               {/* <FormLabel>Password</FormLabel> */}
               <FormControl>
-                <PasswordInput placeholder="Password" {...field} />
+                <PasswordInput placeholder={tAuth("passwordPlaceholder")} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
         <LoadingButton loading={isPending} type="submit" className="w-full">
-          Log in
+          {tAuth("loginButton")}
         </LoadingButton>
       </form>
     </Form>

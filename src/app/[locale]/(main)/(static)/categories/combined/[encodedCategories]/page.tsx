@@ -7,27 +7,32 @@ import { SliderSetting } from "@/lib/sliderSettings";
 export const revalidate = false;
 
 export async function generateStaticParams() {
-  // SystemSetting에서 복수 카테고리 슬라이더 설정을 가져와서 정적 페이지 생성
-  const settings = await prisma.systemSetting.findUnique({
-    where: { key: 'main_sliders' }
-  });
+  try {
+    const settings = await prisma.systemSetting.findUnique({
+      where: { key: 'main_sliders' }
+    });
 
-  if (!settings) {
+    if (!settings) {
+      return [];
+    }
+
+    const sliderSettings = settings.value as SliderSetting[];
+    
+    return sliderSettings
+      .filter(s => s.type === 'category' && s.categories && s.categories.length > 1)
+      .map(s => ({
+        encodedCategories: s.categories!.join('-')
+      }));
+  } catch (error) {
+    console.warn('Skipping combined category static params:', error);
     return [];
   }
-
-  const sliderSettings = settings.value as SliderSetting[];
-  
-  return sliderSettings
-    .filter(s => s.type === 'category' && s.categories && s.categories.length > 1)
-    .map(s => ({
-      encodedCategories: s.categories!.join('-')
-    }));
 }
 
 // 페이지가 존재하는지 확인
-export async function generateMetadata({ params }: { params: { encodedCategories: string } }) {
-  const categories = params.encodedCategories.split('-') as CategoryType[];
+export async function generateMetadata({ params }: { params: Promise<{ encodedCategories: string }> }) {
+  const { encodedCategories } = await params;
+  const categories = encodedCategories.split('-') as CategoryType[];
   
   const posts = await prisma.post.findFirst({
     where: {
@@ -57,10 +62,11 @@ export async function generateMetadata({ params }: { params: { encodedCategories
 }
 
 export default async function CombinedCategoryPage({
-  params: { encodedCategories }
+  params
 }: {
-  params: { encodedCategories: string }
+  params: Promise<{ encodedCategories: string }>
 }) {
+  const { encodedCategories } = await params;
   const categories = encodedCategories.split('-') as CategoryType[];
   
   const posts = await prisma.post.findMany({

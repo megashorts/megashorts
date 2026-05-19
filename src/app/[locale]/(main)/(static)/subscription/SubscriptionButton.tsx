@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useSession } from "@/components/SessionProvider";
 import { useSubscription } from "@/hooks/useSubscription";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 type SubscriptionType = 'weekly' | 'yearly' | 'upgrade';
 
@@ -15,6 +16,8 @@ interface SubscriptionButtonProps {
 
 export function SubscriptionButton({ type, title, onSubscribe }: SubscriptionButtonProps) {
   const { user } = useSession();
+  const t = useTranslations('Subscription');
+  const tCommon = useTranslations('Common');
   // useSubscription을 항상 호출 (enabled 옵션으로 제어)
   const { data: status, isLoading } = useSubscription();
 
@@ -34,7 +37,7 @@ export function SubscriptionButton({ type, title, onSubscribe }: SubscriptionBut
     return (
       <Link href="/login" className="w-full">
         <Button className="mt-4 w-full">
-          {title} 시작하기
+          {t('startPlan', { title })}
         </Button>
       </Link>
     );
@@ -43,25 +46,25 @@ export function SubscriptionButton({ type, title, onSubscribe }: SubscriptionBut
   if (isLoading) {
     return (
       <Button className="mt-4 w-full" disabled>
-        로딩중...
+        {tCommon('loading')}
       </Button>
     );
   }
 
-  let buttonText = `${title} 시작하기`;
+  let buttonText = t('startPlan', { title });
   let isDisabled = false;
   let subscriptionType: SubscriptionType = type;
 
   if (status?.isActive) {
     if (status.subscription === 'yearly') {
-      buttonText = '현재 구독중입니다';
+      buttonText = t('currentlySubscribed');
       isDisabled = true;
     } else if (status.subscription === 'weekly') {
       if (type === 'weekly') {
-        buttonText = '현재 구독중입니다';
+        buttonText = t('currentlySubscribed');
         isDisabled = true;
       } else if (type === 'yearly') {
-        buttonText = '연간 구독 업그레이드';
+        buttonText = t('upgradeYearly');
         subscriptionType = 'upgrade';
       }
     }

@@ -1,3 +1,5 @@
+export {};
+
 // import { NextRequest, NextResponse } from 'next/server';
 // import { validateRequest } from '@/auth';
 // import { USER_ROLE } from '@/lib/constants';

@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { USER_ROLE, USER_ROLE_NAME } from "@/lib/constants";
 import { AlertCircle, CirclePlus, IdCard, Info, Save } from "lucide-react";
@@ -93,6 +94,8 @@ export default function Agencysettings() {
   
   // 네트워크 바이너리 설정
   const [requireBothLegs, setRequireBothLegs] = useState(false);
+  const [payoutQualificationEnabled, setPayoutQualificationEnabled] = useState(false);
+  const [payoutQualificationMemberCount, setPayoutQualificationMemberCount] = useState(0);
   
   // 관리자 권한 확인 (OPERATION3 이상)
   const isAdmin = currentUser?.userRole && currentUser.userRole >= USER_ROLE.OPERATION3;
@@ -296,6 +299,14 @@ export default function Agencysettings() {
               duplicateDistribution: ""
             }]);
           }
+
+          const payoutQualification = settings.settings.network.payoutQualification;
+          setPayoutQualificationEnabled(
+            payoutQualification?.enabled ?? settings.masterType === "BINARY_NETWORK"
+          );
+          setPayoutQualificationMemberCount(
+            Number(payoutQualification?.memberCount ?? (settings.masterType === "BINARY_NETWORK" ? 2 : 0))
+          );
         }
         
         // 네트워크 바이너리 설정
@@ -306,6 +317,9 @@ export default function Agencysettings() {
             setRequireBothLegs(false);
           }
         }
+      } else {
+        setPayoutQualificationEnabled(false);
+        setPayoutQualificationMemberCount(0);
       }
     } catch (error) {
       console.error("설정을 불러오는 중 오류가 발생했습니다:", error);
@@ -377,17 +391,28 @@ export default function Agencysettings() {
         typeSpecificSettings = {
           network: {
             levels: networkLevels,
-            middleManagers: networkMiddleManagers
+            middleManagers: networkMiddleManagers,
+            payoutQualification: {
+              enabled: payoutQualificationEnabled,
+              memberCount: payoutQualificationEnabled ? payoutQualificationMemberCount : 0,
+              countMode: "direct"
+            }
           }
         };
       } else if (masterType === "BINARY_NETWORK") {
         typeSpecificSettings = {
           network: {
             levels: networkLevels,
-            middleManagers: networkMiddleManagers
+            middleManagers: networkMiddleManagers,
+            payoutQualification: {
+              enabled: true,
+              memberCount: payoutQualificationMemberCount || 2,
+              countMode: "direct"
+            }
           },
           binaryNetwork: {
-            requireBothLegs
+            requireBothLegs: false,
+            directReferralLimit: 2
           }
         };
       }
@@ -602,6 +627,41 @@ export default function Agencysettings() {
                   loading={loading}
                   remainingCommissionRate={remainingCommissionRate}
                 />
+
+                <div className="rounded-md border p-3 space-y-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <Label htmlFor="payout-qualification-enabled" className="text-sm">
+                        하위회원 조건 충족 전 커미션 지급 보류
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        조건 전에는 커미션을 계산해 보류하고, 조건 달성 시 누적분을 지급합니다.
+                      </p>
+                    </div>
+                    <Switch
+                      id="payout-qualification-enabled"
+                      checked={masterType === "BINARY_NETWORK" ? true : payoutQualificationEnabled}
+                      onChange={(e) => setPayoutQualificationEnabled(e.target.checked)}
+                      disabled={loading || masterType === "BINARY_NETWORK"}
+                    />
+                  </div>
+
+                  {(masterType === "BINARY_NETWORK" || payoutQualificationEnabled) && (
+                    <div className="space-y-1">
+                      <Label htmlFor="payout-qualification-member-count" className="text-xs">
+                        지급 시작 직접 하위회원 수
+                      </Label>
+                      <Input
+                        id="payout-qualification-member-count"
+                        type="number"
+                        min={masterType === "BINARY_NETWORK" ? 2 : 0}
+                        value={masterType === "BINARY_NETWORK" ? (payoutQualificationMemberCount || 2) : payoutQualificationMemberCount}
+                        onChange={(e) => setPayoutQualificationMemberCount(Number(e.target.value))}
+                        disabled={loading}
+                      />
+                    </div>
+                  )}
+                </div>
                 
                 <Separator />
 

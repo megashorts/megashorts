@@ -10,6 +10,8 @@ import { UserTrigger } from "@/components/CustomUserTrigger";
 import UserButton from "@/components/UserButton";
 import { useSession } from "@/components/SessionProvider";
 import { useUnreadCount } from "@/hooks/queries/useNotifications";
+import LocaleSwitcher from "@/components/LocaleSwitcher";
+import { useTranslations } from 'next-intl';
 
 interface NavBarProps {
   className?: string;
@@ -19,6 +21,7 @@ interface NavBarProps {
 export default function NavBar({ className }: NavBarProps) {
   const session = useSession()
   const { data: unreadData } = useUnreadCount();
+  const t = useTranslations('Common');
   
   const unreadCount = unreadData?.unreadCount ?? 0;
 
@@ -70,13 +73,14 @@ export default function NavBar({ className }: NavBarProps) {
               <Link href="/login" className="relative md:gap-1 group flex items-center justify-center">
                 <LogIn />
                 <span className="rounded hidden md:block text-white text-sm transition-colors duration-200 ease-in-out p-1 group-hover:border-primary group-hover:text-primary">
-                  로그인
+                  {t('login')}
                 </span>
               </Link>
             )}
 
             
           </div>
+          <LocaleSwitcher />
           <SearchField />
           {/* 모바일 네비게이션 */}
           {/* <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-card p-3 border-t flex justify-around w-full z-20">

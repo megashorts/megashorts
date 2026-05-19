@@ -9,6 +9,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import InfiniteScrollContainer from "@/components/InfiniteScrollContainer";
 import kyInstance from "@/lib/ky";
+import { useTranslations } from "next-intl";
 
 interface CategoriesProps {
   category: CategoryType;
@@ -17,6 +18,7 @@ interface CategoriesProps {
 
 export default function Categories({ category, initialPosts }: CategoriesProps) {
   const [isMobile, setIsMobile] = useState(false);
+  const tCommon = useTranslations('Common');
 
   useEffect(() => {
     console.log('[Client] Component mounted, initialPosts:', initialPosts.length);
@@ -86,7 +88,7 @@ export default function Categories({ category, initialPosts }: CategoriesProps) 
       
       {!hasNextPage && allPosts.length > 0 && (
         <p className="text-center text-muted-foreground py-4">
-          모든 컨텐츠를 불러왔습니다.
+          {tCommon('allLoaded')}
         </p>
       )}
     </InfiniteScrollContainer>

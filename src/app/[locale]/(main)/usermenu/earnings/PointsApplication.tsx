@@ -225,6 +225,11 @@ export default function PointsApplication({ userId, userRole }: PointsApplicatio
         alert('신청 금액이 사용 가능한 포인트를 초과합니다.');
         return;
       }
+
+      if (!userStatus.isVerified) {
+        alert('이메일 인증이 완료되어야 포인트 지급을 신청할 수 있습니다.');
+        return;
+      }
       
       if (!userStatus.creatorInfo || !userStatus.creatorInfo.idCheck) {
         alert('포인트 지급을 위한 정보 제출이나 확인이 완료되지 않았습니다.');

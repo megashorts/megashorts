@@ -10,9 +10,9 @@ import NoticeSidebar from "@/components/NoticeSidebar";
 import { getThumbnailUrl } from "@/lib/constants";
 
 type Props = {
-  params: {
+  params: Promise<{
     postId: string;
-  };
+  }>;
 };
 
 // 이전/다음 포스트 타입 정의
@@ -49,19 +49,24 @@ export async function generateMetadata(
 }
 
 export async function generateStaticParams() {
-  const posts = await prisma.post.findMany({
-    where: {
-      status: 'PUBLISHED',
-      categories: {
-        has: CategoryType.NOTIFICATION
-      }
-    },
-    select: { id: true },
-  });
+  try {
+    const posts = await prisma.post.findMany({
+      where: {
+        status: 'PUBLISHED',
+        categories: {
+          has: CategoryType.NOTIFICATION
+        }
+      },
+      select: { id: true },
+    });
 
-  return posts.map((post) => ({
-    postId: post.id,
-  }));
+    return posts.map((post) => ({
+      postId: post.id,
+    }));
+  } catch (error) {
+    console.warn('Skipping notice static params:', error);
+    return [];
+  }
 }
 
 export default async function NoticePostPage({ params }: Props) {

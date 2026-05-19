@@ -30,6 +30,7 @@ import { Language } from "@prisma/client";
 import LanguageFlag from "@/components/LanguageFlag";
 import { Button } from "@/components/ui/button";
 import ProfileActionButtons from "@/components/auth/ProfileActionButtons";
+import { supportedProfileLanguages } from "@/lib/locale-language";
 
 interface EditProfileDialogProps {
   user: UserData;
@@ -128,12 +129,7 @@ export default function EditProfileDialog({
                       ))}
                     </div> */}
                     <div className="flex flex-wrap gap-2">
-                      {[
-                        Language.KOREAN,
-                        Language.ENGLISH, 
-                        Language.CHINESE, 
-                        Language.JAPANESE
-                      ].map((lang) => (
+                      {supportedProfileLanguages.map((lang) => (
                         <button
                           key={lang}
                           type="button"

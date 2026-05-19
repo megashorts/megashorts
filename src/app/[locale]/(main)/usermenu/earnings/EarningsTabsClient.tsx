@@ -42,7 +42,7 @@ export default function EarningsTabsClient({ userId, userRole }: EarningsTabsCli
       <TabsContent value="statistics">
         {currentTab === "statistics" && (
           <Suspense fallback={<LoadingSpinner />}>
-            <PointsStatistics userId={userId} userRole={userRole} />
+            <PointsStatistics userId={userId} userRole={userRole} type="creator" />
           </Suspense>
         )}
       </TabsContent>

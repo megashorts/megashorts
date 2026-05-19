@@ -21,6 +21,9 @@ interface StatisticsData {
     totalPoints: number;
     topMembers: { name: string; points: number }[];
   }[];
+  dailyStats?: { label: string; newMembers: number; points: number; applications: number }[];
+  monthlyStats?: { label: string; newMembers: number; points: number; applications: number }[];
+  topMembers?: { name: string; points: number }[];
 }
 
 interface StatisticsViewProps {
@@ -32,12 +35,10 @@ export default function StatisticsView({ data }: StatisticsViewProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [reportData, setReportData] = useState<any>(null);
 
-  // 주간 정산 목록 (예시)
-  const weekOptions = [
-    { value: '2025-W09', label: '2025년 9주차 (2/24 ~ 3/2)' },
-    { value: '2025-W08', label: '2025년 8주차 (2/17 ~ 2/23)' },
-    { value: '2025-W07', label: '2025년 7주차 (2/10 ~ 2/16)' },
-  ];
+  const weekOptions = (data.weeklyStats || []).map((item: any) => ({
+    value: item.label || item.week,
+    label: item.label || item.week,
+  }));
 
   // 리포트 데이터 조회 함수
   const fetchReportData = async (week: string) => {
@@ -45,40 +46,22 @@ export default function StatisticsView({ data }: StatisticsViewProps) {
     
     setIsLoading(true);
     try {
-      // 실제 구현 시에는 API 호출로 대체
-      // const response = await fetch(`/api/agency/reports?week=${week}`);
-      // const data = await response.json();
-      
-      // 임시 데이터
-      setTimeout(() => {
-        setReportData({
-          week,
-          totalViews: 1250,
-          totalPoints: 45000,
-          dailyStats: [
-            { date: '2025-02-24', views: 180, points: 6500 },
-            { date: '2025-02-25', views: 210, points: 7200 },
-            { date: '2025-02-26', views: 195, points: 6800 },
-            { date: '2025-02-27', views: 220, points: 7500 },
-            { date: '2025-02-28', views: 230, points: 8000 },
-            { date: '2025-03-01', views: 120, points: 4500 },
-            { date: '2025-03-02', views: 95, points: 4500 },
-          ],
-          topMembers: [
-            { name: '영업자 1', points: 12500 },
-            { name: '영업자 2', points: 10800 },
-            { name: '영업자 3', points: 9500 },
-            { name: '영업자 4', points: 8200 },
-            { name: '영업자 5', points: 7500 },
-          ],
-          distributionByLevel: [
-            { level: 1, points: 22500, percentage: 50 },
-            { level: 2, points: 13500, percentage: 30 },
-            { level: 3, points: 9000, percentage: 20 },
-          ]
-        });
-        setIsLoading(false);
-      }, 1000);
+      const selected = (data.weeklyStats || []).find((item: any) => (item.label || item.week) === week);
+      const totalPoints = (selected as any)?.points || selected?.totalPoints || 0;
+
+      setReportData({
+        week,
+        totalViews: selected?.totalViews || 0,
+        totalPoints,
+        dailyStats: data.dailyStats || [],
+        topMembers: data.topMembers || [],
+        distributionByLevel: data.pointsByLevel.map((item) => ({
+          level: item.level,
+          points: item.points,
+          percentage: data.totalPoints > 0 ? Number(((item.points / data.totalPoints) * 100).toFixed(1)) : 0
+        }))
+      });
+      setIsLoading(false);
     } catch (error) {
       console.error('리포트 데이터 조회 실패:', error);
       setIsLoading(false);
@@ -167,7 +150,7 @@ export default function StatisticsView({ data }: StatisticsViewProps) {
                     <TableCell>{item.level}단계</TableCell>
                     <TableCell className="text-right">{item.points.toLocaleString()}P</TableCell>
                     <TableCell className="text-right">
-                      {((item.points / data.totalPoints) * 100).toFixed(1)}%
+                      {data.totalPoints > 0 ? ((item.points / data.totalPoints) * 100).toFixed(1) : "0.0"}%
                     </TableCell>
                   </TableRow>
                 ))}
@@ -275,15 +258,17 @@ export default function StatisticsView({ data }: StatisticsViewProps) {
                     <TableHeader>
                       <TableRow>
                         <TableHead>날짜</TableHead>
-                        <TableHead className="text-right">시청 수</TableHead>
+                        <TableHead className="text-right">신규 회원</TableHead>
+                        <TableHead className="text-right">신청</TableHead>
                         <TableHead className="text-right">포인트</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {reportData.dailyStats.map((day: any, index: number) => (
                         <TableRow key={index}>
-                          <TableCell>{day.date}</TableCell>
-                          <TableCell className="text-right">{day.views.toLocaleString()}</TableCell>
+                          <TableCell>{day.label || day.date}</TableCell>
+                          <TableCell className="text-right">{(day.newMembers || 0).toLocaleString()}</TableCell>
+                          <TableCell className="text-right">{(day.applications || 0).toLocaleString()}</TableCell>
                           <TableCell className="text-right">{day.points.toLocaleString()}P</TableCell>
                         </TableRow>
                       ))}

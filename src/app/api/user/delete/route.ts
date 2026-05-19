@@ -157,6 +157,18 @@ export async function DELETE() {
         where: { userId: user.id },
       });
 
+      if (userInfo.teamMaster) {
+        const promotedReferrerId =
+          userInfo.referredBy && userInfo.referredBy !== user.id
+            ? userInfo.referredBy
+            : userInfo.teamMaster;
+
+        await tx.user.updateMany({
+          where: { referredBy: user.id },
+          data: { referredBy: promotedReferrerId },
+        });
+      }
+
       // 팔로우 관계 삭제
       await tx.follow.deleteMany({
         where: {

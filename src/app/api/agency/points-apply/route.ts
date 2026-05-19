@@ -38,27 +38,19 @@ export async function POST(request: NextRequest) {
     
     // 트랜잭션으로 포인트 지급 처리
     await prisma.$transaction(async (tx) => {
-      // 포인트 지급 내역 저장
-      await tx.payment.create({
-        data: {
-          id: weeklySettlementId,
-          userId: 'system', // 시스템 사용자 ID
-          type: 'AGENCY_SETTLEMENT',
-          status: 'COMPLETED',
-          amount: 0, // 총 지급 금액은 나중에 계산
-          orderId: `settlement-${weeklySettlementId}`,
-          // requestedAt: new Date(),
-          approvedAt: new Date(),
-          metadata: {
-            weekRange,
-            distributionCount: distributions.length
-          }
-        }
-      });
-      
       // 각 사용자별 포인트 지급
       for (const distribution of distributions) {
         if (distribution.grantedAmount > 0) {
+          const orderId = `settlement-${weeklySettlementId}-${distribution.userId}`;
+          const existingPayment = await tx.payment.findUnique({
+            where: { orderId },
+            select: { id: true }
+          });
+
+          if (existingPayment) {
+            continue;
+          }
+
           // 사용자 포인트 업데이트
           await tx.user.update({
             where: { id: distribution.userId },
@@ -68,12 +60,41 @@ export async function POST(request: NextRequest) {
               }
             }
           });
+
+          await tx.payment.upsert({
+            where: {
+              orderId
+            },
+            update: {
+              status: 'COMPLETED',
+              amount: Math.round(distribution.grantedAmount),
+              approvedAt: new Date(),
+              metadata: {
+                weekRange,
+                settlementId: weeklySettlementId,
+                distribution
+              }
+            },
+            create: {
+              userId: distribution.userId,
+              type: 'AGENCY_SETTLEMENT',
+              status: 'COMPLETED',
+              amount: Math.round(distribution.grantedAmount),
+              orderId,
+              approvedAt: new Date(),
+              metadata: {
+                weekRange,
+                settlementId: weeklySettlementId,
+                distribution
+              }
+            }
+          });
           
           // 포인트 지급 알림 생성
           await tx.notification.create({
             data: {
               recipientId: distribution.userId,
-              issuerId: 'system', // 시스템 사용자 ID
+              issuerId: distribution.userId,
               type: 'POINT',
               read: false,
               metadata: {
@@ -85,6 +106,22 @@ export async function POST(request: NextRequest) {
           });
         }
       }
+
+      const distributionKey = buildDistributionKey(weekRange, weeklySettlementId);
+      await tx.systemSetting.upsert({
+        where: { key: distributionKey },
+        update: {
+          value: distributions,
+          valueType: 'json',
+          description: '워커 정산 포인트 분배 내역'
+        },
+        create: {
+          key: distributionKey,
+          value: distributions,
+          valueType: 'json',
+          description: '워커 정산 포인트 분배 내역'
+        }
+      });
     });
     
     return NextResponse.json({ success: true });
@@ -95,4 +132,14 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+function buildDistributionKey(weekRange: string, fallback: string) {
+  const weekMatch = String(weekRange || '').match(/(\d{4})-?W?(\d{1,2})/);
+
+  if (weekMatch) {
+    return `pointDistribution_${weekMatch[1]}_W${weekMatch[2].padStart(2, '0')}`;
+  }
+
+  return `pointDistribution_${fallback}`;
 }

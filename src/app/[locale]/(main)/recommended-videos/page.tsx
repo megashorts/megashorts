@@ -3,7 +3,7 @@ import { CategoryType } from '@prisma/client';
 import { RecommendedVideosClient } from "./RecommendedVideosClient";
 import { Metadata } from "next";
 
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: '추천 동영상',

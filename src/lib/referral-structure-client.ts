@@ -9,12 +9,12 @@ export async function syncReferralStructure(
   try {
 
     // 워커 URL 설정
-    const referralWorkerUrl = process.env.REFERRAL_STRUCTURE_WORKER_URL;
+    const referralWorkerUrl = process.env.REFERRAL_STRUCTURE_WORKER_URL || "https://referral-structure-worker.msdevcm.workers.dev";
     // const referralWorkerUrl = "http://localhost:8787";
     console.log(`추천인 구조 워커 URL: ${referralWorkerUrl}`);
     
     // API 키 확인
-    const apiKey = process.env.WORKER_API_KEY;
+    const apiKey = process.env.WORKER_API_KEY || process.env.NEXT_PUBLIC_WORKER_API_KEY;
     if (!apiKey) {
       console.error('환경 변수 WORKER_API_KEY가 설정되지 않았습니다.');
       throw new Error('환경 변수 WORKER_API_KEY가 설정되지 않았습니다.');
@@ -38,12 +38,16 @@ export async function syncReferralStructure(
     
     if (!response.ok) {
       console.log(`사용자 ${userId}의 영업팀 삭제 요청 실패.`);
-      throw new Error(`영업팀 삭제 요청 실패: ${response.statusText}`);
+      throw new Error(result?.error || `영업팀 동기화 요청 실패: ${response.status} ${response.statusText}`);
     }
     
-    return true;
+    if (!result?.success) {
+      throw new Error(result?.error || "영업팀 동기화 워커가 실패 응답을 반환했습니다.");
+    }
+    
+    return result;
   } catch (error) {
     console.error(`추천인 구조 검증 및 리빌딩 오류:`, error);
-    return false;
+    throw error;
   }
 }

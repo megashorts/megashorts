@@ -7,7 +7,25 @@ let batchTimer: NodeJS.Timeout | null = null;
 let retryCount = 0;
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000; // 1초
-const apiKey = CONFIG.WORKER_API_KEY ?? ''; // .env 파일에 있는 기본값 사용
+
+function getLogEndpoint(): { url: string; headers: Record<string, string> } {
+  if (CONFIG.WORKER_URL && CONFIG.LOG_WRITE_KEY) {
+    return {
+      url: CONFIG.WORKER_URL,
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Log-Write-Key': CONFIG.LOG_WRITE_KEY,
+      },
+    };
+  }
+
+  return {
+    url: CONFIG.LOG_PROXY_URL,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  };
+}
 
 // if (typeof window !== 'undefined') {
 //   window.addEventListener('beforeunload', async () => {
@@ -29,14 +47,21 @@ if (typeof window !== 'undefined') {
     
     const pendingLogsStr = localStorage.getItem(STORAGE_KEYS.PENDING_LOGS);
     if (pendingLogsStr && pendingLogsStr !== '[]') {
-      if (navigator.sendBeacon && CONFIG.WORKER_URL) {
+      const endpoint = getLogEndpoint();
+      if (endpoint.url) {
         const pendingLogs = JSON.parse(pendingLogsStr);
         
-        // API 키를 URL 파라미터로 포함하지 않고 기본 URL 사용
-        const blob = new Blob([JSON.stringify(pendingLogs)], { type: 'application/json' });
-        const success = navigator.sendBeacon(CONFIG.WORKER_URL, blob);
-        
-        if (success) {
+        fetch(endpoint.url, {
+          method: 'POST',
+          headers: endpoint.headers,
+          credentials: 'omit',
+          keepalive: true,
+          body: JSON.stringify(pendingLogs)
+        }).catch((error) => {
+          console.error('Failed to send unload logs:', error);
+        });
+
+        if (pendingLogs.length > 0) {
           localStorage.setItem(STORAGE_KEYS.PENDING_LOGS, '[]');
           localStorage.setItem(STORAGE_KEYS.LAST_SENT, new Date().toISOString());
         }
@@ -54,25 +79,18 @@ async function sendPendingLogs(retry: boolean = false) {
     const pendingLogs = JSON.parse(pendingLogsStr);
     if (pendingLogs.length === 0) return;
 
-    // 워커로 전송
-    if (!CONFIG.WORKER_URL) {
-      console.warn('Worker URL이 설정되지 않았습니다.');
+    const endpoint = getLogEndpoint();
+    if (!endpoint.url) {
+      console.warn('로그 전송 URL이 설정되지 않았습니다.');
       return;
     }
 
     console.log('📤 Sending logs to worker:', pendingLogs);
 
 
-    // API 키 추가 (환경 변수에서 가져오기)
-    const apiKey = CONFIG.WORKER_API_KEY ?? ''; // .env 파일에 있는 기본값 사용
-
-    const response = await fetch(CONFIG.WORKER_URL, {
+    const response = await fetch(endpoint.url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        // 'X-API-Key': apiKey, // API 키 헤더 추가
-        'Authorization': `Bearer ${apiKey}`
-      },
+      headers: endpoint.headers,
       credentials: 'omit',
       body: JSON.stringify(pendingLogs)
     });

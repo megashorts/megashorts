@@ -1,7 +1,8 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import { useToast } from "@/components/ui/use-toast";
+import { useTranslations } from "next-intl";
 import GoogleSignInButton from "./google/GoogleSignInButton";
 import LoginForm from "./LoginForm";
 import NaverSignInButton from "./naver/NaverSignInButton";
@@ -9,6 +10,7 @@ import KakaoSignInButton from "./kakao/KakaoSignInButton";
 
 export default function LoginPage() {
   const { toast } = useToast();
+  const tAuth = useTranslations("Auth");
 
   const handleSocialClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -23,7 +25,7 @@ export default function LoginPage() {
       <LoginForm />
       <div className="flex items-center gap-3 text-xs">
         <div className="h-px flex-1 bg-muted" />
-        <span>OR</span>
+        <span>{tAuth("or")}</span>
         <div className="h-px flex-1 bg-muted" />
       </div>
       <div className="grid grid-cols-3 gap-4">
@@ -39,15 +41,15 @@ export default function LoginPage() {
       </div>
       <div className="text-center">
         <div className="text-gray-500 text-xs mb-2">
-          Don&apos;t have an account? {" "}
+          {tAuth("noAccount")} {" "}
           <Link className="text-white hover:underline" href="/signup">
-            Sign up
+            {tAuth("signup")}
           </Link>
         </div>
         <div className="text-gray-500 text-xs">
-          Forgot your password? {" "}
+          {tAuth("forgotPassword")} {" "}
           <Link className="text-white hover:underline" href="/reset-password">
-            Reset password
+            {tAuth("resetPassword")}
           </Link>
         </div>
       </div>

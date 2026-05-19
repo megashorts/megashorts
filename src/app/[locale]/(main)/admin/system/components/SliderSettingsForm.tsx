@@ -11,6 +11,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { Badge } from "@/components/ui/badge";
 import { CategorySelectModal } from "./CategorySelectModal";
 import { useState } from "react";
+import { Globe } from "lucide-react";
 
 interface SliderSettingsFormProps {
   slider: SliderSetting;
@@ -21,6 +22,7 @@ interface SliderSettingsFormProps {
 
 export function SliderSettingsForm({ slider, onUpdate, onDelete, isFixed }: SliderSettingsFormProps) {
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
+  const [showI18n, setShowI18n] = useState(false);
   
   const {
     attributes,
@@ -37,6 +39,16 @@ export function SliderSettingsForm({ slider, onUpdate, onDelete, isFixed }: Slid
 
   const handleTitleChange = (value: string) => {
     onUpdate({ ...slider, title: value });
+  };
+
+  const handleI18nChange = (locale: string, value: string) => {
+    onUpdate({ 
+      ...slider, 
+      titleI18n: { 
+        ...(slider.titleI18n || {}), 
+        [locale]: value 
+      } 
+    });
   };
 
   const handlePostCountChange = (value: string) => {
@@ -84,14 +96,49 @@ export function SliderSettingsForm({ slider, onUpdate, onDelete, isFixed }: Slid
 
       <div className="space-y-2 pr-5">
         {/* 타이틀 입력 */}
-        <Input
-          value={slider.title}
-          onChange={(e) => handleTitleChange(e.target.value)}
-          placeholder="슬라이더 제목"
-          className="text-sm"
-        />
+        <div className="flex gap-2">
+          <Input
+            value={slider.title}
+            onChange={(e) => handleTitleChange(e.target.value)}
+            placeholder="슬라이더 제목 (기본 - 영어)"
+            className="text-sm flex-1"
+          />
+          <Button 
+            variant="outline" 
+            size="icon" 
+            onClick={() => setShowI18n(!showI18n)}
+            className={`shrink-0 ${showI18n ? 'bg-primary/10 text-primary' : ''}`}
+            title="다국어 제목 설정"
+          >
+            <Globe className="h-4 w-4" />
+          </Button>
+        </div>
 
-        <div className="flex items-center justify-between">
+        {/* 다국어 입력 (토글 시 표시) */}
+        {showI18n && (
+          <div className="space-y-2 pl-2 border-l-2 border-primary/20 mt-2">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold w-8">KO</span>
+              <Input
+                value={slider.titleI18n?.['ko'] || ''}
+                onChange={(e) => handleI18nChange('ko', e.target.value)}
+                placeholder="한국어 제목"
+                className="text-sm h-8"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold w-8">ZH</span>
+              <Input
+                value={slider.titleI18n?.['zh'] || ''}
+                onChange={(e) => handleI18nChange('zh', e.target.value)}
+                placeholder="중국어 제목"
+                className="text-sm h-8"
+              />
+            </div>
+          </div>
+        )}
+
+        <div className="flex items-center justify-between mt-2">
           <div className="flex items-center gap-2 flex-1 min-w-0">
             {/* 포스트 수 입력 */}
             <div className="flex items-center gap-1">

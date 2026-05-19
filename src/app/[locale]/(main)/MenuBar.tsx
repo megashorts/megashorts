@@ -6,11 +6,11 @@ import {
   Megaphone, 
   WalletCards 
 } from "lucide-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Link, usePathname } from "@/i18n/routing";
 import { Button } from "@/components/ui/button";
 import UserWelcome from "@/components/UserWelcome";
 import AuthMenuItems from "@/components/AuthMenuItems";
+import { useTranslations } from 'next-intl';
 
 interface MenuBarProps {
   className?: string;
@@ -18,6 +18,8 @@ interface MenuBarProps {
 
 export default function MenuBar({ className }: MenuBarProps) {
   const pathname = usePathname();
+  const tNav = useTranslations('Nav');
+  const tCat = useTranslations('Category');
   
   // 특정 경로에서는 메뉴바를 숨김
   if (pathname === "/" || pathname.startsWith("/posts") || pathname.startsWith("/video")) {
@@ -28,7 +30,7 @@ export default function MenuBar({ className }: MenuBarProps) {
     <div className={`hidden md:flex flex-col ${className}`}>
       <UserWelcome />
 
-      <div className="text-xs font-medium text-gray-600 ml-4 hidden lg:inline pt-2">메가쇼츠 안내</div>
+      <div className="text-xs font-medium text-gray-600 ml-4 hidden lg:inline pt-2">{tNav('sectionGuide')}</div>
       
       <Button
         variant="ghost"
@@ -37,20 +39,9 @@ export default function MenuBar({ className }: MenuBarProps) {
       >
         <Link href="/subscription">
           <WalletCards />
-          <span className="hidden lg:inline">구독/코인</span>
+          <span className="hidden lg:inline">{tNav('subscriptionCoin')}</span>
         </Link>
       </Button>
-
-      {/* <Button
-        variant="ghost"
-        className="flex items-center justify-start gap-3"
-        asChild
-      >
-        <Link href="/notifications">
-          <Megaphone />
-          <span className="hidden lg:inline">공지사항</span>
-        </Link>
-      </Button> */}
 
       <Button
         variant="ghost"
@@ -59,7 +50,7 @@ export default function MenuBar({ className }: MenuBarProps) {
       >
         <Link href="/notice">
           <Megaphone />
-          <span className="hidden lg:inline">안내 & 블로그</span>
+          <span className="hidden lg:inline">{tNav('noticeBlog')}</span>
         </Link>
       </Button>
 
@@ -70,28 +61,28 @@ export default function MenuBar({ className }: MenuBarProps) {
       >
         <Link href="/company/introduce">
           <Building />
-          <span className="hidden lg:inline">MS소개</span>
+          <span className="hidden lg:inline">{tNav('companyIntro')}</span>
         </Link>
       </Button>
 
       <AuthMenuItems />
 
-      <div className="text-xs font-medium text-gray-600 ml-4 hidden lg:inline pt-2">분류별 바로보기</div>
+      <div className="text-xs font-medium text-gray-600 ml-4 hidden lg:inline pt-2">{tNav('sectionCategory')}</div>
       <div className="flex items-center justify-start gap-3 text-sm ml-4 py-2">
         <Boxes className="justify-start hidden lg:inline"/>
-        <span className="hidden lg:inline">카테고리</span>
+        <span className="hidden lg:inline">{tNav('contentCategory')}</span>
       </div>
       <div className="justify-start gap-3 hidden lg:inline">
         {[
-          { href: "/categories/recent", label: "최신작" },
-          { href: "/categories/ROMANCE", label: "로맨스" },
-          { href: "/categories/ACTION", label: "액션" },
-          { href: "/categories/THRILLER", label: "스릴러" },
-          { href: "/categories/DRAMA", label: "드라마" },
-          { href: "/categories/PERIODPLAY", label: "시대극" },
-          { href: "/categories/FANTASY", label: "판타지" },
-          { href: "/categories/HIGHTEEN", label: "하이틴" },
-          { href: "/categories/ADULT", label: "성인" }
+          { href: "/categories/recent", labelKey: "recent" },
+          { href: "/categories/ROMANCE", labelKey: "ROMANCE" },
+          { href: "/categories/ACTION", labelKey: "ACTION" },
+          { href: "/categories/THRILLER", labelKey: "THRILLER" },
+          { href: "/categories/DRAMA", labelKey: "DRAMA" },
+          { href: "/categories/PERIODPLAY", labelKey: "PERIODPLAY" },
+          { href: "/categories/FANTASY", labelKey: "FANTASY" },
+          { href: "/categories/HIGHTEEN", labelKey: "HIGHTEEN" },
+          { href: "/categories/ADULT", labelKey: "ADULT" }
         ].map((category) => (
           <Button
             key={category.href}
@@ -100,7 +91,7 @@ export default function MenuBar({ className }: MenuBarProps) {
             asChild
           >
             <Link href={category.href}>
-              <span>🔻 {category.label}</span>
+              <span>🔻 {tCat(category.labelKey)}</span>
             </Link>
           </Button>
         ))}

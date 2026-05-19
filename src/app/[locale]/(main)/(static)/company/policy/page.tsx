@@ -3,6 +3,7 @@ import Image from 'next/image';
 import ReactMarkdown from 'react-markdown';
 import fs from 'fs';
 import path from 'path';
+import { getTranslations } from "next-intl/server";
 
 export const metadata = {
   title: "이용약관",
@@ -14,7 +15,8 @@ const content = fs.readFileSync(
   'utf-8'
 );
 
-export default function PolicyPage() {  // params 제거
+export default async function PolicyPage() {
+  const t = await getTranslations('Company');
   return (
     <div className="w-full mb-16">
       {/* 상단 이미지 섹션 */}
@@ -29,7 +31,7 @@ export default function PolicyPage() {  // params 제거
         />
         <div className="absolute inset-0 bg-black/50 flex items-end justify-start pl-8 pb-5">
           <h1 className="text-2xl md:text-3xl lg:text-3xl font-bold text-white">
-            이용약관
+            {t('terms')}
           </h1>
         </div>
         <div className="absolute top-5 right-5">

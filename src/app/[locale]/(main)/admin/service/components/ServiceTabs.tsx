@@ -1,17 +1,17 @@
 // src/app/(main)/admin/service/components/ServiceTabs.tsx
 "use client";
 
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
 import LoadingSpinner from "./LoadingSpinner";
-import { FileClock, Headset, SquareStack } from "lucide-react";
+import { FileClock, Headset, SquareStack, UserRound } from "lucide-react";
 import { useSession } from "@/components/SessionProvider";
 
 const NoticeModalClient = lazy(() => import("./NoticeModalClient"));
 const LogsClient = lazy(() => import("./LogsClient"));
 const AdminInquiryList = lazy(() => import("./inquiry/AdminInquiryList"));
+const UserManagementClient = lazy(() => import("./users/UserManagementClient"));
 
 export default function ServiceTabs() {
   const router = useRouter();
@@ -42,6 +42,10 @@ export default function ServiceTabs() {
             <FileClock className="w-5 h-5 md:w-6 md:h-6" />
             <p className="pl-1 hidden md:block">logs system</p>
           </TabsTrigger>
+          <TabsTrigger value="user" className="flex items-center gap-2">
+            <UserRound className="w-5 h-5 md:w-6 md:h-6" />
+            <p className="pl-1 hidden md:block">user</p>
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="notice" className="space-y-4">
           {currentTab === "notice" && (
@@ -61,6 +65,13 @@ export default function ServiceTabs() {
           {currentTab === "logs" && (
             <Suspense fallback={<LoadingSpinner />}>
               <LogsClient />
+            </Suspense>
+          )}
+        </TabsContent>
+        <TabsContent value="user" className="space-y-4">
+          {currentTab === "user" && (
+            <Suspense fallback={<LoadingSpinner />}>
+              <UserManagementClient />
             </Suspense>
           )}
         </TabsContent>

@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
         const allDistributions = distributionSetting.value as any[];
         distributions = allDistributions.filter((d: any) => 
           d.userId === userId || 
-          d.distributionDetails.some((detail: any) => detail.masterId === userId)
+          (Array.isArray(d.distributionDetails) && d.distributionDetails.some((detail: any) => detail.masterId === userId))
         );
       }
     } else {
@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
         const allDistributions = setting.value as any[];
         const userDistributions = allDistributions.filter((d: any) => 
           d.userId === userId || 
-          d.distributionDetails.some((detail: any) => detail.masterId === userId)
+          (Array.isArray(d.distributionDetails) && d.distributionDetails.some((detail: any) => detail.masterId === userId))
         );
         
         distributions.push(...userDistributions);

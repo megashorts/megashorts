@@ -48,7 +48,7 @@ export default function AgencyEarningsTabsClient({ userId, userRole }: AgencyEar
         
         <TabsContent value="statistics" className="mt-6">
           <Suspense fallback={<LoadingSpinner />}>
-            <PointsStatistics userId={userId} userRole={userRole} />
+            <PointsStatistics userId={userId} userRole={userRole} type="agency" />
           </Suspense>
         </TabsContent>
         

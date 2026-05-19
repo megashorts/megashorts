@@ -6,30 +6,40 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatNumber } from '@/lib/utils';
+import { getRecentIsoWeeks } from '@/lib/stats-period';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 interface PointsStatisticsProps {
   userId: string;
   userRole: number; // 40: 업로더, 20: 영업 멤버
+  type?: 'creator' | 'agency';
 }
 
-export default function PointsStatistics({ userId, userRole }: PointsStatisticsProps) {
-  const [selectedWeek, setSelectedWeek] = useState<string>('current');
+export default function PointsStatistics({ userId, userRole, type }: PointsStatisticsProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const initialPeriod = searchParams.get('period') || 'current';
+  const [selectedWeek, setSelectedWeek] = useState<string>(initialPeriod);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [statsData, setStatsData] = useState<any>(null);
   const [weeklyData, setWeeklyData] = useState<any>(null);
 
   // 업로더인지 영업 멤버인지 확인
   // 20-34: 업로더, 40-50: 영업팀, 60 이상: 관리자 그룹 (업로더 기준으로 렌더링)
-  const isUploader = (userRole >= 20 && userRole < 40) || userRole >= 60;
-  const isAgency = userRole >= 40 && userRole <= 50;
+  const isUploader = type ? type === 'creator' : (userRole >= 20 && userRole < 40) || userRole >= 60;
 
   // 주간 정산 목록 (예시)
-  const weekOptions = [
-    { value: 'current', label: '현재 주차 (진행중)' },
-    { value: '2025-W09', label: '2025년 9주차 (2/24 ~ 3/2)' },
-    { value: '2025-W08', label: '2025년 8주차 (2/17 ~ 2/23)' },
-    { value: '2025-W07', label: '2025년 7주차 (2/10 ~ 2/16)' },
-  ];
+  const weekOptions = getRecentIsoWeeks(8);
+  const periodOptions = weekOptions.some((option) => option.value === selectedWeek || option.key === selectedWeek)
+    ? weekOptions
+    : [
+        {
+          value: selectedWeek,
+          key: selectedWeek,
+          label: `직접 지정 주차 (${selectedWeek})`,
+        },
+        ...weekOptions,
+      ];
 
   // 통계 데이터 조회 함수
   const fetchStatistics = async (week: string) => {
@@ -136,10 +146,11 @@ export default function PointsStatistics({ userId, userRole }: PointsStatisticsP
       }
       
       // Cloudflare 통계 데이터 조회 (글로벌 접속자 지도 등)
+      if (isUploader) {
       try {
         const cloudflareEndpoint = `/api/stats/cloudflare`;
         
-        const cloudflareResponse = await fetch(`${cloudflareEndpoint}?userId=${userId}`);
+        const cloudflareResponse = await fetch(`${cloudflareEndpoint}?userId=${userId}&period=${week}`);
         
         if (cloudflareResponse.ok) {
           const cloudflareData = await cloudflareResponse.json();
@@ -155,6 +166,7 @@ export default function PointsStatistics({ userId, userRole }: PointsStatisticsP
       } catch (cloudflareError) {
         console.error('Cloudflare 통계 데이터 조회 실패:', cloudflareError);
         // Cloudflare 통계 실패는 전체 통계 조회에 영향을 주지 않음
+      }
       }
     } catch (error) {
       console.error('통계 데이터 조회 오류:', error);
@@ -181,6 +193,9 @@ export default function PointsStatistics({ userId, userRole }: PointsStatisticsP
   // 주간 정산 선택 시 호출
   const handleWeekChange = (value: string) => {
     setSelectedWeek(value);
+    const params = new URLSearchParams(searchParams);
+    params.set('period', value);
+    router.push(`?${params.toString()}`, { scroll: false });
     fetchStatistics(value);
   };
 
@@ -310,6 +325,7 @@ export default function PointsStatistics({ userId, userRole }: PointsStatisticsP
       </div>
 
       {/* 글로벌 접속자 지도맵 */}
+      {isUploader && (
       <Card>
         <CardHeader>
           <CardTitle>글로벌 접속자 지도</CardTitle>
@@ -433,6 +449,7 @@ export default function PointsStatistics({ userId, userRole }: PointsStatisticsP
           </div>
         </CardContent>
       </Card>
+      )}
 
       {/* 정산 조회 필터 */}
       <Card>
@@ -448,7 +465,7 @@ export default function PointsStatistics({ userId, userRole }: PointsStatisticsP
                   <SelectValue placeholder="정산 주차 선택" />
                 </SelectTrigger>
                 <SelectContent>
-                  {weekOptions.map((option) => (
+                  {periodOptions.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
                     </SelectItem>

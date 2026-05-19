@@ -240,12 +240,10 @@ export default function TeamMasterSettings() {
         typeSpecificSettings = {
           network: {
             levels: levels,
-            autoQualification: {
+            payoutQualification: {
               enabled: false,
-              memberCount: 10,
-              // chargeAmount: 100000,
-              viewCount: 50,
-              useCondition: "memberCount"
+              memberCount: 0,
+              countMode: "direct"
             }
           }
         };
@@ -253,16 +251,15 @@ export default function TeamMasterSettings() {
         typeSpecificSettings = {
           network: {
             levels: levels,
-            autoQualification: {
-              enabled: false,
-              memberCount: 10,
-              // chargeAmount: 100000,
-              viewCount: 50,
-              useCondition: "memberCount"
+            payoutQualification: {
+              enabled: true,
+              memberCount: 2,
+              countMode: "direct"
             }
           },
           binaryNetwork: {
-            requireBothLegs: true
+            requireBothLegs: false,
+            directReferralLimit: 2
           }
         };
       }

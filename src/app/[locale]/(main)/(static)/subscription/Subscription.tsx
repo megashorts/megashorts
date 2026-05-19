@@ -7,6 +7,7 @@ import PaymentModal from "@/app/[locale]/(main)/usermenu/payments/PaymentModal";
 import BillingModal from "@/app/[locale]/(main)/usermenu/payments/BillingModal";
 import { SubscriptionButton } from "./SubscriptionButton";
 import { CoinPurchaseButton } from "./CoinPurchaseButton";
+import { useTranslations } from "next-intl";
 
 // 구독 정보 타입
 type SubscriptionPlanType = 'weekly' | 'yearly';
@@ -21,26 +22,28 @@ interface SubscriptionPlan {
   description: string;
 }
 
-const subscriptionPlans: Record<'weekly' | 'yearly', SubscriptionPlan> = {
-  weekly: {
-    type: 'weekly',
-    title: '주간 구독',
-    price: 8500,
-    originalPrice: 13000,
-    period: '1주',
-    description: '모든 콘텐츠 무제한 이용.'
-  },
-  yearly: {
-    type: 'yearly',
-    title: '연간 구독',
-    price: 190000,
-    originalPrice: 260000,
-    period: '1년',
-    description: '모든 콘텐츠 무제한 이용.'
-  }
-}
-
 const SubscriptionPage = () => {
+  const t = useTranslations('Subscription');
+
+  const subscriptionPlans: Record<'weekly' | 'yearly', SubscriptionPlan> = {
+    weekly: {
+      type: 'weekly',
+      title: t('weeklyPayment'),
+      price: 8500,
+      originalPrice: 13000,
+      period: t('weeklyPeriod'),
+      description: t('weeklyDesc')
+    },
+    yearly: {
+      type: 'yearly',
+      title: t('yearlyPayment'),
+      price: 190000,
+      originalPrice: 260000,
+      period: t('yearlyPeriod'),
+      description: t('yearlyDesc')
+    }
+  }
+
   // const [isWeekly, setIsweekly] = useState(true);
   const [selectedCoin, setSelectedCoin] = useState<number | null>(null);
   const [showModal, setShowModal] = useState(false)
@@ -67,11 +70,11 @@ const SubscriptionPage = () => {
         {/* 첫 번째 카드 */}
         <div className="relative flex h-full flex-col overflow-hidden rounded-3xl border-2 px-6 py-8">
           <div className="mb-8 relative">
-            <h3 className="mb-2 block text-sm font-medium uppercase tracking-widest text-neutral-700 dark:text-neutral-500">다시없는</h3>
+            <h3 className="mb-2 block text-sm font-medium uppercase tracking-widest text-neutral-700 dark:text-neutral-500">{t('openEventBadge')}</h3>
             <div className="absolute bottom-0 left-0 h-[10px] bg-amber-400 mb-0 -z-10 w-7/12"></div>
             <h2 className="flex items-center text-2xl leading-none text-neutral-900 dark:text-white">
-              <span>오픈 이벤트</span>
-              <span className="ms-1 text-2xl font-normal text-white">!</span>
+              <span>{t('openEvent')}</span>
+              <span className="ms-1 text-2xl font-normal text-white">{t('openEventSub')}</span>
             </h2>
           </div>
           <div className="mb-8 relative items-center border w-full"></div>
@@ -79,13 +82,13 @@ const SubscriptionPage = () => {
             <nav className="mb-8 space-y-4 md:py-4">
               <ul>
                 <li className="flex items-center">
-                  <span className="text-sm text-neutral-700 dark:text-neutral-300">🚩 이벤트기간 이용권 할인!</span>
+                  <span className="text-sm text-neutral-700 dark:text-neutral-300">🚩 {t('eventDiscount')}</span>
                 </li>
                 <li className="flex items-center mt-4">
-                  <span className="text-sm text-neutral-700 dark:text-neutral-300">🚩 오픈기념 코인구매 보너스</span>
+                  <span className="text-sm text-neutral-700 dark:text-neutral-300">🚩 {t('eventCoinBonus')}</span>
                 </li>
                 <li className="flex items-center mt-4">
-                  <span className="text-sm text-neutral-700 dark:text-neutral-300">🚩 가입 이벤트 자동 지원</span>
+                  <span className="text-sm text-neutral-700 dark:text-neutral-300">🚩 {t('eventAutoSupport')}</span>
                 </li>
               </ul>
             </nav>
@@ -104,11 +107,11 @@ const SubscriptionPage = () => {
         {/* 두 번째 카드 */}
         <div className="relative flex h-full flex-col overflow-hidden rounded-3xl border-2 px-6 py-8 border-primary-500 border-red-700/50">
           <div className="mb-8 relative">
-            <h3 className="mb-2 block text-sm font-medium uppercase tracking-widest text-neutral-700 dark:text-red-600">메가쇼츠 추천</h3>
+            <h3 className="mb-2 block text-sm font-medium uppercase tracking-widest text-neutral-700 dark:text-red-600">{t('megashortsRecommend')}</h3>
             <div className="absolute bottom-0 left-0 h-[10px] bg-red-500 mb-0 -z-10 w-8/12"></div>
             <h2 className="flex items-center text-2xl leading-none text-neutral-900 dark:text-white ml-1">
-              <span>무제한</span>
-              <span className="ms-1 text-2xl font-normal text-white">이용권</span>
+              <span>{t('unlimited')}</span>
+              <span className="ms-1 text-2xl font-normal text-white">{t('pass')}</span>
             </h2>
           </div>
           <div className="mb-8 relative items-center border w-full"></div>
@@ -119,17 +122,17 @@ const SubscriptionPage = () => {
               onValueChange={(value) => setSelectedPlan(value as 'weekly' | 'yearly')}
             >
               <TabsList>
-                <TabsTrigger value="weekly">주간 결제</TabsTrigger>
-                <TabsTrigger value="yearly">연간 결제</TabsTrigger>
+                <TabsTrigger value="weekly">{t('weeklyPayment')}</TabsTrigger>
+                <TabsTrigger value="yearly">{t('yearlyPayment')}</TabsTrigger>
               </TabsList>
               <TabsContent value="weekly">
                 {/* {isWeekly && (
                   <> */}
                     <p className="text-sm text-neutral-300 mt-5">🚩 {subscriptionPlans.weekly.description}</p>
-                    <p className="text-sm text-neutral-300 mt-5">🚩 {subscriptionPlans.weekly.period} 자동결제</p>
+                    <p className="text-sm text-neutral-300 mt-5">🚩 {subscriptionPlans.weekly.period} {t('autoPayment')}</p>
                     <h3 className=" text-neutral-300 font-bold mt-5">
-                      <span className="text-2xl font-normal text-white">{subscriptionPlans.weekly.price.toLocaleString()}원 </span>
-                      <span className="text-sm line-through text-gray-500">{subscriptionPlans.weekly.originalPrice.toLocaleString()}원</span>
+                      <span className="text-2xl font-normal text-white">{subscriptionPlans.weekly.price.toLocaleString()}{t('currency')} </span>
+                      <span className="text-sm line-through text-gray-500">{subscriptionPlans.weekly.originalPrice.toLocaleString()}{t('currency')}</span>
                       <span className="text-sm"> / {subscriptionPlans.weekly.period}</span>
                     </h3>
                   {/* </> */}
@@ -139,12 +142,12 @@ const SubscriptionPage = () => {
                 {/* {!isWeekly && (
                   <> */}
                     <p className="text-sm text-neutral-300 mt-5">🚩 {subscriptionPlans.yearly.description}</p>
-                    <p className="text-sm text-neutral-300 mt-5">🚩 {subscriptionPlans.yearly.period} 자동결제</p>
+                    <p className="text-sm text-neutral-300 mt-5">🚩 {subscriptionPlans.yearly.period} {t('autoPayment')}</p>
                     <h3 className=" text-neutral-300 font-bold mt-5">
-                      {/* <span className="text-2xl font-normal text-white">{subscriptionPlans.yearly.price.toLocaleString()}원 </span>
-                      <span className="text-sm line-through text-gray-500">{subscriptionPlans.yearly.originalPrice.toLocaleString()}원</span> */}
-                      <span className="text-2xl font-normal text-white">19만원 </span>
-                      <span className="text-sm line-through text-gray-500">26만원</span>
+                      {/* <span className="text-2xl font-normal text-white">{subscriptionPlans.yearly.price.toLocaleString()}{t('currency')} </span>
+                      <span className="text-sm line-through text-gray-500">{subscriptionPlans.yearly.originalPrice.toLocaleString()}{t('currency')}</span> */}
+                      <span className="text-2xl font-normal text-white">190,000{t('currency')} </span>
+                      <span className="text-sm line-through text-gray-500">260,000{t('currency')}</span>
                       <span className="text-sm"> / {subscriptionPlans.yearly.period}</span>
                     </h3>
                   {/* </>
@@ -183,18 +186,18 @@ const SubscriptionPage = () => {
               />
             )} */}
 
-            <p className="mt-3 text-xs dark:text-white text-center">메가쇼츠 강추서비스.</p>
+            <p className="mt-3 text-xs dark:text-white text-center">{t('highlyRecommended')}</p>
           </div>
         </div>
 
         {/* 세 번째 카드 */}
         <div className="relative flex h-full flex-col overflow-hidden rounded-3xl border-2 px-6 py-8 border-neutral-100 dark:border-neutral-700">
           <div className="mb-8 relative">
-            <h3 className="mb-2 block text-sm font-medium uppercase tracking-widest text-neutral-700 dark:text-red-600">골라보는 취향저격</h3>
+            <h3 className="mb-2 block text-sm font-medium uppercase tracking-widest text-neutral-700 dark:text-red-600">{t('tasteSniper')}</h3>
             <div className="absolute bottom-0 left-0 h-[10px] bg-red-500 mb-0 -z-10 w-6/12"></div>
             <h2 className="flex items-center text-2xl leading-none text-neutral-900 dark:text-white ml-1">
-              <span>코인</span>
-              <span className="ms-1 text-2xl font-normal text-white">구매</span>
+              <span>{t('coins')}</span>
+              <span className="ms-1 text-2xl font-normal text-white">{t('buyCoinsTitle')}</span>
             </h2>
           </div>
           <div className="mb-8 relative items-center border w-full"></div>
@@ -212,13 +215,13 @@ const SubscriptionPage = () => {
                       className="form-radio h-4 w-4 text-sm text-white"
                     />
                     <span className="flex-1 flex justify-between text-sm text-neutral-300">
-                      <span>{option.value}코인</span>
-                      <span>{option.price.toLocaleString()}원</span>
+                      <span>{option.value}{t('coins')}</span>
+                      <span>{option.price.toLocaleString()}{t('currency')}</span>
                     </span>
                   </label>
                 ))}
               </div>
-              <div className="text-sm text-neutral-700 dark:text-neutral-500 mt-3">🚩 프리미엄 컨텐츠 1편당 2코인 소진</div>
+              <div className="text-sm text-neutral-700 dark:text-neutral-500 mt-3">🚩 {t('premiumCoinCost')}</div>
             </div>
           </div>
           <div className="mt-auto flex flex-col">
@@ -252,7 +255,7 @@ const SubscriptionPage = () => {
             />
 
             <p className="mt-3 text-xs dark:text-neutral-400 text-center">
-              한시적 이벤트 가격은 사전 예고없이 종료됨.
+              {t('eventEndWarning')}
             </p>
           </div>
         </div>

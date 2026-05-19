@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server';
 import prisma from '@/lib/prisma';
 
 // 워커 URL 및 API 키 설정
-export const WORKER_URL = 'https://referral-structure.msdevcm.workers.dev';
+export const WORKER_URL = process.env.REFERRAL_STRUCTURE_WORKER_URL || 'https://referral-structure-worker.msdevcm.workers.dev';
 export const API_KEY = process.env.WORKER_API_KEY;
 
 if (!API_KEY) {

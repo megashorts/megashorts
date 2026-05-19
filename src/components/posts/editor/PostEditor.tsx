@@ -21,25 +21,15 @@ import { useRouter } from "next/navigation";
 import { useSession } from "@/components/SessionProvider";
 import LanguageFlag from "@/components/LanguageFlag";
 import { getThumbnailUrl } from "@/lib/constants";
+import { useTranslations } from "next-intl";
 
 type PostFormData = z.infer<typeof postSchema>;
 
-const CATEGORIES: Record<CategoryType, string> = {
-  COMEDY: "즐거운",
-  ROMANCE: "로맨스",
-  ACTION: "액션",
-  THRILLER: "스릴러",
-  DRAMA: "감동적인",
-  PERIODPLAY: "시대극",
-  FANTASY: "환타지",
-  HIGHTEEN: "하이틴",
-  ADULT: "성인",
-  HUMANE: "인간적인",
-  CALM: "잔잔한",
-  VARIETYSHOW: "예능",
-  NOTIFICATION: "안내",
-  MSPOST: "블로그",
-} as const;
+const SELECTABLE_CATEGORIES: CategoryType[] = [
+  "COMEDY", "ROMANCE", "ACTION", "THRILLER", "DRAMA",
+  "PERIODPLAY", "FANTASY", "HIGHTEEN", "ADULT", "HUMANE",
+  "CALM", "VARIETYSHOW",
+];
 
 interface PreparedImage {
   file: File;
@@ -55,12 +45,23 @@ type VideoType = NonNullable<PostData['videos']>[number];
 export function PostEditor({ initialData }: PostEditorProps) {
   const router = useRouter();
   const { user } = useSession();
+  const tCat = useTranslations('Category');
   const [videos, setVideos] = useState<VideoType[]>(
     initialData?.videos || []
   );
   const mutation = useSubmitPostMutation();
   const [selectedCategories, setSelectedCategories] = useState<CategoryType[]>(
     initialData?.categories || []
+  );
+  
+  const [titleI18n, setTitleI18n] = useState<Record<string, string>>(
+    (initialData?.titleI18n as Record<string, string>) || {}
+  );
+  const [contentI18n, setContentI18n] = useState<Record<string, string>>(
+    (initialData?.contentI18n as Record<string, string>) || {}
+  );
+  const [translationLocales, setTranslationLocales] = useState<string[]>(
+    Object.keys((initialData?.titleI18n as Record<string, string>) || {})
   );
   const [preparedImage, setPreparedImage] = useState<PreparedImage | null>(null);
   const [existingThumbnail, setExistingThumbnail] = useState<string | null>(
@@ -148,6 +149,8 @@ export function PostEditor({ initialData }: PostEditorProps) {
         createdAt: now,
         publishedAt: status === 'PUBLISHED' ? now : null,
         postLanguage: selectedLanguage,
+        titleI18n: translationLocales.length > 0 ? titleI18n : undefined,
+        contentI18n: translationLocales.length > 0 ? contentI18n : undefined,
         videos: videos.map(video => ({
           id: video.id,
           filename: video.filename,
@@ -330,14 +333,12 @@ export function PostEditor({ initialData }: PostEditorProps) {
         카테고리 (최대 3개)
         </label>
         <div className="flex flex-wrap gap-2 mt-2">
-          {Object.entries(CATEGORIES)
-            .filter(([key]) => key !== 'NOTIFICATION' && key !== 'MSPOST')
-            .map(([key, label]) => (
+          {SELECTABLE_CATEGORIES
+            .map((category) => (
               <button
-                key={key}
+                key={category}
                 type="button"
                 onClick={() => {
-                  const category = key as CategoryType;
                   const currentCategories = Array.from(selectedCategories);
                   const index = currentCategories.indexOf(category);
                   
@@ -358,14 +359,14 @@ export function PostEditor({ initialData }: PostEditorProps) {
                 }}
                 className={`
                   px-4 py-2 rounded-md text-xs transition-colors
-                  ${selectedCategories.includes(key as CategoryType)
+                  ${selectedCategories.includes(category)
                     ? "bg-primary text-primary-foreground font-medium"
                     : "bg-secondary hover:bg-secondary/80 text-secondary-foreground"}
                   hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary/50
                   active:scale-95 transform duration-100
                 `}
               >
-                {label}
+                {tCat(category)}
               </button>
             ))}
         </div>
@@ -375,7 +376,7 @@ export function PostEditor({ initialData }: PostEditorProps) {
               key={category}
               className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary"
             >
-              {CATEGORIES[category]}
+              {tCat(category)}
             </span>
           ))}
         </div>
@@ -410,6 +411,58 @@ export function PostEditor({ initialData }: PostEditorProps) {
           <p className="mt-1 text-sm text-red-600">
             {errors.content.message}
           </p>
+        )}
+      </div>
+
+      <div className="p-4 border rounded-lg bg-slate-50 dark:bg-slate-900">
+        <label className="block text-sm font-bold mb-4">
+          🌐 자막 및 다국어 번역 추가 (선택)
+        </label>
+        <div className="flex gap-4 mb-4">
+          {['en', 'ko', 'zh'].map(loc => (
+            <label key={loc} className="flex items-center gap-2 cursor-pointer">
+              <input 
+                type="checkbox" 
+                checked={translationLocales.includes(loc)}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setTranslationLocales([...translationLocales, loc]);
+                  } else {
+                    setTranslationLocales(translationLocales.filter(l => l !== loc));
+                  }
+                }}
+                className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
+              />
+              <span className="text-sm font-medium">{loc.toUpperCase()}</span>
+            </label>
+          ))}
+        </div>
+
+        {translationLocales.length > 0 && (
+          <div className="space-y-4 border-t pt-4">
+            {translationLocales.map(loc => (
+              <div key={loc} className="p-4 bg-white dark:bg-slate-800 rounded-md border space-y-3">
+                <h4 className="font-bold text-sm text-primary">{loc.toUpperCase()} 번역</h4>
+                <div>
+                  <input
+                    type="text"
+                    placeholder={`${loc.toUpperCase()} 제목`}
+                    value={titleI18n[loc] || ''}
+                    onChange={(e) => setTitleI18n({ ...titleI18n, [loc]: e.target.value })}
+                    className="w-full text-sm rounded-md border border-gray-300 focus:ring-2 focus:ring-primary p-2"
+                  />
+                </div>
+                <div>
+                  <textarea
+                    placeholder={`${loc.toUpperCase()} 내용`}
+                    value={contentI18n[loc] || ''}
+                    onChange={(e) => setContentI18n({ ...contentI18n, [loc]: e.target.value })}
+                    className="w-full text-sm rounded-md border border-gray-300 focus:ring-2 focus:ring-primary p-2 min-h-[80px]"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
         )}
       </div>
 

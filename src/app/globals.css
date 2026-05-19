@@ -235,7 +235,19 @@ nav ul li a:hover::after {
   }
   body {
     @apply bg-background text-foreground;
-    font-family: var(--font-BMDOHYEON); /* 기본 폰트로 설정 */
+    font-family: var(--font-BMDOHYEON), sans-serif; /* 한국어 기본 폰트 */
+  }
+
+  body.font-locale-en {
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  body.font-locale-zh {
+    font-family: "PingFang SC", "Microsoft YaHei", "Heiti SC", Arial, sans-serif;
+  }
+
+  body.font-locale-ko {
+    font-family: var(--font-BMDOHYEON), sans-serif;
   }
 }
 
@@ -256,4 +268,3 @@ nav ul li a:hover::after {
   background-color: #dc3545;
   box-shadow: 0 0 10px #dc3545;
 }
-

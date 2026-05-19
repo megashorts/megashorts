@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { useSession } from "@/components/SessionProvider";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 interface CoinPurchaseButtonProps {
   selectedCoin: number | null;
@@ -11,6 +12,7 @@ interface CoinPurchaseButtonProps {
 
 export function CoinPurchaseButton({ selectedCoin, onPurchase }: CoinPurchaseButtonProps) {
   const { user } = useSession();
+  const t = useTranslations('Subscription');
 
   if (!user?.id) {
     return (
@@ -19,7 +21,7 @@ export function CoinPurchaseButton({ selectedCoin, onPurchase }: CoinPurchaseBut
           disabled={!selectedCoin}
           className="mt-4 w-full"
         >
-          {selectedCoin ? `${selectedCoin}코인 구매` : '수량을 선택해주세요'}
+          {selectedCoin ? t('buyAmountCoins', { amount: selectedCoin }) : t('selectQuantity')}
         </Button>
       </Link>
     );
@@ -31,7 +33,7 @@ export function CoinPurchaseButton({ selectedCoin, onPurchase }: CoinPurchaseBut
       disabled={!selectedCoin}
       className="mt-4 w-full"
     >
-      {selectedCoin ? `${selectedCoin}코인 구매` : '수량을 선택해주세요'}
+      {selectedCoin ? t('buyAmountCoins', { amount: selectedCoin }) : t('selectQuantity')}
     </Button>
   );
 }

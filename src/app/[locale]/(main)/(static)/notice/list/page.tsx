@@ -8,13 +8,13 @@ import BlogCard from "@/components/posts/BlogCard";
 import NoticeSidebar from "@/components/NoticeSidebar";
 import Image from "next/image";
 import { Pin } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
 
-export const dynamic = 'force-static';
-export const revalidate = false;
-export const fetchCache = 'force-cache';
+export const dynamic = 'force-dynamic';
 
 export default async function NoticeListPage() {
+  const t = await getTranslations('Notice');
   // 공지사항 데이터
   const noticePosts = await prisma.post.findMany({
     where: {
@@ -52,7 +52,7 @@ export default async function NoticeListPage() {
             />
             <div className="absolute inset-0 bg-black/50 flex items-end justify-start pl-4 pb-2 sm:pl-8 sm:pb-5">
               <h1 className="text-base md:text-2xl lg:text-2xl font-bold text-white">
-                메가쇼츠 소식
+                {t('megashortsNews')}
               </h1>
             </div>
           </div>
@@ -63,9 +63,9 @@ export default async function NoticeListPage() {
             <Table>
               <TableHeader>
                 <TableRow className="h-6">
-                  <TableHead className="w-[120px]">게시일</TableHead>
-                  <TableHead>제목</TableHead>
-                  <TableHead className="w-[120px]">작성자</TableHead>
+                  <TableHead className="w-[120px]">{t('date')}</TableHead>
+                  <TableHead>{t('postTitle')}</TableHead>
+                  <TableHead className="w-[120px]">{t('author')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

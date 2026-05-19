@@ -6,6 +6,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatNumber } from '@/lib/utils';
+import { getRecentIsoWeeks } from '@/lib/stats-period';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { 
   BarChart, 
   Users, 
@@ -19,25 +21,33 @@ import {
 } from 'lucide-react';
 
 export function SystemStats() {
-  const [selectedPeriod, setSelectedPeriod] = useState<string>('current');
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const initialPeriod = searchParams.get('period') || 'current';
+  const [selectedPeriod, setSelectedPeriod] = useState<string>(initialPeriod);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [statsData, setStatsData] = useState<any>(null);
   const [weeklyData, setWeeklyData] = useState<any>(null);
 
   // 기간 옵션
-  const periodOptions = [
-    { value: 'current', label: '현재 주차 (진행중)' },
-    { value: '2025-W09', label: '2025년 9주차 (2/24 ~ 3/2)' },
-    { value: '2025-W08', label: '2025년 8주차 (2/17 ~ 2/23)' },
-    { value: '2025-W07', label: '2025년 7주차 (2/10 ~ 2/16)' },
-  ];
+  const recentPeriodOptions = getRecentIsoWeeks(8);
+  const periodOptions = recentPeriodOptions.some((option) => option.value === selectedPeriod || option.key === selectedPeriod)
+    ? recentPeriodOptions
+    : [
+        {
+          value: selectedPeriod,
+          key: selectedPeriod,
+          label: `직접 지정 주차 (${selectedPeriod})`,
+        },
+        ...recentPeriodOptions,
+      ];
 
   // 통계 데이터 조회 함수
   const fetchStatistics = async (period: string) => {
     setIsLoading(true);
     try {
       // 관리자 통계 API 호출
-      const response = await fetch(`/api/stats/admin`);
+      const response = await fetch(`/api/stats/admin?period=${period}`);
       
       if (!response.ok) {
         console.error(`API 호출 실패: ${response.status} ${response.statusText}`);
@@ -70,7 +80,7 @@ export function SystemStats() {
       
       // Cloudflare 통계 데이터 조회 (글로벌 접속자 지도 등)
       try {
-        const cloudflareResponse = await fetch(`/api/stats/cloudflare`);
+        const cloudflareResponse = await fetch(`/api/stats/cloudflare?period=${period}`);
         
         if (cloudflareResponse.ok) {
           const cloudflareResult = await cloudflareResponse.json();
@@ -124,6 +134,9 @@ export function SystemStats() {
   // 기간 선택 시 호출
   const handlePeriodChange = (value: string) => {
     setSelectedPeriod(value);
+    const params = new URLSearchParams(searchParams);
+    params.set('period', value);
+    router.push(`?${params.toString()}`, { scroll: false });
     fetchStatistics(value);
   };
 
@@ -299,13 +312,33 @@ export function SystemStats() {
           <div className="h-[300px] bg-muted rounded-md flex items-center justify-center">
             {isLoading ? (
               <Skeleton className="w-full h-full rounded-md" />
-            ) : statsData?.viewerDistribution ? (
-              <div id="global-map" className="w-full h-full">
-                {/* 지도 컴포넌트가 여기에 렌더링됩니다 */}
-                {/* 실제 구현 시에는 Cloudflare 통계 API에서 가져온 데이터로 지도 렌더링 */}
+            ) : statsData?.viewerDistribution?.length ? (
+              <div id="global-map" className="w-full h-full relative rounded-md overflow-hidden">
+                <div
+                  className="absolute inset-0 bg-contain bg-center"
+                  style={{
+                    backgroundImage: 'url(/world-map.svg)',
+                    backgroundRepeat: 'no-repeat',
+                    backgroundPosition: 'center'
+                  }}
+                />
+                {statsData.viewerDistribution.map((item: any, index: number) => (
+                  <div
+                    key={`${item.country}-${index}`}
+                    className="absolute rounded-full bg-blue-600 shadow-lg"
+                    title={`${item.country}: ${formatNumber(item.count || item.minutes || 0)}`}
+                    style={{
+                      left: `${((item.longitude + 180) / 360) * 100}%`,
+                      top: `${((90 - item.latitude) / 180) * 100}%`,
+                      width: `${Math.max(6, Math.min(22, Number(item.count || item.minutes || 0) / 100))}px`,
+                      height: `${Math.max(6, Math.min(22, Number(item.count || item.minutes || 0) / 100))}px`,
+                      transform: 'translate(-50%, -50%)'
+                    }}
+                  />
+                ))}
               </div>
             ) : (
-              <p className="text-muted-foreground">Cloudflare 통계 API 연동 예정</p>
+              <p className="text-muted-foreground">저장된 Cloudflare 국가별 통계가 없습니다.</p>
             )}
           </div>
         </CardContent>

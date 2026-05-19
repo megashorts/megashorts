@@ -1,10 +1,10 @@
 // app/api/creator-info/[userId]/route.ts
 
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
 import { sendTelegramNotification } from '@/lib/telegram';
-
-const prisma = new PrismaClient();
+import { validateRequest } from '@/auth';
+import { USER_ROLE } from '@/lib/constants';
+import prisma from '@/lib/prisma';
 
 export async function POST(
   request: NextRequest,
@@ -12,6 +12,16 @@ export async function POST(
   const params = await context.params;
   try {
     const { userId } = params;
+    const { user: authUser } = await validateRequest();
+
+    if (!authUser) {
+      return NextResponse.json({ success: false, error: '인증되지 않은 요청입니다.' }, { status: 401 });
+    }
+
+    if (authUser.id !== userId && authUser.userRole < USER_ROLE.OPERATION1) {
+      return NextResponse.json({ success: false, error: '권한이 없습니다.' }, { status: 403 });
+    }
+
     const data = await request.json();
 
     const {

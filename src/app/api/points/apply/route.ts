@@ -64,6 +64,13 @@ export async function POST(request: NextRequest) {
       }, { status: 404 });
     }
 
+    if (!user.emailVerified) {
+      return NextResponse.json({
+        success: false,
+        error: '이메일 인증이 완료되어야 포인트 지급을 신청할 수 있습니다.'
+      }, { status: 400 });
+    }
+
     // CreatorInfo 및 idCheck 확인
     if (!user.CreatorInfo || !user.CreatorInfo.idCheck) {
       return NextResponse.json({
@@ -73,7 +80,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 사용자 포인트 잔액 확인
-    if (user.points < amount) {
+    if (Number(user.points || 0) < amount) {
       return NextResponse.json({
         success: false,
         error: '신청 금액이 사용 가능한 포인트를 초과합니다.'

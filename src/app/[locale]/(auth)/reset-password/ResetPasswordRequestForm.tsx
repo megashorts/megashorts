@@ -4,8 +4,9 @@ import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { logActivity } from "@/lib/activity-logger/client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import LoadingButton from "@/components/LoadingButton";
+import { useTranslations } from "next-intl";
 import {
   Form,
   FormControl,
@@ -21,6 +22,7 @@ export default function ResetPasswordRequestForm() {
   const [error, setError] = useState<string>();
   const [success, setSuccess] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const tAuth = useTranslations("Auth");
 
   const form = useForm<ResetPasswordRequestValues>({
     resolver: zodResolver(resetPasswordRequestSchema),
@@ -76,7 +78,7 @@ export default function ResetPasswordRequestForm() {
         {error && <p className="text-center text-destructive">{error}</p>}
         {success && (
           <p className="text-sm text-center text-green-500">
-            비밀번호 재설정 링크가 전송되었습니다.
+            {tAuth("resetLinkSent")}
           </p>
         )}
 
@@ -86,7 +88,7 @@ export default function ResetPasswordRequestForm() {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input placeholder="가입한 이메일을 입력하세요" type="email" {...field} />
+                <Input placeholder={tAuth("emailToReset")} type="email" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -94,13 +96,13 @@ export default function ResetPasswordRequestForm() {
         />
 
         <LoadingButton loading={isPending} type="submit" className="w-full">
-          재설정 링크 받기
+          {tAuth("getResetLink")}
         </LoadingButton>
 
         <div className="text-gray-500 text-xs text-center">
-          계정이 있으신가요?{" "}
+          {tAuth("alreadyHaveAccount")} {" "}
           <Link className="text-white hover:underline" href="/login">
-            로그인
+            {tAuth("login")}
           </Link>
         </div>
       </form>

@@ -7,8 +7,7 @@ import { CategoryType } from "@prisma/client";
 // export const revalidate = false;
 // export const fetchCache = 'force-cache';
 
-// 포스트 작업 시에만 재생성되도록 설정
-export const revalidate = false;
+export const dynamic = 'force-dynamic';
 
 export default async function RecentPage() {
   const posts = await prisma.post.findMany({

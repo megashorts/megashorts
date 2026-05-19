@@ -3,11 +3,12 @@ import Image from 'next/image';
 import ReactMarkdown from 'react-markdown';
 import fs from 'fs';
 import path from 'path';
+import { getTranslations } from "next-intl/server";
 
 // 페이지 props 타입 정의
 interface PageProps {
-  params: { locale?: string };
-  searchParams: { [key: string]: string | string[] | undefined };
+  params: Promise<{ locale?: string }>;
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 // 마크다운 파일 읽기 함수
@@ -29,7 +30,8 @@ async function getPrivateContent(locale: string = 'ko') {
 
 // 메인 컴포넌트
 export default async function PrivatePage({ params }: PageProps) {
-  const locale = params.locale || 'ko';
+  const t = await getTranslations('Company');
+  const { locale = 'ko' } = await params;
   const content = await getPrivateContent(locale);
 
   return (
@@ -46,7 +48,7 @@ export default async function PrivatePage({ params }: PageProps) {
         />
         <div className="absolute inset-0 bg-black/50 flex items-end justify-start pl-8 pb-5">
           <h1 className="text-2xl md:text-3xl lg:text-3xl font-bold text-white">
-            개인정보 처리방침 및 쿠키정책
+            {t('privacy')}
           </h1>
         </div>
         <div className="absolute top-5 right-5">

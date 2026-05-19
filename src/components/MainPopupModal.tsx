@@ -7,12 +7,14 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { NoticeModal } from '@/app/[locale]/(main)/admin/service/components/types';
 import { getThumbnailUrl } from '@/lib/constants';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 export function MainPopupModal() {
   const isMobile = useIsMobile();
   const [loadedImages, setLoadedImages] = useState<Record<number, boolean>>({});
   const [modals, setModals] = useState<NoticeModal[]>([]);
   const router = useRouter();
+  const tModal = useTranslations('Modal');
 
   useEffect(() => {
     const checkHiddenModal = (modal: NoticeModal) => {
@@ -216,7 +218,7 @@ export function MainPopupModal() {
                         className="px-4 py-2 text-sm text-white bg-black/50 hover:bg-black/70 rounded shadow-lg backdrop-blur-sm"
                       >
                         <span className="drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)]">
-                          오늘은 보지 않기
+                          {tModal('hideToday')}
                         </span>
                       </button>
                     )}
@@ -229,7 +231,7 @@ export function MainPopupModal() {
                         className="px-4 py-2 text-sm text-white bg-black/50 hover:bg-black/70 rounded shadow-lg backdrop-blur-sm"
                       >
                         <span className="drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)]">
-                          다시 보지 않기
+                          {tModal('hideForever')}
                         </span>
                       </button>
                     )}

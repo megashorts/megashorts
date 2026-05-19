@@ -10,16 +10,16 @@ import NoticeSidebar from "@/components/NoticeSidebar";
 import { getThumbnailUrl } from "@/lib/constants";
 
 type Props = {
-    params: {
+    params: Promise<{
       postId: string;
-    };
+    }>;
   };
   
   // 메타데이터 생성
   export async function generateMetadata(
     { params }: Props
   ): Promise<Metadata> {
-    const resolvedParams = await Promise.resolve(params);
+    const resolvedParams = await params;
     const post = await prisma.post.findUnique({
       where: { id: resolvedParams.postId },
       select: { 
@@ -43,23 +43,28 @@ type Props = {
   }
   
   export async function generateStaticParams() {
-    const posts = await prisma.post.findMany({
-      where: {
-        status: 'PUBLISHED',
-        categories: {
-          has: CategoryType.MSPOST
-        }
-      },
-      select: { id: true },
-    });
-  
-    return posts.map((post) => ({
-      postId: post.id,
-    }));
+    try {
+      const posts = await prisma.post.findMany({
+        where: {
+          status: 'PUBLISHED',
+          categories: {
+            has: CategoryType.MSPOST
+          }
+        },
+        select: { id: true },
+      });
+    
+      return posts.map((post) => ({
+        postId: post.id,
+      }));
+    } catch (error) {
+      console.warn('Skipping blog static params:', error);
+      return [];
+    }
   }
   
   export default async function BlogPostPage({ params }: Props) {
-    const resolvedParams = await Promise.resolve(params);
+    const resolvedParams = await params;
     
     // 현재 포스트 데이터 조회
     const post = await prisma.post.findUnique({

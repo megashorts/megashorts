@@ -24,7 +24,7 @@ export async function GET(
 
     // 요청한 사용자 ID와 로그인한 사용자 ID가 일치하는지 확인
     // 또는 관리자 권한이 있는지 확인
-    const isAdmin = authUser.userRole >= 90;
+    const isAdmin = authUser.userRole >= 60;
     const isSameUser = authUser.id === userId;
 
     if (!isAdmin && !isSameUser) {
@@ -61,6 +61,7 @@ export async function GET(
       success: true,
       data: {
         ...user,
+        points: Number(user.points || 0),
         creatorInfo: user.CreatorInfo, // 새로 추가된 필드
       },
     });

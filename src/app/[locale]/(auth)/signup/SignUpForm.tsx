@@ -18,11 +18,13 @@ import { useForm } from "react-hook-form";
 import { signUp } from "./actions";
 import { toast } from "@/components/ui/use-toast";
 import { logActivity } from "@/lib/activity-logger/client";
+import { useTranslations } from "next-intl";
 
 export default function SignUpForm() {
   const addcoinUser = 2;
   const [error, setError] = useState<string>();
   const [isPending, startTransition] = useTransition();
+  const tAuth = useTranslations("Auth");
 
   const form = useForm<SignUpValues>({
     resolver: zodResolver(signUpSchema),
@@ -94,7 +96,7 @@ export default function SignUpForm() {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input placeholder="이메일주소" type="email" {...field} />
+                <Input placeholder={tAuth("emailPlaceholder")} type="email" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -106,7 +108,7 @@ export default function SignUpForm() {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input placeholder="사용자 ID" {...field} />
+                <Input placeholder={tAuth("usernamePlaceholder")} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -118,7 +120,7 @@ export default function SignUpForm() {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <PasswordInput placeholder="비밀번호" {...field} />
+                <PasswordInput placeholder={tAuth("passwordPlaceholder")} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -130,10 +132,10 @@ export default function SignUpForm() {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <PasswordInput placeholder="비밀번호 확인" {...field} />
+                <PasswordInput placeholder={tAuth("confirmPasswordPlaceholder")} {...field} />
               </FormControl>
               {form.watch("password") !== field.value && (
-                <p className="text-destructive">Passwords do not match</p>
+                <p className="text-destructive">{tAuth("passwordsDoNotMatch")}</p>
               )}
               <FormMessage />
             </FormItem>
@@ -145,14 +147,14 @@ export default function SignUpForm() {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input placeholder="(옵션) 추천친구 - @제외 입력" {...field} />
+                <Input placeholder={tAuth("referredByPlaceholder")} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
         <LoadingButton loading={isPending} type="submit" className="w-full">
-          회원가입
+          {tAuth("signupButton")}
         </LoadingButton>
       </form>
     </Form>

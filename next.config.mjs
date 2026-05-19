@@ -3,6 +3,7 @@ import createNextIntlPlugin from 'next-intl/plugin';
 import withPWAInit from "@ducanh2912/next-pwa";
 
 const withNextIntl = createNextIntlPlugin();
+const uploadSentrySourceMaps = process.env.SENTRY_UPLOAD_SOURCE_MAPS === "true";
 const withPWA = withPWAInit({
   dest: "public",
   disable: process.env.NODE_ENV === "development",
@@ -13,9 +14,6 @@ const nextConfig = {
   experimental: {
     staleTimes: {
       dynamic: 30,
-    },
-    turbo: {
-      enabled: true
     },
   },
   serverExternalPackages: ["@node-rs/argon2"],
@@ -70,8 +68,10 @@ const nextConfig = {
   },
 };
 
-export default withSentryConfig(
-  withPWA(withNextIntl(nextConfig)),
+const appConfig = withPWA(withNextIntl(nextConfig));
+
+export default uploadSentrySourceMaps ? withSentryConfig(
+  appConfig,
   {
     org: "megasshorts",
     project: "javascript-nextjs",
@@ -85,4 +85,4 @@ export default withSentryConfig(
     disableLogger: true,
     automaticVercelMonitors: true,
   }
-);
+) : appConfig;

@@ -96,7 +96,7 @@ export async function signUp(
         // 팀마스터 정보 조회
         const teamMasterSettings = await prisma.systemSetting.findFirst({
           where: {
-            key: `team_master_settings_${teamMasterId}`,
+            key: `agencySettings_${teamMasterId}`,
           },
           select: {
             value: true,
@@ -109,6 +109,11 @@ export async function signUp(
 
           // 네트워크 바이너리 타입인 경우 직접 추천 가입자 수 확인
           if (teamMasterType === 'BINARY_NETWORK') {
+            const directReferralLimit =
+              Number(settings.settings?.binaryNetwork?.directReferralLimit) ||
+              Number(settings.settings?.network?.payoutQualification?.memberCount) ||
+              2;
+
             // 추천인의 직접 추천 가입자 수 조회
             // const directReferrals = await prisma.user.count({
             //   where: {
@@ -118,16 +123,16 @@ export async function signUp(
 
             const directReferrals = await prisma.user.count({
               where: {
-                referredBy: referredBy,
+                referredBy: referrer.id,
               },
             });
 
-            // 직접 추천 가입자가 2명 이상인 경우
-            if (directReferrals >= 2) {
+            // 바이너리 네트워크는 직접 하위 레그 수를 제한한다.
+            if (directReferrals >= directReferralLimit) {
               // 워커에서 로그를 기록하므로 클라이언트 측 로그는 제거
 
               return {
-                error: "해당 추천인은 추천가입자수(2명) 완료로 추가할 수 없습니다.",
+                error: `해당 추천인은 추천가입자수(${directReferralLimit}명) 완료로 추가할 수 없습니다.`,
               };
             }
           }
@@ -208,7 +213,7 @@ export async function signUp(
     // 추천인 구조 워커 호출 (팀마스터가 있는 경우)
     if (teamMasterId && referrer) {
       try {     
-        await syncReferralStructure(referrer?.id, "add", teamMasterId);
+        await syncReferralStructure(userId, "add", teamMasterId);
 
       } catch (error) {
         console.error('신규회원 영업자 추가 워커 호출 오류:', error);

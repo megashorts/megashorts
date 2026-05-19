@@ -1,15 +1,20 @@
 // app/api/points/applications/route.ts
 
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { validateRequest } from '@/auth';
+import { USER_ROLE } from '@/lib/constants';
+import prisma from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
     const userId = searchParams.get('userId');
     const period = searchParams.get('period');
+    const { user } = await validateRequest();
+
+    if (!user) {
+      return NextResponse.json({ success: false, error: '인증되지 않은 요청입니다.' }, { status: 401 });
+    }
 
     if (!userId) {
       return NextResponse.json({
@@ -18,13 +23,27 @@ export async function GET(request: NextRequest) {
       }, { status: 400 });
     }
 
+    if (user.id !== userId && user.userRole < USER_ROLE.OPERATION1) {
+      return NextResponse.json({ success: false, error: '권한이 없습니다.' }, { status: 403 });
+    }
+
     // 기간별 필터링 조건 설정
     let dateFilter = {};
     
     if (period && period !== 'all') {
       const now = new Date();
       
-      if (period.includes('Q1')) {
+      if (period === '7days' || period === '30days' || period === '90days') {
+        const days = Number(period.replace('days', ''));
+        const startDate = new Date(now);
+        startDate.setDate(startDate.getDate() - days);
+        dateFilter = {
+          requestedAt: {
+            gte: startDate,
+            lte: now
+          }
+        };
+      } else if (period.includes('Q1')) {
         // 1분기: 1월 1일 ~ 3월 31일
         const year = parseInt(period.split('-')[0]);
         dateFilter = {

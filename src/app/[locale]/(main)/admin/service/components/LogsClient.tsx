@@ -5,7 +5,7 @@ import { LogTable } from './LogTable';
 import { LogFilters } from './LogFilters';
 import { LogModal } from './LogModal';
 import { ActivityLog } from '@/lib/activity-logger/types';
-import { CONFIG, TYPE_DISPLAY_NAMES } from '@/lib/activity-logger/constants';
+import { TYPE_DISPLAY_NAMES } from '@/lib/activity-logger/constants';
 import { LogFiltersState } from '../types';
 
 export default function LogsClient() {
@@ -58,7 +58,7 @@ export default function LogsClient() {
         userId: filters.userId,
         country: filters.country
       });
-      console.log('Worker URL:', CONFIG.WORKER_URL);
+      console.log('Log proxy URL:', '/api/admin/service/logs');
       
       // 디버깅용 - 모든 파일 목록 조회 요청
       // try {
@@ -80,8 +80,10 @@ export default function LogsClient() {
           ...(filters.country && { country: filters.country })
         });
         
-        console.log('Fetching all types with URL:', `${CONFIG.WORKER_URL}?${searchParams}`);
-        const response = await fetch(`${CONFIG.WORKER_URL}?${searchParams}`);
+        console.log('Fetching all types with URL:', `/api/admin/service/logs?${searchParams}`);
+        const response = await fetch(`/api/admin/service/logs?${searchParams}`, {
+          cache: 'no-store'
+        });
         if (!response.ok) {
           console.error('Failed to fetch logs:', response.status, response.statusText);
           throw new Error('Failed to fetch logs');
@@ -101,8 +103,10 @@ export default function LogsClient() {
             ...(filters.country && { country: filters.country })
           });
           
-          console.log(`Fetching type ${type} with URL:`, `${CONFIG.WORKER_URL}?${searchParams}`);
-          const response = await fetch(`${CONFIG.WORKER_URL}?${searchParams}`);
+          console.log(`Fetching type ${type} with URL:`, `/api/admin/service/logs?${searchParams}`);
+          const response = await fetch(`/api/admin/service/logs?${searchParams}`, {
+            cache: 'no-store'
+          });
           if (!response.ok) {
             console.error(`Failed to fetch logs for type ${type}:`, response.status, response.statusText);
             throw new Error(`Failed to fetch logs for type: ${type}`);

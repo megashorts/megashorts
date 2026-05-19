@@ -27,6 +27,7 @@ export const lucia = new Lucia(adapter, {
       kakaoId: databaseUserAttributes.kakaoId,
       naverId: databaseUserAttributes.naverId,
       userRole: databaseUserAttributes.userRole,
+      myLanguage: databaseUserAttributes.myLanguage,
     };
   },
 });
@@ -47,6 +48,7 @@ interface DatabaseUserAttributes {
   kakaoId: string | null;
   naverId: string | null;
   userRole: number;
+  myLanguage: string;
 }
 
 export const google = new Google(

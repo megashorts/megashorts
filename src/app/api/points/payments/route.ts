@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     const period = url.searchParams.get('period') || 'all';
 
     // 3. 권한 확인 (본인 또는 관리자만 가능)
-    const isAdmin = authUser.userRole >= 90;
+    const isAdmin = authUser.userRole >= 60;
     const isSameUser = authUser.id === userId;
     if (!isAdmin && !isSameUser) {
       return NextResponse.json(
@@ -33,9 +33,11 @@ export async function GET(request: NextRequest) {
     let dateFilter: Date | undefined;
     if (period !== 'all') {
       const now = new Date();
-      if (period === '30d') {
+      if (period === '7days') {
+        dateFilter = new Date(now.setDate(now.getDate() - 7));
+      } else if (period === '30d' || period === '30days') {
         dateFilter = new Date(now.setDate(now.getDate() - 30));
-      } else if (period === '90d') {
+      } else if (period === '90d' || period === '90days') {
         dateFilter = new Date(now.setDate(now.getDate() - 90));
       } else if (period === '1y') {
         dateFilter = new Date(now.setFullYear(now.getFullYear() - 1));
