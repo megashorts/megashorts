@@ -261,3 +261,9 @@
 - [x] `VTTCue`의 `snapToLines = false` 및 `line = 67` 설정을 도입하여 디바이스 및 전체화면 상태와 관계없이 균일한 높이 구현 ✅
 - [x] iOS 환경에서의 초기 자막 로딩 시 위치 조정을 위한 `MANIFEST_PARSED` 핸들러 내 자막 트랙 설정 보완 ✅
 - [x] TypeScript 빌드 및 컴파일러 오류가 발생하지 않음을 검증 (`npx tsc --noEmit`) ✅
+
+## Phase 26: 컨텐츠 모달 상단 프리뷰 우측 여백 최적화 (2026-05-27)
+- [x] 컨텐츠 모달(`PostModal.tsx`) 내 영상 프리뷰 영역이 가로 가용 공간을 가득 채우도록 `flex-grow` 적용 ✅
+- [x] 우측 아이콘 컨테이너에 `flex-shrink-0`을 적용하여 찌그러지지 않고 모달 우측 경계선에 정렬되도록 레이아웃 최적화 완료 ✅
+- [x] `npx tsc --noEmit`을 통한 빌드 안정성 및 TypeScript 컴파일 오류 없음 검증 완료 ✅
+

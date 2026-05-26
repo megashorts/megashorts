@@ -138,8 +138,8 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
             <X className="w-6 h-6" />
           </button>
 
-          <div className="flex items-end gap-3 lg:block">
-            <div className="relative aspect-[2/3] w-[min(72vw,320px)] sm:w-[min(58vw,340px)] lg:w-full overflow-hidden rounded-md">
+          <div className="flex items-end gap-3 w-full">
+            <div className="relative aspect-[2/3] flex-grow overflow-hidden rounded-md">
               <div 
                 className={`absolute inset-0 transition-opacity duration-500 ${
                   isVideoReady ? 'opacity-0 pointer-events-none' : 'opacity-100'
@@ -172,7 +172,7 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
               )}
             </div>
 
-            <div className="flex flex-col gap-2 pb-1 lg:hidden">
+            <div className="flex flex-col gap-2 pb-1 flex-shrink-0">
               {post.videos && post.videos.length > 0 && (
                 <Link 
                   href={`/${locale}/video-view/${post.id}`}
@@ -218,7 +218,7 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
         </div>
   
         <div className="w-full bg-black px-5 sm:px-6 pb-6 pt-4 overflow-y-auto min-h-0 flex-1">
-          <div className="hidden lg:flex items-center mb-4">
+          <div className="hidden items-center mb-4">
             <div className="flex items-center gap-3">
               {post.videos && post.videos.length > 0 && (
                 <Link 

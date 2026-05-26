@@ -9,16 +9,55 @@ export const CLOUDFLARE_ACCOUNT_HASH = 'wuhPilUNWOdMaNWjMYkZJg';
 const DEFAULT_STREAM_DELIVERY_BASE_URL = "https://videodelivery.net";
 const rawStreamDeliveryBaseUrl = process.env.NEXT_PUBLIC_STREAM_DELIVERY_BASE_URL?.trim();
 
+function normalizeStreamDeliveryBaseUrl(raw?: string | null) {
+  if (!raw || raw.length === 0) return DEFAULT_STREAM_DELIVERY_BASE_URL;
+
+  try {
+    const parsed = new URL(raw);
+    // customer-*.cloudflarestream.com 응답은 origin별 CORS 제한이 있어
+    // 도메인이 바뀌는 배포 환경에서 재생 실패가 자주 발생함.
+    // videodelivery.net 기반 URL은 동일 영상 ID로 안정적으로 동작.
+    if (parsed.hostname.endsWith(".cloudflarestream.com")) {
+      return DEFAULT_STREAM_DELIVERY_BASE_URL;
+    }
+    return parsed.origin.replace(/\/+$/, "");
+  } catch {
+    return DEFAULT_STREAM_DELIVERY_BASE_URL;
+  }
+}
+
 export const STREAM_DELIVERY_BASE_URL =
-  rawStreamDeliveryBaseUrl && rawStreamDeliveryBaseUrl.length > 0
-    ? rawStreamDeliveryBaseUrl.replace(/\/+$/, "")
-    : DEFAULT_STREAM_DELIVERY_BASE_URL;
+  normalizeStreamDeliveryBaseUrl(rawStreamDeliveryBaseUrl);
+
+function extractStreamId(input: string) {
+  const trimmed = input.trim();
+  if (!trimmed) return trimmed;
+
+  if (!trimmed.includes("/")) {
+    return trimmed;
+  }
+
+  const regexMatch = trimmed.match(
+    /(?:videodelivery\.net|cloudflarestream\.com)\/([^/?#]+)/i,
+  );
+  if (regexMatch?.[1]) {
+    return regexMatch[1];
+  }
+
+  try {
+    const parsed = new URL(trimmed);
+    const firstSegment = parsed.pathname.split("/").filter(Boolean)[0];
+    return firstSegment || trimmed;
+  } catch {
+    return trimmed;
+  }
+}
 
 export const getStreamManifestUrl = (videoId: string) =>
-  `${STREAM_DELIVERY_BASE_URL}/${videoId}/manifest/video.m3u8`;
+  `${STREAM_DELIVERY_BASE_URL}/${extractStreamId(videoId)}/manifest/video.m3u8`;
 
 export const getStreamThumbnailUrl = (videoId: string, height = 600) =>
-  `${STREAM_DELIVERY_BASE_URL}/${videoId}/thumbnails/thumbnail.jpg?time=&height=${height}`;
+  `${STREAM_DELIVERY_BASE_URL}/${extractStreamId(videoId)}/thumbnails/thumbnail.jpg?time=&height=${height}`;
 
 export const getThumbnailUrl = (thumbnailId: string | null | undefined, variant: 'thumbnail' | 'public' = 'thumbnail') => {
   if (!thumbnailId) return '/post-placeholder.jpg';
