@@ -36,15 +36,15 @@ export default function ServiceTabs() {
           </TabsTrigger>
           <TabsTrigger value="inquiry" className="flex items-center gap-2">
             <Headset className="w-5 h-5 md:w-6 md:h-6" />
-            <p className="pl-1 hidden md:block">inquiry</p>
+            <p className="pl-1 hidden md:block">Inquiry</p>
           </TabsTrigger>
           <TabsTrigger value="logs" className="flex items-center gap-2">
             <FileClock className="w-5 h-5 md:w-6 md:h-6" />
-            <p className="pl-1 hidden md:block">logs system</p>
+            <p className="pl-1 hidden md:block">Log System</p>
           </TabsTrigger>
           <TabsTrigger value="user" className="flex items-center gap-2">
             <UserRound className="w-5 h-5 md:w-6 md:h-6" />
-            <p className="pl-1 hidden md:block">user</p>
+            <p className="pl-1 hidden md:block">Users</p>
           </TabsTrigger>
         </TabsList>
         <TabsContent value="notice" className="space-y-4">

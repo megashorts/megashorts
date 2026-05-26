@@ -31,6 +31,7 @@ import LanguageFlag from "@/components/LanguageFlag";
 import { Button } from "@/components/ui/button";
 import ProfileActionButtons from "@/components/auth/ProfileActionButtons";
 import { supportedProfileLanguages } from "@/lib/locale-language";
+import { useTranslations } from "next-intl";
 
 interface EditProfileDialogProps {
   user: UserData;
@@ -43,6 +44,8 @@ export default function EditProfileDialog({
   open,
   onOpenChange,
 }: EditProfileDialogProps) {
+  const tProfile = useTranslations('Profile');
+  const tCommon = useTranslations('Common');
   const form = useForm<UpdateUserProfileValues>({
     resolver: zodResolver(updateUserProfileSchema),
     defaultValues: {
@@ -80,9 +83,9 @@ export default function EditProfileDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="w-full md:min-w-[450px] max-w-[90%] md:max-w-[30%] rounded-lg h-auto">
+      <DialogContent className="w-[calc(100%-1rem)] sm:max-w-xl rounded-lg h-auto">
         <DialogHeader id="dialog-title">
-          <DialogTitle>프로필 수정</DialogTitle>
+          <DialogTitle>{tProfile('editProfile')}</DialogTitle>
           <DialogDescription>
           </DialogDescription>
         </DialogHeader>
@@ -97,9 +100,13 @@ export default function EditProfileDialog({
               name="displayName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Display name</FormLabel>
+                  <FormLabel>{tProfile('displayName')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="Your display name" {...field} />
+                    <Input
+                      placeholder={tProfile('displayNamePlaceholder')}
+                      className="text-base md:text-sm"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -110,7 +117,7 @@ export default function EditProfileDialog({
               name="myLanguage"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>나의 언어선택</FormLabel>
+                  <FormLabel>{tProfile('myLanguage')}</FormLabel>
                   <FormControl>
                     {/* <div className="flex flex-wrap gap-2">
                       {Object.values(Language).map((lang) => (
@@ -134,7 +141,7 @@ export default function EditProfileDialog({
                           key={lang}
                           type="button"
                           onClick={() => field.onChange(lang)}
-                          className={`flex items-center gap-2 px-3 py-2 rounded-md transition-colors ${
+                          className={`flex items-center gap-2 px-3 py-2 rounded-md text-base md:text-sm transition-colors ${
                             field.value === lang  // 현재 선택된 언어와 비교
                               ? 'bg-primary text-primary-foreground'
                               : 'bg-secondary hover:bg-secondary/80'
@@ -154,11 +161,11 @@ export default function EditProfileDialog({
               name="bio"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Bio</FormLabel>
+                  <FormLabel>{tProfile('bio')}</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Tell us a little bit about yourself"
-                      className="resize-none"
+                      placeholder={tProfile('bioPlaceholder')}
+                      className="resize-none text-base md:text-sm"
                       {...field}
                     />
                   </FormControl>
@@ -168,7 +175,7 @@ export default function EditProfileDialog({
             />
             <DialogFooter>
               <LoadingButton type="submit" loading={mutation.isPending}>
-                프로필 수정 & 저장
+                {tCommon('save')}
               </LoadingButton>
             </DialogFooter>
             {/* <hr className="my-4 border-t " />

@@ -6,15 +6,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { format } from 'date-fns';
-import { ko } from 'date-fns/locale';
 import { ActivityLog } from '@/lib/activity-logger/types';
 import { LogIn, CreditCard, FileText, Video, Settings2, Globe, User2, Clock, MapPin, Laptop } from 'lucide-react';
 import { TYPE_DISPLAY_NAMES } from '@/lib/activity-logger/constants';
+import { DEFAULT_ANALYTICS_TIME_ZONE } from '@/lib/analytics-timezone';
 
 interface LogModalProps {
   log: ActivityLog;
   onClose: () => void;
+  timeZone?: string;
 }
 
 const typeIcons = {
@@ -25,6 +25,20 @@ const typeIcons = {
   system: { icon: <Settings2 className="w-5 h-5" />, label: TYPE_DISPLAY_NAMES.system }
 } as const;
 
+function translateWorkerText(text: string): string {
+  return text
+    .replace(/로그인/g, 'Login')
+    .replace(/로그아웃/g, 'Logout')
+    .replace(/회원가입/g, 'Sign Up')
+    .replace(/코인 지급/g, 'Coin Grant')
+    .replace(/포인트 지급/g, 'Point Grant')
+    .replace(/출금 신청/g, 'Withdrawal Request')
+    .replace(/출금 승인/g, 'Withdrawal Approved')
+    .replace(/출금 거부/g, 'Withdrawal Rejected')
+    .replace(/결제 성공/g, 'Payment Success')
+    .replace(/결제 실패/g, 'Payment Failed');
+}
+
 function getTypeIcon(type: string) {
   return (typeIcons[type as keyof typeof typeIcons]?.icon || typeIcons.system.icon);
 }
@@ -33,15 +47,35 @@ function getTypeLabel(type: string) {
   return (typeIcons[type as keyof typeof typeIcons]?.label || TYPE_DISPLAY_NAMES.system);
 }
 
+function formatTimestamp(dateInput: string, timeZone: string) {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  }).format(new Date(dateInput));
+}
+
 function formatLogDetails(log: ActivityLog) {
   // 커스텀 로그 형식 처리 (event 필드가 있는 경우)
   if (log.event) {
+    const eventText = log.eventI18n?.en || translateWorkerText(log.event);
+
     return (
       <div className="space-y-4">
         <div className="flex items-center gap-2">
           {getTypeIcon(log.type)}
-          <span className="text-sm">{log.event}</span>
+          <span className="text-sm">{eventText}</span>
         </div>
+        {log.eventI18n?.ko && log.eventI18n.ko !== eventText && (
+          <div className="rounded-md border px-2 py-2 text-xs text-muted-foreground">
+            Original: {log.eventI18n.ko}
+          </div>
+        )}
         
         {log.details && (
           <div className="rounded-md border py-3 px-2 space-y-3">
@@ -51,7 +85,7 @@ function formatLogDetails(log: ActivityLog) {
                 <div className="col-span-5 text-xs break-all">
                   {typeof value === 'object' 
                     ? JSON.stringify(value) 
-                    : String(value)}
+                    : translateWorkerText(String(value))}
                 </div>
               </div>
             ))}
@@ -63,16 +97,16 @@ function formatLogDetails(log: ActivityLog) {
   
   // 기존 API 로그 형식 처리
   const details = {
-    요청: {
-      메서드: log.method,
-      경로: log.path,
-      쿼리: log.request?.query,
-      바디: log.request?.body
+    Request: {
+      Method: log.method,
+      Path: log.path,
+      Query: log.request?.query,
+      Body: log.request?.body
     },
-    응답: {
-      상태: log.status,
-      데이터: log.response?.data,
-      에러: log.response?.error
+    Response: {
+      Status: log.status,
+      Data: log.response?.data,
+      Error: log.response?.error
     }
   };
 
@@ -84,19 +118,19 @@ function formatLogDetails(log: ActivityLog) {
       </div>
       
       <div className="rounded-md border overflow-hidden">
-        <div className="bg-muted px-3 py-2 text-sm font-medium">요청 정보</div>
+        <div className="bg-muted px-3 py-2 text-sm font-medium">Request Information</div>
         <div className="p-3 space-y-2">
           <div className="grid grid-cols-3 gap-2">
-            <div className="text-sm font-medium text-muted-foreground">메서드:</div>
+            <div className="text-sm font-medium text-muted-foreground">Method:</div>
             <div className="col-span-2 text-sm">{log.method || '-'}</div>
           </div>
           <div className="grid grid-cols-3 gap-2">
-            <div className="text-sm font-medium text-muted-foreground">경로:</div>
+            <div className="text-sm font-medium text-muted-foreground">Path:</div>
             <div className="col-span-2 text-sm break-all">{log.path || '-'}</div>
           </div>
           {log.request?.query && (
             <div className="grid grid-cols-3 gap-2">
-              <div className="text-sm font-medium text-muted-foreground">쿼리:</div>
+              <div className="text-sm font-medium text-muted-foreground">Query:</div>
               <div className="col-span-2 text-sm">
                 <pre className="text-xs bg-muted p-2 rounded-md overflow-auto">
                   {JSON.stringify(log.request.query, null, 2)}
@@ -106,7 +140,7 @@ function formatLogDetails(log: ActivityLog) {
           )}
           {log.request?.body && (
             <div className="grid grid-cols-3 gap-2">
-              <div className="text-sm font-medium text-muted-foreground">바디:</div>
+              <div className="text-sm font-medium text-muted-foreground">Body:</div>
               <div className="col-span-2 text-sm">
                 <pre className="text-xs bg-muted p-2 rounded-md overflow-auto">
                   {JSON.stringify(log.request.body, null, 2)}
@@ -118,21 +152,21 @@ function formatLogDetails(log: ActivityLog) {
       </div>
       
       <div className="rounded-md border overflow-hidden">
-        <div className="bg-muted px-3 py-2 text-sm font-medium">응답 정보</div>
+        <div className="bg-muted px-3 py-2 text-sm font-medium">Response Information</div>
         <div className="p-3 space-y-2">
           <div className="grid grid-cols-3 gap-2">
-            <div className="text-sm font-medium text-muted-foreground">상태:</div>
+            <div className="text-sm font-medium text-muted-foreground">Status:</div>
             <div className="col-span-2 text-sm">{log.status || '-'}</div>
           </div>
           {log.response?.error && (
             <div className="grid grid-cols-3 gap-2">
-              <div className="text-sm font-medium text-muted-foreground">에러:</div>
-              <div className="col-span-2 text-sm text-red-500">{log.response.error}</div>
+              <div className="text-sm font-medium text-muted-foreground">Error:</div>
+              <div className="col-span-2 text-sm text-red-500">{translateWorkerText(log.response.error)}</div>
             </div>
           )}
           {log.response?.data && (
             <div className="grid grid-cols-3 gap-2">
-              <div className="text-sm font-medium text-muted-foreground">데이터:</div>
+              <div className="text-sm font-medium text-muted-foreground">Data:</div>
               <div className="col-span-2 text-sm">
                 <pre className="text-xs bg-muted p-2 rounded-md overflow-auto">
                   {JSON.stringify(log.response.data, null, 2)}
@@ -146,7 +180,7 @@ function formatLogDetails(log: ActivityLog) {
   );
 }
 
-export function LogModal({ log, onClose }: LogModalProps) {
+export function LogModal({ log, onClose, timeZone = DEFAULT_ANALYTICS_TIME_ZONE }: LogModalProps) {
   return (
     <Dialog open onOpenChange={onClose}>
       <DialogContent className="max-w-[95vw] md:max-w-2xl max-h-[90vh] overflow-y-auto rounded-lg">
@@ -160,8 +194,10 @@ export function LogModal({ log, onClose }: LogModalProps) {
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 flex-shrink-0" />
-              <span className="text-sm break-all">{format(new Date(log.timestamp), 'PPP p', { locale: ko })}</span>
+               <Clock className="w-4 h-4 flex-shrink-0" />
+               <span className="text-sm break-all">
+                 {formatTimestamp(log.timestamp, timeZone)} ({timeZone})
+               </span>
             </div>
             <div className="flex items-center gap-2">
               <Globe className="w-4 h-4 flex-shrink-0" />

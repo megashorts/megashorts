@@ -1,4 +1,5 @@
 import { naver } from '@/auth';
+import { shouldUseSecureAuthCookies } from "@/lib/auth-cookie";
 import { generateCodeVerifier, generateState } from "arctic";
 import { cookies } from "next/headers";
 
@@ -17,7 +18,7 @@ export async function GET() {
   (await cookies()).set("state", state, {
   // cookies().set("state", state, {
     path: "/",
-    secure: process.env.NODE_ENV === "production",
+    secure: shouldUseSecureAuthCookies(),
     httpOnly: true,
     maxAge: 60 * 10,
     sameSite: "lax",
@@ -25,7 +26,7 @@ export async function GET() {
 
   (await cookies()).set("code_verifier", codeVerifier, {
     path: "/",
-    secure: process.env.NODE_ENV === "production",
+    secure: shouldUseSecureAuthCookies(),
     httpOnly: true,
     maxAge: 60 * 10,
     sameSite: "lax",

@@ -6,6 +6,7 @@ import "../globals.css";
 import ReactQueryProvider from "../ReactQueryProvider";
 import { OrientationModal } from "@/components/OrientationModal";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
+import { PWAEnhancer } from "@/components/PWAEnhancer";
 import { Analytics } from '@vercel/analytics/next';
 import '@/lib/logging-wrapper';
 import { NextIntlClientProvider } from 'next-intl';
@@ -19,6 +20,7 @@ const BMDOHYEON = localFont({
   display: 'swap',
   variable: '--font-BMDOHYEON',
 });
+const enableAnalytics = process.env.NODE_ENV === 'production' && process.env.VERCEL === '1';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -34,6 +36,7 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://megashorts.com'),
+  manifest: "/manifest.json",
   title: {
     default: "메가쇼츠 MEGASHORTS",
     template: "%s | 메가쇼츠"
@@ -119,7 +122,6 @@ export default async function RootLayout({
 
   // SEO: 기본 URL 및 hreflang alternate 링크 생성
   const baseUrl = 'https://megashorts.com';
-
   return (
     <html lang={locale} suppressHydrationWarning>
       <head>
@@ -133,6 +135,10 @@ export default async function RootLayout({
           />
         ))}
         <link rel="alternate" hrefLang="x-default" href={baseUrl} />
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/apple-icon.png" />
+        <link rel="preconnect" href="https://customer-2cdfxbmja64x0pqo.cloudflarestream.com" />
+        <link rel="preconnect" href="https://videodelivery.net" />
       </head>
       <body className={`${BMDOHYEON.variable} ${localeFontClass}`}>
         <NextIntlClientProvider messages={messages}>
@@ -144,7 +150,8 @@ export default async function RootLayout({
               disableTransitionOnChange
             >
               {children}
-              <Analytics />
+              {enableAnalytics && <Analytics />}
+              <PWAEnhancer />
               <OrientationModal />
               <PWAInstallPrompt />
             </ThemeProvider>

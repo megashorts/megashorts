@@ -7,6 +7,12 @@ import dynamic from 'next/dynamic';
 import { useSession } from '@/components/SessionProvider';
 import { videoDB } from '@/lib/indexedDB';
 import { logActivity } from '@/lib/activity-logger/client';
+import { isStandalonePWA } from '@/lib/pwa-client';
+import {
+  getSubtitleLangCandidates,
+  videoUserLanguageToSubtitleLang,
+  type VideoUserLanguage,
+} from '@/lib/content-language';
 
 const VideoPlayer = dynamic(() => Promise.resolve(({ 
   videoId, 
@@ -31,7 +37,7 @@ const VideoPlayer = dynamic(() => Promise.resolve(({
   onEnded?: () => void;
   onTimeUpdate?: (time: number) => void;
   className?: string;
-  userLanguage?: 'KOREAN' | 'ENGLISH' | 'JAPANESE' | 'CHINESE' | 'THAI' | 'SPANISH' | 'INDONESIAN' | 'VIETNAMESE'; 
+  userLanguage?: VideoUserLanguage;
   initialTime?: number;  
   controls?: boolean;
   muted: boolean;
@@ -92,18 +98,41 @@ const VideoPlayer = dynamic(() => Promise.resolve(({
           
           // 유료 동영상일 때만 서버 저장
           if (isPremium) {
-            const response = await fetch('/api/videos/view', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                videoId,
-                postId,
-                sequence,
-                timestamp: currentTime
-              })
+            const body = JSON.stringify({
+              videoId,
+              postId,
+              sequence,
+              timestamp: currentTime
             });
 
-            const result = await response.json();
+            let result: { message?: string };
+
+            try {
+              const response = await fetch('/api/videos/view', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body
+              });
+
+              if (!response.ok) {
+                throw new Error(`View tracking failed with ${response.status}`);
+              }
+
+              result = await response.json();
+            } catch (error) {
+              if (isStandalonePWA() || !navigator.onLine) {
+                await videoDB.queueOfflineAction({
+                  url: '/api/videos/view',
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body,
+                  description: `video-view:${postId}:${sequence}`,
+                });
+                result = { message: 'queued_offline' };
+              } else {
+                throw error;
+              }
+            }
             
             // 로그 기록
             logActivity({
@@ -166,7 +195,7 @@ const VideoPlayer = dynamic(() => Promise.resolve(({
         }
       }
     }
-  }, [videoId, sequence, isActive, postId, user?.id, onTimeUpdate]);
+  }, [videoId, sequence, isActive, postId, user?.id, user?.username, onTimeUpdate, title, isPremium]);
 
 // HLS 초기화
 useEffect(() => {
@@ -178,6 +207,7 @@ useEffect(() => {
   const initHls = async () => {
     try {
       const { default: Hls } = await import('hls.js');
+      const preferredSubtitleLang = videoUserLanguageToSubtitleLang(userLanguage);
       
       if (Hls.isSupported()) {
         const hls = new Hls({
@@ -188,7 +218,7 @@ useEffect(() => {
           enableIMSC1: true,
           enableCEA708Captions: true,
           subtitlePreference: {
-            lang: 'ko'
+            lang: preferredSubtitleLang
           },
         });
         hlsRef.current = hls;
@@ -201,9 +231,13 @@ useEffect(() => {
             setIsLoaded(true);
             // 자막 트랙 설정
             const subtitleTracks = hls.subtitleTracks;
-            const koreanTrack = subtitleTracks.findIndex(track => track.lang === 'ko');
-            if (koreanTrack !== -1) {
-              hls.subtitleTrack = koreanTrack;
+            const subtitleLangCandidates = getSubtitleLangCandidates(userLanguage);
+            const selectedTrack = subtitleLangCandidates
+              .map((lang) => subtitleTracks.findIndex(track => track.lang?.toLowerCase().startsWith(lang)))
+              .find((trackIndex) => trackIndex !== -1) ?? -1;
+
+            if (selectedTrack !== -1) {
+              hls.subtitleTrack = selectedTrack;
 
               // iOS 체크 및 자막 스타일 설정
               const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
@@ -217,8 +251,8 @@ useEffect(() => {
                 document.head.appendChild(styleElement);
 
                 // 자막 트랙에 직접 스타일 적용
-                if (video.textTracks[koreanTrack]) {
-                  const track = video.textTracks[koreanTrack];
+                if (video.textTracks[selectedTrack]) {
+                  const track = video.textTracks[selectedTrack];
                   track.mode = 'showing';
                   Array.from(track.cues || []).forEach((cue: any) => {
                     if (cue) {
@@ -270,7 +304,7 @@ useEffect(() => {
       hlsRef.current = null;
     }
   };
-}, [videoUrl]);
+}, [videoUrl, userLanguage]);
 
 // timeupdate 이벤트 리스너를 별도로 관리
 useEffect(() => {
@@ -428,7 +462,11 @@ useEffect(() => {
 
     const handleLoadedMetadata = () => {
       if (video.textTracks.length > 0) {
-        const track = video.textTracks[0];
+        const subtitleLangCandidates = getSubtitleLangCandidates(userLanguage);
+        const trackIndex = Array.from(video.textTracks).findIndex((track) =>
+          subtitleLangCandidates.some((lang) => track.language?.toLowerCase().startsWith(lang))
+        );
+        const track = video.textTracks[trackIndex === -1 ? 0 : trackIndex];
         track.mode = 'showing';
         track.addEventListener('cuechange', handleCueChange);
       }
@@ -443,7 +481,7 @@ useEffect(() => {
       }
       video.removeEventListener('loadedmetadata', handleLoadedMetadata);
     };
-  }, []);
+  }, [userLanguage]);
 
   return (
     <div className={cn('relative w-full h-full', className)}>

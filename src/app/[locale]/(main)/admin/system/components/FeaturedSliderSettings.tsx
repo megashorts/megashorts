@@ -80,8 +80,8 @@ export function FeaturedSliderSettings({ slider, onUpdate }: FeaturedSliderSetti
     >
       <div className="flex justify-between items-center gap-x-3 mb-2">
         <div className="flex items-center gap-x-2">
-          <h1 className="text-sm ml-2">최상단 슬라이더</h1>
-          <p className="text-xs text-muted-foreground">추가 포스트</p>
+          <h1 className="text-sm ml-2">Top Slider</h1>
+          <p className="text-xs text-muted-foreground">Additional Posts</p>
         </div>
         <Button
           variant="ghost"

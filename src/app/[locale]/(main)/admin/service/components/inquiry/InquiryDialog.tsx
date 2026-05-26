@@ -136,7 +136,7 @@ export default function InquiryDialog({
         </div>
         <div className="flex-none flex gap-2">
           <Textarea
-            placeholder="내용을 작성하세요"
+            placeholder="Type a message"
             value={content}
             onChange={(e) => setContent(e.target.value)}
             className="flex-1 resize-none text-sm"
@@ -169,7 +169,7 @@ export default function InquiryDialog({
                       className="gap-2"
                     >
                       <span className="w-2 h-2 rounded-full bg-yellow-400" />
-                      대기중
+                      Pending
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => {
@@ -179,7 +179,7 @@ export default function InquiryDialog({
                       className="gap-2"
                     >
                       <span className="w-2 h-2 rounded-full bg-blue-500" />
-                      진행중
+                      In Progress
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => {
@@ -189,7 +189,7 @@ export default function InquiryDialog({
                       className="gap-2"
                     >
                       <span className="w-2 h-2 rounded-full bg-green-500" />
-                      완료
+                      Resolved
                     </DropdownMenuItem>
                   </>
                 ) : (
@@ -201,7 +201,7 @@ export default function InquiryDialog({
                     className="gap-2"
                   >
                     <span className="w-2 h-2 rounded-full bg-green-500" />
-                    완료
+                    Resolved
                   </DropdownMenuItem>
                 )}
               </DropdownMenuContent>

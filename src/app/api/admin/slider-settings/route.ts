@@ -2,6 +2,8 @@ import { NextRequest } from "next/server";
 import { revalidatePath } from 'next/cache';
 import prisma from "@/lib/prisma";
 import { SliderSetting } from "@/lib/sliderSettings";
+import { invalidateHomeContentFromAdmin } from "@/lib/content-revalidation";
+import { localeCodes } from "@/i18n/config";
 
 export async function GET() {
   try {
@@ -37,8 +39,8 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    // 메인 페이지 재생성
-    revalidatePath('/');
+    // 메인/최근/추천 및 태그 무효화
+    invalidateHomeContentFromAdmin();
 
     // 영향 받는 카테고리 페이지들 재생성
     settings
@@ -47,7 +49,12 @@ export async function POST(request: NextRequest) {
         const path = s.categories && s.categories.length > 1
           ? `/categories/combined/${s.categories.join('-')}`
           : `/categories/${s.categories?.[0]}`;
+
         revalidatePath(path);
+        localeCodes.forEach((locale) => {
+          if (locale === "en") return;
+          revalidatePath(`/${locale}${path}`);
+        });
       });
 
     return Response.json({ success: true });

@@ -27,8 +27,7 @@ export default function AgencyTabs() {
   const currentTab = searchParams.get("tab") || "settings";
   const { user } = useSession();
   
-  // 관리자 권한 확인 (OPERATION3 이상)
-  const isAdmin = user?.userRole && user.userRole >= USER_ROLE.OPERATION3;
+  const isAdmin = user?.userRole && user.userRole >= USER_ROLE.OPERATION1;
 
   const handleTabChange = (value: string) => {
     const params = new URLSearchParams(searchParams);
@@ -43,16 +42,16 @@ export default function AgencyTabs() {
           {isAdmin && (
             <TabsTrigger value="teammaster" className="flex items-center gap-2">
               <Users className="w-5 h-5 md:w-6 md:h-6" />
-              <p className="pl-1 hidden md:block">팀마스터</p>
+              <p className="pl-1 hidden md:block">Team Master</p>
             </TabsTrigger>
           )}
           <TabsTrigger value="settings" className="flex items-center gap-2">
             <Settings className="w-5 h-5 md:w-6 md:h-6" />
-            <p className="pl-1 hidden md:block">설정</p>
+            <p className="pl-1 hidden md:block">Settings</p>
           </TabsTrigger>
           <TabsTrigger value="search" className="flex items-center gap-2">
             <Search className="w-5 h-5 md:w-6 md:h-6" />
-            <p className="pl-1 hidden md:block">조회</p>
+            <p className="pl-1 hidden md:block">Lookup</p>
           </TabsTrigger>
         </TabsList>
         

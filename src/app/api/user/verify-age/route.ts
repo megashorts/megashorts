@@ -18,57 +18,60 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
     const { birthDate, confirmed } = body as {
-      birthDate: string;
+      birthDate?: string;
       confirmed: boolean;
     };
 
     // 필수 파라미터 검증
-    if (!birthDate || !confirmed) {
+    if (!confirmed) {
       return NextResponse.json(
-        { error: '생년월일과 동의 확인이 필요합니다' },
+        { error: '성인 확인 동의가 필요합니다' },
         { status: 400 }
       );
     }
-
-    // 생년월일 파싱 및 유효성 검증
-    const parsedDate = new Date(birthDate);
-    if (isNaN(parsedDate.getTime())) {
-      return NextResponse.json(
-        { error: '유효하지 않은 날짜 형식입니다' },
-        { status: 400 }
-      );
-    }
-
-    // 미래 날짜 방지
     const now = new Date();
-    if (parsedDate > now) {
-      return NextResponse.json(
-        { error: '유효하지 않은 생년월일입니다' },
-        { status: 400 }
-      );
-    }
+    let parsedDate: Date | null = null;
 
-    // 나이 계산 (만 나이 기준)
-    let age = now.getFullYear() - parsedDate.getFullYear();
-    const monthDiff = now.getMonth() - parsedDate.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < parsedDate.getDate())) {
-      age--;
-    }
+    // 선택 입력: 생년월일을 보낸 경우에만 나이 검증 수행
+    if (birthDate) {
+      parsedDate = new Date(birthDate);
+      if (isNaN(parsedDate.getTime())) {
+        return NextResponse.json(
+          { error: '유효하지 않은 날짜 형식입니다' },
+          { status: 400 }
+        );
+      }
 
-    // 만 18세 미만 거부
-    if (age < 18) {
-      return NextResponse.json(
-        { error: '만 18세 이상만 성인인증이 가능합니다', isMinor: true },
-        { status: 403 }
-      );
-    }
+      // 미래 날짜 방지
+      if (parsedDate > now) {
+        return NextResponse.json(
+          { error: '유효하지 않은 생년월일입니다' },
+          { status: 400 }
+        );
+      }
 
-    // 비현실적 나이 방지 (150세 이상)
-    if (age > 150) {
-      return NextResponse.json(
-        { error: '유효하지 않은 생년월일입니다' },
-        { status: 400 }
-      );
+      // 나이 계산 (만 나이 기준)
+      let age = now.getFullYear() - parsedDate.getFullYear();
+      const monthDiff = now.getMonth() - parsedDate.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < parsedDate.getDate())) {
+        age--;
+      }
+
+      // 만 18세 미만 거부
+      if (age < 18) {
+        return NextResponse.json(
+          { error: '만 18세 이상만 성인인증이 가능합니다', isMinor: true },
+          { status: 403 }
+        );
+      }
+
+      // 비현실적 나이 방지 (150세 이상)
+      if (age > 150) {
+        return NextResponse.json(
+          { error: '유효하지 않은 생년월일입니다' },
+          { status: 400 }
+        );
+      }
     }
 
     // DB 업데이트: adultauth + birthDate + adultAuthAt

@@ -14,30 +14,35 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
+import { useTranslations } from 'next-intl';
+import LanguageFlag from '@/components/LanguageFlag';
+import { useToast } from '@/components/ui/use-toast';
 
 interface PointsApplicationProps {
   userId: string;
-  userRole: number; // 40: 업로더, 20: 영업 멤버
+  userRole: number;
 }
 
 export default function PointsApplication({ userId, userRole }: PointsApplicationProps) {
+  const t = useTranslations('Earnings');
+  const { toast } = useToast();
   const [selectedPeriod, setSelectedPeriod] = useState<string>('all');
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  // 통합된 거래 목록 (지급 + 신청 합친 것)
   const [records, setRecords] = useState<any[]>([]);
 
   const [userStatus, setUserStatus] = useState<{
     isVerified: boolean;
     availablePoints: number;
+    minWithdrawPoint: number;
     creatorInfo: any;
   }>({
     isVerified: false,
     availablePoints: 0,
+    minWithdrawPoint: 0,
     creatorInfo: null,
   });
   
-  // 신청 모달 상태
   const [isApplicationModalOpen, setIsApplicationModalOpen] = useState<boolean>(false);
   const [isVerificationModalOpen, setIsVerificationModalOpen] = useState<boolean>(false);
   const [applicationForm, setApplicationForm] = useState({
@@ -55,20 +60,15 @@ export default function PointsApplication({ userId, userRole }: PointsApplicatio
     address: '',
   });
 
-  // 업로더인지 영업 멤버인지 확인
   const isUploader = userRole >= 40;
 
-  // 기간 옵션 (프론트에서 정의)
   const periodOptions = [
-    { value: 'all', label: '전체 기간' },
-    { value: '7days', label: '최근 7일' },
-    { value: '30days', label: '최근 30일' },
-    { value: '90days', label: '최근 90일' },
+    { value: 'all', label: t('allPeriods') },
+    { value: '7days', label: t('last7Days') },
+    { value: '30days', label: t('last30Days') },
+    { value: '90days', label: t('last90Days') },
   ];
 
-  // ----------------------------
-  // 유저 상태 조회 (기존 코드 유지)
-  // ----------------------------
   const fetchUserStatus = async () => {
     setIsLoading(true);
     
@@ -76,7 +76,7 @@ export default function PointsApplication({ userId, userRole }: PointsApplicatio
       const response = await fetch(`/api/points/users/${userId}`);
       
       if (!response.ok) {
-        throw new Error(`API 호출 실패: ${response.status} ${response.statusText}`);
+        throw new Error(`API call failed: ${response.status} ${response.statusText}`);
       }
       
       const data = await response.json();
@@ -87,6 +87,7 @@ export default function PointsApplication({ userId, userRole }: PointsApplicatio
         setUserStatus({
           isVerified: user.emailVerified || false,
           availablePoints: user.points || 0,
+          minWithdrawPoint: Number(user.minWithdrawPoint || 0),
           creatorInfo: user.creatorInfo
         });
         
@@ -103,18 +104,15 @@ export default function PointsApplication({ userId, userRole }: PointsApplicatio
           });
         }
       } else {
-        console.error('사용자 정보 조회 실패:', data.error);
+        console.error('Failed to load user status:', data.error);
       }
     } catch (error) {
-      console.error('사용자 정보 조회 오류:', error);
+      console.error('User status request error:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // ----------------------------
-  // Helper: 기간 -> 시작일 계산 (클라이언트 필터링용)
-  // ----------------------------
   const getStartDateForPeriod = (period: string): number => {
     const now = new Date();
     if (period === '7days') {
@@ -132,47 +130,37 @@ export default function PointsApplication({ userId, userRole }: PointsApplicatio
       d.setDate(d.getDate() - 90);
       return d.getTime();
     }
-    // 'all' 또는 기본
     return 0;
   };
 
-  // ----------------------------
-  // 지급/신청 조회 및 통합 (중요 변경 부분)
-  // - 기존처럼 백엔드의 두 API를 호출하되, 클라이언트에서 정규화/병합/필터링/정렬
-  // ----------------------------
   const fetchPaymentHistory = async (period: string) => {
     setIsLoading(true);
 
     try {
-      // 1) 지급 API 호출 (백엔드가 period를 지원하면 쿼리로 전달)
       const paymentsResponse = await fetch(`/api/points/payments?userId=${userId}&period=${period}`);
       if (!paymentsResponse.ok) {
-        throw new Error(`API 호출 실패: ${paymentsResponse.status} ${paymentsResponse.statusText}`);
+        throw new Error(`API call failed: ${paymentsResponse.status} ${paymentsResponse.statusText}`);
       }
       const paymentsData = await paymentsResponse.json();
 
-      // 백엔드 응답 구조가 서비스마다 달라서 안전하게 접근
       const paymentsArr = paymentsData.success
         ? (paymentsData.data?.payments || paymentsData.withdrawals || [])
         : [];
 
-      // 2) 신청 API 호출
       const applicationsResponse = await fetch(`/api/points/applications?userId=${userId}&period=${period}`);
       if (!applicationsResponse.ok) {
-        throw new Error(`API 호출 실패: ${applicationsResponse.status} ${applicationsResponse.statusText}`);
+        throw new Error(`API call failed: ${applicationsResponse.status} ${applicationsResponse.statusText}`);
       }
       const applicationsData = await applicationsResponse.json();
       const applicationsArr = applicationsData.success
         ? (applicationsData.data?.applications || [])
         : [];
 
-      // 3) 정규화(normalize) - 두 타입을 같은 shape으로 맞춤
       const normalizedPayments = paymentsArr.map((p: any) => ({
         id: String(p.id ?? p._id ?? ''),
-        // 가능한 date 필드들을 순서대로 사용
         date: p.date || p.paidAt || p.updatedAt || p.createdAt || '',
         amount: Number(p.amount ?? p.points ?? 0),
-        status: p.status ?? 'completed', // 지급은 'completed' 등
+        status: p.status ?? 'completed',
         type: 'PAYMENT' as const,
         raw: p,
       }));
@@ -181,20 +169,18 @@ export default function PointsApplication({ userId, userRole }: PointsApplicatio
         id: String(a.id ?? a._id ?? ''),
         date: a.createdAt || a.date || a.requestedAt || '',
         amount: Number(a.amount ?? a.points ?? 0),
-        status: a.status ?? 'PENDING', // 신청은 'PENDING' 등
+        status: a.status ?? 'PENDING',
         type: 'APPLICATION' as const,
         raw: a,
       }));
 
-      // 4) 합치고 날짜 기준 내림차순 정렬
       let combined = [...normalizedPayments, ...normalizedApplications];
       combined.sort((a, b) => {
         const ta = Date.parse(a.date || '') || 0;
         const tb = Date.parse(b.date || '') || 0;
-        return tb - ta; // 최신이 위로
+        return tb - ta;
       });
 
-      // 5) 클라이언트에서 period 필터링 (백엔드가 처리하지 않아도 동작하도록)
       if (period !== 'all') {
         const startTs = getStartDateForPeriod(period);
         combined = combined.filter((r) => {
@@ -203,36 +189,44 @@ export default function PointsApplication({ userId, userRole }: PointsApplicatio
         });
       }
 
-      // 6) 상태 저장
       setRecords(combined);
     } catch (error) {
-      console.error('지급/신청 통합 조회 오류:', error);
-      setRecords([]); // 실패 시 빈 배열
+      console.error('Payment/application history request error:', error);
+      setRecords([]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // 포인트 신청 제출 (기존)
   const submitApplication = async () => {
     try {
-      if (applicationForm.amount <= 0) {
-        alert('신청 금액은 0보다 커야 합니다.');
+      const amount = Number(applicationForm.amount || 0);
+      if (!Number.isFinite(amount) || amount <= 0) {
+        toast({ description: t('amountGreaterThanZero'), variant: 'destructive', duration: 1800 });
+        return;
+      }
+
+      if (amount < userStatus.minWithdrawPoint) {
+        toast({
+          description: t('minimumWithdrawalRequired', { points: formatNumber(userStatus.minWithdrawPoint) }),
+          variant: 'destructive',
+          duration: 2200,
+        });
         return;
       }
       
-      if (applicationForm.amount > userStatus.availablePoints) {
-        alert('신청 금액이 사용 가능한 포인트를 초과합니다.');
+      if (amount > userStatus.availablePoints) {
+        toast({ description: t('amountExceedsAvailable'), variant: 'destructive', duration: 1800 });
         return;
       }
 
       if (!userStatus.isVerified) {
-        alert('이메일 인증이 완료되어야 포인트 지급을 신청할 수 있습니다.');
+        toast({ description: t('emailVerificationRequired'), variant: 'destructive', duration: 1800 });
         return;
       }
       
       if (!userStatus.creatorInfo || !userStatus.creatorInfo.idCheck) {
-        alert('포인트 지급을 위한 정보 제출이나 확인이 완료되지 않았습니다.');
+        toast({ description: isUploader ? t('creatorInfoVerificationRequired') : t('payoutInfoVerificationRequired'), variant: 'destructive', duration: 1800 });
         return;
       }
       
@@ -249,32 +243,30 @@ export default function PointsApplication({ userId, userRole }: PointsApplicatio
       });
       
       if (!response.ok) {
-        throw new Error(`API 호출 실패: ${response.status} ${response.statusText}`);
+        throw new Error(`API call failed: ${response.status} ${response.statusText}`);
       }
       
       const data = await response.json();
       
       if (data.success) {
-        alert('포인트 신청이 완료되었습니다.');
+        toast({ description: t('applicationSubmitted'), duration: 1800 });
         setIsApplicationModalOpen(false);
         
-        // 갱신: 유저 상태 + 통합 레코드 재조회
         fetchUserStatus();
         fetchPaymentHistory(selectedPeriod);
       } else {
-        alert(`포인트 신청 실패: ${data.error}`);
+        toast({ description: t('applicationFailedWithError', { error: data.error }), variant: 'destructive', duration: 2200 });
       }
     } catch (error) {
-      console.error('포인트 신청 실패:', error);
-      alert('포인트 신청 중 오류가 발생했습니다.');
+      console.error('Point application request error:', error);
+      toast({ description: t('applicationError'), variant: 'destructive', duration: 2200 });
     }
   };
 
-  // CreatorInfo 저장 (기존)
   const submitCreatorInfo = async () => {
     try {
       if (!creatorInfoForm.accountHolder || !creatorInfoForm.bankName || !creatorInfoForm.accountNumber) {
-        alert('필수 정보를 모두 입력해주세요.');
+        alert(t('requiredFieldsMissing'));
         return;
       }
       
@@ -287,48 +279,42 @@ export default function PointsApplication({ userId, userRole }: PointsApplicatio
       });
       
       if (!response.ok) {
-        throw new Error(`API 호출 실패: ${response.status} ${response.statusText}`);
+        throw new Error(`API call failed: ${response.status} ${response.statusText}`);
       }
       
       const data = await response.json();
       
       if (data.success) {
-        alert('크리에이터 정보가 저장되었습니다.');
+        alert(isUploader ? t('creatorInfoSaved') : t('payoutInfoSaved'));
         setIsVerificationModalOpen(false);
         fetchUserStatus();
       } else {
-        alert(`크리에이터 정보 저장 실패: ${data.error}`);
+        alert(isUploader ? t('creatorInfoSaveFailedWithError', { error: data.error }) : t('payoutInfoSaveFailedWithError', { error: data.error }));
       }
     } catch (error) {
-      console.error('크리에이터 정보 저장 실패:', error);
-      alert('크리에이터 정보 저장 중 오류가 발생했습니다.');
+      console.error('Payout info save request error:', error);
+      alert(isUploader ? t('creatorInfoSaveError') : t('payoutInfoSaveError'));
     }
   };
 
-  // 기간 선택 시
   const handlePeriodChange = (value: string) => {
     setSelectedPeriod(value);
     fetchPaymentHistory(value);
   };
 
-  // 마운트 시 초기 데이터 로드
   useEffect(() => {
     fetchUserStatus();
     fetchPaymentHistory(selectedPeriod);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ----------------------------
-  // UI 렌더 관련 헬퍼: 상태 라벨/배지 variant
-  // ----------------------------
   const getStatusLabel = (rec: any) => {
     if (rec.type === 'PAYMENT') {
-      return rec.status === 'completed' ? '지급 완료' : '처리 중';
+      return rec.status === 'completed' ? t('paymentCompleted') : t('processing');
     } else {
-      // APPLICATION
-      if (rec.status === 'APPROVED') return '승인됨';
-      if (rec.status === 'REJECTED') return '거부됨';
-      return '처리 중';
+      if (rec.status === 'APPROVED') return t('approved');
+      if (rec.status === 'REJECTED') return t('rejected');
+      return t('processing');
     }
   };
   const getBadgeVariant = (rec: any) => {
@@ -342,30 +328,29 @@ export default function PointsApplication({ userId, userRole }: PointsApplicatio
   };
 
   return (
-    <div className="space-y-6">
-      {/* 자격 인증 정보 (기존 UI 유지) */}
+    <div className="space-y-2">
       <Card>
         <CardHeader>
-          <CardTitle>크리에이터 정보 확인</CardTitle>
+          <CardTitle>{isUploader ? t('creatorInfoCheck') : t('payoutInfoCheck')}</CardTitle>
           <CardDescription>
-            포인트 지급을 위해서는 이메일 인증, 크리에이터 정보 등록, 신분정보 확인이 필요합니다.
+            {isUploader ? t('creatorInfoCheckDescription') : t('payoutInfoCheckDescription')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {isLoading ? (
             <Skeleton className="h-32 rounded-lg" />
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-2">
               <div className="flex justify-between items-center">
                 <div className="flex gap-2">
                   <Badge variant={userStatus.isVerified ? "secondary" : "destructive"}>
-                    {userStatus.isVerified ? "이메일 인증 완료" : "이메일 미인증"}
+                    {userStatus.isVerified ? t('emailVerified') : t('emailNotVerified')}
                   </Badge>
                   <Badge variant={userStatus.creatorInfo?.bankName ? "secondary" : "destructive"}>
-                    {userStatus.creatorInfo?.bankName ? "크리에이터 정보 등록 완료" : "크리에이터 정보 미등록"}
+                    {userStatus.creatorInfo?.bankName ? t('payoutInfoRegistered') : t('payoutInfoNotRegistered')}
                   </Badge>
                   <Badge variant={userStatus.creatorInfo?.idCheck ? "secondary" : "destructive"}>
-                    {userStatus.creatorInfo?.idCheck ? "신분확인정보 제출 확인" : "신분확인정보 제출 미확인"}
+                    {userStatus.creatorInfo?.idCheck ? t('identitySubmitted') : t('identityNotSubmitted')}
                   </Badge>
                 </div>
               </div>
@@ -376,19 +361,19 @@ export default function PointsApplication({ userId, userRole }: PointsApplicatio
                   <div>
                     <h4 className="font-medium">
                       {(userStatus.isVerified && userStatus.creatorInfo?.idCheck)
-                        ? "인증완료. 포인트 지급 신청이 가능합니다." 
-                        : "인증이 필요합니다"}
+                        ? t('verifiedCanApply')
+                        : t('verificationRequired')}
                     </h4>
                     <p className="text-sm text-muted-foreground mt-1">
                       {(userStatus.isVerified && userStatus.creatorInfo?.idCheck)
                         ? (
                             <>
-                              은행: {creatorInfoForm.bankName}&nbsp;&nbsp; 
-                              예금주: {creatorInfoForm.accountHolder}&nbsp;&nbsp; 
-                              계좌번호: {creatorInfoForm.accountNumber}
+                              {t('bank')}: {creatorInfoForm.bankName}&nbsp;&nbsp;
+                              {t('accountHolder')}: {creatorInfoForm.accountHolder}&nbsp;&nbsp;
+                              {t('accountNumber')}: {creatorInfoForm.accountNumber}
                             </>
                           ) 
-                        : "국가별 인증서류(신분증, 거주증명 등)를 hello@megashorts.com으로 발송하세요. 확인 후 처리됩니다."}
+                        : t('sendIdentityDocuments')}
                     </p>
                   </div>
                 </div>
@@ -396,7 +381,7 @@ export default function PointsApplication({ userId, userRole }: PointsApplicatio
 
               <div className="flex items-center">
                 <div>
-                  <h3 className="text-lg font-medium text-muted-foreground">🎁 나의 포인트 </h3>
+                  <h3 className="text-lg font-medium text-muted-foreground">{t('myPoints')}</h3>
                 </div>
                 <div className="text-xl font-bold ml-2">
                   {formatNumberFull(userStatus.availablePoints)} p
@@ -408,121 +393,120 @@ export default function PointsApplication({ userId, userRole }: PointsApplicatio
                   <DialogTrigger asChild>
                     <Button variant="outline">
                       {userStatus.creatorInfo?.bankName 
-                        ? "크리에이터 정보 수정" 
-                        : "크리에이터 정보 입력"}
+                        ? t('editPayoutInfo')
+                        : t('enterPayoutInfo')}
                     </Button>
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>크리에이터 정보 입력</DialogTitle>
+                      <DialogTitle>{t('enterPayoutInfo')}</DialogTitle>
                       <DialogDescription>
-                        국가별 인증서류(신분증)를 hello@megashorts.com으로 발송하세요.
+                        {t('sendIdentityDocumentsShort')}
                       </DialogDescription>
                     </DialogHeader>
-                    <div className="space-y-4 py-4">
-                      {/* ... 폼 (기존 코드 유지) */}
+                    <div className="space-y-2 py-2">
                       <div className="space-y-2">
-                        <Label htmlFor="accountHolder">예금주 <span className="text-red-500">*</span></Label>
+                        <Label htmlFor="accountHolder">{t('accountHolder')} <span className="text-red-500">*</span></Label>
                         <Input
                           id="accountHolder"
                           value={creatorInfoForm.accountHolder}
                           onChange={(e) => setCreatorInfoForm({...creatorInfoForm, accountHolder: e.target.value})}
-                          placeholder="예금주를 입력하세요"
+                          placeholder={t('accountHolderPlaceholder')}
                           required
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="country">국가 <span className="text-red-500">*</span></Label>
+                        <Label htmlFor="country">{t('country')} <span className="text-red-500">*</span></Label>
                         <Select 
                           value={creatorInfoForm.country} 
                           onValueChange={(value) => setCreatorInfoForm({...creatorInfoForm, country: value})}
                         >
                           <SelectTrigger>
-                            <SelectValue placeholder="국가 선택" />
+                            <SelectValue placeholder={t('selectCountry')} />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="KR">🇰🇷 대한민국</SelectItem>
-                            <SelectItem value="US">🇺🇸 미국</SelectItem>
-                            <SelectItem value="CN">🇨🇳 중국</SelectItem>
-                            <SelectItem value="JP">🇯🇵 일본</SelectItem>
-                            <SelectItem value="TH">🇹🇭 태국</SelectItem>
-                            <SelectItem value="ES">🇪🇸 스페인</SelectItem>
-                            <SelectItem value="ID">🇮🇩 인도네시아</SelectItem>
-                            <SelectItem value="VN">🇻🇳 베트남</SelectItem>
+                            <SelectItem value="KR"><span className="inline-flex items-center gap-1"><LanguageFlag language="KR" className="h-4 w-4" />{t('countryKR')}</span></SelectItem>
+                            <SelectItem value="US"><span className="inline-flex items-center gap-1"><LanguageFlag language="US" className="h-4 w-4" />{t('countryUS')}</span></SelectItem>
+                            <SelectItem value="CN"><span className="inline-flex items-center gap-1"><LanguageFlag language="CN" className="h-4 w-4" />{t('countryCN')}</span></SelectItem>
+                            <SelectItem value="JP"><span className="inline-flex items-center gap-1"><LanguageFlag language="JP" className="h-4 w-4" />{t('countryJP')}</span></SelectItem>
+                            <SelectItem value="TH"><span className="inline-flex items-center gap-1"><LanguageFlag language="TH" className="h-4 w-4" />{t('countryTH')}</span></SelectItem>
+                            <SelectItem value="ES"><span className="inline-flex items-center gap-1"><LanguageFlag language="ES" className="h-4 w-4" />{t('countryES')}</span></SelectItem>
+                            <SelectItem value="ID"><span className="inline-flex items-center gap-1"><LanguageFlag language="ID" className="h-4 w-4" />{t('countryID')}</span></SelectItem>
+                            <SelectItem value="VN"><span className="inline-flex items-center gap-1"><LanguageFlag language="VN" className="h-4 w-4" />{t('countryVN')}</span></SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="bankName">은행명 <span className="text-red-500">*</span></Label>
+                        <Label htmlFor="bankName">{t('bankName')} <span className="text-red-500">*</span></Label>
                         <Input
                           id="bankName"
                           value={creatorInfoForm.bankName}
                           onChange={(e) => setCreatorInfoForm({...creatorInfoForm, bankName: e.target.value})}
-                          placeholder="은행명을 입력하세요"
+                          placeholder={t('bankNamePlaceholder')}
                           required
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="accountNumber">계좌번호 <span className="text-red-500">*</span></Label>
+                        <Label htmlFor="accountNumber">{t('accountNumber')} <span className="text-red-500">*</span></Label>
                         <Input
                           id="accountNumber"
                           value={creatorInfoForm.accountNumber}
                           onChange={(e) => setCreatorInfoForm({...creatorInfoForm, accountNumber: e.target.value})}
-                          placeholder="계좌번호를 입력하세요"
+                          placeholder={t('accountNumberPlaceholder')}
                           required
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="swiftCode">SWIFT 코드</Label>
+                        <Label htmlFor="swiftCode">{t('swiftCode')}</Label>
                         <Input
                           id="swiftCode"
                           value={creatorInfoForm.swiftCode}
                           onChange={(e) => setCreatorInfoForm({...creatorInfoForm, swiftCode: e.target.value})}
-                          placeholder="해외 송금시 필요한 SWIFT 코드"
+                          placeholder={t('swiftCodePlaceholder')}
                         />
                         <p className="text-xs text-muted-foreground">
-                          해외 은행 계좌인 경우 필요합니다.
+                          {t('swiftCodeHelp')}
                         </p>
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="paypalEmail">페이팔 이메일</Label>
+                        <Label htmlFor="paypalEmail">{t('paypalEmail')}</Label>
                         <Input
                           id="paypalEmail"
                           type="email"
                           value={creatorInfoForm.paypalEmail}
                           onChange={(e) => setCreatorInfoForm({...creatorInfoForm, paypalEmail: e.target.value})}
-                          placeholder="페이팔 이메일 주소"
+                          placeholder={t('paypalEmailPlaceholder')}
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="phoneNumber">전화번호</Label>
+                        <Label htmlFor="phoneNumber">{t('phoneNumber')}</Label>
                         <Input
                           id="phoneNumber"
                           value={creatorInfoForm.phoneNumber}
                           onChange={(e) => setCreatorInfoForm({...creatorInfoForm, phoneNumber: e.target.value})}
-                          placeholder="전화번호를 입력하세요"
+                          placeholder={t('phoneNumberPlaceholder')}
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="address">주소</Label>
+                        <Label htmlFor="address">{t('address')}</Label>
                         <Textarea
                           id="address"
                           value={creatorInfoForm.address}
                           onChange={(e) => setCreatorInfoForm({...creatorInfoForm, address: e.target.value})}
-                          placeholder="주소를 입력하세요"
+                          placeholder={t('addressPlaceholder')}
                         />
                       </div>
                     </div>
                     <DialogFooter>
-                      <Button variant="outline" onClick={() => setIsVerificationModalOpen(false)}>취소</Button>
-                      <Button onClick={submitCreatorInfo}>저장</Button>
+                      <Button variant="outline" onClick={() => setIsVerificationModalOpen(false)}>{t('cancel')}</Button>
+                      <Button onClick={submitCreatorInfo}>{t('save')}</Button>
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
@@ -530,54 +514,55 @@ export default function PointsApplication({ userId, userRole }: PointsApplicatio
                 <Dialog open={isApplicationModalOpen} onOpenChange={setIsApplicationModalOpen}>
                   <DialogTrigger asChild>
                     <Button 
-                      onClick={() => setApplicationForm({...applicationForm, amount: Math.min(10000, userStatus.availablePoints)})}
+                      onClick={() => setApplicationForm({...applicationForm, amount: Math.min(Math.max(userStatus.minWithdrawPoint, 1), userStatus.availablePoints)})}
                       disabled={!userStatus.isVerified || !userStatus.creatorInfo?.idCheck || userStatus.availablePoints <= 0}
                     >
-                      포인트 지급 신청
+                      {t('applyPoints')}
                     </Button>
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>포인트 지급 신청</DialogTitle>
+                      <DialogTitle>{t('applyPoints')}</DialogTitle>
                       <DialogDescription>
-                        신청할 포인트 금액과 계좌 정보를 확인해주세요.
+                        {t('applyPointsDescription')}
                       </DialogDescription>
                     </DialogHeader>
-                    <div className="space-y-4 py-4">
+                    <div className="space-y-2 py-2">
                       <div className="space-y-2">
-                        <Label htmlFor="amount">신청 금액 (포인트)</Label>
+                        <Label htmlFor="amount">{t('applicationAmount')}</Label>
                         <Input
                           id="amount"
                           type="number"
                           value={applicationForm.amount}
                           onChange={(e) => setApplicationForm({...applicationForm, amount: Math.min(Number(e.target.value), userStatus.availablePoints)})}
                           max={userStatus.availablePoints}
-                          min={1}
+                          min={userStatus.minWithdrawPoint || 1}
                         />
-                        <p className="text-xs text-muted-foreground">
-                          사용 가능한 포인트: {formatNumber(userStatus.availablePoints)} P
-                        </p>
-                      </div>
-                      <div className="space-y-2">
-                        <Label>계좌 정보</Label>
-                        <div className="p-3 bg-muted rounded-md">
-                          <p className="text-sm">{userStatus.creatorInfo?.bankName} {userStatus.creatorInfo?.accountNumber}</p>
-                          <p className="text-sm">예금주: {userStatus.creatorInfo?.accountHolder}</p>
+                        <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
+                          <span>{t('availablePoints', { points: formatNumber(userStatus.availablePoints) })}</span>
+                          <span>{t('minimumWithdrawalPoints', { points: formatNumber(userStatus.minWithdrawPoint) })}</span>
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="reason">신청 사유 (선택사항)</Label>
+                        <Label>{t('bankInfo')}</Label>
+                        <div className="p-3 bg-muted rounded-md">
+                          <p className="text-sm">{userStatus.creatorInfo?.bankName} {userStatus.creatorInfo?.accountNumber}</p>
+                          <p className="text-sm">{t('accountHolder')}: {userStatus.creatorInfo?.accountHolder}</p>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="reason">{t('applicationReason')}</Label>
                         <Textarea
                           id="reason"
                           value={applicationForm.reason}
                           onChange={(e) => setApplicationForm({...applicationForm, reason: e.target.value})}
-                          placeholder="신청 사유를 입력하세요"
+                          placeholder={t('applicationReasonPlaceholder')}
                         />
                       </div>
                     </div>
                     <DialogFooter>
-                      <Button variant="outline" onClick={() => setIsApplicationModalOpen(false)}>취소</Button>
-                      <Button onClick={submitApplication}>신청</Button>
+                      <Button variant="outline" onClick={() => setIsApplicationModalOpen(false)}>{t('cancel')}</Button>
+                      <Button onClick={submitApplication}>{t('apply')}</Button>
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
@@ -587,21 +572,19 @@ export default function PointsApplication({ userId, userRole }: PointsApplicatio
         </CardContent>
       </Card>
 
-      {/* ---------- 지급/신청 통합 조회 (단일 테이블) ---------- */}
       <Card>
         <CardHeader>
-          <CardTitle>거래 내역</CardTitle>
+          <CardTitle>{t('transactionHistory')}</CardTitle>
           <CardDescription>
-            포인트 신청 및 지급 기록을 함께 확인하세요.
+            {t('transactionHistoryDescription')}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col md:flex-row gap-4 mb-4">
+          <div className="mb-2 flex flex-col gap-2 md:flex-row">
             <div className="w-full md:w-1/3">
-              {/* <label className="text-sm font-medium mb-1 block">조회 기간</label> */}
               <Select value={selectedPeriod} onValueChange={handlePeriodChange}>
                 <SelectTrigger>
-                  <SelectValue placeholder="조회 기간 선택" />
+                  <SelectValue placeholder={t('selectPeriod')} />
                 </SelectTrigger>
                 <SelectContent>
                   {periodOptions.map((option) => (
@@ -614,7 +597,7 @@ export default function PointsApplication({ userId, userRole }: PointsApplicatio
             </div>
             <div className="flex items-end">
               <Button variant="outline" onClick={() => fetchPaymentHistory(selectedPeriod)}>
-                조회
+                {t('search')}
               </Button>
             </div>
           </div>
@@ -622,23 +605,32 @@ export default function PointsApplication({ userId, userRole }: PointsApplicatio
           {isLoading ? (
             <Skeleton className="h-[200px] rounded-lg" />
           ) : records.length > 0 ? (
-            <div className="border rounded-md">
-              {/* <div className="p-3 bg-muted font-medium">거래 내역</div> */}
-              <div className="grid grid-cols-5 gap-4 p-4 font-medium border-b bg-muted">
-                <div>거래 ID</div>
-                <div>날짜</div>
-                <div>금액</div>
-                <div>유형</div>
-                <div>상태</div>
+            <div className="overflow-hidden rounded-md border">
+              <div className="hidden grid-cols-[minmax(0,1.7fr)_150px_110px_90px_90px] gap-2 border-b bg-muted p-3 text-sm font-medium md:grid">
+                <div>{t('transactionId')}</div>
+                <div>{t('date')}</div>
+                <div className="text-right">{t('amount')}</div>
+                <div className="text-center">{t('type')}</div>
+                <div className="text-center">{t('status')}</div>
               </div>
 
               {records.map((rec) => (
-                <div key={`${rec.type}-${rec.id}`} className="grid grid-cols-5 gap-4 p-4 border-b last:border-0 items-center">
-                  <div className="text-sm">{rec.id}</div>
-                  <div className="text-sm">{rec.date}</div>
-                  <div className="text-sm">{formatNumber(rec.amount)} P</div>
-                  <div className="text-sm">{rec.type === 'PAYMENT' ? '지급' : '신청'}</div>
-                  <div>
+                <div key={`${rec.type}-${rec.id}`} className="grid gap-2 border-b p-3 text-sm last:border-0 md:grid-cols-[minmax(0,1.7fr)_150px_110px_90px_90px] md:items-center">
+                  <div className="min-w-0 truncate font-medium" title={rec.id}>{rec.id}</div>
+                  <div className="flex justify-between md:block">
+                    <span className="text-muted-foreground md:hidden">{t('date')}</span>
+                    <span className="truncate" title={rec.date}>{rec.date}</span>
+                  </div>
+                  <div className="flex justify-between md:block md:text-right">
+                    <span className="text-muted-foreground md:hidden">{t('amount')}</span>
+                    <span>{formatNumber(rec.amount)} P</span>
+                  </div>
+                  <div className="flex justify-between md:block md:text-center">
+                    <span className="text-muted-foreground md:hidden">{t('type')}</span>
+                    <span>{rec.type === 'PAYMENT' ? t('payment') : t('application')}</span>
+                  </div>
+                  <div className="flex justify-between md:block md:text-center">
+                    <span className="text-muted-foreground md:hidden">{t('status')}</span>
                     <Badge variant={getBadgeVariant(rec)}>
                       {getStatusLabel(rec)}
                     </Badge>
@@ -648,7 +640,7 @@ export default function PointsApplication({ userId, userRole }: PointsApplicatio
             </div>
           ) : (
             <div className="h-[100px] bg-muted rounded-md flex items-center justify-center">
-              <p className="text-muted-foreground">거래 내역이 없습니다.</p>
+              <p className="text-muted-foreground">{t('noTransactions')}</p>
             </div>
           )}
         </CardContent>

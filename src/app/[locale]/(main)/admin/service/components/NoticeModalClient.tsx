@@ -33,7 +33,7 @@ export default function NoticeModalClient({ currentUser }: NoticeModalClientProp
       console.error('Failed to fetch modals:', error);
       toast({
         variant: "destructive",
-        description: "모달 목록을 불러오는데 실패했습니다.",
+        description: "Failed to load modal list.",
         duration: 1500,
       });
     }
@@ -82,15 +82,15 @@ export default function NoticeModalClient({ currentUser }: NoticeModalClientProp
   
       toast({
         description: editingModal 
-          ? "모달이 수정되었습니다."
-          : "새 모달이 추가되었습니다.",
+          ? "Modal has been updated."
+          : "New modal has been added.",
         duration: 1500,
       });
     } catch (error) {
       console.error('Failed to save modal:', error);
       toast({
         variant: "destructive",
-        description: "모달 저장에 실패했습니다.",
+        description: "Failed to save modal.",
         duration: 1500,
       });
     }
@@ -115,14 +115,14 @@ export default function NoticeModalClient({ currentUser }: NoticeModalClientProp
       ));
 
       toast({
-        description: "모달이 업데이트되었습니다.",
+        description: "Modal has been updated.",
         duration: 1500,
       });
     } catch (error) {
       console.error('Failed to update modal:', error);
       toast({
         variant: "destructive",
-        description: "모달 업데이트에 실패했습니다.",
+        description: "Failed to update modal.",
         duration: 1500,
       });
     }
@@ -140,14 +140,14 @@ export default function NoticeModalClient({ currentUser }: NoticeModalClientProp
       setModals(prev => prev.filter(modal => modal.id !== id));
 
       toast({
-        description: "모달이 삭제되었습니다.",
+        description: "Modal has been deleted.",
         duration: 1500,
       });
     } catch (error) {
       console.error('Failed to delete modal:', error);
       toast({
         variant: "destructive",
-        description: "모달 삭제에 실패했습니다.",
+        description: "Failed to delete modal.",
         duration: 1500,
       });
     }
@@ -190,7 +190,7 @@ export default function NoticeModalClient({ currentUser }: NoticeModalClientProp
   return (
     <div className="space-y-2">
       <div className="flex justify-between items-center">
-        <h2 className="text-base font-semibold ml-2 mt-1">메인팝업 운영</h2>
+        <h2 className="text-base font-semibold ml-2 mt-1">Main Popup Management</h2>
         <Button
           variant="outline"
           size="icon"

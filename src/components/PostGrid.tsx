@@ -8,6 +8,9 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useInView } from "react-intersection-observer";
 import { getThumbnailUrl } from "@/lib/constants";
+import { useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
+import { getLocalizedPostTitle } from "@/lib/content-language";
 
 interface PostGridProps {
   initialPosts: PostData[];
@@ -22,6 +25,8 @@ export default function PostGrid({
 }: PostGridProps) {
   const [selectedPost, setSelectedPost] = useState<PostData | null>(null);
   const { ref, inView } = useInView();
+  const locale = useLocale();
+  const tContent = useTranslations('Content');
 
   const {
     data,
@@ -29,11 +34,12 @@ export default function PostGrid({
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: ["posts", apiEndpoint, category],
+    queryKey: ["posts", apiEndpoint, category, locale],
     queryFn: async ({ pageParam }) => {
       const searchParams = new URLSearchParams({
         ...(pageParam ? { cursor: pageParam } : {}),
-        ...(category ? { category } : {})
+        ...(category ? { category } : {}),
+        locale,
       });
       
       const res = await fetch(`${apiEndpoint}?${searchParams}`);
@@ -70,29 +76,33 @@ export default function PostGrid({
   return (
     <>
       <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-        {allPosts.map((post) => (
-          <div 
-            key={post.id}
-            className="relative aspect-[2/3] rounded-md overflow-hidden cursor-pointer group"
-            onClick={() => setSelectedPost(post)}
-          >
-            <Image
-              src={getThumbnailUrl(post.thumbnailId)}
-              alt={`타이틀 ${post.title || ''} - ${post.categories || ''} 컨텐츠의 대표 이미지`}
-              fill
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
-              sizes="(max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
-              loading="lazy"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <div className="absolute bottom-0 left-0 right-0 p-4">
-                <h3 className="text-sm text-white font-medium line-clamp-2">
-                  {post.title}
-                </h3>
+        {allPosts.map((post) => {
+          const localizedTitle = getLocalizedPostTitle(post, locale);
+
+          return (
+            <div
+              key={post.id}
+              className="relative aspect-[2/3] rounded-md overflow-hidden cursor-pointer group"
+              onClick={() => setSelectedPost(post)}
+            >
+              <Image
+                src={getThumbnailUrl(post.thumbnailId)}
+                alt={`타이틀 ${localizedTitle} - ${post.categories || ''} 컨텐츠의 대표 이미지`}
+                fill
+                className="object-cover transition-transform duration-300 group-hover:scale-105"
+                sizes="(max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <div className="absolute bottom-0 left-0 right-0 p-4">
+                  <h3 className="text-sm text-white font-medium line-clamp-2">
+                    {localizedTitle}
+                  </h3>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <div 
@@ -102,9 +112,9 @@ export default function PostGrid({
         {isFetchingNextPage ? (
           <Loader2 className="w-6 h-6 animate-spin" />
         ) : hasNextPage ? (
-          <span className="text-muted-foreground">스크롤하여 더 보기...</span>
+          <span className="text-muted-foreground">{tContent('scrollForMore')}</span>
         ) : allPosts.length > 0 ? (
-          <span className="text-muted-foreground">모든 컨텐츠를 불러왔습니다</span>
+          <span className="text-muted-foreground">{tContent('allLoaded')}</span>
         ) : null}
       </div>
 
@@ -117,4 +127,3 @@ export default function PostGrid({
     </>
   );
 }
-

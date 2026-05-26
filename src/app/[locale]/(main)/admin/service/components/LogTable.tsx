@@ -3,12 +3,12 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { LogTableProps } from "../types";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, Info, LogIn, CreditCard, FileText, Video, Settings2, User2, Globe, MapPin, Laptop, Timer, Pen } from 'lucide-react';
-import { format } from 'date-fns';
-import { ko } from 'date-fns/locale';
+import { ArrowUpDown, LogIn, CreditCard, FileText, Video, Settings2, User2, Globe, MapPin, Timer, Pen } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { ActivityLog } from '@/lib/activity-logger/types';
 import { TYPE_DISPLAY_NAMES } from '@/lib/activity-logger/constants';
+
+const DEFAULT_TIME_ZONE = 'UTC';
 
 type LogType = keyof typeof TYPE_DISPLAY_NAMES;
 
@@ -24,10 +24,24 @@ function isValidLogType(type: string): type is LogType {
   return type in typeIcons;
 }
 
+function translateWorkerText(text: string): string {
+  return text
+    .replace(/로그인/g, 'Login')
+    .replace(/로그아웃/g, 'Logout')
+    .replace(/회원가입/g, 'Sign Up')
+    .replace(/코인 지급/g, 'Coin Grant')
+    .replace(/포인트 지급/g, 'Point Grant')
+    .replace(/출금 신청/g, 'Withdrawal Request')
+    .replace(/출금 승인/g, 'Withdrawal Approved')
+    .replace(/출금 거부/g, 'Withdrawal Rejected')
+    .replace(/결제 성공/g, 'Payment Success')
+    .replace(/결제 실패/g, 'Payment Failed');
+}
+
 function getLogDescription(log: ActivityLog): string {
   // 커스텀 로그 형식 처리 (event 필드가 있는 경우)
   if (log.event) {
-    return log.event;
+    return log.eventI18n?.en || translateWorkerText(log.event);
   }
   
   // 기존 API 로그 형식 처리
@@ -36,7 +50,7 @@ function getLogDescription(log: ActivityLog): string {
   const status = log.status ? `(${log.status})` : '';
   
   if (log.response?.error) {
-    return `${method} ${path} ${status} - ${log.response.error}`;
+    return `${method} ${path} ${status} - ${translateWorkerText(log.response.error)}`;
   }
   
   return `${method} ${path} ${status}`;
@@ -49,7 +63,41 @@ function getTypeIcon(type: string) {
   return typeIcons.system.icon;
 }
 
-export function LogTable({ logs, loading, onViewDetails, onSort, sortField, sortOrder }: LogTableProps) {
+function formatInTimeZone(dateInput: string, timeZone: string) {
+  const date = new Date(dateInput);
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  }).formatToParts(date);
+
+  const year = parts.find((part) => part.type === 'year')?.value;
+  const month = parts.find((part) => part.type === 'month')?.value;
+  const day = parts.find((part) => part.type === 'day')?.value;
+  const hour = parts.find((part) => part.type === 'hour')?.value;
+  const minute = parts.find((part) => part.type === 'minute')?.value;
+  const second = parts.find((part) => part.type === 'second')?.value;
+
+  return {
+    date: `${year}-${month}-${day}`,
+    time: `${hour}:${minute}:${second}`,
+  };
+}
+
+export function LogTable({
+  logs,
+  loading,
+  onViewDetails,
+  onSort,
+  sortField,
+  sortOrder,
+  timeZone = DEFAULT_TIME_ZONE,
+}: LogTableProps) {
   const handleSort = (field: string) => {
     if (onSort) {
       onSort(field);
@@ -57,7 +105,7 @@ export function LogTable({ logs, loading, onViewDetails, onSort, sortField, sort
   };
 
   if (loading) {
-    return <div className="text-center py-4">로그를 불러오는 중...</div>;
+    return <div className="text-center py-4">Loading logs...</div>;
   }
 
   return (
@@ -72,6 +120,7 @@ export function LogTable({ logs, loading, onViewDetails, onSort, sortField, sort
                 className="h-8 px-2 -ml-4"
               >
                 <Timer className="ml-2 h-4 w-4" />
+                <span className="text-[10px] ml-1">{timeZone}</span>
                 <ArrowUpDown className="ml-2 h-4 w-4" />
               </Button>
             </TableHead>
@@ -79,10 +128,10 @@ export function LogTable({ logs, loading, onViewDetails, onSort, sortField, sort
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="flex justify-center">
-                    <span className="sr-only">타입</span>
+                    <span className="sr-only">Type</span>
                   </div>
                 </TooltipTrigger>
-                <TooltipContent>로그 타입</TooltipContent>
+                <TooltipContent>Log Type</TooltipContent>
               </Tooltip>
             </TableHead>
             <TableHead className="hidden md:table-cell w-[60px]">
@@ -92,7 +141,7 @@ export function LogTable({ logs, loading, onViewDetails, onSort, sortField, sort
                   <Globe className="h-4 w-4" />
                   </div>
                 </TooltipTrigger>
-                <TooltipContent>국가</TooltipContent>
+                <TooltipContent>Country</TooltipContent>
               </Tooltip>
             </TableHead>
             <TableHead className="hidden md:table-cell w-[100px]">
@@ -102,7 +151,7 @@ export function LogTable({ logs, loading, onViewDetails, onSort, sortField, sort
                     <MapPin className="h-4 w-4" />
                   </div>
                 </TooltipTrigger>
-                <TooltipContent>IP 주소</TooltipContent>
+                <TooltipContent>IP Address</TooltipContent>
               </Tooltip>
             </TableHead>
             <TableHead className="w-[120px]">
@@ -112,7 +161,7 @@ export function LogTable({ logs, loading, onViewDetails, onSort, sortField, sort
                     <User2 className="h-4 w-4" />
                   </div>
                 </TooltipTrigger>
-                <TooltipContent>사용자</TooltipContent>
+                <TooltipContent>User</TooltipContent>
               </Tooltip>
             </TableHead>
             <TableHead>
@@ -135,14 +184,14 @@ export function LogTable({ logs, loading, onViewDetails, onSort, sortField, sort
                 onClick={() => onViewDetails(log)}
               >
                 {/* <TableCell className="font-mono whitespace-nowrap">
-                  {format(new Date(log.timestamp), 'HH:mm:ss', { locale: ko })}
+                  {format(new Date(log.timestamp), 'HH:mm:ss')}
                 </TableCell> */}
                 <TableCell className="font-mono whitespace-nowrap">
                   {/* <span className="text-xs text-gray-500 mr-1"> */}
-                  <span className="mr-2">
-                    {format(new Date(log.timestamp), 'MM-dd', { locale: ko })}
+                    <span className="mr-2">
+                    {formatInTimeZone(log.timestamp, timeZone).date}
                   </span>
-                  {format(new Date(log.timestamp), 'HH:mm:ss', { locale: ko })}
+                  {formatInTimeZone(log.timestamp, timeZone).time}
                 </TableCell>
                 <TableCell className="hidden md:table-cell text-center">
                   <Tooltip>
@@ -168,7 +217,7 @@ export function LogTable({ logs, loading, onViewDetails, onSort, sortField, sort
                       </div>
                     </TooltipTrigger>
                     <TooltipContent>
-                      {log.country || '알 수 없음'}
+                      {log.country || 'Unknown'}
                       {log.city ? ` (${log.city})` : ''}
                     </TooltipContent>
                   </Tooltip>
@@ -190,7 +239,7 @@ export function LogTable({ logs, loading, onViewDetails, onSort, sortField, sort
                         </span>
                       </TooltipTrigger>
                       <TooltipContent>
-                        {log.username || '비로그인 사용자'}
+                        {log.username || 'Guest User'}
                       </TooltipContent>
                     </Tooltip>
                   </div>

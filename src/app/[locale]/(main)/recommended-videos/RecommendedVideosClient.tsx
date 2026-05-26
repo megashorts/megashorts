@@ -12,6 +12,11 @@ import 'swiper/css';
 import 'swiper/css/virtual';
 import { videoDB } from '@/lib/indexedDB';
 import { useSession } from '@/components/SessionProvider';
+import { useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
+import { getLocalizedPostTitle, localeToVideoUserLanguage } from '@/lib/content-language';
+import { usePwaVideoChrome } from '@/hooks/usePwaVideoChrome';
+import { warmRecommendedPwaAssets } from '@/lib/pwa-video-preload';
 
 const MS_RECOMMENDED_VIEW_INFO = 'ms_recommended_view_info';
 
@@ -24,19 +29,28 @@ interface RecommendedVideosClientProps {
   posts: {
     id: string;
     title: string | null;
+    titleI18n?: unknown;
+    content?: string | null;
+    contentI18n?: unknown;
+    postLanguage?: string;
     videos: {
       id: string;
       sequence: number;
+      subtitle?: string[];
     }[];
   }[];
 }
 
 export function RecommendedVideosClient({ posts: initialPosts }: RecommendedVideosClientProps) {
   const { user } = useSession();
+  const locale = useLocale();
+  const tContent = useTranslations('Content');
+  const userLanguage = localeToVideoUserLanguage(locale);
   const [loadedPosts, setLoadedPosts] = useState(initialPosts);
   const [activeIndex, setActiveIndex] = useState(0);
   const swiperRef = useRef<SwiperType>();
   const [showButtons, setShowButtons] = useState(false);
+  const { isPwaMobile } = usePwaVideoChrome(showButtons);
   const timeoutRef = useRef<NodeJS.Timeout>();
   const [currentTime, setCurrentTime] = useState(0);
   const [viewedVideos, setViewedVideos] = useState<Set<string>>(new Set());
@@ -101,7 +115,7 @@ export function RecommendedVideosClient({ posts: initialPosts }: RecommendedVide
 
   const loadMorePosts = useCallback(async () => {
     try {
-      const response = await fetch(`/api/posts/recommended?skip=${loadedPosts.length}&take=15`);
+      const response = await fetch(`/api/posts/recommended?skip=${loadedPosts.length}&take=15&locale=${locale}`);
       const newPosts = await response.json();
       
       if (Array.isArray(newPosts) && newPosts.length > 0) {
@@ -110,7 +124,7 @@ export function RecommendedVideosClient({ posts: initialPosts }: RecommendedVide
     } catch (error) {
       console.error('Failed to load more posts:', error);
     }
-  }, [loadedPosts.length]);
+  }, [loadedPosts.length, locale]);
 
   useEffect(() => {
     if (loadedPosts.length - activeIndex <= 5) {
@@ -118,13 +132,18 @@ export function RecommendedVideosClient({ posts: initialPosts }: RecommendedVide
     }
   }, [activeIndex, loadedPosts.length, loadMorePosts]);
 
+  useEffect(() => {
+    if (!isPwaMobile) return;
+    warmRecommendedPwaAssets(loadedPosts, activeIndex);
+  }, [activeIndex, isPwaMobile, loadedPosts]);
+
   const handleSlideChange = useCallback((swiper: SwiperType) => {
     setActiveIndex(swiper.activeIndex);
 
     // 현재 위치 저장
     const viewInfo: RecommendedViewInfo = {
       recommendedViewIndex: swiper.activeIndex,
-      recommendedViewPostId: loadedPosts[swiper.activeIndex].id
+      recommendedViewPostId: loadedPosts[swiper.activeIndex]?.id || ''
     };
     localStorage.setItem(MS_RECOMMENDED_VIEW_INFO, JSON.stringify(viewInfo));
   }, [loadedPosts]);
@@ -172,7 +191,10 @@ export function RecommendedVideosClient({ posts: initialPosts }: RecommendedVide
 
   return (
     <div 
-      className="fixed inset-0 bg-black overflow-hidden"
+      className={cn(
+        "fixed inset-0 bg-black overflow-hidden",
+        isPwaMobile && "pwa-recommended-page"
+      )}
       onMouseMove={updateButtonsVisibility}
       onTouchStart={updateButtonsVisibility}
     >
@@ -200,13 +222,21 @@ export function RecommendedVideosClient({ posts: initialPosts }: RecommendedVide
         {loadedPosts.map((post, index) => {
           const video = post.videos[0];
           const streamId = video.id;
+          const localizedTitle = getLocalizedPostTitle(post, locale);
           return (
             <SwiperSlide key={`${post.id}-${index}`}>
-              <div className="w-full h-full flex items-center justify-center bg-black pt-[48px] md:pt-[70px] pb-1">
-                <div className="relative aspect-[9/16] h-full mx-auto">
+              <div className={cn(
+                "w-full h-full flex items-center justify-center bg-black",
+                isPwaMobile ? "pwa-recommended-slide" : "pt-[48px] md:pt-[70px] pb-1"
+              )}>
+                <div className={cn(
+                  "relative aspect-[9/16] h-full mx-auto",
+                  isPwaMobile && "max-h-[100dvh]"
+                )}>
                   <div 
                     className={cn(
-                      "absolute inset-x-0 top-10 md:mb-8 z-10 transition-opacity duration-300",
+                      "absolute inset-x-0 md:mb-8 z-10 transition-opacity duration-300",
+                      isPwaMobile ? "top-[max(0.75rem,env(safe-area-inset-top))]" : "top-10",
                       showButtons ? "opacity-100" : "opacity-0"
                     )}
                   >
@@ -216,7 +246,9 @@ export function RecommendedVideosClient({ posts: initialPosts }: RecommendedVide
                           href={`/video-view/${post.id}?t=${currentTime}`}
                           className="hover:text-primary transition-colors"
                         >
-                          <h1 className="text-base md:text-lg text-slate-100 inline">{post.title} 보러가기</h1>
+                          <h1 className="text-base md:text-lg text-slate-100 inline">
+                            {tContent('watchTitle', { title: localizedTitle })}
+                          </h1>
                         </Link>
                         <p className="text-xl font-semibold inline-block pl-2 relative top-[3px]">👀</p>
                       </div>
@@ -231,15 +263,18 @@ export function RecommendedVideosClient({ posts: initialPosts }: RecommendedVide
                     onEnded={handleVideoEnd}
                     onTimeUpdate={setCurrentTime}
                     className="w-full h-full aspect-[9/16]"
-                    userLanguage="KOREAN"
+                    userLanguage={userLanguage}
                     muted={isMuted}
-                    title={post.title || ''}
+                    title={localizedTitle}
                     isPremium={false}
                   />
 
                   <div 
                     className={cn(
-                      "relative right-4 bottom-32 md:right-[-5.5rem] md:bottom-30 z-10 transition-opacity duration-300",
+                      "z-10 transition-opacity duration-300",
+                      isPwaMobile
+                        ? "absolute right-2 bottom-[calc(env(safe-area-inset-bottom)+5.5rem)]"
+                        : "relative right-4 bottom-32 md:right-[-5.5rem] md:bottom-30",
                       showButtons ? "opacity-100" : "opacity-0"
                     )}
                     onClick={(e) => e.stopPropagation()}

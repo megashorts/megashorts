@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import {
@@ -35,17 +36,19 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useSession } from "@/components/SessionProvider";
-import { USER_ROLE, USER_ROLE_NAME } from "@/lib/constants";
+import { USER_ROLE, USER_ROLE_NAME_EN } from "@/lib/constants";
 import kyInstance from "@/lib/ky";
 import {
   CheckCircle2,
   Eye,
   Gift,
   KeyRound,
+  LineChart,
   Loader2,
   MoreHorizontal,
   Pencil,
   Search,
+  User,
   UserCog,
 } from "lucide-react";
 
@@ -112,14 +115,14 @@ interface UserDetailResponse {
 
 const PAGE_SIZES = [10, 20, 50];
 
-const roleOptions = Object.entries(USER_ROLE_NAME)
+const roleOptions = Object.entries(USER_ROLE_NAME_EN)
   .map(([value, label]) => ({ value: Number(value), label }))
   .sort((a, b) => a.value - b.value);
 
 const editableRoleOptions = roleOptions.filter((role) => role.value >= USER_ROLE.USER);
 
 function getRoleLabel(role: number) {
-  return (USER_ROLE_NAME as Record<number, string>)[role] || `Role ${role}`;
+  return (USER_ROLE_NAME_EN as Record<number, string>)[role] || `Role ${role}`;
 }
 
 function formatDateValue(value: string | Date | null | undefined) {
@@ -152,6 +155,41 @@ function getDefaultSubscriptionType(subscription: UserSubscription | null) {
   if (status !== "active") return "free";
   if (type === "basic" || type === "premium") return type;
   return "free";
+}
+
+function getEarningsHref(targetUser: UserRow) {
+  const path = targetUser.userRole >= USER_ROLE.CREATOR_Lv1 && targetUser.userRole < USER_ROLE.TEAM_MEMBER
+    ? "/usermenu/earnings"
+    : "/usermenu/agency-earnings";
+
+  return `${path}?tab=statistics&targetUserId=${encodeURIComponent(targetUser.id)}`;
+}
+
+function getProfileHref(targetUser: UserRow) {
+  return `/usermenu/users/${encodeURIComponent(targetUser.username)}`;
+}
+
+function UserActionItems({ targetUser, onView }: { targetUser: UserRow; onView: () => void }) {
+  return (
+    <>
+      <DropdownMenuItem onClick={onView}>
+        <Eye className="mr-2 h-4 w-4" />
+        View
+      </DropdownMenuItem>
+      <DropdownMenuItem asChild>
+        <Link href={getEarningsHref(targetUser)}>
+          <LineChart className="mr-2 h-4 w-4" />
+          Earnings
+        </Link>
+      </DropdownMenuItem>
+      <DropdownMenuItem asChild>
+        <Link href={getProfileHref(targetUser)}>
+          <User className="mr-2 h-4 w-4" />
+          Profile
+        </Link>
+      </DropdownMenuItem>
+    </>
+  );
 }
 
 export default function UserManagementClient() {
@@ -213,7 +251,7 @@ export default function UserManagementClient() {
       };
 
       if (!response.ok || !data.success) {
-        throw new Error(data.error || "사용자 상세 정보를 불러오지 못했습니다.");
+        throw new Error(data.error || "Failed to load user details.");
       }
 
       return data;
@@ -224,7 +262,7 @@ export default function UserManagementClient() {
   const detailErrorMessage =
     detailQuery.error instanceof Error
       ? detailQuery.error.message
-      : "사용자 상세 정보를 불러오지 못했습니다.";
+      : "Failed to load user details.";
 
   const invalidateAll = async () => {
     await Promise.all([
@@ -263,7 +301,7 @@ export default function UserManagementClient() {
     },
     onSuccess: async () => {
       toast({
-        description: "지급이 완료되었습니다.",
+        description: "Grant completed.",
         duration: 1500,
       });
       setGrantAmount("");
@@ -274,7 +312,7 @@ export default function UserManagementClient() {
     onError: (error) => {
       toast({
         variant: "destructive",
-        description: error instanceof Error ? error.message : "지급 처리에 실패했습니다.",
+        description: error instanceof Error ? error.message : "Failed to process grant.",
         duration: 2000,
       });
     },
@@ -294,7 +332,7 @@ export default function UserManagementClient() {
     },
     onSuccess: async () => {
       toast({
-        description: "사용자 정보가 수정되었습니다.",
+        description: "User information updated.",
         duration: 1500,
       });
       setEditDialogOpen(false);
@@ -303,7 +341,7 @@ export default function UserManagementClient() {
     onError: (error) => {
       toast({
         variant: "destructive",
-        description: error instanceof Error ? error.message : "수정 처리에 실패했습니다.",
+        description: error instanceof Error ? error.message : "Failed to update user.",
         duration: 2000,
       });
     },
@@ -316,7 +354,7 @@ export default function UserManagementClient() {
     },
     onSuccess: async () => {
       toast({
-        description: "활성 세션이 강제 로그아웃되었습니다.",
+        description: "Active sessions logged out.",
         duration: 1500,
       });
       await invalidateAll();
@@ -325,7 +363,7 @@ export default function UserManagementClient() {
       toast({
         variant: "destructive",
         description:
-          error instanceof Error ? error.message : "강제 로그아웃 처리에 실패했습니다.",
+          error instanceof Error ? error.message : "Failed to force logout.",
         duration: 2000,
       });
     },
@@ -342,7 +380,7 @@ export default function UserManagementClient() {
     },
     onSuccess: async () => {
       toast({
-        description: "비밀번호가 변경되었습니다.",
+        description: "Password changed.",
         duration: 1500,
       });
       setNewPassword("");
@@ -354,7 +392,7 @@ export default function UserManagementClient() {
       toast({
         variant: "destructive",
         description:
-          error instanceof Error ? error.message : "비밀번호 변경에 실패했습니다.",
+          error instanceof Error ? error.message : "Failed to change password.",
         duration: 2000,
       });
     },
@@ -438,16 +476,73 @@ export default function UserManagementClient() {
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-md border">
-        <Table>
+      {/* 모바일 화면용 카드 리스트 */}
+      {listQuery.isLoading ? (
+        <div className="sm:hidden py-10 text-center text-muted-foreground border rounded-md">
+          <Loader2 className="mx-auto h-5 w-5 animate-spin" />
+        </div>
+      ) : listQuery.data?.users.length ? (
+        <div className="sm:hidden space-y-3">
+          {listQuery.data.users.map((targetUser) => {
+            const subscription = getSubscriptionDisplay(targetUser.subscription);
+            return (
+              <div key={targetUser.id} className="p-3 border rounded-lg bg-card space-y-2 shadow-xs">
+                <div className="flex justify-between items-start">
+                  <div className="space-y-1 min-w-0">
+                    <p className="font-semibold truncate text-sm">{targetUser.displayName}</p>
+                    <p className="text-xs text-muted-foreground truncate">{targetUser.email || "-"}</p>
+                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <UserActionItems targetUser={targetUser} onView={() => openDetail(targetUser.id)} />
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+
+                <div className="flex flex-wrap gap-2 items-center text-[11px]">
+                  <Badge variant="outline" className="text-[10px] px-1 py-0">{getRoleLabel(targetUser.userRole)}</Badge>
+                  <div className="inline-flex items-center gap-1 bg-muted px-2 py-0.5 rounded-full">
+                    <span className={`led-indicator ${subscription.ledClass} h-1.5 w-1.5`} />
+                    <span className="font-medium text-[10px]">{subscription.label}</span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 pt-1.5 border-t text-[11px]">
+                  <div>
+                    <span className="text-muted-foreground">Points: </span>
+                    <span className="font-semibold">{Number(targetUser.points).toLocaleString()}</span>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Coins: </span>
+                    <span className="font-semibold">{Number(targetUser.coins).toLocaleString()}</span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="sm:hidden py-8 text-center text-muted-foreground border rounded-lg">
+          No user data found.
+        </div>
+      )}
+
+      {/* 데스크탑 화면용 테이블 */}
+      <div className="hidden sm:block overflow-x-auto rounded-md border">
+        <Table className="min-w-[600px] md:min-w-full">
           <TableHeader>
             <TableRow>
-              <TableHead>Email</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Subscription</TableHead>
+              <TableHead className="min-w-[120px] max-w-[220px]">Email</TableHead>
+              <TableHead className="min-w-[100px] max-w-[180px]">Name</TableHead>
+              <TableHead className="hidden sm:table-cell">Role</TableHead>
+              <TableHead className="hidden sm:table-cell">Subscription</TableHead>
               <TableHead className="text-right">Points</TableHead>
-              <TableHead className="text-right">Coins</TableHead>
+              <TableHead className="hidden md:table-cell text-right">Coins</TableHead>
               <TableHead className="w-[80px] text-right">Action</TableHead>
             </TableRow>
           </TableHeader>
@@ -463,16 +558,16 @@ export default function UserManagementClient() {
                 const subscription = getSubscriptionDisplay(targetUser.subscription);
                 return (
                   <TableRow key={targetUser.id}>
-                    <TableCell className="max-w-[220px] truncate">
+                    <TableCell className="max-w-[120px] sm:max-w-[220px] truncate break-all">
                       {targetUser.email || "-"}
                     </TableCell>
-                    <TableCell className="max-w-[180px] truncate">
+                    <TableCell className="max-w-[100px] sm:max-w-[180px] truncate break-all">
                       {targetUser.displayName}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden sm:table-cell">
                       <Badge variant="outline">{getRoleLabel(targetUser.userRole)}</Badge>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden sm:table-cell">
                       <div className="inline-flex items-center gap-2">
                         <span className={`led-indicator ${subscription.ledClass}`} />
                         <span className="font-medium">{subscription.label}</span>
@@ -481,7 +576,7 @@ export default function UserManagementClient() {
                     <TableCell className="text-right">
                       {Number(targetUser.points).toLocaleString()}
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="hidden md:table-cell text-right">
                       {Number(targetUser.coins).toLocaleString()}
                     </TableCell>
                     <TableCell className="text-right">
@@ -492,10 +587,7 @@ export default function UserManagementClient() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => openDetail(targetUser.id)}>
-                            <Eye className="mr-2 h-4 w-4" />
-                            View
-                          </DropdownMenuItem>
+                          <UserActionItems targetUser={targetUser} onView={() => openDetail(targetUser.id)} />
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -505,7 +597,7 @@ export default function UserManagementClient() {
             ) : (
               <TableRow>
                 <TableCell colSpan={7} className="py-8 text-center text-muted-foreground">
-                  사용자 데이터가 없습니다.
+                  No user data found.
                 </TableCell>
               </TableRow>
             )}
@@ -515,7 +607,7 @@ export default function UserManagementClient() {
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-muted-foreground">
-          {total}명 중 {(listQuery.data?.users.length ?? 0)}명 표시
+          Showing {(listQuery.data?.users.length ?? 0)} of {total} users
         </p>
         <div className="flex items-center gap-2">
           <Select
@@ -648,7 +740,7 @@ export default function UserManagementClient() {
               <p className="text-sm text-destructive">{detailErrorMessage}</p>
             </div>
           ) : (
-            <div className="py-10 text-center text-muted-foreground">사용자 정보를 찾을 수 없습니다.</div>
+            <div className="py-10 text-center text-muted-foreground">User information not found.</div>
           )}
         </DialogContent>
       </Dialog>
@@ -714,7 +806,7 @@ export default function UserManagementClient() {
           <DialogHeader>
             <DialogTitle>Edit User</DialogTitle>
             <DialogDescription>
-              사용자 계정 정보를 수정합니다. 저장 즉시 반영됩니다.
+              Edit user account details. Changes apply immediately upon saving.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
@@ -769,7 +861,7 @@ export default function UserManagementClient() {
             <div className="flex justify-between gap-2 border-t pt-4">
               <div className="text-sm text-destructive">
                 <p className="font-semibold">Force Logout (Blacklist Sessions)</p>
-                <p className="text-muted-foreground">활성 세션을 모두 무효화합니다.</p>
+                <p className="text-muted-foreground">Invalidates all active sessions.</p>
               </div>
               <Button
                 variant="destructive"
@@ -800,9 +892,9 @@ export default function UserManagementClient() {
       <Dialog open={passwordDialogOpen} onOpenChange={setPasswordDialogOpen}>
         <DialogContent className="sm:max-w-[460px]">
           <DialogHeader>
-            <DialogTitle>관리자 비밀번호 변경</DialogTitle>
+            <DialogTitle>Change Password</DialogTitle>
             <DialogDescription>
-              관리자 등급(OPERATION3+)만 수행할 수 있으며 변경 즉시 대상 세션이 모두 종료됩니다.
+              Only administrator level (OPERATION3+) can perform this. Target sessions will terminate immediately.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
@@ -812,7 +904,7 @@ export default function UserManagementClient() {
                 type="password"
                 value={newPassword}
                 onChange={(event) => setNewPassword(event.target.value)}
-                placeholder="8자 이상"
+                placeholder="Min 8 characters"
               />
             </div>
             <div className="space-y-1">
@@ -824,7 +916,7 @@ export default function UserManagementClient() {
               />
             </div>
             {newPassword.length > 0 && newPasswordConfirm.length > 0 && newPassword !== newPasswordConfirm && (
-              <p className="text-sm text-destructive">비밀번호가 일치하지 않습니다.</p>
+              <p className="text-sm text-destructive">Passwords do not match.</p>
             )}
 
             <div className="flex justify-end gap-2 pt-1">

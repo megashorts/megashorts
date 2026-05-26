@@ -1,0 +1,170 @@
+
+--- 2026-05-18T17:00:47.247Z debug
+🪵  Writing logs to "/Users/kimryan/Desktop/megas/.tmp/wrangler-logs/wrangler-2026-05-18_17-00-47_204.log"
+---
+
+--- 2026-05-18T17:00:47.247Z debug
+Metrics dispatcher: Dispatching disabled - would have sent {"deviceId":"c8397d8f-15b6-4383-ac87-c9f1f1083fc4","event":"wrangler command started","timestamp":1779123647247,"properties":{"amplitude_session_id":1779123647246,"amplitude_event_id":0,"wranglerVersion":"4.0.0","osPlatform":"Mac OS","osVersion":"Darwin Kernel Version 22.6.0: Sun Dec 17 22:14:25 PST 2023; root:xnu-8796.141.3.703.2~2/RELEASE_ARM64_T8112","nodeVersion":24,"packageManager":"npm","isFirstUsage":false,"configFileType":"toml","isCI":false,"isPagesCI":false,"isWorkersCI":false,"isInteractive":false,"hasAssets":false,"argsUsed":["command","remote"],"argsCombination":"command, remote","command":"wrangler d1 execute","args":{"remote":true,"command":"<REDACTED>","xJsonConfig":true,"j":true,"json":false,"preview":false,"database":"<REDACTED>"}}}.
+---
+
+--- 2026-05-18T17:00:47.248Z debug
+.env file not found at ".env". Continuing... For more details, refer to https://developers.cloudflare.com/workers/wrangler/system-environment-variables/
+---
+
+--- 2026-05-18T17:00:47.252Z log
+
+ ⛅️ wrangler 4.0.0 (update available 4.92.0)
+--------------------------------------------
+
+---
+
+--- 2026-05-18T17:00:47.255Z debug
+No experimental flag store instantiated
+---
+
+--- 2026-05-18T17:00:47.255Z debug
+Attempted to use flag "RESOURCES_PROVISION" which has not been instantiated
+---
+
+--- 2026-05-18T17:00:47.255Z debug
+No experimental flag store instantiated
+---
+
+--- 2026-05-18T17:00:47.255Z debug
+Attempted to use flag "RESOURCES_PROVISION" which has not been instantiated
+---
+
+--- 2026-05-18T17:00:47.256Z debug
+Saving to cache: {"account":{"id":"923201050a960d4c64fb9b90a88cb956","name":""}}
+---
+
+--- 2026-05-18T17:00:47.256Z log
+🌀 Executing on remote database megashorts-db (52d25396-2a61-42a8-904f-2d7956cede44):
+---
+
+--- 2026-05-18T17:00:47.256Z log
+🌀 To execute on your local development database, remove the --remote flag from your wrangler command.
+---
+
+--- 2026-05-18T17:00:47.256Z debug
+-- START CF API REQUEST: POST https://api.cloudflare.com/client/v4/accounts/923201050a960d4c64fb9b90a88cb956/d1/database/52d25396-2a61-42a8-904f-2d7956cede44/query
+---
+
+--- 2026-05-18T17:00:47.256Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T17:00:47.256Z debug
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T17:00:47.256Z debug
+-- END CF API REQUEST
+---
+
+--- 2026-05-18T17:00:47.405Z debug
+-- START CF API RESPONSE: OK 200
+---
+
+--- 2026-05-18T17:00:47.406Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T17:00:47.406Z debug
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T17:00:47.406Z debug
+-- END CF API RESPONSE
+---
+
+--- 2026-05-18T17:00:47.406Z log
+🚣 Executed 1 command in 0.4175ms
+---
+
+--- 2026-05-18T17:00:47.407Z log
+[
+  {
+    "results": [
+      {
+        "id": "iFkC5EkR45qVcks-FjKp-",
+        "date": "2026-05-24",
+        "user_id": "codex_agency_test_20260518165836_uploader",
+        "master_id": null,
+        "post_id": "codex_agency_test_20260518165836_binary_post",
+        "commission_type": "CREATOR",
+        "processed": 1,
+        "point_by_coin": 48,
+        "point_by_subscription": 0,
+        "view_count_coin": 2,
+        "view_count_subscription": 2,
+        "metadata": "{\"processingStartedAt\":\"2026-05-18T16:59:22.351Z\",\"attemptedPoints\":144,\"executionId\":\"Q3Ln4ggT\"}"
+      },
+      {
+        "id": "6HNTSHIbc6oVr_rK-Mfck",
+        "date": "2026-05-24",
+        "user_id": "codex_agency_test_20260518165836_uploader",
+        "master_id": null,
+        "post_id": "codex_agency_test_20260518165836_hq_post",
+        "commission_type": "CREATOR",
+        "processed": 1,
+        "point_by_coin": 96,
+        "point_by_subscription": 0,
+        "view_count_coin": 4,
+        "view_count_subscription": 4,
+        "metadata": "{\"processingStartedAt\":\"2026-05-18T16:59:22.351Z\",\"attemptedPoints\":144,\"executionId\":\"Q3Ln4ggT\"}"
+      },
+      {
+        "id": "E7IoN0t9PSEpc4uTnujBB",
+        "date": "2026-05-24",
+        "user_id": "codex_agency_test_20260518165836_uploader",
+        "master_id": null,
+        "post_id": "codex_agency_test_20260518165836_network_post",
+        "commission_type": "CREATOR",
+        "processed": 1,
+        "point_by_coin": 96,
+        "point_by_subscription": 0,
+        "view_count_coin": 4,
+        "view_count_subscription": 2,
+        "metadata": "{\"processingStartedAt\":\"2026-05-18T16:59:22.876Z\",\"attemptedPoints\":96,\"executionId\":\"Q3Ln4ggT\"}"
+      },
+      {
+        "id": "2CLUgm8IFu3ikHuda_M9B",
+        "date": "2026-05-24",
+        "user_id": "codex_agency_test_20260518165836_uploader",
+        "master_id": null,
+        "post_id": "codex_agency_test_20260518165836_network_post",
+        "commission_type": "CREATOR",
+        "processed": 1,
+        "point_by_coin": 144,
+        "point_by_subscription": 0,
+        "view_count_coin": 6,
+        "view_count_subscription": 3,
+        "metadata": "{\"processingStartedAt\":\"2026-05-18T16:59:28.291Z\",\"attemptedPoints\":144,\"executionId\":\"Oic7f--d\"}"
+      }
+    ],
+    "success": true,
+    "meta": {
+      "served_by": "v3-prod",
+      "served_by_region": "APAC",
+      "served_by_colo": "HKG",
+      "served_by_primary": true,
+      "timings": {
+        "sql_duration_ms": 0.4175
+      },
+      "duration": 0.4175,
+      "changes": 0,
+      "last_row_id": 273,
+      "changed_db": false,
+      "size_after": 278528,
+      "rows_read": 8,
+      "rows_written": 0,
+      "total_attempts": 1
+    }
+  }
+]
+---
+
+--- 2026-05-18T17:00:47.407Z debug
+Metrics dispatcher: Dispatching disabled - would have sent {"deviceId":"c8397d8f-15b6-4383-ac87-c9f1f1083fc4","event":"wrangler command completed","timestamp":1779123647407,"properties":{"amplitude_session_id":1779123647246,"amplitude_event_id":1,"wranglerVersion":"4.0.0","osPlatform":"Mac OS","osVersion":"Darwin Kernel Version 22.6.0: Sun Dec 17 22:14:25 PST 2023; root:xnu-8796.141.3.703.2~2/RELEASE_ARM64_T8112","nodeVersion":24,"packageManager":"npm","isFirstUsage":false,"configFileType":"toml","isCI":false,"isPagesCI":false,"isWorkersCI":false,"isInteractive":false,"hasAssets":false,"argsUsed":["command","remote"],"argsCombination":"command, remote","command":"wrangler d1 execute","args":{"remote":true,"command":"<REDACTED>","xJsonConfig":true,"j":true,"json":false,"preview":false,"database":"<REDACTED>"},"durationMs":170,"durationSeconds":0.17,"durationMinutes":0.0028333333333333335}}.
+---

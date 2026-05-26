@@ -22,14 +22,30 @@ import { useSession } from "@/components/SessionProvider";
 import LanguageFlag from "@/components/LanguageFlag";
 import { getThumbnailUrl } from "@/lib/constants";
 import { useTranslations } from "next-intl";
+import { USER_ROLE } from "@/lib/constants";
 
 type PostFormData = z.infer<typeof postSchema>;
 
-const SELECTABLE_CATEGORIES: CategoryType[] = [
+const BASE_SELECTABLE_CATEGORIES: CategoryType[] = [
   "COMEDY", "ROMANCE", "ACTION", "THRILLER", "DRAMA",
   "PERIODPLAY", "FANTASY", "HIGHTEEN", "ADULT", "HUMANE",
   "CALM", "VARIETYSHOW",
 ];
+
+const PRIVILEGED_CATEGORIES: CategoryType[] = [
+  "NOTIFICATION",
+  "MSPOST",
+];
+
+const TRANSLATION_LOCALES: Array<{ locale: 'ko' | 'zh'; language: Language }> = [
+  { locale: 'ko', language: Language.KOREAN },
+  { locale: 'zh', language: Language.CHINESE },
+];
+
+const TRANSLATION_LOCALE_LANGUAGE = TRANSLATION_LOCALES.reduce<Record<string, Language>>((acc, item) => {
+  acc[item.locale] = item.language;
+  return acc;
+}, {});
 
 interface PreparedImage {
   file: File;
@@ -46,6 +62,7 @@ export function PostEditor({ initialData }: PostEditorProps) {
   const router = useRouter();
   const { user } = useSession();
   const tCat = useTranslations('Category');
+  const tEditor = useTranslations('PostEditor');
   const [videos, setVideos] = useState<VideoType[]>(
     initialData?.videos || []
   );
@@ -62,6 +79,7 @@ export function PostEditor({ initialData }: PostEditorProps) {
   );
   const [translationLocales, setTranslationLocales] = useState<string[]>(
     Object.keys((initialData?.titleI18n as Record<string, string>) || {})
+      .filter((locale) => TRANSLATION_LOCALES.some((item) => item.locale === locale))
   );
   const [preparedImage, setPreparedImage] = useState<PreparedImage | null>(null);
   const [existingThumbnail, setExistingThumbnail] = useState<string | null>(
@@ -74,12 +92,16 @@ export function PostEditor({ initialData }: PostEditorProps) {
   const [selectedLanguage, setSelectedLanguage] = useState<Language>(
     initialData?.postLanguage || Language.CHINESE
   );
+  const canManageNoticeAndBlog = (user?.userRole ?? 0) >= USER_ROLE.OPERATION1;
+  const selectableCategories = canManageNoticeAndBlog
+    ? [...BASE_SELECTABLE_CATEGORIES, ...PRIVILEGED_CATEGORIES]
+    : BASE_SELECTABLE_CATEGORIES;
 
   const editor = useEditor({
     extensions: [
       StarterKit,
       Placeholder.configure({
-        placeholder: '내용을 입력하세요... (필수)',
+        placeholder: tEditor('contentPlaceholder'),
         showOnlyWhenEditable: true,
         emptyEditorClass: 'is-editor-empty'
       })
@@ -136,6 +158,18 @@ export function PostEditor({ initialData }: PostEditorProps) {
   
       const now = new Date().toISOString();
   
+      const selectedTitleI18n = translationLocales.reduce<Record<string, string>>((acc, locale) => {
+        const value = titleI18n[locale];
+        if (value?.trim()) acc[locale] = value;
+        return acc;
+      }, {});
+
+      const selectedContentI18n = translationLocales.reduce<Record<string, string>>((acc, locale) => {
+        const value = contentI18n[locale];
+        if (value?.trim()) acc[locale] = value;
+        return acc;
+      }, {});
+
       const postData = {
         id: initialData?.id,
         title: formValues.title,
@@ -149,8 +183,8 @@ export function PostEditor({ initialData }: PostEditorProps) {
         createdAt: now,
         publishedAt: status === 'PUBLISHED' ? now : null,
         postLanguage: selectedLanguage,
-        titleI18n: translationLocales.length > 0 ? titleI18n : undefined,
-        contentI18n: translationLocales.length > 0 ? contentI18n : undefined,
+        titleI18n: Object.keys(selectedTitleI18n).length > 0 ? selectedTitleI18n : undefined,
+        contentI18n: Object.keys(selectedContentI18n).length > 0 ? selectedContentI18n : undefined,
         videos: videos.map(video => ({
           id: video.id,
           filename: video.filename,
@@ -174,19 +208,19 @@ export function PostEditor({ initialData }: PostEditorProps) {
         const errorMessage = result.error.errors.map(error => {
           switch (error.path[0]) {
             case 'title':
-              return '제목을 입력해주세요';
+              return tEditor('validationTitle');
             case 'titleOriginal':
-              return '원작제목을 입력해주세요';
+              return tEditor('validationTitleOriginal');
             case 'content':
-              return '내용을 입력해주세요';
+              return tEditor('validationContent');
             case 'priority':
-              return '우선순위를 1-10 사이의 숫자로 입력해주세요';
+              return tEditor('validationPriority');
             case 'categories':
-              return '카테고리를 선택해주세요';
+              return tEditor('validationCategories');
             case 'ageLimit':
-              return '연령제한은 12-18 사이여야 합니다';
+              return tEditor('validationAgeLimit');
             case 'videos':
-              return '최소 1개의 비디오가 필요합니다';
+              return tEditor('validationVideos');
             default:
               return error.message;
           }
@@ -212,7 +246,7 @@ export function PostEditor({ initialData }: PostEditorProps) {
   
       toast({
         variant: "default",
-        description: status === 'PUBLISHED' ? "포스트가 발행되었습니다." : "임시저장되었습니다.",
+        description: status === 'PUBLISHED' ? tEditor('publishedToast') : tEditor('draftToast'),
       });
   
       if (newPost && typeof newPost === 'object' && 'id' in newPost) {
@@ -223,7 +257,7 @@ export function PostEditor({ initialData }: PostEditorProps) {
       console.error("Error creating post:", error);
       toast({
         variant: "destructive",
-        description: "포스트 저장에 실패했습니다.",
+        description: tEditor('saveFailed'),
       });
     } finally {
       setIsSaving(false);
@@ -234,12 +268,12 @@ export function PostEditor({ initialData }: PostEditorProps) {
     <div className="max-w-4xl mx-auto p-1 space-y-6">
       <div>
         <label className="block text-sm font-medium mb-2">
-          제목
+          {tEditor('title')}
         </label>
         <input
           type="text"
           {...register("title")}
-          placeholder="제목을 입력해주세요 (필수)"
+          placeholder={tEditor('titlePlaceholder')}
           className="w-full text-base rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 p-3"
         />
         {errors.title && (
@@ -253,7 +287,7 @@ export function PostEditor({ initialData }: PostEditorProps) {
         <input
           type="text"
           {...register("titleOriginal")}
-          placeholder="원작제목의 언어가 다르다면 입력하세요 (옵션)"
+          placeholder={tEditor('titleOriginalPlaceholder')}
           className="w-full text-base rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 p-3"
         />
         {errors.titleOriginal && (
@@ -265,12 +299,12 @@ export function PostEditor({ initialData }: PostEditorProps) {
 
       <div>
         <label className="block text-sm font-medium mb-2">
-          동영상 언어
+          {tEditor('videoLanguage')}
         </label>
         <div className="flex gap-3">
           {Object.values(Language)
             .filter((lang) => 
-              !['ENGLISH', 'JAPANESE', 'THAI', 'SPANISH', 'INDONESIAN', 'VIETNAMESE'].includes(lang)
+              ['ENGLISH', 'KOREAN', 'CHINESE'].includes(lang)
             )
             .map((lang) => (
             <button
@@ -291,7 +325,7 @@ export function PostEditor({ initialData }: PostEditorProps) {
 
       <div className="space-y-4">
         <label className="block text-sm font-medium mb-2">
-          썸네일 이미지
+          {tEditor('thumbnailImage')}
         </label>
 
         <ImageUploader
@@ -312,7 +346,7 @@ export function PostEditor({ initialData }: PostEditorProps) {
           <div className="mb-4">
             <img 
               src={getThumbnailUrl(existingThumbnail)}
-              alt="현재 썸네일" 
+              alt={tEditor('currentThumbnailAlt')}
               width={90}
               height={135}
               className="rounded-lg"
@@ -322,7 +356,7 @@ export function PostEditor({ initialData }: PostEditorProps) {
               onClick={() => setExistingThumbnail(null)}
               className="mt-2 text-sm text-red-600"
             >
-              썸네일 제거
+              {tEditor('removeThumbnail')}
             </button>
           </div>
         )}
@@ -330,10 +364,10 @@ export function PostEditor({ initialData }: PostEditorProps) {
 
       <div>
         <label className="block text-sm font-medium mb-2">
-        카테고리 (최대 3개)
+          {tEditor('categoriesMax')}
         </label>
         <div className="flex flex-wrap gap-2 mt-2">
-          {SELECTABLE_CATEGORIES
+          {selectableCategories
             .map((category) => (
               <button
                 key={category}
@@ -345,7 +379,7 @@ export function PostEditor({ initialData }: PostEditorProps) {
                   if (index === -1) {
                     if (currentCategories.length >= 3) {
                       toast({
-                        description: "카테고리는 최대 3개까지 선택 가능합니다.",
+                        description: tEditor('categoryMaxToast'),
                       });
                       return;
                     }
@@ -384,7 +418,7 @@ export function PostEditor({ initialData }: PostEditorProps) {
 
       <div>
         <label className="block text-sm font-medium mb-2">
-          비디오
+          {tEditor('video')}
         </label>
         <VideoUploader
           videos={videos}
@@ -401,7 +435,7 @@ export function PostEditor({ initialData }: PostEditorProps) {
 
       <div>
         <label className="block text-sm font-medium mb-2">
-          내용
+          {tEditor('content')}
         </label>
         <EditorContent
           editor={editor}
@@ -416,24 +450,24 @@ export function PostEditor({ initialData }: PostEditorProps) {
 
       <div className="p-4 border rounded-lg bg-slate-50 dark:bg-slate-900">
         <label className="block text-sm font-bold mb-4">
-          🌐 자막 및 다국어 번역 추가 (선택)
+          {tEditor('translationSection')}
         </label>
         <div className="flex gap-4 mb-4">
-          {['en', 'ko', 'zh'].map(loc => (
-            <label key={loc} className="flex items-center gap-2 cursor-pointer">
+          {TRANSLATION_LOCALES.map(({ locale, language }) => (
+            <label key={locale} className="flex items-center gap-2 cursor-pointer">
               <input 
                 type="checkbox" 
-                checked={translationLocales.includes(loc)}
+                checked={translationLocales.includes(locale)}
                 onChange={(e) => {
                   if (e.target.checked) {
-                    setTranslationLocales([...translationLocales, loc]);
+                    setTranslationLocales([...translationLocales, locale]);
                   } else {
-                    setTranslationLocales(translationLocales.filter(l => l !== loc));
+                    setTranslationLocales(translationLocales.filter(l => l !== locale));
                   }
                 }}
                 className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
               />
-              <span className="text-sm font-medium">{loc.toUpperCase()}</span>
+              <LanguageFlag language={language} />
             </label>
           ))}
         </div>
@@ -442,11 +476,14 @@ export function PostEditor({ initialData }: PostEditorProps) {
           <div className="space-y-4 border-t pt-4">
             {translationLocales.map(loc => (
               <div key={loc} className="p-4 bg-white dark:bg-slate-800 rounded-md border space-y-3">
-                <h4 className="font-bold text-sm text-primary">{loc.toUpperCase()} 번역</h4>
+                <h4 className="flex items-center gap-2 font-bold text-sm text-primary">
+                  <LanguageFlag language={TRANSLATION_LOCALE_LANGUAGE[loc]} />
+                  <span>{tEditor('translationTitle', { locale: loc.toUpperCase() })}</span>
+                </h4>
                 <div>
                   <input
                     type="text"
-                    placeholder={`${loc.toUpperCase()} 제목`}
+                    placeholder={tEditor('translationTitlePlaceholder', { locale: loc.toUpperCase() })}
                     value={titleI18n[loc] || ''}
                     onChange={(e) => setTitleI18n({ ...titleI18n, [loc]: e.target.value })}
                     className="w-full text-sm rounded-md border border-gray-300 focus:ring-2 focus:ring-primary p-2"
@@ -454,7 +491,7 @@ export function PostEditor({ initialData }: PostEditorProps) {
                 </div>
                 <div>
                   <textarea
-                    placeholder={`${loc.toUpperCase()} 내용`}
+                    placeholder={tEditor('translationContentPlaceholder', { locale: loc.toUpperCase() })}
                     value={contentI18n[loc] || ''}
                     onChange={(e) => setContentI18n({ ...contentI18n, [loc]: e.target.value })}
                     className="w-full text-sm rounded-md border border-gray-300 focus:ring-2 focus:ring-primary p-2 min-h-[80px]"
@@ -469,17 +506,17 @@ export function PostEditor({ initialData }: PostEditorProps) {
        <div className="space-y-4">
         <div className="flex items-center gap-4">
           <label className="text-sm font-medium">
-             컨텐츠 이용연령
+             {tEditor('ageLimit')}
            </label>
            <select
             {...register("ageLimit")}
             defaultValue="15"
             className="w-32 text-base rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary p-2"
           >
-            <option value="0">전체</option>
-            <option value="12">12세 이상</option>
-            <option value="15">15세 이상</option>
-            <option value="18">18세 이상</option>
+            <option value="0">{tEditor('ageAll')}</option>
+            <option value="12">{tEditor('agePlus', { age: 12 })}</option>
+            <option value="15">{tEditor('agePlus', { age: 15 })}</option>
+            <option value="18">{tEditor('agePlus', { age: 18 })}</option>
           </select>
         </div>
       </div>
@@ -491,14 +528,14 @@ export function PostEditor({ initialData }: PostEditorProps) {
           onClick={() => handleSave('DRAFT')}
           disabled={isSaving}
         >
-          임시저장
+          {tEditor('draft')}
         </Button>
         <Button
           type="button"
           onClick={() => handleSave('PUBLISHED')}
           disabled={isSaving}
         >
-          {isSaving ? "저장 중..." : initialData ? "수정" : "저장"}
+          {isSaving ? tEditor('saving') : initialData ? tEditor('edit') : tEditor('save')}
         </Button>
       </div>
     </div>

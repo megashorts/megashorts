@@ -5,6 +5,7 @@
 import { validateRequest } from '@/auth';
 import prisma from "@/lib/prisma";
 import { getPostDataInclude } from "@/lib/types";
+import { invalidatePostContent } from "@/lib/content-revalidation";
 
 export async function deletePost(id: string) {
   const { user } = await validateRequest();
@@ -115,6 +116,13 @@ for (const video of post.videos) {
 
       return deleted;
     });
+
+    if (deletedPost.status === "PUBLISHED") {
+      invalidatePostContent({
+        postId: deletedPost.id,
+        categories: deletedPost.categories,
+      });
+    }
 
     return deletedPost;
   } catch (error) {

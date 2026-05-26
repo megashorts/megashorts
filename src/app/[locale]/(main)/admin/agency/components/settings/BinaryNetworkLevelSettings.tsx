@@ -44,7 +44,7 @@ export default function BinaryNetworkLevelSettings({
   // 레벨 추가
   const addLevel = () => {
     const newLevel = {
-      name: `${levels.length + 1}단계`,
+      name: `Level ${levels.length + 1}`,
       level: levels.length + 1,
       commissionRate: 1
     };
@@ -70,21 +70,21 @@ export default function BinaryNetworkLevelSettings({
       {/* 단계 및 수수료 설정 */}
       <div className="space-y-4">
         <div className="flex justify-between items-center">
-          <h3 className="text-lg font-medium">단계 및 수수료 설정</h3>
+          <h3 className="text-lg font-medium">Level & Commission Settings</h3>
           <Button
             variant="outline"
             size="sm"
             onClick={addLevel}
             disabled={loading}
           >
-            단계 추가
+            Add Level
           </Button>
         </div>
         
         {levels.map((level, index) => (
           <div key={index} className="grid grid-cols-12 gap-4 items-center">
             <div className="col-span-4">
-              <Label htmlFor={`binary-name-${index}`}>이름</Label>
+              <Label htmlFor={`binary-name-${index}`}>Name</Label>
               <Input
                 id={`binary-name-${index}`}
                 value={level.name}
@@ -93,7 +93,7 @@ export default function BinaryNetworkLevelSettings({
               />
             </div>
             <div className="col-span-3">
-              <Label htmlFor={`binary-level-${index}`}>단계</Label>
+              <Label htmlFor={`binary-level-${index}`}>Level</Label>
               <Input
                 id={`binary-level-${index}`}
                 type="number"
@@ -103,7 +103,7 @@ export default function BinaryNetworkLevelSettings({
               />
             </div>
             <div className="col-span-3">
-              <Label htmlFor={`binary-rate-${index}`}>수수료 (%)</Label>
+              <Label htmlFor={`binary-rate-${index}`}>Commission (%)</Label>
               <Input
                 id={`binary-rate-${index}`}
                 type="number"
@@ -119,7 +119,7 @@ export default function BinaryNetworkLevelSettings({
                 onClick={() => removeLevel(index)}
                 disabled={loading}
               >
-                삭제
+                Delete
               </Button>
             </div>
           </div>
@@ -128,7 +128,7 @@ export default function BinaryNetworkLevelSettings({
       
       {/* 자동 자격 부여 설정 */}
       <div className="space-y-4">
-        <h3 className="text-lg font-medium">중간 관리자 자동 자격 부여 설정</h3>
+        <h3 className="text-lg font-medium">Middle Manager Auto Qualification Settings</h3>
         <div className="space-y-4 border p-4 rounded-md">
           <div className="flex items-center space-x-2">
             <Switch
@@ -140,12 +140,12 @@ export default function BinaryNetworkLevelSettings({
               })}
               disabled={loading}
             />
-            <Label htmlFor="binary-auto-qualification">자동 자격 부여 활성화</Label>
+            <Label htmlFor="binary-auto-qualification">Enable Auto Qualification</Label>
           </div>
           
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="binary-member-count">하위회원 수</Label>
+              <Label htmlFor="binary-member-count">Sub-members</Label>
               <Input
                 id="binary-member-count"
                 type="number"
@@ -159,7 +159,7 @@ export default function BinaryNetworkLevelSettings({
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="binary-charge-amount">충전 금액</Label>
+              <Label htmlFor="binary-charge-amount">Charge Amount</Label>
               <Input
                 id="binary-charge-amount"
                 type="number"
@@ -173,7 +173,7 @@ export default function BinaryNetworkLevelSettings({
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="binary-usage-amount">사용 금액</Label>
+              <Label htmlFor="binary-usage-amount">Usage Amount</Label>
               <Input
                 id="binary-usage-amount"
                 type="number"
@@ -187,7 +187,7 @@ export default function BinaryNetworkLevelSettings({
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="binary-use-condition">조건 적용 방식</Label>
+              <Label htmlFor="binary-use-condition">Condition Type</Label>
               <Select
                 value={autoQualification.useCondition}
                 onValueChange={(val: "memberCount" | "chargeAmount" | "usageAmount" | "both") => setAutoQualification({
@@ -197,13 +197,13 @@ export default function BinaryNetworkLevelSettings({
                 disabled={loading || !autoQualification.enabled}
               >
                 <SelectTrigger id="binary-use-condition">
-                  <SelectValue placeholder="조건 선택" />
+                  <SelectValue placeholder="Select Condition" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="memberCount">하위회원 수</SelectItem>
-                  <SelectItem value="chargeAmount">충전 금액</SelectItem>
-                  <SelectItem value="usageAmount">사용 금액</SelectItem>
-                  <SelectItem value="both">모두 충족</SelectItem>
+                  <SelectItem value="memberCount">Sub-members</SelectItem>
+                  <SelectItem value="chargeAmount">Charge Amount</SelectItem>
+                  <SelectItem value="usageAmount">Usage Amount</SelectItem>
+                  <SelectItem value="both">All Conditions Met</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -220,7 +220,7 @@ export default function BinaryNetworkLevelSettings({
           disabled={loading}
         />
         <Label htmlFor="require-both-legs">
-          하위회원 2명이 충족될 때만 추가 회원 등록 가능
+          Only register additional members when 2 sub-members are met
         </Label>
       </div>
     </div>

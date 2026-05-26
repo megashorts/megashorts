@@ -4,6 +4,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { validateRequest } from '@/auth';
 import { sendTelegramNotification } from '@/lib/telegram';
 import prisma from '@/lib/prisma';
+import { DEFAULT_SETTINGS } from '@/lib/admin/system-settingspage';
+
+function systemSettingNumber(value: unknown, fallback: number) {
+  const settingValue = value as { value?: unknown } | null;
+  const numeric = Number(settingValue?.value ?? value);
+  return Number.isFinite(numeric) ? numeric : fallback;
+}
 
 // 포인트 지급 신청 API
 export async function POST(request: NextRequest) {
@@ -49,19 +56,32 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // 사용자 및 CreatorInfo 조회
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      include: {
-        CreatorInfo: true
-      }
-    });
+    const [user, minWithdrawSetting] = await Promise.all([
+      prisma.user.findUnique({
+        where: { id: userId },
+        include: {
+          CreatorInfo: true
+        }
+      }),
+      prisma.systemSetting.findUnique({
+        where: { key: 'minWithdrawPoint' },
+        select: { value: true },
+      }),
+    ]);
 
     if (!user) {
       return NextResponse.json({
         success: false,
         error: '사용자를 찾을 수 없습니다.'
       }, { status: 404 });
+    }
+
+    const minWithdrawPoint = systemSettingNumber(minWithdrawSetting?.value, DEFAULT_SETTINGS.minWithdrawPoint.value);
+    if (Number(amount) < minWithdrawPoint) {
+      return NextResponse.json({
+        success: false,
+        error: `최소 출금 가능 포인트는 ${minWithdrawPoint.toLocaleString()}P입니다.`
+      }, { status: 400 });
     }
 
     if (!user.emailVerified) {

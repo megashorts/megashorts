@@ -19,14 +19,22 @@ import {
   DEFAULT_SETTINGS
 } from '@/lib/admin/system-settingspage';
 import { useToast } from "@/components/ui/use-toast";
+import {
+  CONTENT_LANGUAGE_POLICIES,
+  CONTENT_LANGUAGE_POLICY_DESCRIPTIONS,
+  CONTENT_LANGUAGE_POLICY_LABELS,
+  type ContentLanguagePolicy,
+} from '@/lib/content-language';
+import { ANALYTICS_TIME_ZONE_OPTIONS } from '@/lib/analytics-timezone';
 
-const formatNumber = (num: number) => {
-  return num.toLocaleString('ko-KR');
+const toFiniteNumber = (value: unknown, fallback = 0) => {
+  const parsed = typeof value === 'number' ? value : Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
 };
 
-const parseFormattedNumber = (str: string) => {
-  return Number(str.replace(/,/g, ''));
-};
+const formatNumber = (num: unknown) => toFiniteNumber(num).toLocaleString('ko-KR');
+
+const parseFormattedNumber = (str: string) => toFiniteNumber(str.replace(/,/g, ''));
 
 export function SystemSettings() {
   const [settings, setSettings] = useState<SystemSettings>(DEFAULT_SETTINGS);
@@ -62,7 +70,7 @@ export function SystemSettings() {
     };
 
     fetchSettings();
-  }, []);
+  }, [toast]);
 
   const handleSaveSection = async (section: keyof typeof SECTIONS) => {
     if (saving) return;
@@ -85,20 +93,20 @@ export function SystemSettings() {
         // 시스템 설정: Vercel 환경변수 업데이트
         await ky.post('/api/admin/settings/apply');
         toast({
-          title: "Success",
-          description: "시스템 설정이 저장되고 환경변수가 업데이트되었습니다"
+          title: "Settings Saved",
+          description: "System settings saved and environment variables updated."
         });
       } else if (section === 'UPLOADER_CONFIG') {
         // 업로더 레벨: DB 저장만
         toast({
-          title: "Success",
-          description: "업로더 레벨 설정이 저장되었습니다"
+          title: "Settings Saved",
+          description: "Uploader level settings saved."
         });
       } else if (section === 'PRICE_EVENT') {
         // 가격 및 이벤트: DB 저장만
         toast({
-          title: "Success",
-          description: "가격 및 이벤트 설정이 저장되었습니다"
+          title: "Settings Saved",
+          description: "Price and event settings saved."
         });
       }
 
@@ -130,9 +138,11 @@ export function SystemSettings() {
     field: 'amount' | 'price' | 'globalPrice' | 'type',
     value: number
   ) => {
-    const packages = [...settings[key].value];
+    const fallbackPackages = DEFAULT_SETTINGS[key].value;
+    const currentPackages = Array.isArray(settings[key]?.value) ? settings[key].value : fallbackPackages;
+    const packages = [...currentPackages];
     packages[index] = {
-      ...packages[index],
+      ...(packages[index] || fallbackPackages[index] || {}),
       [field]: value,
       ...(field === 'price' ? { globalPrice: Number((value / 1000).toFixed(2)) } : {})
     };
@@ -156,7 +166,7 @@ export function SystemSettings() {
         <CardContent className="p-6">
           <div className="flex items-center justify-center">
             <Loader2 className="w-6 h-6 animate-spin" />
-            <p className="ml-2">설정을 불러오는 중...</p>
+            <p className="ml-2">Loading settings...</p>
           </div>
         </CardContent>
       </Card>
@@ -214,9 +224,9 @@ export function SystemSettings() {
                         <table className="min-w-full border-collapse bg-card">
                           <thead>
                             <tr className="border-b">
-                              <th className="text-left py-1.5 px-2 font-medium text-xs">레벨</th>
-                              <th className="text-left py-1.5 px-2 font-medium text-xs">월 조회수</th>
-                              <th className="text-left py-1.5 px-2 font-medium text-xs">수익률 (%)</th>
+                              <th className="text-left py-1.5 px-2 font-medium text-xs">Level</th>
+                              <th className="text-left py-1.5 px-2 font-medium text-xs">Monthly Views</th>
+                              <th className="text-left py-1.5 px-2 font-medium text-xs">Revenue Share (%)</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -282,9 +292,15 @@ export function SystemSettings() {
                   // }
 
                   if (key === 'subscriptionPackages') {
+                    const subscriptionPackages = Array.isArray(settings.subscriptionPackages?.value)
+                      ? settings.subscriptionPackages.value
+                      : DEFAULT_SETTINGS.subscriptionPackages.value;
+                    const coinPackages = Array.isArray(settings.coinPackages?.value)
+                      ? settings.coinPackages.value
+                      : DEFAULT_SETTINGS.coinPackages.value;
                     const allPackages = [
-                      ...settings.subscriptionPackages.value,
-                      ...settings.coinPackages.value
+                      ...subscriptionPackages,
+                      ...coinPackages
                     ];
 
                     return (
@@ -292,26 +308,26 @@ export function SystemSettings() {
                         <table className="min-w-full border-collapse bg-card">
                           <thead>
                             <tr className="border-b">
-                              <th className="text-center py-1.5 px-1 font-medium text-xs">구분</th>
-                              <th className="text-center py-1.5 px-1 font-medium text-xs">설정</th>
-                              <th className="text-center py-1.5 px-1 font-medium text-xs">한국 가격</th>
-                              <th className="text-center py-1.5 px-1 font-medium text-xs">글로벌 가격</th>
+                              <th className="text-center py-1.5 px-1 font-medium text-xs">Type</th>
+                              <th className="text-center py-1.5 px-1 font-medium text-xs">Setting</th>
+                              <th className="text-center py-1.5 px-1 font-medium text-xs">Korea Price</th>
+                              <th className="text-center py-1.5 px-1 font-medium text-xs">Global Price</th>
                             </tr>
                           </thead>
                           <tbody>
                             {allPackages.map((pkg, index) => {
                               const isSubscription = 'type' in pkg;
                               const packageKey = isSubscription ? 'subscriptionPackages' : 'coinPackages';
-                              const packageIndex = isSubscription ? index : index - settings.subscriptionPackages.value.length;
+                              const packageIndex = isSubscription ? index : index - subscriptionPackages.length;
 
                               return (
                                 <tr key={index} className="border-b last:border-0">
                                   <td className="py-1.5 px-1 text-xs text-center">
-                                    {isSubscription ? '구독' : '수량'}
+                                    {isSubscription ? 'Subscription' : 'Coins'}
                                   </td>
                                   <td className="py-1.5 px-1 text-xs text-center">
                                     {isSubscription ? (
-                                      (pkg as SubscriptionPackage).type === 'weekly' ? '주간' : '연간'
+                                      (pkg as SubscriptionPackage).type === 'weekly' ? 'Weekly' : 'Yearly'
                                     ) : (
                                       <Input
                                         type="text"
@@ -342,6 +358,60 @@ export function SystemSettings() {
                             })}
                           </tbody>
                         </table>
+                      </div>
+                    );
+                  }
+
+                  if (key === 'contentLanguagePolicy') {
+                    const value = settings[key].value as ContentLanguagePolicy;
+
+                    return (
+                      <div key={key} className="py-1 space-y-1.5">
+                        <div className="flex items-center justify-between gap-4">
+                          <Label className="text-xs flex-1">
+                            {SETTING_LABELS[key as keyof typeof SETTING_LABELS]}
+                          </Label>
+                          <select
+                            value={value}
+                            onChange={(e) => handleSettingChange(key, e.target.value as ContentLanguagePolicy)}
+                            className="h-7 w-56 rounded-md border border-input bg-background px-2 text-xs text-foreground"
+                          >
+                            {CONTENT_LANGUAGE_POLICIES.map((policy) => (
+                              <option key={policy} value={policy}>
+                                {CONTENT_LANGUAGE_POLICY_LABELS[policy]}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <p className="pl-1 text-[11px] leading-4 text-muted-foreground">
+                          {CONTENT_LANGUAGE_POLICY_DESCRIPTIONS[value]}
+                        </p>
+                      </div>
+                    );
+                  }
+
+                  if (key === 'analyticsTimeZone') {
+                    return (
+                      <div key={key} className="py-1 space-y-1.5">
+                        <div className="flex items-center justify-between gap-4">
+                          <Label className="text-xs flex-1">
+                            {SETTING_LABELS[key as keyof typeof SETTING_LABELS]}
+                          </Label>
+                          <select
+                            value={String(settings[key].value)}
+                            onChange={(e) => handleSettingChange(key, e.target.value)}
+                            className="h-7 w-56 rounded-md border border-input bg-background px-2 text-xs text-foreground"
+                          >
+                            {ANALYTICS_TIME_ZONE_OPTIONS.map((tz) => (
+                              <option key={tz} value={tz}>
+                                {tz}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <p className="pl-1 text-[11px] leading-4 text-muted-foreground">
+                          Log and reporting day-boundary time zone.
+                        </p>
                       </div>
                     );
                   }
@@ -381,8 +451,8 @@ export function SystemSettings() {
           <CardHeader className="bg-muted/50 p-3">
             <div className="flex items-center justify-between gap-2">
               <div className="flex-1">
-                <CardTitle className="text-base">수동배포</CardTitle>
-                <CardDescription className="text-xs mt-1">수동 배포 관리</CardDescription>
+                <CardTitle className="text-base">Manual Deploy</CardTitle>
+                <CardDescription className="text-xs mt-1">Manual Deployment Management</CardDescription>
               </div>
             </div>
           </CardHeader>
@@ -390,26 +460,26 @@ export function SystemSettings() {
             <div className="space-y-3">
               <div className="flex items-center justify-between py-1 gap-4">
                 <Label className="text-xs flex-1">
-                  수동 배포 1 설명
+                  Manual Deploy 1 Description
                 </Label>
                 <Button
                   variant="outline"
                   size="sm"
                   className="h-7"
                 >
-                  배포1
+                  Deploy 1
                 </Button>
               </div>
               <div className="flex items-center justify-between py-1 gap-4">
                 <Label className="text-xs flex-1">
-                  수동 배포 2 설명
+                  Manual Deploy 2 Description
                 </Label>
                 <Button
                   variant="outline"
                   size="sm"
                   className="h-7"
                 >
-                  배포2
+                  Deploy 2
                 </Button>
               </div>
             </div>

@@ -1,0 +1,115 @@
+
+--- 2026-05-18T16:42:42.368Z debug
+🪵  Writing logs to "/Users/kimryan/Desktop/megas/.tmp/wrangler-logs/wrangler-2026-05-18_16-42-42_284.log"
+---
+
+--- 2026-05-18T16:42:42.368Z debug
+Metrics dispatcher: Dispatching disabled - would have sent {"deviceId":"c8397d8f-15b6-4383-ac87-c9f1f1083fc4","event":"wrangler command started","timestamp":1779122562367,"properties":{"amplitude_session_id":1779122562367,"amplitude_event_id":0,"wranglerVersion":"4.0.0","osPlatform":"Mac OS","osVersion":"Darwin Kernel Version 22.6.0: Sun Dec 17 22:14:25 PST 2023; root:xnu-8796.141.3.703.2~2/RELEASE_ARM64_T8112","nodeVersion":20,"packageManager":"npm","isFirstUsage":false,"configFileType":"toml","isCI":false,"isPagesCI":false,"isWorkersCI":false,"isInteractive":false,"hasAssets":false,"argsUsed":[],"argsCombination":"","command":"wrangler whoami","args":{"xJsonConfig":true,"j":true}}}.
+---
+
+--- 2026-05-18T16:42:42.369Z debug
+.env file not found at ".env". Continuing... For more details, refer to https://developers.cloudflare.com/workers/wrangler/system-environment-variables/
+---
+
+--- 2026-05-18T16:42:42.372Z log
+
+ ⛅️ wrangler 4.0.0 (update available 4.92.0)
+--------------------------------------------
+
+---
+
+--- 2026-05-18T16:42:42.375Z log
+Getting User settings...
+---
+
+--- 2026-05-18T16:42:42.375Z debug
+-- START CF API REQUEST: GET https://api.cloudflare.com/client/v4/user
+---
+
+--- 2026-05-18T16:42:42.375Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:42:42.375Z debug
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:42:42.375Z debug
+-- END CF API REQUEST
+---
+
+--- 2026-05-18T16:42:42.731Z debug
+-- START CF API RESPONSE: Forbidden 403
+---
+
+--- 2026-05-18T16:42:42.732Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:42:42.732Z debug
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:42:42.732Z debug
+-- END CF API RESPONSE
+---
+
+--- 2026-05-18T16:42:42.733Z debug
+-- START CF API REQUEST: GET https://api.cloudflare.com/client/v4/accounts?page=1
+---
+
+--- 2026-05-18T16:42:42.733Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:42:42.733Z debug
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:42:42.733Z debug
+-- END CF API REQUEST
+---
+
+--- 2026-05-18T16:42:44.760Z debug
+-- START CF API RESPONSE: OK 200
+---
+
+--- 2026-05-18T16:42:44.761Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:42:44.761Z debug
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:42:44.761Z debug
+-- END CF API RESPONSE
+---
+
+--- 2026-05-18T16:42:44.762Z log
+ℹ️  The API Token is read from the CLOUDFLARE_API_TOKEN in your environment.
+---
+
+--- 2026-05-18T16:42:44.763Z log
+👋 You are logged in with an API Token. Unable to retrieve email for this user. Are you missing the `User->User Details->Read` permission?
+---
+
+--- 2026-05-18T16:42:44.769Z log
+┌─────────────────────────────┬──────────────────────────────────┐
+│ Account Name                │ Account ID                       │
+├─────────────────────────────┼──────────────────────────────────┤
+│ Msdevcm@gmail.com's Account │ 923201050a960d4c64fb9b90a88cb956 │
+└─────────────────────────────┴──────────────────────────────────┘
+---
+
+--- 2026-05-18T16:42:44.769Z log
+🔓 To see token permissions visit https://dash.cloudflare.com/profile/api-tokens.
+---
+
+--- 2026-05-18T16:42:44.770Z debug
+Metrics dispatcher: Dispatching disabled - would have sent {"deviceId":"c8397d8f-15b6-4383-ac87-c9f1f1083fc4","event":"view accounts","timestamp":1779122564770,"properties":{"category":"Workers","wranglerVersion":"4.0.0","os":"darwin:arm64"}}.
+---
+
+--- 2026-05-18T16:42:44.771Z debug
+Metrics dispatcher: Dispatching disabled - would have sent {"deviceId":"c8397d8f-15b6-4383-ac87-c9f1f1083fc4","event":"wrangler command completed","timestamp":1779122564771,"properties":{"amplitude_session_id":1779122562367,"amplitude_event_id":1,"wranglerVersion":"4.0.0","osPlatform":"Mac OS","osVersion":"Darwin Kernel Version 22.6.0: Sun Dec 17 22:14:25 PST 2023; root:xnu-8796.141.3.703.2~2/RELEASE_ARM64_T8112","nodeVersion":20,"packageManager":"npm","isFirstUsage":false,"configFileType":"toml","isCI":false,"isPagesCI":false,"isWorkersCI":false,"isInteractive":false,"hasAssets":false,"argsUsed":[],"argsCombination":"","command":"wrangler whoami","args":{"xJsonConfig":true,"j":true},"durationMs":2413,"durationSeconds":2.413,"durationMinutes":0.040216666666666664}}.
+---

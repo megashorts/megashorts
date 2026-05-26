@@ -3,6 +3,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validateRequest } from '@/auth';
 import prisma from '@/lib/prisma';
+import { DEFAULT_SETTINGS } from '@/lib/admin/system-settingspage';
+
+function systemSettingNumber(value: unknown, fallback: number) {
+  const settingValue = value as { value?: unknown } | null;
+  const numeric = Number(settingValue?.value ?? value);
+  return Number.isFinite(numeric) ? numeric : fallback;
+}
 
 // 사용자 정보 조회 API
 export async function GET(
@@ -34,20 +41,25 @@ export async function GET(
       );
     }
 
-    // 사용자 정보 조회 (CreatorInfo 포함으로 수정)
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        username: true,
-        displayName: true, // 추가
-        email: true,
-        emailVerified: true,
-        points: true,
-        userRole: true,
-        CreatorInfo: true, // 새로 추가
-      },
-    });
+    const [user, minWithdrawSetting] = await Promise.all([
+      prisma.user.findUnique({
+        where: { id: userId },
+        select: {
+          id: true,
+          username: true,
+          displayName: true,
+          email: true,
+          emailVerified: true,
+          points: true,
+          userRole: true,
+          CreatorInfo: true,
+        },
+      }),
+      prisma.systemSetting.findUnique({
+        where: { key: 'minWithdrawPoint' },
+        select: { value: true },
+      }),
+    ]);
 
     if (!user) {
       return NextResponse.json(
@@ -62,7 +74,8 @@ export async function GET(
       data: {
         ...user,
         points: Number(user.points || 0),
-        creatorInfo: user.CreatorInfo, // 새로 추가된 필드
+        minWithdrawPoint: systemSettingNumber(minWithdrawSetting?.value, DEFAULT_SETTINGS.minWithdrawPoint.value),
+        creatorInfo: user.CreatorInfo,
       },
     });
   } catch (error) {

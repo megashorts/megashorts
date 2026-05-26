@@ -74,3 +74,28 @@ export const USER_ROLE_NAME = {
   [USER_ROLE.EXECUTIVE]: "임원진",
   [USER_ROLE.MASTER_ADMIN]: "최고 관리자",
 } as const;
+
+export const USER_ROLE_NAME_EN = {
+  [USER_ROLE.USER]: "MS Member",
+  [USER_ROLE.CREATOR_Lv1]: "Creator Lv1",
+  [USER_ROLE.CREATOR_Lv2]: "Creator Lv2",
+  [USER_ROLE.CREATOR_Lv3]: "Creator Lv3",
+  [USER_ROLE.CREATOR_Lv4]: "Creator Lv4",
+  [USER_ROLE.CREATOR_Lv5]: "Creator Lv5",
+  [USER_ROLE.CREATOR_Lv6]: "Creator Lv6",
+  [USER_ROLE.CREATOR_Lv7]: "Creator Lv7",
+  [USER_ROLE.CREATOR_Lv8]: "Creator Lv8",
+  [USER_ROLE.SUPPORTER]: "Supporter",
+  [USER_ROLE.TEAM_MEMBER]: "Agency Member",
+  [USER_ROLE.TEAM_AGENCY]: "Agency Master",
+  [USER_ROLE.TEAM_OPERATOR]: "HQ Operator",
+  [USER_ROLE.TEAM_MASTER]: "HQ Master",
+  [USER_ROLE.NATIONAL_MASTER]: "National Master",
+  [USER_ROLE.MARKETING1]: "Marketing Team",
+  [USER_ROLE.MARKETING2]: "Marketing Manager",
+  [USER_ROLE.OPERATION1]: "Operations Team",
+  [USER_ROLE.OPERATION2]: "Operations Manager",
+  [USER_ROLE.OPERATION3]: "Operations Master",
+  [USER_ROLE.EXECUTIVE]: "Executive",
+  [USER_ROLE.MASTER_ADMIN]: "Super Admin",
+} as const;

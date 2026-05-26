@@ -1,6 +1,8 @@
 import { validateRequest } from "@/auth";
 import { USER_ROLE } from "@/lib/constants";
 import { NextRequest, NextResponse } from "next/server";
+import { getAnalyticsTimeZone } from "@/lib/analytics-timezone-server";
+import { normalizeAnalyticsTimeZone } from "@/lib/analytics-timezone";
 
 const DEFAULT_LOG_WORKER_URL = "https://megashorts-logs.msdevcm.workers.dev";
 
@@ -29,7 +31,14 @@ export async function GET(request: NextRequest) {
 
   const sourceUrl = new URL(request.url);
   const workerUrl = new URL(url);
-  workerUrl.search = sourceUrl.search;
+  const searchParams = new URLSearchParams(sourceUrl.search);
+  const requestedTimeZone = searchParams.get('timezone');
+  if (requestedTimeZone) {
+    searchParams.set('timezone', normalizeAnalyticsTimeZone(requestedTimeZone));
+  } else {
+    searchParams.set('timezone', await getAnalyticsTimeZone());
+  }
+  workerUrl.search = searchParams.toString();
 
   const response = await fetch(workerUrl, {
     headers: {

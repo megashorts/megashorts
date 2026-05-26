@@ -26,6 +26,7 @@ import { VideoWithSubtitles } from "@/lib/types";
 import { useSession } from "@/components/SessionProvider";
 import { MobileVideoUploader } from "./MobileVideoUploader";
 import { MobileVideoEditor } from "./MobileVideoEditor";
+import { useTranslations } from "next-intl";
 
 type Video = VideoWithSubtitles;
 
@@ -94,6 +95,7 @@ export function VideoUploader({
   const [uploading, setUploading] = useState(false);
   const { uploadVideo, uploadSubtitle, progress } = useUploader();
   const { user } = useSession();
+  const tUploader = useTranslations('VideoUploader');
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -111,7 +113,7 @@ export function VideoUploader({
     if (!user) {
       toast({
         variant: "destructive",
-        description: "로그인이 필요합니다."
+        description: tUploader('loginRequired')
       });
       return;
     }
@@ -119,7 +121,7 @@ export function VideoUploader({
     if (acceptedFiles.length > maxFiles) {
       toast({
         variant: "destructive",
-        description: `한 번에 최대 ${maxFiles}개의 파일만 업로드할 수 있습니다.`
+        description: tUploader('maxFiles', { maxFiles })
       });
       return;
     }
@@ -152,7 +154,7 @@ export function VideoUploader({
                   } catch (subtitleError) {
                     console.error(`Failed to upload subtitle for ${baseName}:`, subtitleError);
                     toast({
-                      description: `자막 업로드 실패: ${subtitleFile.name}`,
+                      description: tUploader('subtitleUploadFailedWithName', { filename: subtitleFile.name }),
                       variant: "destructive",
                     });
                   }
@@ -189,12 +191,12 @@ export function VideoUploader({
       console.error("업로드 실패:", error);
       toast({
         variant: "destructive",
-        description: "업로드에 실패했습니다. 다시 시도해 주세요."
+        description: tUploader('uploadFailed')
       });
     } finally {
       setUploading(false);
     }
-  }, [videos, maxFiles, uploadVideo, uploadSubtitle, onChange, user]);
+  }, [videos, maxFiles, uploadVideo, uploadSubtitle, onChange, user, tUploader]);
 
   const handleDragEnd = useCallback((event: DragEndEvent) => {
     const { active, over } = event;
@@ -221,7 +223,7 @@ export function VideoUploader({
     try {
       const ext = file.name.split('.').pop()?.toLowerCase();
       if (ext !== 'srt' && ext !== 'vtt') {
-        throw new Error('지원되지 않는 자막 파일 형식입니다.');
+        throw new Error(tUploader('unsupportedSubtitle'));
       }
   
       const result = await uploadSubtitle(videoId, file, language);
@@ -244,16 +246,16 @@ export function VideoUploader({
       onChange(updatedVideos);
   
       toast({
-        description: "자막이 업로드되었습니다.",
+        description: tUploader('subtitleUploaded'),
       });
     } catch (error) {
       console.error("자막 업로드 실패:", error);
       toast({
         variant: "destructive",
-        description: error instanceof Error ? error.message : "자막 업로드에 실패했습니다."
+        description: error instanceof Error ? error.message : tUploader('subtitleUploadFailed')
       });
     }
-  }, [videos, uploadSubtitle, onChange]);
+  }, [videos, uploadSubtitle, onChange, tUploader]);
 
   const handleVideoDelete = useCallback(async (videoId: string) => {
     try {
@@ -279,16 +281,16 @@ export function VideoUploader({
       onChange(reorderedVideos);
       
       toast({
-        description: "비디오가 삭제되었습니다."
+        description: tUploader('videoDeleted')
       });
     } catch (error) {
       console.error('Error deleting video:', error);
       toast({
         variant: "destructive",
-        description: "비디오 삭제에 실패했습니다."
+        description: tUploader('videoDeleteFailed')
       });
     }
-  }, [videos, onChange]);
+  }, [videos, onChange, tUploader]);
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
@@ -345,7 +347,7 @@ export function VideoUploader({
             <input {...getInputProps()} />
             {uploading ? (
               <div className="space-y-2">
-                <p>업로드 중...</p>
+                <p>{tUploader('uploading')}</p>
                 {Object.entries(progress).map(([filename, value]) => (
                   <div key={filename} className="space-y-1">
                     <p className="text-sm">{filename}</p>
@@ -355,12 +357,12 @@ export function VideoUploader({
               </div>
             ) : (
               <p className="text-xs text-muted-foreground">
-                비디오 & 자막을 클릭 또는 드래그하세요.
+                {tUploader('dropHint')}
                 <br />
                 <span className="text-xs text-gray-500">
-                  (최대 {maxFiles}개, 각 100MB 이하)
+                  ({tUploader('fileLimit', { maxFiles })})
                   <br />
-                  비디오: MP4/WebM, 자막: VTT (_ko 접미사로 구분)
+                  {tUploader('fileGuide')}
                 </span>
               </p>
             )}

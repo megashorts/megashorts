@@ -28,4 +28,5 @@ export interface LogTableProps {
   onSort?: (field: string) => void;
   sortField?: string;
   sortOrder?: 'asc' | 'desc';
+  timeZone?: string;
 }

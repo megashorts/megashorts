@@ -1,25 +1,40 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { SystemSettings, type SystemSettingValue } from "@/lib/admin/system-settingspage";
+import {
+  DEFAULT_SETTINGS,
+  SystemSettings,
+  type SystemSettingValue,
+} from "@/lib/admin/system-settingspage";
 import { SystemSetting } from "@prisma/client";
+import { normalizeAnalyticsTimeZone } from "@/lib/analytics-timezone";
 
 export async function GET() {
   try {
     const settings = await prisma.systemSetting.findMany();
-    
-    // Convert DB records to SystemSettings format
+
     const formattedSettings = settings.reduce((acc: Partial<SystemSettings>, setting: SystemSetting) => {
-      // Convert DB value to SystemSettingValue format
-      const dbValue = setting.value as { enabled: boolean; value: string | number | boolean };
+      const dbValue = setting.value as unknown;
+      const defaultSetting = DEFAULT_SETTINGS[setting.key as keyof SystemSettings] as SystemSettingValue | undefined;
+      const hasWrappedValue =
+        dbValue !== null &&
+        typeof dbValue === "object" &&
+        !Array.isArray(dbValue) &&
+        "value" in dbValue;
+
+      const rawSetting = hasWrappedValue
+        ? dbValue as Partial<SystemSettingValue>
+        : { enabled: defaultSetting?.enabled ?? true, value: dbValue };
+
       const settingValue: SystemSettingValue = {
-        enabled: dbValue.enabled ?? true,
-        value: dbValue.value
+        enabled: rawSetting.enabled ?? defaultSetting?.enabled ?? true,
+        value: (rawSetting.value ?? defaultSetting?.value) as any
       };
+
       return {
         ...acc,
         [setting.key]: settingValue
       };
-    }, {} as SystemSettings);
+    }, { ...DEFAULT_SETTINGS } as Partial<SystemSettings>);
 
     return NextResponse.json(formattedSettings);
   } catch (error) {
@@ -34,10 +49,22 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const { settings } = await req.json() as { settings: Record<string, SystemSettingValue> };
+    const sanitizedSettings = Object.entries(settings).reduce<Record<string, SystemSettingValue>>((acc, [key, value]) => {
+      if (key === 'analyticsTimeZone') {
+        acc[key] = {
+          ...value,
+          value: normalizeAnalyticsTimeZone(value.value),
+        };
+        return acc;
+      }
+
+      acc[key] = value;
+      return acc;
+    }, {});
 
     // Update settings in parallel
     await Promise.all(
-      Object.entries(settings).map(([key, value]) =>
+      Object.entries(sanitizedSettings).map(([key, value]) =>
         prisma.systemSetting.upsert({
           where: { key },
           create: {

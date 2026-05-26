@@ -6,12 +6,23 @@ import { CropImageDialog } from "@/components/CropImageDialog";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 interface ImageUploaderProps {
   onImagePrepared: (imageData: { file: File, preview: string }) => void;
   aspectRatio?: number;
   username?: string;
   hidePreview?: boolean;
+  textOverrides?: Partial<{
+    imageCropRequired: string;
+    imageLoadFailed: string;
+    imageReady: string;
+    imageProcessFailed: string;
+    imageDropHint: string;
+    imageFileGuide: string;
+    recrop: string;
+    cropCancelled: string;
+  }>;
 }
 
 export function ImageUploader({
@@ -19,11 +30,15 @@ export function ImageUploader({
   aspectRatio = 2/3,
   username,
   hidePreview = false,
+  textOverrides,
 }: ImageUploaderProps) {
   const [cropImageUrl, setCropImageUrl] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const { toast } = useToast();
+  const tUploader = useTranslations('VideoUploader');
   const [uploadFileName, setUploadFileName] = useState<string>('');
+  const getText = (key: keyof NonNullable<ImageUploaderProps['textOverrides']>) =>
+    textOverrides?.[key] || tUploader(key);
 
   const handleFileSelect = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     console.log('File input change event:', event);
@@ -37,11 +52,11 @@ export function ImageUploader({
       console.log('FileReader loaded');
       setCropImageUrl(reader.result as string);
       toast({
-        description: "이미지를 크롭해주세요.",
+        description: getText('imageCropRequired'),
       });
     };
     reader.readAsDataURL(file);
-  }, [toast]);
+  }, [toast, tUploader, textOverrides]);
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     console.log('onDrop called with files:', acceptedFiles);
@@ -60,7 +75,7 @@ export function ImageUploader({
       console.log('Setting cropImageUrl:', result.substring(0, 50) + '...');
       setCropImageUrl(result);
       toast({
-        description: "이미지를 크롭해주세요.",
+        description: getText('imageCropRequired'),
       });
     };
 
@@ -68,13 +83,13 @@ export function ImageUploader({
       console.error('FileReader error:', error);
       toast({
         variant: "destructive",
-        description: "이미지 로드에 실패했습니다.",
+        description: getText('imageLoadFailed'),
       });
     };
 
     console.log('Starting to read file:', file.name);
     reader.readAsDataURL(file);
-  }, [toast]);
+  }, [toast, tUploader, textOverrides]);
 
   const handleCrop = async (croppedImage: string) => {
     try {
@@ -96,13 +111,13 @@ export function ImageUploader({
       });
   
       toast({
-        description: "이미지가 준비되었습니다.",
+        description: getText('imageReady'),
       });
     } catch (error) {
       console.error("이미지 처리 실패:", error);
       toast({
         variant: "destructive",
-        description: "이미지 처리에 실패했습니다.",
+        description: getText('imageProcessFailed'),
       });
     } finally {
       setCropImageUrl(null);
@@ -135,10 +150,10 @@ export function ImageUploader({
           onChange={handleFileSelect}
         />
         <p className="text-xs text-muted-foreground">
-          이미지를 드래그하거나 클릭하여 선택하세요
+          {getText('imageDropHint')}
           <br />
           <span className="text-xs text-gray-500">
-            (최대 5MB, JPG/PNG/WebP)
+            ({getText('imageFileGuide')})
           </span>
         </p>
       </div>
@@ -159,14 +174,14 @@ export function ImageUploader({
               e.stopPropagation();
               setCropImageUrl(previewUrl);
               toast({
-                description: "이미지를 다시 크롭해주세요.",
+                description: getText('imageCropRequired'),
               });
             }}
             className="absolute top-2 right-2"
             variant="secondary"
             size="sm"
           >
-            다시 크롭하기
+            {getText('recrop')}
           </Button>
         </div>
       )}
@@ -178,7 +193,7 @@ export function ImageUploader({
             console.log('CropImageDialog onClose called');
             setCropImageUrl(null);
             toast({
-              description: "크롭이 취소되었습니다.",
+              description: getText('cropCancelled'),
             });
           }}
           imageUrl={cropImageUrl}

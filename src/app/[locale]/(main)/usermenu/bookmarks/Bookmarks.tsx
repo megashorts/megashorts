@@ -7,9 +7,11 @@ import PostsLoadingSkeleton from "@/components/posts/PostsLoadingSkeleton";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import kyInstance from "@/lib/ky";
 import { PostsPage } from "@/lib/types";
+import { useTranslations } from "next-intl";
 
 export default function Bookmarks() {
   const { user } = useSession();
+  const tUserMenu = useTranslations('UserMenu');
 
   const {
     data,
@@ -42,7 +44,7 @@ export default function Bookmarks() {
           />
         </div>
         <p className="text-lg text-muted-foreground text-center font-medium">
-          로그인이 필요한 메뉴입니다
+          {tUserMenu('loginRequiredMenu')}
         </p>
       </div>
     );
@@ -55,7 +57,7 @@ export default function Bookmarks() {
   if (status === "success" && !initialPosts.length) {
     return (
       <p className="text-center text-muted-foreground mt-8">
-        목록 컨텐츠가 아직 없습니다.
+        {tUserMenu('emptyList')}
       </p>
     );
   }
@@ -63,7 +65,7 @@ export default function Bookmarks() {
   if (status === "error") {
     return (
       <p className="text-center text-destructive mt-8">
-        컨텐츠를 불러오는 중 오류가 발생했습니다.
+        {tUserMenu('loadError')}
       </p>
     );
   }

@@ -1,3 +1,5 @@
+@import "maplibre-gl/dist/maplibre-gl.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -267,4 +269,66 @@ nav ul li a:hover::after {
 .led-red {
   background-color: #dc3545;
   box-shadow: 0 0 10px #dc3545;
+}
+
+html.pwa-standalone,
+html.pwa-standalone body {
+  background: #000;
+  overscroll-behavior-y: none;
+}
+
+html.pwa-mobile body {
+  min-height: 100dvh;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pwa-recommended-page {
+  height: 100dvh;
+  padding-top: env(safe-area-inset-top);
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  touch-action: pan-y;
+}
+
+.pwa-recommended-slide {
+  height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  padding: 0;
+}
+
+html.pwa-video-screen header {
+  transition: opacity 220ms ease, transform 220ms ease;
+}
+
+html.pwa-video-chrome-hidden header {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-100%);
+}
+
+html.pwa-video-chrome-hidden .pwa-recommended-page {
+  padding: 0;
+}
+
+html.pwa-video-chrome-hidden .pwa-recommended-slide {
+  height: 100dvh;
+}
+
+.country-bubble-popup .maplibregl-popup-content {
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+}
+
+.country-bubble-popup .maplibregl-popup-tip {
+  border-top-color: #fff;
+  border-bottom-color: #fff;
+}
+
+.country-bubble-popup-card {
+  border-radius: 6px;
+  background: #fff;
+  color: #111827;
+  box-shadow: 0 8px 24px rgb(15 23 42 / 18%);
+  padding: 8px 10px;
 }

@@ -3,8 +3,14 @@ import prisma from "@/lib/prisma";
 import { getPostDataInclude } from "@/lib/types";
 import PostGrid from "@/components/PostGrid";
 import { SliderSetting } from "@/lib/sliderSettings";
+import { getLocale } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
+import { getContentLanguagePolicy, getContentLanguageWhere } from "@/lib/content-language-server";
+import { unstable_cache } from "next/cache";
+import { CONTENT_TAGS } from "@/lib/content-revalidation";
 
 export const revalidate = false;
+export const dynamic = "force-static";
 
 export async function generateStaticParams() {
   try {
@@ -33,10 +39,16 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ encodedCategories: string }> }) {
   const { encodedCategories } = await params;
   const categories = encodedCategories.split('-') as CategoryType[];
+  const currentLocale = await getLocale();
+  const contentLanguagePolicy = await getContentLanguagePolicy();
+  const tCat = await getTranslations('Category');
+  const tContent = await getTranslations('Content');
+  const categoryTitle = categories.map((category) => tCat(category)).join(' & ');
   
   const posts = await prisma.post.findFirst({
     where: {
       status: 'PUBLISHED',
+      ...getContentLanguageWhere(currentLocale, contentLanguagePolicy),
       NOT: {
         categories: {
           hasSome: [CategoryType.MSPOST, CategoryType.NOTIFICATION]
@@ -56,8 +68,8 @@ export async function generateMetadata({ params }: { params: Promise<{ encodedCa
   }
 
   return {
-    title: `${categories.join(' & ')} 카테고리`,
-    description: `${categories.join(' & ')} 카테고리의 포스트 목록`
+    title: tContent('categoryTitle', { category: categoryTitle }),
+    description: tContent('categoryDescription', { category: categoryTitle })
   };
 }
 
@@ -68,32 +80,54 @@ export default async function CombinedCategoryPage({
 }) {
   const { encodedCategories } = await params;
   const categories = encodedCategories.split('-') as CategoryType[];
+  const currentLocale = await getLocale();
+  const contentLanguagePolicy = await getContentLanguagePolicy();
+  const tCat = await getTranslations('Category');
+  const tContent = await getTranslations('Content');
+  const categoryTitle = categories.map((category) => tCat(category)).join(' & ');
   
-  const posts = await prisma.post.findMany({
-    where: {
-      categories: {
-        hasEvery: categories // AND 조건으로 모든 카테고리를 포함하는 포스트만 선택
-      },
-      status: "PUBLISHED",
-      NOT: {
-        categories: {
-          hasSome: [CategoryType.MSPOST, CategoryType.NOTIFICATION]
-        }
-      }
+  const getCombinedCategoryPosts = unstable_cache(
+    async (locale: string, encoded: string, policy: typeof contentLanguagePolicy) => {
+      const parsedCategories = encoded.split("-") as CategoryType[];
+      return prisma.post.findMany({
+        where: {
+          ...getContentLanguageWhere(locale, policy),
+          categories: {
+            hasEvery: parsedCategories
+          },
+          status: "PUBLISHED",
+          NOT: {
+            categories: {
+              hasSome: [CategoryType.MSPOST, CategoryType.NOTIFICATION]
+            }
+          }
+        },
+        include: getPostDataInclude(""),
+        orderBy: {
+          createdAt: "desc"
+        },
+        take: 20
+      });
     },
-    include: getPostDataInclude(""),
-    orderBy: { 
-      createdAt: "desc"
-    },
-    take: 20
-  });
+    ["combined-category-page-posts"],
+    {
+      tags: [
+        CONTENT_TAGS.categories,
+        `content:locale:${currentLocale}`,
+        ...categories.map((category) => `content:category:${category}`),
+      ],
+      revalidate: false,
+    }
+  );
+
+  const posts = await getCombinedCategoryPosts(currentLocale, encodedCategories, contentLanguagePolicy);
 
   return (
     <main className="flex w-full min-w-0 gap-5">
       <div className="w-full min-w-0 space-y-2 mx-5 md:mx-1 lg:mx-1 xl:mx-1">
         <div className="rounded-xl bg-card p-2 sm:p-3 mx-auto shadow-sm">
           <h1 className="text-center text-base sm:text-xl font-bold">
-            {categories.join(' & ')} 카테고리
+            {tContent('categoryTitle', { category: categoryTitle })}
           </h1>
         </div>
         <PostGrid 

@@ -5,6 +5,7 @@ import { Play, Share2 } from "lucide-react";
 import { useToast } from "../ui/use-toast";
 import { PostData } from "@/lib/types";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 interface PublicActionsProps {
   post: PostData;  // userId 제거
@@ -12,17 +13,18 @@ interface PublicActionsProps {
 
 export default function PublicActions({ post }: PublicActionsProps) {
   const { toast } = useToast();
+  const tCommon = useTranslations('Common');
 
   const handleShare = async () => {
     try {
       await navigator.clipboard.writeText(`${window.location.origin}/posts/${post.id}`);
       toast({
-        description: 'URL이 복사되었습니다.'
+        description: tCommon('linkCopied')
       });
     } catch (err) {
       toast({
         variant: "destructive",
-        description: 'URL 복사에 실패했습니다.'
+        description: tCommon('copyFailed')
       });
     }
   };

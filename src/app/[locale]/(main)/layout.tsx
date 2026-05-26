@@ -18,14 +18,16 @@ export default function Layout({
   const { data: sessionData = { user: null, session: null } } = useQuery({
     queryKey: ['session'],
     queryFn: async () => {
+      if (typeof window === 'undefined') {
+        return { user: null, session: null };
+      }
       const res = await fetch('/api/auth/session');
       return res.json();
     },
-    // 불필요한 API 호출 방지 설정
-    refetchOnMount: false,      // 컴포넌트 마운트 시 자동 갱신 비활성화
-    refetchOnWindowFocus: false, // 윈도우 포커스 시 자동 갱신 비활성화
-    refetchOnReconnect: false,   // 네트워크 재연결 시 자동 갱신 비활성화
-    staleTime: Infinity,         // 데이터가 절대 오래된 것으로 간주되지 않도록 설정
+    refetchOnMount: true,        // 마운트 시 세션 상태 갱신 허용
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    staleTime: 0,                 // 클라이언트 마운트 시 즉시 검증되도록 staleTime을 0으로 설정
   });
 
   // 모바일에서 불필요한 포커스 방지
@@ -34,8 +36,8 @@ export default function Layout({
     const preventFocus = (e: Event) => {
       const target = e.target as HTMLElement;
       if (
-        target.tagName !== 'INPUT' && 
-        target.tagName !== 'TEXTAREA' && 
+        target.tagName !== 'INPUT' &&
+        target.tagName !== 'TEXTAREA' &&
         target.getAttribute('contenteditable') !== 'true' &&
         !target.closest('[role="searchbox"]') && // 검색 관련 요소 제외
         !target.closest('.video-container')  // 비디오 컨테이너 제외
@@ -45,14 +47,14 @@ export default function Layout({
         }
       }
     };
-  
+
     // capture만 사용
-    document.addEventListener('touchstart', preventFocus, { 
+    document.addEventListener('touchstart', preventFocus, {
       capture: true
     });
-    
+
     return () => {
-      document.removeEventListener('touchstart', preventFocus, { 
+      document.removeEventListener('touchstart', preventFocus, {
         capture: true
       });
     };

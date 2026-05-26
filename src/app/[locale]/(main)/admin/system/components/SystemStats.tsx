@@ -1,554 +1,415 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { formatNumber } from '@/lib/utils';
-import { getRecentIsoWeeks } from '@/lib/stats-period';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { 
-  BarChart, 
-  Users, 
-  UserCheck, 
-  Calendar, 
-  Coins, 
-  DollarSign, 
-  Play, 
-  Eye, 
-  TrendingUp 
-} from 'lucide-react';
+import { useEffect, useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
+import CountryBubbleMap from "@/components/stats/CountryBubbleMap";
+import { formatNumber } from "@/lib/utils";
+import { getCurrentStatsPeriod, getRecentStatsPeriods, inferStatsPeriodUnit, type StatsPeriodUnit } from "@/lib/stats-period";
+import { BarChart, Coins, DollarSign, Eye, Play, TrendingUp, Users } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+
+const unitLabels: Record<StatsPeriodUnit, string> = {
+  daily: "Day",
+  weekly: "Week",
+  monthly: "Month",
+};
 
 export function SystemStats() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const initialPeriod = searchParams.get('period') || 'current';
-  const [selectedPeriod, setSelectedPeriod] = useState<string>(initialPeriod);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const initialPeriod = searchParams.get("period") || getCurrentStatsPeriod("weekly");
+  const initialUnit = inferStatsPeriodUnit(initialPeriod);
+  const [periodUnit, setPeriodUnit] = useState<StatsPeriodUnit>(initialUnit);
+  const [selectedPeriod, setSelectedPeriod] = useState(initialPeriod === "current" ? getCurrentStatsPeriod(initialUnit) : initialPeriod);
+  const [cumulativeData, setCumulativeData] = useState<any>(null);
   const [statsData, setStatsData] = useState<any>(null);
-  const [weeklyData, setWeeklyData] = useState<any>(null);
+  const [reportData, setReportData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isCumulativeLoading, setIsCumulativeLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  // 기간 옵션
-  const recentPeriodOptions = getRecentIsoWeeks(8);
-  const periodOptions = recentPeriodOptions.some((option) => option.value === selectedPeriod || option.key === selectedPeriod)
-    ? recentPeriodOptions
-    : [
-        {
-          value: selectedPeriod,
-          key: selectedPeriod,
-          label: `직접 지정 주차 (${selectedPeriod})`,
-        },
-        ...recentPeriodOptions,
-      ];
+  const periodOptions = useMemo(() => {
+    const options = getRecentStatsPeriods(periodUnit, 12, "en");
+    return options.some((option) => option.value === selectedPeriod)
+      ? options
+      : [{ value: selectedPeriod, key: selectedPeriod, label: selectedPeriod }, ...options];
+  }, [periodUnit, selectedPeriod]);
 
-  // 통계 데이터 조회 함수
+  const updateUrl = (period: string, unit = periodUnit) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("tab", "stats");
+    params.set("period", period);
+    params.set("unit", unit);
+    router.push(`?${params.toString()}`, { scroll: false });
+  };
+
+  const fetchCumulative = async () => {
+    setIsCumulativeLoading(true);
+    try {
+      const [statsResponse, cfResponse] = await Promise.all([
+        fetch(`/api/stats/admin?period=all`, { cache: "no-store" }),
+        fetch(`/api/stats/cloudflare?period=all`, { cache: "no-store" }),
+      ]);
+      const statsResult = statsResponse.ok ? await statsResponse.json() : null;
+      const cfResult = cfResponse.ok ? await cfResponse.json() : null;
+      const nextStats = statsResult?.success ? statsResult.data : null;
+
+      if (cfResult?.success && nextStats) {
+        nextStats.viewerDistribution = cfResult.data?.viewerDistribution || [];
+        nextStats.cloudflareSource = cfResult.data?.source || "-";
+      }
+
+      setCumulativeData(nextStats);
+    } finally {
+      setIsCumulativeLoading(false);
+    }
+  };
+
   const fetchStatistics = async (period: string) => {
     setIsLoading(true);
     try {
-      // 관리자 통계 API 호출
-      const response = await fetch(`/api/stats/admin?period=${period}`);
-      
-      if (!response.ok) {
-        console.error(`API 호출 실패: ${response.status} ${response.statusText}`);
-        throw new Error(`통계 데이터 조회 실패: ${response.status} ${response.statusText}`);
-      }
-      
-      const result = await response.json();
-      
-      if (result.success) {
-        setStatsData(result.data);
-      } else {
-        console.error('통계 데이터 조회 실패:', result.error);
-      }
-      
-      // 주간 정산 데이터 조회 (현재가 아닌 경우)
-      if (period !== 'current') {
-        const weeklyResponse = await fetch(`/api/stats/reports?period=${period}`);
-        
-        if (weeklyResponse.ok) {
-          const weeklyResult = await weeklyResponse.json();
-          if (weeklyResult.success) {
-            setWeeklyData(weeklyResult.data);
-          }
-        } else {
-          console.error(`주간 정산 데이터 조회 실패: ${weeklyResponse.status} ${weeklyResponse.statusText}`);
-        }
-      } else {
-        setWeeklyData(null);
-      }
-      
-      // Cloudflare 통계 데이터 조회 (글로벌 접속자 지도 등)
-      try {
-        const cloudflareResponse = await fetch(`/api/stats/cloudflare?period=${period}`);
-        
-        if (cloudflareResponse.ok) {
-          const cloudflareResult = await cloudflareResponse.json();
-          if (cloudflareResult.success && cloudflareResult.data) {
-            // 기존 statsData에 Cloudflare 통계 데이터 추가
-            setStatsData((prevData: any) => ({
-              ...prevData,
-              viewerDistribution: cloudflareResult.data.viewerDistribution,
-              cloudflareStats: cloudflareResult.data
-            }));
-          }
-        }
-      } catch (cloudflareError) {
-        console.error('Cloudflare 통계 데이터 조회 실패:', cloudflareError);
-        // Cloudflare 통계 실패는 전체 통계 조회에 영향을 주지 않음
-      }
-      
-      setIsLoading(false);
-    } catch (error) {
-      console.error('통계 데이터 조회 실패:', error);
+      const [statsResponse, reportResponse] = await Promise.all([
+        fetch(`/api/stats/admin?period=${period}`, { cache: "no-store" }),
+        fetch(`/api/stats/reports?period=${period}`, { cache: "no-store" }),
+      ]);
+      const statsResult = statsResponse.ok ? await statsResponse.json() : null;
+      const reportResult = reportResponse.ok ? await reportResponse.json() : null;
+      const nextStats = statsResult?.success ? statsResult.data : null;
+
+      setStatsData(nextStats);
+      setReportData(reportResult?.success ? reportResult.data : null);
+    } finally {
       setIsLoading(false);
     }
   };
 
-  // 캐시 무효화 함수
-  const invalidateCache = async () => {
-    try {
-      if (confirm('모든 통계 캐시를 무효화하시겠습니까? 다음 조회 시 최신 데이터를 가져옵니다.')) {
-        const response = await fetch(`/api/stats/cache/invalidate`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          }
-        });
-        
-        if (response.ok) {
-          alert('캐시가 성공적으로 무효화되었습니다.');
-          // 데이터 다시 조회
-          fetchStatistics(selectedPeriod);
-        } else {
-          console.error(`캐시 무효화 실패: ${response.status} ${response.statusText}`);
-          alert(`캐시 무효화 중 오류가 발생했습니다: ${response.status} ${response.statusText}`);
-        }
-      }
-    } catch (error) {
-      console.error('캐시 무효화 오류:', error);
-      alert('캐시 무효화 중 오류가 발생했습니다.');
-    }
+  const handleUnitChange = (unit: StatsPeriodUnit) => {
+    const period = getCurrentStatsPeriod(unit);
+    setPeriodUnit(unit);
+    setSelectedPeriod(period);
+    updateUrl(period, unit);
+    fetchStatistics(period);
   };
 
-  // 기간 선택 시 호출
-  const handlePeriodChange = (value: string) => {
-    setSelectedPeriod(value);
-    const params = new URLSearchParams(searchParams);
-    params.set('period', value);
-    router.push(`?${params.toString()}`, { scroll: false });
-    fetchStatistics(value);
+  const handlePeriodChange = (period: string) => {
+    setSelectedPeriod(period);
+    updateUrl(period);
+    fetchStatistics(period);
   };
 
-  // 컴포넌트 마운트 시 데이터 조회
   useEffect(() => {
+    setMounted(true);
+    fetchCumulative();
     fetchStatistics(selectedPeriod);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const cards = [
+    { title: "Users", icon: Users, value: `${formatNumber(cumulativeData?.users?.total || 0)} / ${formatNumber(cumulativeData?.users?.yesterdayNew || 0)}`, note: "Total / Yesterday" },
+    { title: "Content", icon: BarChart, value: `${formatNumber(cumulativeData?.content?.totalPosts || 0)} / ${formatNumber(cumulativeData?.content?.totalVideos || 0)} / ${formatNumber(cumulativeData?.content?.totalPaidVideos || 0)}`, note: "Post / Videos / Paid" },
+    { title: "Paid Streaming", icon: Play, value: `${formatNumber(cumulativeData?.cumulative?.subscriptionViews ?? 0)} / ${formatNumber(cumulativeData?.cumulative?.coinViews ?? 0)}`, note: "Sub / Coin" },
+    { title: "Points", icon: Coins, value: `${formatNumber(cumulativeData?.cumulative?.revenuePoints || 0)} / ${formatNumber(cumulativeData?.cumulative?.creatorPaidPoints || 0)} / ${formatNumber(cumulativeData?.cumulative?.agencyPaidPoints || 0)}`, note: "Revenue Points / Creator / Agency" },
+    { title: "Revenue", icon: DollarSign, value: `${formatNumber(cumulativeData?.cumulative?.totalRevenue || 0)} / ${formatNumber(cumulativeData?.cumulative?.yesterdayRevenue || 0)}`, note: "Total Revenue / Yesterday" },
+  ];
+
+  if (!mounted) {
+    return <SystemStatsInitialSkeleton />;
+  }
+
   return (
-    <div className="space-y-6">
-      {/* 상단 통계 카드 - 첫 번째 줄 */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {isLoading ? (
-          // 로딩 중 스켈레톤 UI
+    <div className="space-y-2">
+      <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-5">
+        {isCumulativeLoading ? (
           <>
-            <Skeleton className="h-32 rounded-lg" />
-            <Skeleton className="h-32 rounded-lg" />
-            <Skeleton className="h-32 rounded-lg" />
-            <Skeleton className="h-32 rounded-lg" />
-          </>
-        ) : statsData ? (
-          <>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium flex items-center">
-                  <Users className="w-4 h-4 mr-2" />
-                  회원
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{formatNumber(statsData.users?.total || 0)}</div>
-                <p className="text-xs text-muted-foreground">
-                  누적 가입자 (오늘 +{statsData.users?.todayNew || 0}) / 탈퇴 {formatNumber(statsData.users?.deleted || 0)}
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium flex items-center">
-                  <UserCheck className="w-4 h-4 mr-2" />
-                  구독자
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {formatNumber((statsData.users?.weeklySubscribers || 0) + (statsData.users?.yearlySubscribers || 0))}
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  주간 {formatNumber(statsData.users?.weeklySubscribers || 0)} / 연간 {formatNumber(statsData.users?.yearlySubscribers || 0)}
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium flex items-center">
-                  <Coins className="w-4 h-4 mr-2" />
-                  코인
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{formatNumber(statsData.coins?.totalPurchased || 0)}</div>
-                <p className="text-xs text-muted-foreground">
-                  구매 수량 / 사용 {formatNumber(statsData.coins?.totalUsed || 0)}
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium flex items-center">
-                  <DollarSign className="w-4 h-4 mr-2" />
-                  매출
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{formatNumber(statsData.coins?.totalPurchaseAmount || 0)}</div>
-                <p className="text-xs text-muted-foreground">
-                  코인 구매 금액 (원)
-                </p>
-              </CardContent>
-            </Card>
+            <Skeleton className="h-28 rounded-lg" />
+            <Skeleton className="h-28 rounded-lg" />
+            <Skeleton className="h-28 rounded-lg" />
+            <Skeleton className="h-28 rounded-lg" />
+            <Skeleton className="h-28 rounded-lg" />
           </>
         ) : (
-          // 데이터 없음
-          <div className="col-span-4 text-center py-8">
-            <p className="text-muted-foreground">통계 데이터를 불러올 수 없습니다.</p>
-          </div>
+          cards.map((card) => {
+            const Icon = card.icon;
+            return (
+              <Card key={card.title}>
+                <CardHeader className="pb-2">
+                  <CardTitle className="flex items-center text-sm font-medium">
+                    <Icon className="mr-2 h-4 w-4" />
+                    {card.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{card.value}</div>
+                  <p className="mt-1 text-xs text-muted-foreground">{card.note}</p>
+                </CardContent>
+              </Card>
+            );
+          })
         )}
       </div>
 
-      {/* 상단 통계 카드 - 두 번째 줄 */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {isLoading ? (
-          // 로딩 중 스켈레톤 UI
-          <>
-            <Skeleton className="h-32 rounded-lg" />
-            <Skeleton className="h-32 rounded-lg" />
-            <Skeleton className="h-32 rounded-lg" />
-            <Skeleton className="h-32 rounded-lg" />
-          </>
-        ) : statsData ? (
-          <>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium flex items-center">
-                  <BarChart className="w-4 h-4 mr-2" />
-                  콘텐츠
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{formatNumber(statsData.content?.totalPosts || 0)}</div>
-                <p className="text-xs text-muted-foreground">
-                  전체 포스트 / 동영상 {formatNumber(statsData.content?.totalVideos || 0)}개 (유료 {formatNumber(statsData.content?.totalPaidVideos || 0)}개)
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium flex items-center">
-                  <Play className="w-4 h-4 mr-2" />
-                  스트리밍
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{formatNumber(statsData.views?.totalStreamingRequests || 0)}</div>
-                <p className="text-xs text-muted-foreground">
-                  누적 스트리밍 요청 수
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium flex items-center">
-                  <Eye className="w-4 h-4 mr-2" />
-                  유료 시청
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {formatNumber((statsData.views?.subscriptionViews || 0) + (statsData.views?.coinViews || 0))}
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  구독 {formatNumber(statsData.views?.subscriptionViews || 0)} / 코인 {formatNumber(statsData.views?.coinViews || 0)}
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium flex items-center">
-                  <TrendingUp className="w-4 h-4 mr-2" />
-                  오늘 시청
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{formatNumber(statsData.views?.todayViews || 0)}</div>
-                <p className="text-xs text-muted-foreground">
-                  오늘 발생한 시청 수
-                </p>
-              </CardContent>
-            </Card>
-          </>
-        ) : null}
-      </div>
-
-      {/* 글로벌 접속자 지도맵 */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center">
-            <span className="i-lucide-globe w-5 h-5 mr-2"></span>
-            글로벌 접속자 지도
+          <CardTitle className="flex items-center text-base">
+            <Eye className="mr-2 h-4 w-4" />
+            Global Streaming Map (Free + Paid)
           </CardTitle>
+          <p className="text-xs text-muted-foreground">Cumulative through the latest stored Cloudflare worker result. Timezone: Asia/Seoul.</p>
         </CardHeader>
         <CardContent>
-          <div className="h-[300px] bg-muted rounded-md flex items-center justify-center">
-            {isLoading ? (
-              <Skeleton className="w-full h-full rounded-md" />
-            ) : statsData?.viewerDistribution?.length ? (
-              <div id="global-map" className="w-full h-full relative rounded-md overflow-hidden">
-                <div
-                  className="absolute inset-0 bg-contain bg-center"
-                  style={{
-                    backgroundImage: 'url(/world-map.svg)',
-                    backgroundRepeat: 'no-repeat',
-                    backgroundPosition: 'center'
-                  }}
-                />
-                {statsData.viewerDistribution.map((item: any, index: number) => (
-                  <div
-                    key={`${item.country}-${index}`}
-                    className="absolute rounded-full bg-blue-600 shadow-lg"
-                    title={`${item.country}: ${formatNumber(item.count || item.minutes || 0)}`}
-                    style={{
-                      left: `${((item.longitude + 180) / 360) * 100}%`,
-                      top: `${((90 - item.latitude) / 180) * 100}%`,
-                      width: `${Math.max(6, Math.min(22, Number(item.count || item.minutes || 0) / 100))}px`,
-                      height: `${Math.max(6, Math.min(22, Number(item.count || item.minutes || 0) / 100))}px`,
-                      transform: 'translate(-50%, -50%)'
-                    }}
-                  />
-                ))}
-              </div>
-            ) : (
-              <p className="text-muted-foreground">저장된 Cloudflare 국가별 통계가 없습니다.</p>
-            )}
-          </div>
+          {isCumulativeLoading ? (
+            <Skeleton className="h-[360px] rounded-md" />
+          ) : (
+            <CountryBubbleMap
+              data={cumulativeData?.viewerDistribution || []}
+              metricLabel="Total streaming"
+              emptyLabel="No stored Cloudflare country stats available."
+            />
+          )}
         </CardContent>
       </Card>
 
-      {/* 랭킹 정보 */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {isLoading ? (
-          <>
-            <Skeleton className="h-64 rounded-lg" />
-            <Skeleton className="h-64 rounded-lg" />
-            <Skeleton className="h-64 rounded-lg" />
-          </>
-        ) : statsData?.topItems ? (
-          <>
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-sm">인기 포스트 TOP 5</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2">
-                  {statsData.topItems.posts?.map((post: any, index: number) => (
-                    <li key={post.id} className="flex justify-between items-center text-sm">
-                      <span className="flex items-center">
-                        <span className="w-5 text-center font-bold">{index + 1}</span>
-                        <span className="ml-2 truncate max-w-[150px]">{post.title}</span>
-                      </span>
-                      <span className="text-muted-foreground">{formatNumber(post.views)}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-sm">유료 시청 TOP 5</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2">
-                  {statsData.topItems.paidPosts?.map((post: any, index: number) => (
-                    <li key={post.id} className="flex justify-between items-center text-sm">
-                      <span className="flex items-center">
-                        <span className="w-5 text-center font-bold">{index + 1}</span>
-                        <span className="ml-2 truncate max-w-[150px]">{post.title}</span>
-                      </span>
-                      <span className="text-muted-foreground">{formatNumber(post.views)}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-sm">포인트 TOP 5 업로더</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2">
-                  {statsData.topItems.uploaders?.map((uploader: any, index: number) => (
-                    <li key={uploader.id} className="flex justify-between items-center text-sm">
-                      <span className="flex items-center">
-                        <span className="w-5 text-center font-bold">{index + 1}</span>
-                        <span className="ml-2 truncate max-w-[150px]">{uploader.name}</span>
-                      </span>
-                      <span className="text-muted-foreground">{formatNumber(uploader.points)}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-          </>
-        ) : null}
-      </div>
-
-      {/* 랭킹 정보 - 두 번째 줄 */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {isLoading ? (
-          <>
-            <Skeleton className="h-64 rounded-lg" />
-            <Skeleton className="h-64 rounded-lg" />
-            <Skeleton className="h-64 rounded-lg" />
-          </>
-        ) : statsData?.topItems ? (
-          <>
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-sm">포인트 TOP 5 영업자</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2">
-                  {statsData.topItems.agencyMembers?.map((member: any, index: number) => (
-                    <li key={member.id} className="flex justify-between items-center text-sm">
-                      <span className="flex items-center">
-                        <span className="w-5 text-center font-bold">{index + 1}</span>
-                        <span className="ml-2 truncate max-w-[150px]">{member.name}</span>
-                      </span>
-                      <span className="text-muted-foreground">{formatNumber(member.points)}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-sm">추천인 TOP 5</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2">
-                  {statsData.topItems.referrers?.map((referrer: any, index: number) => (
-                    <li key={referrer.id} className="flex justify-between items-center text-sm">
-                      <span className="flex items-center">
-                        <span className="w-5 text-center font-bold">{index + 1}</span>
-                        <span className="ml-2 truncate max-w-[150px]">{referrer.name}</span>
-                      </span>
-                      <span className="text-muted-foreground">{formatNumber(referrer.count)}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-sm">급상승 포스트</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2">
-                  {statsData.topItems.risingPosts?.map((post: any, index: number) => (
-                    <li key={post.id} className="flex justify-between items-center text-sm">
-                      <span className="flex items-center">
-                        <span className="w-5 text-center font-bold">{index + 1}</span>
-                        <span className="ml-2 truncate max-w-[150px]">{post.title}</span>
-                      </span>
-                      <span className="text-muted-foreground">+{formatNumber(post.growth)}%</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-          </>
-        ) : null}
-      </div>
-
-      {/* 정산 조회 필터 */}
       <Card>
         <CardHeader>
-          <CardTitle>정산 내역 조회</CardTitle>
+          <CardTitle className="text-base">Stored Statistics Lookup</CardTitle>
+          <p className="text-xs text-muted-foreground">Timezone: {statsData?.timezone || cumulativeData?.timezone || "Asia/Seoul"}</p>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-2 md:flex-row md:items-end">
+          <div className="grid grid-cols-3 gap-2 md:w-72">
+            {(Object.keys(unitLabels) as StatsPeriodUnit[]).map((unit) => (
+              <Button key={unit} variant={periodUnit === unit ? "default" : "outline"} onClick={() => handleUnitChange(unit)}>
+                {unitLabels[unit]}
+              </Button>
+            ))}
+          </div>
+          <div className="w-full md:max-w-sm">
+            <Select value={selectedPeriod} onValueChange={handlePeriodChange}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select period" />
+              </SelectTrigger>
+              <SelectContent>
+                {periodOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <Button onClick={() => fetchStatistics(selectedPeriod)}>Search</Button>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center text-base">
+            <TrendingUp className="mr-2 h-4 w-4" />
+            Stored Settlement Report
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col md:flex-row gap-4 mb-4">
-            <div className="w-full md:w-1/3">
-              <label className="text-sm font-medium mb-1 block">정산 주차</label>
-              <Select value={selectedPeriod} onValueChange={handlePeriodChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder="정산 주차 선택" />
-                </SelectTrigger>
-                <SelectContent>
-                  {periodOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex items-end gap-2">
-              <Button onClick={() => fetchStatistics(selectedPeriod)}>
-                조회
-              </Button>
-              <Button 
-                variant="outline" 
-                onClick={invalidateCache}
-              >
-                캐시 무효화
-              </Button>
-            </div>
-          </div>
-
-          {/* 조회 결과 */}
           {isLoading ? (
-            <Skeleton className="h-[200px] rounded-lg" />
-          ) : weeklyData ? (
-            <div className="border rounded-md">
-              <div className="grid grid-cols-4 gap-4 p-4 font-medium border-b">
-                <div>구분</div>
-                <div>항목</div>
-                <div>수량</div>
-                <div>포인트</div>
+            <Skeleton className="h-[220px] rounded-md" />
+          ) : reportData ? (
+            <div className="space-y-2">
+              <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
+                {(reportData.cards || []).map((item: any) => (
+                  <div key={item.title} className="rounded-md border p-4">
+                    <p className="text-sm font-medium">{item.title}</p>
+                    <p className="mt-2 text-xl font-semibold">{item.value}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">{item.note}</p>
+                  </div>
+                ))}
               </div>
-              {weeklyData.items?.map((item: any, index: number) => (
-                <div key={index} className="grid grid-cols-4 gap-4 p-4 border-b last:border-0">
-                  <div className="text-sm">{item.category || '-'}</div>
-                  <div className="text-sm">{item.name || '-'}</div>
-                  <div className="text-sm">{formatNumber(item.count || 0)}</div>
-                  <div className="text-sm">{formatNumber(item.points || 0)}</div>
-                </div>
-              ))}
-              {/* 합계 행 */}
-              <div className="grid grid-cols-4 gap-4 p-4 font-medium bg-muted">
-                <div>합계</div>
-                <div></div>
-                <div>{formatNumber(weeklyData.totalCount || 0)}</div>
-                <div>{formatNumber(weeklyData.totalPoints || 0)}</div>
-              </div>
+              <ReportList title="Top Paid Posts" items={reportData.topPaidPosts || reportData.items || []} />
+              <ViewBasisTable items={reportData.viewBasisDetails || []} />
+              <ReportList title="Top Creator Payouts" items={reportData.topCreators || []} nameKey="name" />
+              <ReportList title="Top Marketer Payouts (Excluding Masters)" items={reportData.topAgencyMembers || []} nameKey="name" />
+              <PostPayoutTable items={reportData.items || []} />
+              <BreakdownList title="Agency Payout by Type" items={reportData.agencyTypeBreakdown || []} />
+              <PayoutDetailTable title="Creator Payout Detail" items={reportData.creatorPayoutDetails || []} showPost />
+              <PayoutDetailTable title="Agency Payout Detail" items={reportData.agencyPayoutDetails || []} showPost />
             </div>
           ) : (
-            <div className="h-[200px] bg-muted rounded-md flex items-center justify-center">
-              <p className="text-muted-foreground">정산 주차를 선택하면 상세 내역이 표시됩니다.</p>
+            <div className="flex h-[220px] items-center justify-center rounded-md bg-muted p-4 text-sm text-muted-foreground">
+              No stored report result is available.
             </div>
           )}
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+function ViewBasisTable({ items }: { items: any[] }) {
+  return (
+    <div className="overflow-hidden rounded-md border">
+      <div className="border-b bg-muted p-3 text-sm font-medium">Paid View Basis Detail</div>
+      <div className="hidden grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_100px_80px_80px] gap-2 border-b bg-muted/60 p-3 text-sm font-medium md:grid">
+        <div>Post</div>
+        <div>Video</div>
+        <div>Method</div>
+        <div className="text-right">Viewers</div>
+        <div className="text-right">Views</div>
+      </div>
+      {items.length > 0 ? items.map((item: any, index: number) => (
+        <div key={`${item.postId}-${item.videoId}-${item.accessMethod}-${index}`} className="grid gap-2 border-b p-3 text-sm last:border-0 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_100px_80px_80px]">
+          <div className="min-w-0 truncate font-medium" title={item.postTitle || item.postId || "-"}>{item.postTitle || item.postId || "-"}</div>
+          <div className="min-w-0 truncate" title={item.videoId || "-"}>{item.videoLabel || item.videoId || "-"}</div>
+          <div className="truncate">{item.accessMethod || "-"}</div>
+          <div className="flex justify-between md:block md:text-right">
+            <span className="text-muted-foreground md:hidden">Viewers</span>
+            <span>{formatNumber(item.viewers || 0)}</span>
+          </div>
+          <div className="flex justify-between md:block md:text-right">
+            <span className="text-muted-foreground md:hidden">Views</span>
+            <span>{formatNumber(item.views || 0)}</span>
+          </div>
+        </div>
+      )) : (
+        <div className="p-3 text-sm text-muted-foreground">
+          No stored video-level view detail rows. This appears after viewgroup writes `grouped_view_details`.
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PostPayoutTable({ items }: { items: any[] }) {
+  return (
+    <div className="overflow-hidden rounded-md border">
+      <div className="hidden grid-cols-[minmax(0,1.5fr)_100px_100px_110px] gap-2 border-b bg-muted p-3 text-sm font-medium md:grid">
+        <div>Post</div>
+        <div className="text-right">Sub Views</div>
+        <div className="text-right">Coin Views</div>
+        <div className="text-right">Points</div>
+      </div>
+      {items.map((item: any) => (
+        <div key={item.id || item.title} className="grid gap-2 border-b p-3 text-sm last:border-0 md:grid-cols-[minmax(0,1.5fr)_100px_100px_110px]">
+          <div className="min-w-0 truncate font-medium" title={item.title || item.id || "-"}>{item.title || item.id || "-"}</div>
+          <div className="flex justify-between md:block md:text-right">
+            <span className="text-muted-foreground md:hidden">Sub Views</span>
+            <span>{formatNumber(item.subscriptionViews || 0)}</span>
+          </div>
+          <div className="flex justify-between md:block md:text-right">
+            <span className="text-muted-foreground md:hidden">Coin Views</span>
+            <span>{formatNumber(item.coinViews || 0)}</span>
+          </div>
+          <div className="flex justify-between md:block md:text-right">
+            <span className="text-muted-foreground md:hidden">Points</span>
+            <span>{formatNumber(item.points || 0)} P</span>
+          </div>
+        </div>
+      ))}
+      <div className="grid gap-2 bg-muted p-3 text-sm font-medium md:grid-cols-[minmax(0,1.5fr)_100px_100px_110px]">
+        <div>Total</div>
+        <div className="md:text-right">{formatNumber(items.reduce((sum: number, item: any) => sum + Number(item.subscriptionViews || 0), 0))}</div>
+        <div className="md:text-right">{formatNumber(items.reduce((sum: number, item: any) => sum + Number(item.coinViews || 0), 0))}</div>
+        <div className="md:text-right">{formatNumber(items.reduce((sum: number, item: any) => sum + Number(item.points || 0), 0))} P</div>
+      </div>
+    </div>
+  );
+}
+
+function BreakdownList({ title, items }: { title: string; items: any[] }) {
+  return (
+    <div className="rounded-md border">
+      <div className="border-b bg-muted p-3 text-sm font-medium">{title}</div>
+      {items.length > 0 ? (
+        <div className="divide-y">
+          {items.map((item: any) => (
+            <div key={item.id || item.label} className="grid grid-cols-[minmax(0,1fr)_90px_90px_110px] gap-2 p-3 text-sm">
+              <div className="min-w-0 truncate" title={item.label || item.id}>{item.label || item.id}</div>
+              <div className="text-right">{formatNumber(item.subscriptionViews || 0)}</div>
+              <div className="text-right">{formatNumber(item.coinViews || 0)}</div>
+              <div className="text-right">{formatNumber(item.points || 0)} P</div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="p-3 text-sm text-muted-foreground">No stored agency payout rows.</div>
+      )}
+    </div>
+  );
+}
+
+function PayoutDetailTable({ title, items, showPost = false }: { title: string; items: any[]; showPost?: boolean }) {
+  const desktopGrid = showPost
+    ? "md:grid-cols-[minmax(0,1.1fr)_120px_minmax(0,1.2fr)_80px_80px_100px]"
+    : "md:grid-cols-[minmax(0,1.2fr)_140px_80px_80px_110px]";
+
+  return (
+    <div className="overflow-hidden rounded-md border">
+      <div className="border-b bg-muted p-3 text-sm font-medium">{title}</div>
+      <div className={`hidden gap-2 border-b bg-muted/60 p-3 text-sm font-medium md:grid ${desktopGrid}`}>
+        <div>Recipient</div>
+        <div>Type</div>
+        {showPost && <div>Post</div>}
+        <div className="text-right">Sub</div>
+        <div className="text-right">Coin</div>
+        <div className="text-right">Points</div>
+      </div>
+      {items.length > 0 ? items.map((item: any, index: number) => (
+        <div key={`${item.recipientId}-${item.postId}-${item.type}-${index}`} className={`grid gap-2 border-b p-3 text-sm last:border-0 ${desktopGrid}`}>
+          <div className="min-w-0 truncate font-medium" title={item.recipientName || item.recipientId || "-"}>{item.recipientName || item.recipientId || "-"}</div>
+          <div className="truncate" title={item.label || item.type || "-"}>{item.label || item.type || "-"}</div>
+          {showPost && <div className="min-w-0 truncate" title={item.postTitle || item.postId || "-"}>{item.postTitle || item.postId || "-"}</div>}
+          <div className="flex justify-between md:block md:text-right">
+            <span className="text-muted-foreground md:hidden">Sub</span>
+            <span>{formatNumber(item.subscriptionViews || 0)}</span>
+          </div>
+          <div className="flex justify-between md:block md:text-right">
+            <span className="text-muted-foreground md:hidden">Coin</span>
+            <span>{formatNumber(item.coinViews || 0)}</span>
+          </div>
+          <div className="flex justify-between md:block md:text-right">
+            <span className="text-muted-foreground md:hidden">Points</span>
+            <span>{formatNumber(item.totalPoints || 0)} P</span>
+          </div>
+        </div>
+      )) : (
+        <div className="p-3 text-sm text-muted-foreground">No stored payout detail rows.</div>
+      )}
+    </div>
+  );
+}
+
+function SystemStatsInitialSkeleton() {
+  return (
+    <div className="space-y-2">
+      <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-5">
+        <Skeleton className="h-28 rounded-lg" />
+        <Skeleton className="h-28 rounded-lg" />
+        <Skeleton className="h-28 rounded-lg" />
+        <Skeleton className="h-28 rounded-lg" />
+        <Skeleton className="h-28 rounded-lg" />
+      </div>
+      <Skeleton className="h-[360px] rounded-lg" />
+      <Skeleton className="h-24 rounded-lg" />
+      <Skeleton className="h-[260px] rounded-lg" />
+    </div>
+  );
+}
+
+function ReportList({ title, items, nameKey = "title" }: { title: string; items: any[]; nameKey?: string }) {
+  return (
+    <div className="rounded-md border">
+      <div className="border-b bg-muted p-3 text-sm font-medium">{title}</div>
+      <div className="divide-y">
+        {items.length > 0 ? items.slice(0, 5).map((item, index) => (
+          <div key={`${item.id || item[nameKey] || index}`} className="grid grid-cols-[32px_minmax(0,1fr)_90px_90px] gap-2 p-3 text-sm">
+            <div className="text-muted-foreground">{index + 1}</div>
+            <div className="min-w-0 truncate" title={item[nameKey] || item.id || "-"}>{item[nameKey] || item.id || "-"}</div>
+            <div className="text-right">{formatNumber(item.views || item.totalViews || 0)}</div>
+            <div className="text-right">{formatNumber(item.points || item.totalPoints || 0)} P</div>
+          </div>
+        )) : (
+          <div className="p-3 text-sm text-muted-foreground">No stored result.</div>
+        )}
+      </div>
     </div>
   );
 }

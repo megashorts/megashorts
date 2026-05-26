@@ -1,7 +1,9 @@
 import { validateRequest } from "@/auth";
 import { USER_ROLE } from "@/lib/constants";
-import { assertStatsAccess, getWeeklyAgencySettlement, getWeeklyCreatorSettlement } from "@/lib/stats-queries";
+import { formatStoredAgencyDetails, formatStoredCreatorDetails } from "@/lib/stored-stats-formatters";
+import { assertStatsAccess } from "@/lib/stats-queries";
 import { fetchCommissionSummaryFromWorker } from "@/lib/worker-stats";
+import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -24,43 +26,55 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
       }
 
-      const fallback = await getWeeklyAgencySettlement(userId!, period);
       const workerSummary = await fetchCommissionSummaryFromWorker({
         scope: "agency",
         userId: userId!,
         period,
       });
-      const team = workerSummary?.teamSummary;
+      const detail = formatStoredAgencyDetails(workerSummary, period);
+      const postIds = Array.isArray(detail.items) ? detail.items.map((item: any) => item.postId).filter(Boolean) : [];
+      const posts = postIds.length > 0
+        ? await prisma.post.findMany({ where: { id: { in: postIds } }, select: { id: true, title: true, postNum: true } })
+        : [];
+      const postMap = new Map(posts.map((post) => [post.id, post.title || `Post #${post.postNum}`]));
 
       return NextResponse.json({
         success: true,
         data: {
-          ...fallback,
-          source: workerSummary?.source || "postgres",
-          totalPoints: team?.teamTotal ?? fallback.totalPoints,
-          totalMembers:
-            (team?.creators?.userCount || 0) +
-            (team?.directReferrers?.userCount || 0) +
-            (team?.indirectReferrers?.userCount || 0) || fallback.totalMembers,
+          ...detail,
+          items: Array.isArray(detail.items)
+            ? detail.items.map((item: any) => ({
+                ...item,
+                postTitle: postMap.get(item.postId) || item.postId,
+              }))
+            : [],
         },
       });
     }
 
-    const fallback = await getWeeklyCreatorSettlement(userId!, period);
     const workerSummary = await fetchCommissionSummaryFromWorker({
       scope: "creator",
       userId: userId!,
       period,
     });
-    const creator = workerSummary?.creator;
+
+    const detail = formatStoredCreatorDetails(workerSummary, period);
+    const postIds = Array.isArray(detail.items) ? detail.items.map((item: any) => item.postId).filter(Boolean) : [];
+    const posts = postIds.length > 0
+      ? await prisma.post.findMany({ where: { id: { in: postIds } }, select: { id: true, title: true, postNum: true } })
+      : [];
+    const postMap = new Map(posts.map((post) => [post.id, post.title || `Post #${post.postNum}`]));
 
     return NextResponse.json({
       success: true,
       data: {
-        ...fallback,
-        source: workerSummary?.source || "postgres",
-        totalViewCount: creator?.totalViews ?? fallback.totalViewCount,
-        totalPoints: creator?.totalPoints ?? fallback.totalPoints,
+        ...detail,
+        items: Array.isArray(detail.items)
+          ? detail.items.map((item: any) => ({
+              ...item,
+              postTitle: postMap.get(item.postId) || item.postTitle,
+            }))
+          : [],
       },
     });
   } catch (error) {

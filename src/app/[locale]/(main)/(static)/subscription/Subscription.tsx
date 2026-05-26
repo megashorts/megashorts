@@ -1,17 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import Image from "next/image";
-import PaymentModal from "@/app/[locale]/(main)/usermenu/payments/PaymentModal";
-import BillingModal from "@/app/[locale]/(main)/usermenu/payments/BillingModal";
 import { SubscriptionButton } from "./SubscriptionButton";
 import { CoinPurchaseButton } from "./CoinPurchaseButton";
 import { useTranslations } from "next-intl";
+import { useToast } from "@/components/ui/use-toast";
+import {
+  DEFAULT_COIN_PACKAGES,
+  DEFAULT_SUBSCRIPTION_PACKAGES,
+  type CoinPackage,
+  type SubscriptionPackage,
+} from "@/lib/admin/system-settingspage";
 
 // 구독 정보 타입
 type SubscriptionPlanType = 'weekly' | 'yearly';
-type BillingType = SubscriptionPlanType | 'upgrade';
 
 interface SubscriptionPlan {
   type: SubscriptionPlanType;
@@ -22,47 +26,117 @@ interface SubscriptionPlan {
   description: string;
 }
 
+const toFiniteNumber = (value: unknown, fallback: number) => {
+  const parsed = typeof value === 'number' ? value : Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+};
+
+const getGlobalPrice = (
+  pkg: Pick<SubscriptionPackage | CoinPackage, 'price' | 'globalPrice'>,
+  fallback: Pick<SubscriptionPackage | CoinPackage, 'price' | 'globalPrice'>,
+) => {
+  const fallbackGlobal = toFiniteNumber(fallback.globalPrice, toFiniteNumber(fallback.price, 0));
+  const directGlobal = toFiniteNumber(pkg.globalPrice, Number.NaN);
+  if (Number.isFinite(directGlobal)) return directGlobal;
+
+  const legacyPrice = toFiniteNumber(pkg.price, Number.NaN);
+  return Number.isFinite(legacyPrice) ? Number((legacyPrice / 1000).toFixed(2)) : fallbackGlobal;
+};
+
+const getOriginalPrice = (price: number) => Number((price * 1.2).toFixed(2));
+
 const SubscriptionPage = () => {
   const t = useTranslations('Subscription');
+  const { toast } = useToast();
+  const [pricing, setPricing] = useState<{
+    subscriptionPackages: SubscriptionPackage[];
+    coinPackages: CoinPackage[];
+  }>({
+    subscriptionPackages: DEFAULT_SUBSCRIPTION_PACKAGES,
+    coinPackages: DEFAULT_COIN_PACKAGES,
+  });
+
+  useEffect(() => {
+    let ignore = false;
+
+    fetch('/api/admin/settings', { cache: 'no-store' })
+      .then((response) => response.json())
+      .then((settings) => {
+        if (ignore) return;
+        const subscriptionPackages = settings?.subscriptionPackages?.value;
+        const coinPackages = settings?.coinPackages?.value;
+
+        setPricing({
+          subscriptionPackages: Array.isArray(subscriptionPackages) && subscriptionPackages.length > 0
+            ? subscriptionPackages
+            : DEFAULT_SUBSCRIPTION_PACKAGES,
+          coinPackages: Array.isArray(coinPackages) && coinPackages.length > 0
+            ? coinPackages
+            : DEFAULT_COIN_PACKAGES,
+        });
+      })
+      .catch(() => {
+        if (!ignore) {
+          setPricing({
+            subscriptionPackages: DEFAULT_SUBSCRIPTION_PACKAGES,
+            coinPackages: DEFAULT_COIN_PACKAGES,
+          });
+        }
+      });
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  const weeklyPackage = pricing.subscriptionPackages.find((pkg) => pkg.type === 'weekly') || DEFAULT_SUBSCRIPTION_PACKAGES[0];
+  const yearlyPackage = pricing.subscriptionPackages.find((pkg) => pkg.type === 'yearly') || DEFAULT_SUBSCRIPTION_PACKAGES[1];
 
   const subscriptionPlans: Record<'weekly' | 'yearly', SubscriptionPlan> = {
     weekly: {
       type: 'weekly',
       title: t('weeklyPayment'),
-      price: 8500,
-      originalPrice: 13000,
+      price: getGlobalPrice(weeklyPackage, DEFAULT_SUBSCRIPTION_PACKAGES[0]),
+      originalPrice: getOriginalPrice(getGlobalPrice(weeklyPackage, DEFAULT_SUBSCRIPTION_PACKAGES[0])),
       period: t('weeklyPeriod'),
       description: t('weeklyDesc')
     },
     yearly: {
       type: 'yearly',
       title: t('yearlyPayment'),
-      price: 190000,
-      originalPrice: 260000,
+      price: getGlobalPrice(yearlyPackage, DEFAULT_SUBSCRIPTION_PACKAGES[1]),
+      originalPrice: getOriginalPrice(getGlobalPrice(yearlyPackage, DEFAULT_SUBSCRIPTION_PACKAGES[1])),
       period: t('yearlyPeriod'),
       description: t('yearlyDesc')
     }
   }
 
-  // const [isWeekly, setIsweekly] = useState(true);
   const [selectedCoin, setSelectedCoin] = useState<number | null>(null);
-  const [showModal, setShowModal] = useState(false)
-  const [showBillingModal, setShowBillingModal] = useState(false)
-  // const searchParams = useSearchParams()
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlanType>('weekly');
-  const [billingType, setBillingType] = useState<BillingType>('weekly');
 
   interface CoinOption {
     value: number;
     price: number;
   }
 
-  const coinOptions: CoinOption[] = [    
-    { value: 10, price: 1_400 },
-    { value: 70, price: 10_000 },
-    { value: 350, price: 45000 },
-    { value: 700, price: 85000 }
-  ];
+  const coinOptions: CoinOption[] = pricing.coinPackages.map((option) => ({
+    value: toFiniteNumber(option.amount, 0),
+    price: getGlobalPrice(option, DEFAULT_COIN_PACKAGES[0]),
+  }));
+
+  const formatUsd = (value: number) => new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: value % 1 === 0 ? 0 : 2,
+    maximumFractionDigits: 2,
+  }).format(value);
+
+  const showPaymentPlaceholder = () => {
+    toast({
+      title: t('paymentPendingTitle'),
+      description: t('paymentPendingDescription'),
+    });
+  };
 
   return (
     <div className="overflow-hidden text-sm text-neutral-700 md:text-base pb-24">
@@ -118,7 +192,6 @@ const SubscriptionPage = () => {
           <div className="flex-1 flex flex-col justify-start ">
             <Tabs 
               defaultValue="weekly" 
-              // onValueChange={(value) => setIsweekly(value === "weekly")}
               onValueChange={(value) => setSelectedPlan(value as 'weekly' | 'yearly')}
             >
               <TabsList>
@@ -126,32 +199,22 @@ const SubscriptionPage = () => {
                 <TabsTrigger value="yearly">{t('yearlyPayment')}</TabsTrigger>
               </TabsList>
               <TabsContent value="weekly">
-                {/* {isWeekly && (
-                  <> */}
                     <p className="text-sm text-neutral-300 mt-5">🚩 {subscriptionPlans.weekly.description}</p>
                     <p className="text-sm text-neutral-300 mt-5">🚩 {subscriptionPlans.weekly.period} {t('autoPayment')}</p>
                     <h3 className=" text-neutral-300 font-bold mt-5">
-                      <span className="text-2xl font-normal text-white">{subscriptionPlans.weekly.price.toLocaleString()}{t('currency')} </span>
-                      <span className="text-sm line-through text-gray-500">{subscriptionPlans.weekly.originalPrice.toLocaleString()}{t('currency')}</span>
+                      <span className="text-2xl font-normal text-white">{formatUsd(subscriptionPlans.weekly.price)} </span>
+                      <span className="text-sm line-through text-gray-500">{formatUsd(subscriptionPlans.weekly.originalPrice)}</span>
                       <span className="text-sm"> / {subscriptionPlans.weekly.period}</span>
                     </h3>
-                  {/* </> */}
-                {/* )} */}
               </TabsContent>
               <TabsContent value="yearly">
-                {/* {!isWeekly && (
-                  <> */}
                     <p className="text-sm text-neutral-300 mt-5">🚩 {subscriptionPlans.yearly.description}</p>
                     <p className="text-sm text-neutral-300 mt-5">🚩 {subscriptionPlans.yearly.period} {t('autoPayment')}</p>
                     <h3 className=" text-neutral-300 font-bold mt-5">
-                      {/* <span className="text-2xl font-normal text-white">{subscriptionPlans.yearly.price.toLocaleString()}{t('currency')} </span>
-                      <span className="text-sm line-through text-gray-500">{subscriptionPlans.yearly.originalPrice.toLocaleString()}{t('currency')}</span> */}
-                      <span className="text-2xl font-normal text-white">190,000{t('currency')} </span>
-                      <span className="text-sm line-through text-gray-500">260,000{t('currency')}</span>
+                      <span className="text-2xl font-normal text-white">{formatUsd(subscriptionPlans.yearly.price)} </span>
+                      <span className="text-sm line-through text-gray-500">{formatUsd(subscriptionPlans.yearly.originalPrice)}</span>
                       <span className="text-sm"> / {subscriptionPlans.yearly.period}</span>
                     </h3>
-                  {/* </>
-                )} */}
               </TabsContent>
             </Tabs>
           </div>
@@ -159,32 +222,8 @@ const SubscriptionPage = () => {
             <SubscriptionButton
               type={selectedPlan}
               title={subscriptionPlans[selectedPlan].title}
-              onSubscribe={(type) => {
-                setBillingType(type);  // 실제 결제에 사용할 타입
-                setShowBillingModal(true);
-              }}
+              onSubscribe={showPaymentPlaceholder}
             />
-
-            {showBillingModal && (
-              <BillingModal
-                type={billingType}  // upgrade 타입이 포함된 billingType 사용
-                amount={subscriptionPlans[selectedPlan].price}
-                onClose={() => setShowBillingModal(false)}
-              />
-            )}
-
-            {/* <SubscriptionButton
-              type={selectedPlan}
-              title={subscriptionPlans[selectedPlan].title}
-              onSubscribe={() => setShowBillingModal(true)}
-            />
-            {showBillingModal && (
-              <BillingModal
-                type={selectedPlan}
-                amount={subscriptionPlans[selectedPlan].price}
-                onClose={() => setShowBillingModal(false)}
-              />
-            )} */}
 
             <p className="mt-3 text-xs dark:text-white text-center">{t('highlyRecommended')}</p>
           </div>
@@ -214,9 +253,9 @@ const SubscriptionPage = () => {
                       onChange={(e) => setSelectedCoin(Number(e.target.value))}
                       className="form-radio h-4 w-4 text-sm text-white"
                     />
-                    <span className="flex-1 flex justify-between text-sm text-neutral-300">
-                      <span>{option.value}{t('coins')}</span>
-                      <span>{option.price.toLocaleString()}{t('currency')}</span>
+                      <span className="flex-1 flex justify-between text-sm text-neutral-300">
+                        <span>{option.value}{t('coins')}</span>
+                      <span>{formatUsd(option.price)}</span>
                     </span>
                   </label>
                 ))}
@@ -225,33 +264,9 @@ const SubscriptionPage = () => {
             </div>
           </div>
           <div className="mt-auto flex flex-col">
-
-            {/* <Button>
-              <Link href={"/usermenu/payments"}>
-                결제
-              </Link>
-            </Button> */}
-
-            {/* <Button 
-              onClick={() => {
-                if (!selectedCoin) return
-                setShowModal(true)  // 모달 열기
-              }}
-            >
-              {selectedCoin ? `${selectedCoin}코인 구매` : '수량을 선택해주세요'}
-            </Button> */}
-
-            {/* <Button 
-              onClick={() => setShowModal(true)}
-              disabled={!selectedCoin}
-              className="mt-4 w-full"
-            >
-              {selectedCoin ? `${selectedCoin}코인 구매` : '수량을 선택해주세요'}
-            </Button> */}
-
             <CoinPurchaseButton
               selectedCoin={selectedCoin}
-              onPurchase={() => setShowModal(true)}
+              onPurchase={showPaymentPlaceholder}
             />
 
             <p className="mt-3 text-xs dark:text-neutral-400 text-center">
@@ -260,13 +275,6 @@ const SubscriptionPage = () => {
           </div>
         </div>
       </div>
-      {showModal && selectedCoin && (
-        <PaymentModal
-          paymentAmount={coinOptions.find(opt => opt.value === selectedCoin)?.price || 0}
-          coins={selectedCoin}
-          onClose={() => setShowModal(false)}
-        />
-      )}
     </div>
   );
 };

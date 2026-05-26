@@ -82,14 +82,14 @@ export function MainSettings() {
       });
 
       toast({
-        title: "포스트 업데이트 완료",
-        description: "추천 포스트가 해제되었습니다.",
+        title: "Post Updated",
+        description: "Featured post removed.",
       });
     } catch (error) {
       console.error('Failed to unfeature post:', error);
       toast({
-        title: "업데이트 실패",
-        description: "포스트 업데이트에 실패했습니다.",
+        title: "Update Failed",
+        description: "Failed to update the post.",
         variant: "destructive",
       });
     }
@@ -138,8 +138,8 @@ export function MainSettings() {
       } catch (error) {
         console.error('Failed to load slider settings:', error);
         toast({
-          title: "설정 로드 실패",
-          description: "슬라이더 설정을 불러오는데 실패했습니다.",
+          title: "Failed to Load Settings",
+          description: "Failed to load slider settings.",
           variant: "destructive",
         });
       } finally {
@@ -230,7 +230,7 @@ export function MainSettings() {
     const newSlider: SliderSetting = {
       id: generateSliderId('category', [], order),
       type: 'category',
-      title: "새 카테고리 슬라이더",
+      title: "New Category Slider",
       postCount: defaultSliderSettings.category.postCount,
       categories: [], // 빈 배열로 설정 (null 대신)
       order,
@@ -246,7 +246,7 @@ export function MainSettings() {
     const newSlider: SliderSetting = {
       id: generateSliderId('latest', [], order),
       type: 'latest',
-      title: "새 최근포스트 슬라이더",
+      title: "New Latest Posts Slider",
       postCount: defaultSliderSettings.category.postCount,
       categories: [], // 빈 배열로 설정 (null 대신)
       order,
@@ -262,7 +262,7 @@ export function MainSettings() {
     const newSlider: SliderSetting = {
       id: generateSliderId('ranked', undefined, order),
       type: 'ranked',
-      title: "랭킹 슬라이더", // 기본 타이틀 (사용자가 변경 가능)
+      title: "Ranked Slider", // 기본 타이틀 (사용자가 변경 가능)
       postCount: defaultSliderSettings.ranked.postCount,
       rankingType: defaultSliderSettings.ranked.rankingType, // 'likes'로 기본 설정됨
       order,
@@ -277,14 +277,14 @@ export function MainSettings() {
     try {
       await saveMainSliderSettings(sliders);
       toast({
-        title: "설정 저장 완료",
-        description: "슬라이더 설정이 저장되었습니다.",
+        title: "Settings Saved",
+        description: "Slider settings have been saved.",
       });
     } catch (error) {
       console.error('Failed to save slider settings:', error);
       toast({
-        title: "설정 저장 실패",
-        description: "슬라이더 설정 저장에 실패했습니다.",
+        title: "Failed to Save Settings",
+        description: "Failed to save slider settings.",
         variant: "destructive",
       });
     }
@@ -296,7 +296,7 @@ export function MainSettings() {
         <CardContent className="p-6">
           <div className="flex items-center justify-center">
             <Loader2 className="w-6 h-6 animate-spin" />
-            <p className="ml-2">설정을 불러오는 중...</p>
+            <p className="ml-2">Loading settings...</p>
           </div>
         </CardContent>
       </Card>
@@ -310,9 +310,9 @@ export function MainSettings() {
           {/* 슬라이더 설정 섹션 */}
           <div>
             <h5 className="text-base font-medium mb-2 mt-4">
-              슬라이더 관리
+              Slider Management
               <p className="text-xs text-muted-foreground">
-                # 포스트 숫자 / 슬라이더별 타이틀, 위치관리, 추가, 삭제.
+                # Post count / Title per slider, order management, add, delete.
               </p>
             </h5>
             <div className="space-y-2">
@@ -352,21 +352,21 @@ export function MainSettings() {
                   className="flex-1"
                   variant="outline"
                 >
-                  + 카테고리 슬라이더
+                  + Category Slider
                 </Button>
                 <Button
                   onClick={handleAddRankedSlider}
                   className="flex-1"
                   variant="outline"
                 >
-                  + 랭킹 슬라이더
+                  + Ranked Slider
                 </Button>
                 <Button
                   onClick={handleAddLatestSlider}
                   className="flex-1"
                   variant="outline"
                 >
-                  + 최근포스트 슬라이더
+                  + Latest Slider
                 </Button>
               </div>
             </div>
@@ -377,7 +377,7 @@ export function MainSettings() {
           {/* 추천 포스트 섹션 */}
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h5 className="text-base font-medium">추천 포스트 관리</h5>
+              <h5 className="text-base font-medium">Featured Posts Management</h5>
               <Button
                 variant="outline"
                 size="icon"
@@ -433,14 +433,14 @@ export function MainSettings() {
                     });
 
                     toast({
-                      title: "포스트 업데이트 완료",
-                      description: "추천 포스트가 추가되었습니다.",
+                      title: "Post Updated",
+                      description: "Featured post added.",
                     });
                   } catch (error) {
                     console.error('Failed to update posts:', error);
                     toast({
-                      title: "업데이트 실패",
-                      description: "포스트 업데이트에 실패했습니다.",
+                      title: "Update Failed",
+                      description: "Failed to update the post.",
                       variant: "destructive",
                     });
                   }

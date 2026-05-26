@@ -1,20 +1,10 @@
 import { validateRequest } from "@/auth";
 import { USER_ROLE } from "@/lib/constants";
+import { countryCenters, normalizeCountryCode } from "@/lib/country-centers";
 import prisma from "@/lib/prisma";
-import { fetchCfStatsFromWorker, periodDateKey } from "@/lib/worker-stats";
+import { inferStatsPeriodUnit, periodDateKey } from "@/lib/stats-period";
+import { fetchCfStatsFromWorker } from "@/lib/worker-stats";
 import { NextRequest, NextResponse } from "next/server";
-
-const countryCoordinates: Record<string, { latitude: number; longitude: number; country: string }> = {
-  KR: { country: "KR", latitude: 36.5, longitude: 127.8 },
-  US: { country: "US", latitude: 39.8, longitude: -98.6 },
-  CN: { country: "CN", latitude: 35.9, longitude: 104.2 },
-  JP: { country: "JP", latitude: 36.2, longitude: 138.3 },
-  TH: { country: "TH", latitude: 15.8, longitude: 101.0 },
-  ES: { country: "ES", latitude: 40.4, longitude: -3.7 },
-  ID: { country: "ID", latitude: -2.5, longitude: 118.0 },
-  VN: { country: "VN", latitude: 14.1, longitude: 108.3 },
-  SG: { country: "SG", latitude: 1.35, longitude: 103.8 },
-};
 
 export async function GET(request: NextRequest) {
   try {
@@ -27,23 +17,40 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const requestedUserId = searchParams.get("userId");
     const selectedPeriod = searchParams.get("period") || "current";
+    const fallbackPeriod = searchParams.get("fallbackPeriod") || undefined;
 
     if (requestedUserId && requestedUserId !== user.id && user.userRole < USER_ROLE.OPERATION1) {
       return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
     }
 
-    const cfPeriod = /^\d{4}-\d{2}$/.test(selectedPeriod)
-      ? "monthly"
-      : /^\d{4}-\d{2}-\d{2}$/.test(selectedPeriod)
-        ? "daily"
-        : "weekly";
-    const workerStats = await fetchCfStatsFromWorker({
+    const isAllPeriod = selectedPeriod === "all";
+    const cfPeriod = isAllPeriod ? "weekly" : inferStatsPeriodUnit(selectedPeriod);
+    let workerStats = await fetchCfStatsFromWorker({
       period: cfPeriod,
-      date: periodDateKey(selectedPeriod),
+      date: isAllPeriod ? "all" : periodDateKey(selectedPeriod, cfPeriod),
+      creator: requestedUserId || undefined,
     });
-    const workerCountries = Array.isArray(workerStats?.topCountries) ? workerStats.topCountries : null;
+    let workerCountries = Array.isArray(workerStats?.topCountries) ? workerStats.topCountries : null;
 
-    const stored = workerCountries ? null : await prisma.systemSetting.findFirst({
+    if (requestedUserId && isAllPeriod && (!workerCountries || workerCountries.length === 0) && fallbackPeriod && fallbackPeriod !== "all") {
+      const fallbackUnit = inferStatsPeriodUnit(fallbackPeriod);
+      const fallbackStats = await fetchCfStatsFromWorker({
+        period: fallbackUnit,
+        date: periodDateKey(fallbackPeriod, fallbackUnit),
+        creator: requestedUserId,
+      });
+      const fallbackCountries = Array.isArray(fallbackStats?.topCountries) ? fallbackStats.topCountries : null;
+
+      if (fallbackCountries && fallbackCountries.length > 0) {
+        workerStats = {
+          ...fallbackStats,
+          source: `${fallbackStats?.source || "stored_cf_stats"}_fallback_period`,
+        };
+        workerCountries = fallbackCountries;
+      }
+    }
+
+    const stored = workerCountries || requestedUserId ? null : await prisma.systemSetting.findFirst({
       where: {
         key: {
           startsWith: "cfStats_",
@@ -59,13 +66,16 @@ export async function GET(request: NextRequest) {
         : []);
     const viewerDistribution = topCountries
       .map((item: any) => {
-        const code = String(item.country || item.countryCode || "").toUpperCase();
-        const coords = countryCoordinates[code];
+        const code = normalizeCountryCode(item.country || item.countryCode);
+        const coords = countryCenters[code];
 
         if (!coords) return null;
 
         return {
-          ...coords,
+          country: coords.code,
+          countryName: coords.name,
+          latitude: coords.latitude,
+          longitude: coords.longitude,
           count: Number(item.count || item.requests || item.minutes || 0),
           minutes: Number(item.minutes || 0),
         };

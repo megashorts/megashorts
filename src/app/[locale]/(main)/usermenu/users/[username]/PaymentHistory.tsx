@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Payment } from '@prisma/client';
 import { Button } from '@/components/ui/button';
 import { Ban } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 interface PaymentHistoryProps {
   userId: string;
@@ -19,6 +20,9 @@ interface PaymentMetadata {
 }
 
 export default function PaymentHistory({ userId, isAdmin }: PaymentHistoryProps) {
+  const tPayments = useTranslations('Payments');
+  const tCommon = useTranslations('Common');
+  const tSubscription = useTranslations('Subscription');
   const { data: payments, refetch } = useQuery<Payment[]>({
     queryKey: ['payments', userId],
     queryFn: () => fetch(`/api/users/${userId}/payments`).then(res => res.json()),
@@ -26,7 +30,7 @@ export default function PaymentHistory({ userId, isAdmin }: PaymentHistoryProps)
   });
 
   const handleCancel = async (paymentKey: string) => {
-    if (!confirm('이 결제를 취소하시겠습니까?')) return;
+    if (!confirm(tSubscription('cancelConfirm'))) return;
 
     const res = await fetch('/api/payments/cancel', {
       method: 'POST',
@@ -44,23 +48,23 @@ export default function PaymentHistory({ userId, isAdmin }: PaymentHistoryProps)
     
     if (payment.type === 'coin' && metadata?.coins) {
       return {
-        title: `${metadata.coins}코인 구매`,
-        description: `${payment.amount.toLocaleString()}원`
+        title: tSubscription('buyAmountCoins', { amount: metadata.coins }),
+        description: `${payment.amount.toLocaleString()}${tSubscription('currency')}`
       };
     }
 
     if (metadata?.subscriptionType) {
-      const type = metadata.subscriptionType === 'weekly' ? '주간' : '연간';
-      const isAuto = metadata.isAutoPayment ? ' (자동결제)' : '';
+      const type = metadata.subscriptionType === 'weekly' ? tSubscription('weeklyPayment') : tSubscription('yearlyPayment');
+      const isAuto = metadata.isAutoPayment ? ` (${tSubscription('autoPayment')})` : '';
       return {
-        title: `${type} 구독${isAuto}`,
-        description: `${payment.amount.toLocaleString()}원`
+        title: `${type}${isAuto}`,
+        description: `${payment.amount.toLocaleString()}${tSubscription('currency')}`
       };
     }
 
     return {
-      title: '결제',
-      description: `${payment.amount.toLocaleString()}원`
+      title: tPayments('title'),
+      description: `${payment.amount.toLocaleString()}${tSubscription('currency')}`
     };
   };
 
@@ -85,9 +89,9 @@ export default function PaymentHistory({ userId, isAdmin }: PaymentHistoryProps)
                     payment.status === 'cancelled' ? 'bg-red-100 text-red-800' :
                     payment.status === 'pending' ? 'bg-gray-100 text-gray-800' : ''
                   }`}>
-                    {payment.status === 'success' ? '결제 완료' :
-                     payment.status === 'cancelled' ? '취소됨' :
-                     payment.status === 'pending' ? '처리 중' : payment.status}
+                    {payment.status === 'success' ? tPayments('success') :
+                     payment.status === 'cancelled' ? tCommon('cancel') :
+                     payment.status === 'pending' ? tPayments('pending') : payment.status}
                   </span>
                 </div>
               </div>
@@ -104,7 +108,7 @@ export default function PaymentHistory({ userId, isAdmin }: PaymentHistoryProps)
                     className="mt-2"
                   >
                     <Ban className="h-4 w-4 mr-1" />
-                    취소
+                    {tCommon('cancel')}
                   </Button>
                 )}
               </div>
@@ -112,7 +116,7 @@ export default function PaymentHistory({ userId, isAdmin }: PaymentHistoryProps)
 
             {metadata?.cancelReason && (
               <p className="mt-2 text-sm text-muted-foreground">
-                취소 사유: {metadata.cancelReason}
+                {tCommon('cancel')}: {metadata.cancelReason}
               </p>
             )}
           </div>

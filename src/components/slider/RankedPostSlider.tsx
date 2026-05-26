@@ -14,6 +14,9 @@ import 'swiper/css/free-mode';
 import 'swiper/css/navigation';
 import PostModal from '../posts/PostModal';
 import { getThumbnailUrl } from '@/lib/constants';
+import { useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
+import { getLocalizedPostTitle } from '@/lib/content-language';
 
 
 interface RankedPostSliderProps {
@@ -24,6 +27,8 @@ interface RankedPostSliderProps {
 }
 
 const RankedPostSlider = ({ posts, title, sliderId }: RankedPostSliderProps) => {
+  const locale = useLocale();
+  const tCommon = useTranslations('Common');
   // const router = useRouter();
   const [isBeginning, setIsBeginning] = useState(true);
   const [isEnd, setIsEnd] = useState(false);
@@ -54,7 +59,7 @@ const RankedPostSlider = ({ posts, title, sliderId }: RankedPostSliderProps) => 
           href={viewAllHref}
           className="text-sm text-gray-300 hover:text-white transition-colors duration-200"
         >
-          전체보기
+          {tCommon('viewAll')}
         </Link> */}
       </div>
 
@@ -100,54 +105,57 @@ const RankedPostSlider = ({ posts, title, sliderId }: RankedPostSliderProps) => 
           }}
           className={sliderId}
         >
-          {posts.map((post, index) => (
-            <SwiperSlide
-              key={post.id}
-              className="!w-[calc(100%/3.5+40px)] md:!w-[calc(100%/5.5+40px)] lg:!w-[calc(100%/8.5+40px)] xl:!w-[calc(100%/8.5+40px)]"  // slidesPerView 값과 맞춤
-            >
-              <div className="relative pl-[35px]">
-                <div 
-                  className="absolute left-4 sm:left-2 bottom-[-10px] z-[1]"
-                >
-                  <span 
-                    className="text-[70px] leading-[90px] md:text-[100px] md:leading-[110px] font-bold"
-                    style={{ 
-                      color: '#141414',
-                      WebkitTextStroke: '2px rgba(211, 211, 211, 1)',
-                      textShadow: '3px 3px 5px rgba(128,128,128,0.9)',
-                      // fontFamily: 'Arial, sans-serif',
-                      fontWeight: 900
-                    }}
+          {posts.map((post, index) => {
+            const localizedTitle = getLocalizedPostTitle(post, locale);
+
+            return (
+              <SwiperSlide
+                key={post.id}
+                className="!w-[calc(100%/3.5+40px)] md:!w-[calc(100%/5.5+40px)] lg:!w-[calc(100%/8.5+40px)] xl:!w-[calc(100%/8.5+40px)]"  // slidesPerView 값과 맞춤
+              >
+                <div className="relative pl-[35px]">
+                  <div
+                    className="absolute left-4 sm:left-2 bottom-[-10px] z-[1]"
                   >
-                    {index + 1}
-                  </span>
-                </div>
-                <div
-                  className="relative aspect-[2/3] rounded-md overflow-hidden cursor-pointer group/item"  // scale-90 추가하여 크기 10% 감소
-                  onMouseEnter={() => setHoveredIndex(index)}
-                  onMouseLeave={() => setHoveredIndex(null)}
-                  onClick={() => handleSlideClick(post)}
-                >
-                  <Image
-                    src={getThumbnailUrl(post.thumbnailId)}
-                    alt={`타이틀 ${post.title || ''} - ${post.categories || ''} 컨텐츠의 대표 이미지`}
-                    fill
-                    className="object-cover transition-transform duration-300 group-hover/item:scale-105"
-                    sizes="(max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
-                    priority
-                  />
-                  
-                  {hoveredIndex === index && (
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent">
-                      <div className="absolute bottom-0 left-0 right-0 p-4">
-                        <h3 className="text-sm font-bold text-white mb-1 justify-center">{post.title}</h3>
+                    <span
+                      className="text-[70px] leading-[90px] md:text-[100px] md:leading-[110px] font-bold"
+                      style={{
+                        color: '#141414',
+                        WebkitTextStroke: '2px rgba(211, 211, 211, 1)',
+                        textShadow: '3px 3px 5px rgba(128,128,128,0.9)',
+                        // fontFamily: 'Arial, sans-serif',
+                        fontWeight: 900
+                      }}
+                    >
+                      {index + 1}
+                    </span>
+                  </div>
+                  <div
+                    className="relative aspect-[2/3] rounded-md overflow-hidden cursor-pointer group/item"  // scale-90 추가하여 크기 10% 감소
+                    onMouseEnter={() => setHoveredIndex(index)}
+                    onMouseLeave={() => setHoveredIndex(null)}
+                    onClick={() => handleSlideClick(post)}
+                  >
+                    <Image
+                      src={getThumbnailUrl(post.thumbnailId)}
+                      alt={`타이틀 ${localizedTitle} - ${post.categories || ''} 컨텐츠의 대표 이미지`}
+                      fill
+                      className="object-cover transition-transform duration-300 group-hover/item:scale-105"
+                      sizes="(max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                    />
+
+                    {hoveredIndex === index && (
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent">
+                        <div className="absolute bottom-0 left-0 right-0 p-4">
+                          <h3 className="text-sm font-bold text-white mb-1 justify-center">{localizedTitle}</h3>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
-              </div>
-            </SwiperSlide>
-          ))}
+              </SwiperSlide>
+            );
+          })}
         </Swiper>
 
         {/* <button 

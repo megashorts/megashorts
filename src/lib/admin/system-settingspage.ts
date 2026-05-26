@@ -1,5 +1,11 @@
 // src/lib/admin/system-settingspage.ts
 
+import {
+  DEFAULT_CONTENT_LANGUAGE_POLICY,
+  type ContentLanguagePolicy,
+} from '@/lib/content-language';
+import { DEFAULT_ANALYTICS_TIME_ZONE } from '@/lib/analytics-timezone';
+
 // 시스템 설정 타입 정의
 export interface SystemSettingValue<T = number | string | boolean> {
   enabled: boolean;
@@ -41,6 +47,8 @@ export interface SystemSettings {
   viewCoinAmount: SystemSettingValue<number>;          // 시청시 코인 소모 수량
   referralCoinAmount: SystemSettingValue<number>;      // 추천인 가입 코인 지급 수량
   serviceLogEnabled: SystemSettingValue<boolean>;      // 서비스 로그 작성 여부
+  analyticsTimeZone: SystemSettingValue<string>;       // 분석/로그 기준 타임존
+  contentLanguagePolicy: SystemSettingValue<ContentLanguagePolicy>; // 콘텐츠 언어 노출 정책
   
   // 업로더 레벨 설정
   uploaderQualification: SystemSettingValue<UploaderLevel[]>; // 업로더 자격 기준
@@ -84,8 +92,8 @@ export interface SectionInfo {
 // 설정 섹션 정의
 export const SECTIONS: Record<string, SectionInfo> = {
   PRICE_EVENT: {
-    title: '가격 및 이벤트 설정',
-    description: '구독, 코인 가격 및 이벤트 코인 관리',
+    title: 'Pricing & Event Settings',
+    description: 'Manage subscriptions, coin prices, and event coins',
     keys: [
       'subscriptionPackages',
       'coinPackages',
@@ -94,8 +102,8 @@ export const SECTIONS: Record<string, SectionInfo> = {
     ]
   },
   UPLOADER_CONFIG: {
-    title: '업로더 및 정산 설정',
-    description: '레벨별 조회수 기준 및 수익 분배율 관리',
+    title: 'Uploader & Settlement Settings',
+    description: 'Manage monthly views requirements and revenue share rates by level',
     keys: [
       'uploaderQualification',
       'coinToPoint',
@@ -103,13 +111,15 @@ export const SECTIONS: Record<string, SectionInfo> = {
     ]
   },
   SYSTEM_CONFIG: {
-    title: '시스템 설정',
-    description: '포인트, 코인 소모량 및 로그 설정',
+    title: 'System Settings',
+    description: 'Manage point withdrawals, coin consumption, and service logging',
     keys: [
       'viewCoinAmount',
       'referralCoinAmount',
       'minWithdrawPoint',
-      'serviceLogEnabled'
+      'serviceLogEnabled',
+      'analyticsTimeZone',
+      'contentLanguagePolicy'
     ]
   }
 } as const;
@@ -126,22 +136,26 @@ export const SETTING_KEYS = {
   uploaderQualification: 'uploaderQualification',
   coinToPoint: 'coinToPoint',
   noteamReffererPointRatio: 'noteamReffererPointRatio',
-  serviceLogEnabled: 'serviceLogEnabled'
+  serviceLogEnabled: 'serviceLogEnabled',
+  analyticsTimeZone: 'analyticsTimeZone',
+  contentLanguagePolicy: 'contentLanguagePolicy'
 } as const;
 
 // 설정 표시 이름
 export const SETTING_LABELS = {
-  subscriptionPackages: '구독 패키지',
-  coinPackages: '코인 패키지',
-  eventCoin1Amount: '이벤트 코인 1',
-  eventCoin2Amount: '이벤트 코인 2',
-  minWithdrawPoint: '최소 출금 포인트',
-  viewCoinAmount: '시청 코인 소모량',
-  referralCoinAmount: '추천인 코인 지급량',
-  uploaderQualification: '업로더 자격',
-  coinToPoint: '1코인-포인트 정산변환 수량',
-  noteamReffererPointRatio: '미소속 추천인 포인트 비율(%)',
-  serviceLogEnabled: '서비스 로그'
+  subscriptionPackages: 'Subscription Packages',
+  coinPackages: 'Coin Packages',
+  eventCoin1Amount: 'Event Coin 1',
+  eventCoin2Amount: 'Event Coin 2',
+  minWithdrawPoint: 'Minimum Withdrawal Points',
+  viewCoinAmount: 'Coin Consumption per View',
+  referralCoinAmount: 'Referral Registration Coin Award',
+  uploaderQualification: 'Uploader Qualification',
+  coinToPoint: '1 Coin to Points Exchange Rate',
+  noteamReffererPointRatio: 'Unaffiliated Referrer Point Ratio (%)',
+  serviceLogEnabled: 'Service Logging',
+  analyticsTimeZone: 'Analytics Time Zone',
+  contentLanguagePolicy: 'Content Language Visibility Policy'
 } as const;
 
 // 기본 설정값
@@ -151,12 +165,12 @@ export const DEFAULT_SETTINGS: SystemSettings = {
   eventCoin1Amount: { 
     enabled: true, 
     value: 10,
-    description: '신규 가입 시 지급되는 이벤트 코인'
+    description: 'Event coins awarded upon new registration'
   },
   eventCoin2Amount: { 
     enabled: true, 
     value: 20,
-    description: '추천인 이벤트 달성 시 지급되는 코인'
+    description: 'Event coins awarded upon completing referral conditions'
   },
   minWithdrawPoint: { enabled: true, value: 50000 },
   viewCoinAmount: { enabled: true, value: 2 },
@@ -164,5 +178,15 @@ export const DEFAULT_SETTINGS: SystemSettings = {
   uploaderQualification: { enabled: true, value: DEFAULT_UPLOADER_LEVELS },
   coinToPoint: { enabled: true, value: 120 },
   noteamReffererPointRatio: { enabled: true, value: 1 },
-  serviceLogEnabled: { enabled: true, value: true }
+  serviceLogEnabled: { enabled: true, value: true },
+  analyticsTimeZone: {
+    enabled: true,
+    value: DEFAULT_ANALYTICS_TIME_ZONE,
+    description: 'Single source-of-truth time zone for log display and reporting boundaries.',
+  },
+  contentLanguagePolicy: {
+    enabled: true,
+    value: DEFAULT_CONTENT_LANGUAGE_POLICY,
+    description: 'Determines whether to filter the content list by selected language or show all content with locale-based fallbacks.'
+  }
 };

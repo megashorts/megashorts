@@ -13,6 +13,9 @@ import 'swiper/css/navigation';
 import { PostData } from '@/lib/types';
 import PostModal from '../posts/PostModal';
 import { getThumbnailUrl } from '@/lib/constants';
+import { useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
+import { getLocalizedPostTitle } from '@/lib/content-language';
 
 interface PostSliderProps {
   posts: PostData[];
@@ -23,6 +26,8 @@ interface PostSliderProps {
 }
 
 const PostSlider = ({ posts, title, category, viewAllHref, sliderId }: PostSliderProps) => {
+  const locale = useLocale();
+  const tCommon = useTranslations('Common');
   const filteredPosts = category 
     ? posts.filter(post => post.categories?.includes(category))
     : posts;
@@ -64,7 +69,7 @@ const PostSlider = ({ posts, title, category, viewAllHref, sliderId }: PostSlide
           href={viewAllHref}
           className="text-sm text-gray-300 hover:text-white transition-colors duration-200"
         >
-          전체보기
+          {tCommon('viewAll')}
         </Link>
       </div>
 
@@ -110,41 +115,44 @@ const PostSlider = ({ posts, title, category, viewAllHref, sliderId }: PostSlide
           }}
           className={sliderId}
         >
-          {filteredPosts.map((post, index) => (
-            <SwiperSlide
-              key={post.id}
-              // className="!opacity-100"
-              // className="!w-[calc(100%/3.6)] md:!w-[calc(100%/5.6)] lg:!w-[calc(100%/6.2)] xl:!w-[calc(100%/7.8)]"
-              // style={{
-              //   width: `${100/slidesPerView}%`,
-              //   maxWidth: window?.innerWidth >= 1024 ? '200px' : 'none'  // 데스크탑: 200px로 증가
-              // }}
-            >
-              <div
-                className="relative aspect-[2/3] rounded-md overflow-hidden cursor-pointer group/item"
-                onMouseEnter={() => setHoveredIndex(index)}
-                onMouseLeave={() => setHoveredIndex(null)}
-                onClick={() => handleSlideClick(post)}
+          {filteredPosts.map((post, index) => {
+            const localizedTitle = getLocalizedPostTitle(post, locale);
+
+            return (
+              <SwiperSlide
+                key={post.id}
+                // className="!opacity-100"
+                // className="!w-[calc(100%/3.6)] md:!w-[calc(100%/5.6)] lg:!w-[calc(100%/6.2)] xl:!w-[calc(100%/7.8)]"
+                // style={{
+                //   width: `${100/slidesPerView}%`,
+                //   maxWidth: window?.innerWidth >= 1024 ? '200px' : 'none'  // 데스크탑: 200px로 증가
+                // }}
               >
-                <Image
-                  src={getThumbnailUrl(post.thumbnailId)}
-                  alt={`타이틀 ${post.title || ''} - ${post.categories || ''} 컨텐츠의 대표 이미지`}
-                  fill
-                  className="object-cover transition-all duration-300 group-hover/item:scale-105"
-                  sizes="(max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
-                  priority
-                />
-                
-                {hoveredIndex === index && (
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent">
-                    <div className="absolute bottom-0 left-0 right-0 p-4 ">
-                      <h3 className="text-sm font-bold text-white mb-1 justify-center">{post.title}</h3>
+                <div
+                  className="relative aspect-[2/3] rounded-md overflow-hidden cursor-pointer group/item"
+                  onMouseEnter={() => setHoveredIndex(index)}
+                  onMouseLeave={() => setHoveredIndex(null)}
+                  onClick={() => handleSlideClick(post)}
+                >
+                  <Image
+                    src={getThumbnailUrl(post.thumbnailId)}
+                    alt={`타이틀 ${localizedTitle} - ${post.categories || ''} 컨텐츠의 대표 이미지`}
+                    fill
+                    className="object-cover transition-all duration-300 group-hover/item:scale-105"
+                    sizes="(max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                  />
+
+                  {hoveredIndex === index && (
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent">
+                      <div className="absolute bottom-0 left-0 right-0 p-4 ">
+                        <h3 className="text-sm font-bold text-white mb-1 justify-center">{localizedTitle}</h3>
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            </SwiperSlide>
-          ))}
+                  )}
+                </div>
+              </SwiperSlide>
+            );
+          })}
         </Swiper>
 
         {/* {shouldEnableSwiper && (

@@ -1,23 +1,16 @@
 import { Language } from "@prisma/client";
+import { getLocalizedContent } from "@/lib/content-language";
 
 /**
- * Returns the translated content if it exists for the current locale,
- * otherwise falls back to the original content (regardless of whether the locale is 'en' or not).
- * This prevents forcing English titles for Korean/Chinese original content.
+ * Returns translated content for the current locale,
+ * then falls back to English and finally the original content.
  */
 export function getDynamicContent(
   originalContent: string | null | undefined,
-  i18nContent: any | null | undefined,
+  i18nContent: unknown,
   currentLocale: string
 ): string {
-  if (!originalContent) return "";
-  
-  if (i18nContent && typeof i18nContent === "object" && i18nContent[currentLocale]) {
-    return i18nContent[currentLocale];
-  }
-
-  // Fallback to original content
-  return originalContent;
+  return getLocalizedContent(originalContent, i18nContent, currentLocale);
 }
 
 /**

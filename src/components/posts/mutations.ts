@@ -62,40 +62,19 @@ export function useDeletePostMutation() {
           }
         );
 
-        // 2. 페이지 revalidate (백그라운드에서 처리)
-        const revalidatePaths = [
-          '/',
-          '/categories/recent',
-          ...deletedPost.categories.map(category => 
-            `/categories/${category.toLowerCase()}`
-          )
-        ];
+        // 서버 액션에서 on-demand 무효화를 처리하므로 클라이언트는 로컬 상태만 반영
 
-        Promise.all(
-          revalidatePaths.map(path =>
-            fetch('/api/revalidate', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ path })
-            })
-          )
-        ).catch(error => {
-          console.error('Failed to revalidate paths:', error);
-        });
-
-        // 3. 알림
+        // 알림
         toast({
           description: "Post deleted",
         });
 
-        // 4. 페이지 이동 (현재 페이지가 삭제된 포스트 페이지인 경우)
+        // 페이지 이동 (현재 페이지가 삭제된 포스트 페이지인 경우)
         if (pathname === `/posts/${deletedPost.id}`) {
           router.push('/');
         }
 
-        // 5. 서버 컴포넌트 리프레시 (마지막에 처리)
+        // 서버 컴포넌트 리프레시
         setTimeout(() => {
           router.refresh();
         }, 0);

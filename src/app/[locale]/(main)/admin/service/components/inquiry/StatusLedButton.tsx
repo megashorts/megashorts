@@ -33,19 +33,19 @@ export default function StatusLedButton({ status, onChange }: StatusLedButtonPro
       <DropdownMenuContent align="start" className="w-[150px]">
         <DropdownMenuItem onClick={() => onChange(undefined)} className="gap-3">
           <span className="w-2 h-2" />
-          전체
+          All
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => onChange("PENDING")} className="gap-3">
           <span className="w-2 h-2 rounded-full bg-yellow-400" />
-          대기중
+          Pending
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => onChange("IN_PROGRESS")} className="gap-3">
           <span className="w-2 h-2 rounded-full bg-blue-500" />
-          진행중
+          In Progress
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => onChange("CLOSED")} className="gap-3">
           <span className="w-2 h-2 rounded-full bg-green-500" />
-          완료
+          Resolved
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

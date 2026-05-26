@@ -5,6 +5,11 @@ import { Google, Kakao, Naver } from "arctic";
 import { Lucia, Session, User } from "lucia";
 import { cookies } from "next/headers";
 import { cache } from "react";
+import {
+  PWA_STANDALONE_COOKIE,
+  withPwaSessionCookieAttributes,
+} from "@/lib/pwa-session";
+import { shouldUseSecureAuthCookies } from "@/lib/auth-cookie";
 
 
 // access table name for prisma/schema.prisma
@@ -14,7 +19,7 @@ export const lucia = new Lucia(adapter, {
   sessionCookie: {
     expires: false,
     attributes: {
-      secure: process.env.NODE_ENV === "production",
+      secure: shouldUseSecureAuthCookies(),
     },
   },
   getUserAttributes(databaseUserAttributes) {
@@ -89,10 +94,13 @@ export const validateRequest = cache(
     try {
       if (result.session && result.session.fresh) {
         const sessionCookie = lucia.createSessionCookie(result.session.id);
+        const isPwaStandalone = cookieStore.get(PWA_STANDALONE_COOKIE)?.value === "1";
         cookieStore.set(
           sessionCookie.name,
           sessionCookie.value,
-          sessionCookie.attributes,
+          isPwaStandalone
+            ? withPwaSessionCookieAttributes(sessionCookie.attributes)
+            : sessionCookie.attributes,
         );
       }
       if (!result.session) {

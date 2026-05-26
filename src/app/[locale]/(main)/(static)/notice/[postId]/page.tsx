@@ -8,9 +8,11 @@ import { CategoryType, Post, Prisma } from "@prisma/client";
 import { ArrowLeft, ArrowRight, List } from "lucide-react";
 import NoticeSidebar from "@/components/NoticeSidebar";
 import { getThumbnailUrl } from "@/lib/constants";
+import { getLocalizedPostTitle, getLocalizedPostContent } from "@/lib/content-language";
 
 type Props = {
   params: Promise<{
+    locale: string;
     postId: string;
   }>;
 };
@@ -25,6 +27,7 @@ export async function generateMetadata(
   parent: ResolvingMetadata
 ): Promise<Metadata> {
   const resolvedParams = await params;
+  const locale = resolvedParams.locale;
 
   const post = await prisma.post.findUnique({
     where: { id: resolvedParams.postId },
@@ -36,13 +39,15 @@ export async function generateMetadata(
   });
 
   if (!post) return { title: '공지사항' };
+  const localizedTitle = getLocalizedPostTitle(post, locale);
+  const localizedContent = getLocalizedPostContent(post, locale);
 
   return {
-    title: post.title || '공지사항',
-    description: post.content || '',
+    title: localizedTitle || '공지사항',
+    description: localizedContent || '',
     openGraph: {
-      title: post.title || '공지사항',
-      description: post.content || '',
+      title: localizedTitle || '공지사항',
+      description: localizedContent || '',
       images: post.thumbnailId ? [getThumbnailUrl(post.thumbnailId)] : [],
     },
   };
@@ -71,6 +76,7 @@ export async function generateStaticParams() {
 
 export default async function NoticePostPage({ params }: Props) {
   const resolvedParams = await params;
+  const locale = resolvedParams.locale;
   console.log(`[Server] Rendering notice page: ${resolvedParams.postId}`, new Date().toISOString());
   // 현재 포스트 데이터 조회
   const post = await prisma.post.findUnique({
@@ -87,6 +93,8 @@ export default async function NoticePostPage({ params }: Props) {
   if (!post) {
     notFound();
   }
+  const localizedTitle = getLocalizedPostTitle(post, locale);
+  const localizedContent = getLocalizedPostContent(post, locale);
 
   // 이전/다음 포스트 조회
   const [prevPost, nextPost]: [NavigationPost, NavigationPost] = await Promise.all([
@@ -182,7 +190,7 @@ export default async function NoticePostPage({ params }: Props) {
 
             {/* 포스트 제목 */}
             <h1 className="text-xl font-bold mb-2">
-              {post.title}
+              {localizedTitle}
             </h1>
 
             {/* 작성 정보 */}
@@ -196,7 +204,7 @@ export default async function NoticePostPage({ params }: Props) {
               <div className="relative w-full aspect-[3/2] mb-4">
                 <Image
                   src={getThumbnailUrl(post.thumbnailId, 'public')}
-                  alt={`타이틀 ${post.title || ''} - ${post.categories || ''} 컨텐츠의 대표 이미지`}
+                  alt={`타이틀 ${localizedTitle || ''} - ${post.categories || ''} 컨텐츠의 대표 이미지`}
                   className="object-cover rounded-lg"
                   priority
                   width={1200}         // 2배 증가
@@ -212,7 +220,7 @@ export default async function NoticePostPage({ params }: Props) {
 
             {/* 포스트 내용 */}
             <div className="prose prose-invert max-w-none">
-              <p className="whitespace-pre-wrap font-sans text-base text-white">{post.content}</p>
+              <p className="whitespace-pre-wrap font-sans text-base text-white">{localizedContent}</p>
             </div>
           </div>
 

@@ -1,0 +1,335 @@
+
+--- 2026-05-18T16:53:45.987Z debug
+🪵  Writing logs to "/Users/kimryan/Desktop/megas/.tmp/wrangler-logs/wrangler-2026-05-18_16-53-45_917.log"
+---
+
+--- 2026-05-18T16:53:45.987Z debug
+Metrics dispatcher: Dispatching disabled - would have sent {"deviceId":"c8397d8f-15b6-4383-ac87-c9f1f1083fc4","event":"wrangler command started","timestamp":1779123225987,"properties":{"amplitude_session_id":1779123225984,"amplitude_event_id":0,"wranglerVersion":"4.0.0","osPlatform":"Mac OS","osVersion":"Darwin Kernel Version 22.6.0: Sun Dec 17 22:14:25 PST 2023; root:xnu-8796.141.3.703.2~2/RELEASE_ARM64_T8112","nodeVersion":24,"packageManager":"npm","isFirstUsage":false,"configFileType":"toml","isCI":false,"isPagesCI":false,"isWorkersCI":false,"isInteractive":false,"hasAssets":false,"argsUsed":["c","config"],"argsCombination":"c, config","command":"wrangler deploy","args":{"config":"<REDACTED>","c":"<REDACTED>","xJsonConfig":true,"j":true,"noBundle":false,"latest":false,"keepVars":false,"xAutoCreate":true}}}.
+---
+
+--- 2026-05-18T16:53:45.989Z debug
+.env file not found at ".env". Continuing... For more details, refer to https://developers.cloudflare.com/workers/wrangler/system-environment-variables/
+---
+
+--- 2026-05-18T16:53:46.003Z log
+
+ ⛅️ wrangler 4.0.0 (update available 4.92.0)
+--------------------------------------------
+
+---
+
+--- 2026-05-18T16:53:46.226Z debug
+Saving to cache: {"account":{"id":"923201050a960d4c64fb9b90a88cb956","name":""}}
+---
+
+--- 2026-05-18T16:53:46.227Z debug
+Starting verifyWorkerMatchesCITag() with tag: undefined, name: megashorts-logs
+---
+
+--- 2026-05-18T16:53:46.227Z debug
+No WRANGLER_CI_MATCH_TAG variable provided, aborting verifyWorkerMatchesCITag()
+---
+
+--- 2026-05-18T16:53:46.227Z debug
+-- START CF API REQUEST: GET https://api.cloudflare.com/client/v4/accounts/923201050a960d4c64fb9b90a88cb956/workers/services/megashorts-logs
+---
+
+--- 2026-05-18T16:53:46.227Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:53:46.227Z debug
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:53:46.227Z debug
+-- END CF API REQUEST
+---
+
+--- 2026-05-18T16:53:46.566Z debug
+-- START CF API RESPONSE: OK 200
+---
+
+--- 2026-05-18T16:53:46.567Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:53:46.567Z debug
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:53:46.567Z debug
+-- END CF API RESPONSE
+---
+
+--- 2026-05-18T16:53:46.568Z debug
+-- START CF API REQUEST: GET https://api.cloudflare.com/client/v4/accounts/923201050a960d4c64fb9b90a88cb956/workers/scripts/megashorts-logs/deployments
+---
+
+--- 2026-05-18T16:53:46.568Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:53:46.568Z debug
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:53:46.568Z debug
+-- END CF API REQUEST
+---
+
+--- 2026-05-18T16:53:46.875Z debug
+-- START CF API RESPONSE: OK 200
+---
+
+--- 2026-05-18T16:53:46.875Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:53:46.875Z debug
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:53:46.875Z debug
+-- END CF API RESPONSE
+---
+
+--- 2026-05-18T16:53:46.951Z log
+Total Upload: 36.37 KiB / gzip: 8.61 KiB
+---
+
+--- 2026-05-18T16:53:46.953Z debug
+-- START CF API REQUEST: POST https://api.cloudflare.com/client/v4/accounts/923201050a960d4c64fb9b90a88cb956/workers/scripts/megashorts-logs/versions
+---
+
+--- 2026-05-18T16:53:46.953Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:53:46.953Z debug
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:53:46.954Z debug
+BODY: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:53:46.954Z debug
+-- END CF API REQUEST
+---
+
+--- 2026-05-18T16:53:48.592Z debug
+-- START CF API RESPONSE: OK 200
+---
+
+--- 2026-05-18T16:53:48.592Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:53:48.592Z debug
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:53:48.592Z debug
+-- END CF API RESPONSE
+---
+
+--- 2026-05-18T16:53:48.594Z debug
+-- START CF API REQUEST: POST https://api.cloudflare.com/client/v4/accounts/923201050a960d4c64fb9b90a88cb956/workers/scripts/megashorts-logs/deployments
+---
+
+--- 2026-05-18T16:53:48.594Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:53:48.594Z debug
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:53:48.594Z debug
+-- END CF API REQUEST
+---
+
+--- 2026-05-18T16:53:49.562Z debug
+-- START CF API RESPONSE: OK 200
+---
+
+--- 2026-05-18T16:53:49.564Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:53:49.564Z debug
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:53:49.564Z debug
+-- END CF API RESPONSE
+---
+
+--- 2026-05-18T16:53:49.568Z debug
+-- START CF API REQUEST: PATCH https://api.cloudflare.com/client/v4/accounts/923201050a960d4c64fb9b90a88cb956/workers/scripts/megashorts-logs/script-settings
+---
+
+--- 2026-05-18T16:53:49.568Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:53:49.568Z debug
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:53:49.568Z debug
+-- END CF API REQUEST
+---
+
+--- 2026-05-18T16:53:50.253Z debug
+-- START CF API RESPONSE: OK 200
+---
+
+--- 2026-05-18T16:53:50.253Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:53:50.253Z debug
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:53:50.253Z debug
+-- END CF API RESPONSE
+---
+
+--- 2026-05-18T16:53:50.254Z log
+Worker Startup Time: 12 ms
+---
+
+--- 2026-05-18T16:53:50.255Z log
+Your worker has access to the following bindings:
+- D1 Databases:
+  - DB: megashorts-db (52d25396-2a61-42a8-904f-2d7956cede44)
+- R2 Buckets:
+  - LOGS_BUCKET: logs-bucket
+---
+
+--- 2026-05-18T16:53:50.257Z log
+Uploaded megashorts-logs (3.69 sec)
+---
+
+--- 2026-05-18T16:53:50.257Z debug
+-- START CF API REQUEST: GET https://api.cloudflare.com/client/v4/accounts/923201050a960d4c64fb9b90a88cb956/workers/scripts/megashorts-logs/subdomain
+---
+
+--- 2026-05-18T16:53:50.257Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:53:50.257Z debug
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:53:50.257Z debug
+-- END CF API REQUEST
+---
+
+--- 2026-05-18T16:53:50.486Z debug
+-- START CF API RESPONSE: OK 200
+---
+
+--- 2026-05-18T16:53:50.486Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:53:50.486Z debug
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:53:50.486Z debug
+-- END CF API RESPONSE
+---
+
+--- 2026-05-18T16:53:50.487Z debug
+-- START CF API REQUEST: GET https://api.cloudflare.com/client/v4/accounts/923201050a960d4c64fb9b90a88cb956/workers/subdomain
+---
+
+--- 2026-05-18T16:53:50.487Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:53:50.487Z debug
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:53:50.487Z debug
+-- END CF API REQUEST
+---
+
+--- 2026-05-18T16:53:50.770Z debug
+-- START CF API RESPONSE: OK 200
+---
+
+--- 2026-05-18T16:53:50.770Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:53:50.770Z debug
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:53:50.770Z debug
+-- END CF API RESPONSE
+---
+
+--- 2026-05-18T16:53:50.771Z debug
+-- START CF API REQUEST: PUT https://api.cloudflare.com/client/v4/accounts/923201050a960d4c64fb9b90a88cb956/workers/scripts/megashorts-logs/schedules
+---
+
+--- 2026-05-18T16:53:50.771Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:53:50.771Z debug
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:53:50.771Z debug
+-- END CF API REQUEST
+---
+
+--- 2026-05-18T16:53:51.218Z debug
+-- START CF API RESPONSE: OK 200
+---
+
+--- 2026-05-18T16:53:51.219Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:53:51.219Z debug
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:53:51.219Z debug
+-- END CF API RESPONSE
+---
+
+--- 2026-05-18T16:53:51.219Z log
+Deployed megashorts-logs triggers (0.73 sec)
+---
+
+--- 2026-05-18T16:53:51.219Z log
+  https://megashorts-logs.msdevcm.workers.dev
+---
+
+--- 2026-05-18T16:53:51.219Z log
+  schedule: 0 15 * * *
+---
+
+--- 2026-05-18T16:53:51.219Z log
+Current Version ID: 977fc05d-ba01-4521-b6d2-be6d274a6259
+---
+
+--- 2026-05-18T16:53:51.221Z debug
+Metrics dispatcher: Dispatching disabled - would have sent {"deviceId":"c8397d8f-15b6-4383-ac87-c9f1f1083fc4","event":"deploy worker script","timestamp":1779123231221,"properties":{"category":"Workers","wranglerVersion":"4.0.0","os":"darwin:arm64","usesTypeScript":true,"durationMs":4994}}.
+---
+
+--- 2026-05-18T16:53:51.223Z debug
+Metrics dispatcher: Dispatching disabled - would have sent {"deviceId":"c8397d8f-15b6-4383-ac87-c9f1f1083fc4","event":"wrangler command completed","timestamp":1779123231223,"properties":{"amplitude_session_id":1779123225984,"amplitude_event_id":1,"wranglerVersion":"4.0.0","osPlatform":"Mac OS","osVersion":"Darwin Kernel Version 22.6.0: Sun Dec 17 22:14:25 PST 2023; root:xnu-8796.141.3.703.2~2/RELEASE_ARM64_T8112","nodeVersion":24,"packageManager":"npm","isFirstUsage":false,"configFileType":"toml","isCI":false,"isPagesCI":false,"isWorkersCI":false,"isInteractive":false,"hasAssets":false,"argsUsed":["c","config"],"argsCombination":"c, config","command":"wrangler deploy","args":{"config":"<REDACTED>","c":"<REDACTED>","xJsonConfig":true,"j":true,"noBundle":false,"latest":false,"keepVars":false,"xAutoCreate":true},"durationMs":5258,"durationSeconds":5.258,"durationMinutes":0.08763333333333333}}.
+---

@@ -1,12 +1,17 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { LogTable } from './LogTable';
 import { LogFilters } from './LogFilters';
 import { LogModal } from './LogModal';
 import { ActivityLog } from '@/lib/activity-logger/types';
 import { TYPE_DISPLAY_NAMES } from '@/lib/activity-logger/constants';
 import { LogFiltersState } from '../types';
+import {
+  DEFAULT_ANALYTICS_TIME_ZONE,
+  formatDateInTimeZone,
+  normalizeAnalyticsTimeZone,
+} from '@/lib/analytics-timezone';
 
 export default function LogsClient() {
   const [logs, setLogs] = useState<ActivityLog[]>([]);
@@ -14,6 +19,7 @@ export default function LogsClient() {
   const [selectedLog, setSelectedLog] = useState<ActivityLog | null>(null);
   const [sortField, setSortField] = useState<string>('timestamp');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [timeZone, setTimeZone] = useState(DEFAULT_ANALYTICS_TIME_ZONE);
   
   const [filters, setFilters] = useState<LogFiltersState>(() => {
     // 기본값: 지난 1시간
@@ -33,15 +39,35 @@ export default function LogsClient() {
     };
   });
 
-  const formatDateForWorker = (date: Date) => {
-    // YYYY-MM-DD 형식으로 변환
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
+  useEffect(() => {
+    let mounted = true;
 
-  const fetchLogs = async () => {
+    const loadTimeZone = async () => {
+      try {
+        const response = await fetch('/api/admin/settings', { cache: 'no-store' });
+        if (!response.ok) return;
+        const settings = await response.json() as {
+          analyticsTimeZone?: { enabled?: boolean; value?: unknown };
+        };
+        const enabled = settings.analyticsTimeZone?.enabled !== false;
+        const selected = enabled
+          ? normalizeAnalyticsTimeZone(settings.analyticsTimeZone?.value)
+          : DEFAULT_ANALYTICS_TIME_ZONE;
+        if (mounted) {
+          setTimeZone(selected);
+        }
+      } catch (error) {
+        console.error('Failed to load analytics timezone:', error);
+      }
+    };
+
+    loadTimeZone();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const fetchLogs = useCallback(async () => {
     // timestamp가 없으면 조회하지 않음 (검색 버튼 클릭 전)
     if (!filters.timestamp) return;
 
@@ -50,76 +76,51 @@ export default function LogsClient() {
     setLoading(true);
     
     try {
-      // 디버깅 정보 출력
-      console.log('Fetching logs with filters:', {
-        startDate: formatDateForWorker(filters.startDate),
-        endDate: formatDateForWorker(filters.endDate),
-        types: filters.types,
-        userId: filters.userId,
-        country: filters.country
-      });
-      console.log('Log proxy URL:', '/api/admin/service/logs');
-      
-      // 디버깅용 - 모든 파일 목록 조회 요청
-      // try {
-      //   const debugResponse = await fetch(`${CONFIG.WORKER_URL}/debug-list-files`);
-      //   if (debugResponse.ok) {
-      //     const debugData = await debugResponse.json();
-      //     console.log('All files in bucket:', debugData);
-      //   }
-      // } catch (debugError) {
-      //   console.error('Debug request failed:', debugError);
-      // }
-      
+      const baseParams = {
+        startDate: formatDateInTimeZone(filters.startDate, timeZone),
+        endDate: formatDateInTimeZone(filters.endDate, timeZone),
+        timezone: timeZone,
+      };
+
       // 타입이 선택되지 않았거나 모든 타입이 선택된 경우 단일 요청
       if (filters.types.length === 0 || filters.types.length === Object.keys(TYPE_DISPLAY_NAMES).length) {
         const searchParams = new URLSearchParams({
-          startDate: formatDateForWorker(filters.startDate),
-          endDate: formatDateForWorker(filters.endDate),
+          ...baseParams,
           ...(filters.userId && { userId: filters.userId }),
           ...(filters.country && { country: filters.country })
         });
         
-        console.log('Fetching all types with URL:', `/api/admin/service/logs?${searchParams}`);
         const response = await fetch(`/api/admin/service/logs?${searchParams}`, {
           cache: 'no-store'
         });
         if (!response.ok) {
-          console.error('Failed to fetch logs:', response.status, response.statusText);
           throw new Error('Failed to fetch logs');
         }
         
         const data = await response.json();
-        console.log('Received data for all types:', data.length);
         allLogs.push(...data);
       } else {
         // 선택된 각 타입별로 요청
         for (const type of filters.types) {
           const searchParams = new URLSearchParams({
-            startDate: formatDateForWorker(filters.startDate),
-            endDate: formatDateForWorker(filters.endDate),
+            ...baseParams,
             type,
             ...(filters.userId && { userId: filters.userId }),
             ...(filters.country && { country: filters.country })
           });
           
-          console.log(`Fetching type ${type} with URL:`, `/api/admin/service/logs?${searchParams}`);
           const response = await fetch(`/api/admin/service/logs?${searchParams}`, {
             cache: 'no-store'
           });
           if (!response.ok) {
-            console.error(`Failed to fetch logs for type ${type}:`, response.status, response.statusText);
             throw new Error(`Failed to fetch logs for type: ${type}`);
           }
           
           const data = await response.json();
-          console.log(`Received data for type ${type}:`, data.length);
           allLogs.push(...data);
         }
       }
-      
-      console.log('Total logs fetched:', allLogs.length);
-      
+
       // 중복 키 방지를 위해 타임스탬프와 인덱스 조합으로 고유 ID 생성
       const logsWithIds = allLogs.map((log: ActivityLog, index: number) => ({
         ...log,
@@ -148,8 +149,7 @@ export default function LogsClient() {
       const startIndex = (filters.page - 1) * filters.perPage;
       const endIndex = startIndex + filters.perPage;
       const paginatedLogs = sortedLogs.slice(startIndex, endIndex);
-      
-      console.log('Paginated logs:', paginatedLogs.length);
+
       setLogs(paginatedLogs);
     } catch (error) {
       console.error('Error fetching logs:', error);
@@ -157,12 +157,12 @@ export default function LogsClient() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters, sortField, sortOrder, timeZone]);
 
   // filters.timestamp가 변경될 때만 fetchLogs 실행
   useEffect(() => {
     fetchLogs();
-  }, [filters.timestamp, sortField, sortOrder]);
+  }, [fetchLogs]);
 
   const handleViewDetails = (log: ActivityLog) => {
     setSelectedLog(log);
@@ -196,9 +196,10 @@ export default function LogsClient() {
         onSort={handleSort}
         sortField={sortField}
         sortOrder={sortOrder}
+        timeZone={timeZone}
       />
       {selectedLog && (
-        <LogModal log={selectedLog} onClose={handleCloseModal} />
+        <LogModal log={selectedLog} onClose={handleCloseModal} timeZone={timeZone} />
       )}
     </div>
   );

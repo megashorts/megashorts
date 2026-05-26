@@ -1,0 +1,567 @@
+
+--- 2026-05-18T16:47:36.090Z debug
+🪵  Writing logs to "/Users/kimryan/Desktop/megas/.tmp/wrangler-logs/wrangler-2026-05-18_16-47-36_052.log"
+---
+
+--- 2026-05-18T16:47:36.090Z debug
+Metrics dispatcher: Dispatching disabled - would have sent {"deviceId":"c8397d8f-15b6-4383-ac87-c9f1f1083fc4","event":"wrangler command started","timestamp":1779122856090,"properties":{"amplitude_session_id":1779122856089,"amplitude_event_id":0,"wranglerVersion":"4.0.0","osPlatform":"Mac OS","osVersion":"Darwin Kernel Version 22.6.0: Sun Dec 17 22:14:25 PST 2023; root:xnu-8796.141.3.703.2~2/RELEASE_ARM64_T8112","nodeVersion":24,"packageManager":"npm","isFirstUsage":false,"configFileType":"toml","isCI":false,"isPagesCI":false,"isWorkersCI":false,"isInteractive":false,"hasAssets":false,"argsUsed":["c","config"],"argsCombination":"c, config","command":"wrangler deploy","args":{"config":"<REDACTED>","c":"<REDACTED>","xJsonConfig":true,"j":true,"noBundle":false,"latest":false,"keepVars":false,"xAutoCreate":true}}}.
+---
+
+--- 2026-05-18T16:47:36.091Z debug
+.env file not found at ".env". Continuing... For more details, refer to https://developers.cloudflare.com/workers/wrangler/system-environment-variables/
+---
+
+--- 2026-05-18T16:47:36.098Z log
+
+ ⛅️ wrangler 4.0.0 (update available 4.92.0)
+--------------------------------------------
+
+---
+
+--- 2026-05-18T16:47:36.110Z debug
+Saving to cache: {"account":{"id":"923201050a960d4c64fb9b90a88cb956","name":""}}
+---
+
+--- 2026-05-18T16:47:36.110Z debug
+Starting verifyWorkerMatchesCITag() with tag: undefined, name: viewcount-team-worker
+---
+
+--- 2026-05-18T16:47:36.110Z debug
+No WRANGLER_CI_MATCH_TAG variable provided, aborting verifyWorkerMatchesCITag()
+---
+
+--- 2026-05-18T16:47:36.110Z debug
+-- START CF API REQUEST: GET https://api.cloudflare.com/client/v4/accounts/923201050a960d4c64fb9b90a88cb956/workers/services/viewcount-team-worker
+---
+
+--- 2026-05-18T16:47:36.110Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:36.110Z debug
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:36.110Z debug
+-- END CF API REQUEST
+---
+
+--- 2026-05-18T16:47:36.810Z debug
+-- START CF API RESPONSE: OK 200
+---
+
+--- 2026-05-18T16:47:36.810Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:36.810Z debug
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:36.810Z debug
+-- END CF API RESPONSE
+---
+
+--- 2026-05-18T16:47:36.812Z debug
+-- START CF API REQUEST: GET https://api.cloudflare.com/client/v4/accounts/923201050a960d4c64fb9b90a88cb956/workers/scripts/viewcount-team-worker/deployments
+---
+
+--- 2026-05-18T16:47:36.812Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:36.812Z debug
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:36.812Z debug
+-- END CF API REQUEST
+---
+
+--- 2026-05-18T16:47:37.109Z debug
+-- START CF API RESPONSE: OK 200
+---
+
+--- 2026-05-18T16:47:37.109Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:37.109Z debug
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:37.109Z debug
+-- END CF API RESPONSE
+---
+
+--- 2026-05-18T16:47:37.160Z log
+Total Upload: 206.97 KiB / gzip: 41.09 KiB
+---
+
+--- 2026-05-18T16:47:37.164Z debug
+Saving to cache: {"account":{"id":"923201050a960d4c64fb9b90a88cb956","name":""}}
+---
+
+--- 2026-05-18T16:47:37.164Z debug
+-- START CF API REQUEST: GET https://api.cloudflare.com/client/v4/accounts/923201050a960d4c64fb9b90a88cb956/queues?name=viewcountteam-queue&name=viewcountteam-queue&page=1
+---
+
+--- 2026-05-18T16:47:37.164Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:37.164Z debug
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:37.164Z debug
+-- END CF API REQUEST
+---
+
+--- 2026-05-18T16:47:37.534Z debug
+-- START CF API RESPONSE: OK 200
+---
+
+--- 2026-05-18T16:47:37.534Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:37.534Z debug
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:37.534Z debug
+-- END CF API RESPONSE
+---
+
+--- 2026-05-18T16:47:37.536Z debug
+-- START CF API REQUEST: POST https://api.cloudflare.com/client/v4/accounts/923201050a960d4c64fb9b90a88cb956/workers/scripts/viewcount-team-worker/versions
+---
+
+--- 2026-05-18T16:47:37.536Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:37.536Z debug
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:37.540Z debug
+BODY: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:37.540Z debug
+-- END CF API REQUEST
+---
+
+--- 2026-05-18T16:47:38.906Z debug
+-- START CF API RESPONSE: OK 200
+---
+
+--- 2026-05-18T16:47:38.906Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:38.906Z debug
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:38.906Z debug
+-- END CF API RESPONSE
+---
+
+--- 2026-05-18T16:47:38.907Z debug
+-- START CF API REQUEST: POST https://api.cloudflare.com/client/v4/accounts/923201050a960d4c64fb9b90a88cb956/workers/scripts/viewcount-team-worker/deployments
+---
+
+--- 2026-05-18T16:47:38.907Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:38.907Z debug
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:38.907Z debug
+-- END CF API REQUEST
+---
+
+--- 2026-05-18T16:47:39.668Z debug
+-- START CF API RESPONSE: OK 200
+---
+
+--- 2026-05-18T16:47:39.668Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:39.668Z debug
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:39.668Z debug
+-- END CF API RESPONSE
+---
+
+--- 2026-05-18T16:47:39.668Z debug
+-- START CF API REQUEST: PATCH https://api.cloudflare.com/client/v4/accounts/923201050a960d4c64fb9b90a88cb956/workers/scripts/viewcount-team-worker/script-settings
+---
+
+--- 2026-05-18T16:47:39.668Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:39.668Z debug
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:39.668Z debug
+-- END CF API REQUEST
+---
+
+--- 2026-05-18T16:47:40.692Z debug
+-- START CF API RESPONSE: OK 200
+---
+
+--- 2026-05-18T16:47:40.692Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:40.692Z debug
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:40.692Z debug
+-- END CF API RESPONSE
+---
+
+--- 2026-05-18T16:47:40.692Z log
+Worker Startup Time: 1 ms
+---
+
+--- 2026-05-18T16:47:40.694Z log
+Your worker has access to the following bindings:
+- Queues:
+  - VIEWCOUNTTEAM_QUEUE: viewcountteam-queue
+- D1 Databases:
+  - DB: megashorts-db (52d25396-2a61-42a8-904f-2d7956cede44)
+- R2 Buckets:
+  - POINTS_BUCKET: points-system-bucket
+  - LOGS_BUCKET: logs-bucket
+- Services:
+  - CFSTATSADMIN_WORKER: cfstats-admin
+  - COMMISSION_WORKER: commission-worker
+- Vars:
+  - SUPABASE_URL: "https://bpvmstecehkyztiflxqr.supabase..."
+---
+
+--- 2026-05-18T16:47:40.695Z log
+Uploaded viewcount-team-worker (3.88 sec)
+---
+
+--- 2026-05-18T16:47:40.696Z debug
+-- START CF API REQUEST: GET https://api.cloudflare.com/client/v4/accounts/923201050a960d4c64fb9b90a88cb956/workers/scripts/viewcount-team-worker/subdomain
+---
+
+--- 2026-05-18T16:47:40.696Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:40.696Z debug
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:40.696Z debug
+-- END CF API REQUEST
+---
+
+--- 2026-05-18T16:47:40.918Z debug
+-- START CF API RESPONSE: OK 200
+---
+
+--- 2026-05-18T16:47:40.918Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:40.918Z debug
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:40.918Z debug
+-- END CF API RESPONSE
+---
+
+--- 2026-05-18T16:47:40.918Z debug
+Saving to cache: {"account":{"id":"923201050a960d4c64fb9b90a88cb956","name":""}}
+---
+
+--- 2026-05-18T16:47:40.919Z debug
+-- START CF API REQUEST: GET https://api.cloudflare.com/client/v4/accounts/923201050a960d4c64fb9b90a88cb956/queues?name=viewcountteam-queue&name=viewcountteam-queue&page=1
+---
+
+--- 2026-05-18T16:47:40.919Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:40.919Z debug
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:40.919Z debug
+-- END CF API REQUEST
+---
+
+--- 2026-05-18T16:47:41.199Z debug
+-- START CF API RESPONSE: OK 200
+---
+
+--- 2026-05-18T16:47:41.199Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:41.199Z debug
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:41.199Z debug
+-- END CF API RESPONSE
+---
+
+--- 2026-05-18T16:47:41.200Z debug
+-- START CF API REQUEST: GET https://api.cloudflare.com/client/v4/accounts/923201050a960d4c64fb9b90a88cb956/workers/subdomain
+---
+
+--- 2026-05-18T16:47:41.200Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:41.200Z debug
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:41.200Z debug
+-- END CF API REQUEST
+---
+
+--- 2026-05-18T16:47:41.416Z debug
+-- START CF API RESPONSE: OK 200
+---
+
+--- 2026-05-18T16:47:41.416Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:41.416Z debug
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:41.416Z debug
+-- END CF API RESPONSE
+---
+
+--- 2026-05-18T16:47:41.417Z debug
+Saving to cache: {"account":{"id":"923201050a960d4c64fb9b90a88cb956","name":""}}
+---
+
+--- 2026-05-18T16:47:41.417Z debug
+Saving to cache: {"account":{"id":"923201050a960d4c64fb9b90a88cb956","name":""}}
+---
+
+--- 2026-05-18T16:47:41.417Z debug
+-- START CF API REQUEST: GET https://api.cloudflare.com/client/v4/accounts/923201050a960d4c64fb9b90a88cb956/queues?page=1&name=viewcountteam-queue
+---
+
+--- 2026-05-18T16:47:41.417Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:41.417Z debug
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:41.417Z debug
+-- END CF API REQUEST
+---
+
+--- 2026-05-18T16:47:41.418Z debug
+-- START CF API REQUEST: GET https://api.cloudflare.com/client/v4/accounts/923201050a960d4c64fb9b90a88cb956/queues?page=1&name=viewcountteam-queue
+---
+
+--- 2026-05-18T16:47:41.418Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:41.418Z debug
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:41.418Z debug
+-- END CF API REQUEST
+---
+
+--- 2026-05-18T16:47:41.682Z debug
+-- START CF API RESPONSE: OK 200
+---
+
+--- 2026-05-18T16:47:41.682Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:41.682Z debug
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:41.682Z debug
+-- END CF API RESPONSE
+---
+
+--- 2026-05-18T16:47:41.683Z debug
+Saving to cache: {"account":{"id":"923201050a960d4c64fb9b90a88cb956","name":""}}
+---
+
+--- 2026-05-18T16:47:41.683Z debug
+-- START CF API REQUEST: PUT https://api.cloudflare.com/client/v4/accounts/923201050a960d4c64fb9b90a88cb956/queues/c0d749a064df4cd582d8f2c42cdee355
+---
+
+--- 2026-05-18T16:47:41.683Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:41.683Z debug
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:41.683Z debug
+-- END CF API REQUEST
+---
+
+--- 2026-05-18T16:47:41.700Z debug
+-- START CF API RESPONSE: OK 200
+---
+
+--- 2026-05-18T16:47:41.700Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:41.700Z debug
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:41.700Z debug
+-- END CF API RESPONSE
+---
+
+--- 2026-05-18T16:47:41.700Z debug
+Saving to cache: {"account":{"id":"923201050a960d4c64fb9b90a88cb956","name":""}}
+---
+
+--- 2026-05-18T16:47:41.700Z debug
+-- START CF API REQUEST: GET https://api.cloudflare.com/client/v4/accounts/923201050a960d4c64fb9b90a88cb956/queues?page=1&name=viewcountteam-queue
+---
+
+--- 2026-05-18T16:47:41.700Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:41.700Z debug
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:41.700Z debug
+-- END CF API REQUEST
+---
+
+--- 2026-05-18T16:47:42.212Z debug
+-- START CF API RESPONSE: OK 200
+---
+
+--- 2026-05-18T16:47:42.213Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:42.213Z debug
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:42.213Z debug
+-- END CF API RESPONSE
+---
+
+--- 2026-05-18T16:47:42.284Z debug
+-- START CF API RESPONSE: OK 200
+---
+
+--- 2026-05-18T16:47:42.285Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:42.285Z debug
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:42.285Z debug
+-- END CF API RESPONSE
+---
+
+--- 2026-05-18T16:47:42.285Z debug
+Saving to cache: {"account":{"id":"923201050a960d4c64fb9b90a88cb956","name":""}}
+---
+
+--- 2026-05-18T16:47:42.286Z debug
+-- START CF API REQUEST: PUT https://api.cloudflare.com/client/v4/accounts/923201050a960d4c64fb9b90a88cb956/queues/c0d749a064df4cd582d8f2c42cdee355/consumers/4cbf04bbf33e4373afb707834e2e95a6
+---
+
+--- 2026-05-18T16:47:42.286Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:42.286Z debug
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:42.286Z debug
+-- END CF API REQUEST
+---
+
+--- 2026-05-18T16:47:42.621Z debug
+-- START CF API RESPONSE: OK 200
+---
+
+--- 2026-05-18T16:47:42.621Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:42.621Z debug
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:42.621Z debug
+-- END CF API RESPONSE
+---
+
+--- 2026-05-18T16:47:42.621Z log
+Deployed viewcount-team-worker triggers (1.42 sec)
+---
+
+--- 2026-05-18T16:47:42.622Z log
+  https://viewcount-team-worker.msdevcm.workers.dev
+---
+
+--- 2026-05-18T16:47:42.623Z log
+  Producer for viewcountteam-queue
+---
+
+--- 2026-05-18T16:47:42.623Z log
+  Consumer for viewcountteam-queue
+---
+
+--- 2026-05-18T16:47:42.623Z log
+Current Version ID: aaee58f4-a224-4585-94fd-d2939c9f0cc2
+---
+
+--- 2026-05-18T16:47:42.624Z debug
+Metrics dispatcher: Dispatching disabled - would have sent {"deviceId":"c8397d8f-15b6-4383-ac87-c9f1f1083fc4","event":"deploy worker script","timestamp":1779122862624,"properties":{"category":"Workers","wranglerVersion":"4.0.0","os":"darwin:arm64","usesTypeScript":true,"durationMs":6513}}.
+---
+
+--- 2026-05-18T16:47:42.627Z debug
+Metrics dispatcher: Dispatching disabled - would have sent {"deviceId":"c8397d8f-15b6-4383-ac87-c9f1f1083fc4","event":"wrangler command completed","timestamp":1779122862627,"properties":{"amplitude_session_id":1779122856089,"amplitude_event_id":1,"wranglerVersion":"4.0.0","osPlatform":"Mac OS","osVersion":"Darwin Kernel Version 22.6.0: Sun Dec 17 22:14:25 PST 2023; root:xnu-8796.141.3.703.2~2/RELEASE_ARM64_T8112","nodeVersion":24,"packageManager":"npm","isFirstUsage":false,"configFileType":"toml","isCI":false,"isPagesCI":false,"isWorkersCI":false,"isInteractive":false,"hasAssets":false,"argsUsed":["c","config"],"argsCombination":"c, config","command":"wrangler deploy","args":{"config":"<REDACTED>","c":"<REDACTED>","xJsonConfig":true,"j":true,"noBundle":false,"latest":false,"keepVars":false,"xAutoCreate":true},"durationMs":6546,"durationSeconds":6.546,"durationMinutes":0.1091}}.
+---

@@ -27,7 +27,7 @@ export default function NavBar({ className }: NavBarProps) {
 
   return (
     <header className={`absolute w-full z-50 bg-transparent ${className}`}>
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-5 px-5 lg:px-8 lg:py-6 py-1 md:py-3">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-5 px-5 lg:px-8 py-2 md:py-3 lg:py-6">
         {/* 데스크탑 로고 */}
         <Link href="/" className="hidden md:block">
           <div className="relative w-[192px] h-[24px]">
@@ -52,13 +52,14 @@ export default function NavBar({ className }: NavBarProps) {
         
         {/* 우측 메뉴 */}
         <div className="flex items-center gap-4 md:gap-3 ml-auto">
-          {/* <div className="hidden lg:flex items-center gap-5"> */}
           <div className="flex items-center gap-1 md:gap-3">
             <NavLinks />
+          </div>
+          <div className="flex items-center gap-4 md:gap-3">
             {session?.user ? (
-              <div className="relative pl-1 ">
+              <div className="relative">
                 <UserButton 
-                  className="transition-colors text-white flex items-center justify-center border-transparent hover:border-primary rounded-full border-2 focus:outline-none focus:ring-0 "
+                  className="text-white"
                 />
                 {unreadCount > 0 && (
                   <span
@@ -77,11 +78,9 @@ export default function NavBar({ className }: NavBarProps) {
                 </span>
               </Link>
             )}
-
-            
+            <LocaleSwitcher />
+            <SearchField />
           </div>
-          <LocaleSwitcher />
-          <SearchField />
           {/* 모바일 네비게이션 */}
           {/* <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-card p-3 border-t flex justify-around w-full z-20">
             <NavLinks view="mobile" />

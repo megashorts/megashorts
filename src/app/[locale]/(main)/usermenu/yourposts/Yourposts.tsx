@@ -9,6 +9,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Loader2 } from "lucide-react";
 import InfiniteScrollContainer from "@/components/InfiniteScrollContainer";
 import PostGrid from "@/components/PostGrid";
+import { useTranslations } from "next-intl";
 
 interface YourPostsProps {
   status: "PUBLISHED" | "DRAFT";
@@ -16,6 +17,7 @@ interface YourPostsProps {
 
 export default function YourPosts({ status }: YourPostsProps) {
   const isMobile = useIsMobile();
+  const tUserMenu = useTranslations('UserMenu');
 
   const {
     data,
@@ -53,8 +55,8 @@ export default function YourPosts({ status }: YourPostsProps) {
     return (
       <p className="text-center text-muted-foreground">
         {status === "PUBLISHED" 
-          ? "게시된 컨텐츠가 없습니다."
-          : "임시저장된 컨텐츠가 없습니다."}
+          ? tUserMenu('emptyPublished')
+          : tUserMenu('emptyDraft')}
       </p>
     );
   }
@@ -62,7 +64,7 @@ export default function YourPosts({ status }: YourPostsProps) {
   if (queryStatus === "error") {
     return (
       <p className="text-center text-destructive">
-        컨텐츠를 불러오는 중 오류가 발생했습니다.
+        {tUserMenu('loadError')}
       </p>
     );
   }
@@ -91,7 +93,7 @@ export default function YourPosts({ status }: YourPostsProps) {
       
       {!hasNextPage && posts.length > 0 && (
         <p className="text-center text-muted-foreground py-4">
-          모든 컨텐츠를 로딩했습니다.
+          {tUserMenu('allLoaded')}
         </p>
       )}
     </InfiniteScrollContainer>

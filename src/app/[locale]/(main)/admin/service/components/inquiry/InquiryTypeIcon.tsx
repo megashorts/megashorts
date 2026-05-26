@@ -13,11 +13,11 @@ export default function InquiryTypeIcon({ type, className }: InquiryTypeIconProp
   const config = {
     REPORT: {
       icon: <AlertTriangle className={`text-red-500 table-cell-icon ${className} w-4 h-4`} />,
-      label: "신고",
+      label: "Report",
     },
     INQUIRY: {
       icon: <HelpCircle className={`text-blue-500 table-cell-icon ${className} w-4 h-4`} />,
-      label: "문의",
+      label: "Inquiry",
     },
   };
 

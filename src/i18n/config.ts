@@ -12,15 +12,15 @@ export interface LocaleConfig {
   code: LocaleCode;
   name: string;        // 해당 언어로 표시되는 이름
   englishName: string; // 영어 이름
-  flag: string;        // 국기 이모지
+  flag: string;        // 국기 이미지 경로
   dir: 'ltr' | 'rtl';  // 텍스트 방향
 }
 
 // ── 지원 언어 목록 (이 배열만 수정하면 전체 반영) ──
 export const locales: LocaleConfig[] = [
-  { code: 'en', name: 'English',  englishName: 'English',  flag: 'https://flagcdn.com/w40/us.png', dir: 'ltr' },
-  { code: 'ko', name: '한국어',    englishName: 'Korean',   flag: 'https://flagcdn.com/w40/kr.png', dir: 'ltr' },
-  { code: 'zh', name: '中文',      englishName: 'Chinese',  flag: 'https://flagcdn.com/w40/cn.png', dir: 'ltr' },
+  { code: 'en', name: 'English',  englishName: 'English',  flag: '/flags/en.svg', dir: 'ltr' },
+  { code: 'ko', name: '한국어',    englishName: 'Korean',   flag: '/flags/ko.svg', dir: 'ltr' },
+  { code: 'zh', name: '中文',      englishName: 'Chinese',  flag: '/flags/zh.svg', dir: 'ltr' },
 ];
 
 // ── 기본 언어 ──

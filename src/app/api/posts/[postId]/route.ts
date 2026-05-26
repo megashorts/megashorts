@@ -44,7 +44,9 @@ export async function PUT(
         data: {
           title: validatedData.title,
           titleOriginal: validatedData.titleOriginal,
+          titleI18n: validatedData.titleI18n,
           content: validatedData.content,
+          contentI18n: validatedData.contentI18n,
           thumbnailId: validatedData.thumbnailId,
           status: validatedData.status,
           categories: validatedData.categories,
@@ -67,6 +69,7 @@ export async function PUT(
           validatedData.videos.map((video) =>
             tx.video.create({
               data: {
+                id: video.id,
                 postId: post.id,
                 filename: video.filename,
                 sequence: video.sequence,

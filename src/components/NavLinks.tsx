@@ -37,13 +37,13 @@ export default function NavLinks() {
       return (
         <Button
           variant="ghost"
-          className={`flex items-center md:gap-2 hover:bg-transparent group relative ${
+          className={`group relative h-6 w-6 p-0 hover:bg-transparent md:h-10 md:w-auto md:px-3 ${
             isActive("usermenu/bookmarks") ? "text-primary" : ""
           }`}
           title="Bookmarks"
           asChild
         >
-          <Link href="/usermenu/bookmarks" className="relative">
+          <Link href="/usermenu/bookmarks" className="relative inline-flex items-center md:gap-2">
             <Bookmark className="size-6" />
             <span className={`${isActive("/bookmarks") ? "text-primary" : "group-hover:text-primary"} hidden md:block`}>{tNav('myList')}</span>
             <span className="absolute left-0 bottom-[0px] w-full h-1 bg-primary scale-x-0 transition-transform duration-200 group-hover:scale-x-100 hidden md:block" />
@@ -72,7 +72,7 @@ export default function NavLinks() {
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
-              className="flex items-center md:gap-2 hover:bg-transparent group relative"
+              className="group relative h-6 w-6 p-0 hover:bg-transparent md:h-10 md:w-auto md:px-3"
               title="Bookmarks"
             >
               <Clapperboard className="size-6" />
@@ -157,30 +157,30 @@ export default function NavLinks() {
 
     return (
       <>
-        <div className="flex md:gap-4">
+        <div className="flex items-center gap-4 md:gap-4">
           <Button
             variant="ghost"
-            className={`flex items-center md:gap-2 hover:bg-transparent group relative ${
+            className={`hidden md:inline-flex group relative h-6 w-6 p-0 hover:bg-transparent md:h-10 md:w-auto md:px-3 ${
               isActive("/") ? "text-primary" : ""
             }`}
             title="Home"
             asChild
           >
-            <Link href="/" className="relative">
-              <Home className="size-6 hidden md:block" />
+            <Link href="/" className="relative inline-flex items-center md:gap-2">
+              <Home className="size-6" />
               <span className={`${isActive("/") ? "text-primary" : "group-hover:text-primary"} hidden md:block`}>{tNav('home')}</span>
               <span className="absolute left-0 bottom-[0px] w-full h-1 bg-primary scale-x-0 transition-transform duration-200 group-hover:scale-x-100 hidden md:block" />
             </Link>
           </Button>
           <Button
             variant="ghost"
-            className={`flex items-center md:gap-2 hover:bg-transparent group relative ${
+            className={`group relative h-6 w-6 p-0 hover:bg-transparent md:h-10 md:w-auto md:px-3 ${
               isActive("/recommended-videos") ? "text-primary" : ""
             }`}
             title="For you"
             asChild
           >
-            <Link href="/recommended-videos" className="relative">
+            <Link href="/recommended-videos" className="relative inline-flex items-center md:gap-2">
               <Compass className="size-6" />
               <span className={`${isActive("/recommended-videos") ? "text-primary" : "group-hover:text-primary"} hidden md:block`}>{tNav('recommend')}</span>
               <span className="absolute left-0 bottom-[0px] w-full h-1 bg-primary scale-x-0 transition-transform duration-200 group-hover:scale-x-100 hidden md:block" />

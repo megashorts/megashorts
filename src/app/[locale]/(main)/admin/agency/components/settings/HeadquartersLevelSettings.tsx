@@ -60,7 +60,7 @@ export default function HeadquartersLevelSettings({
     
     // 새 레벨 생성
     const newLevel = {
-      name: `중간 단계 ${levels.length}`,
+      name: `Middle Level ${levels.length}`,
       level: levels.length,
       commissionRate: 1
     };
@@ -220,7 +220,7 @@ export default function HeadquartersLevelSettings({
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h3 className="text-sm font-medium">본부구조 확장 및 수수료 설정</h3>
+        <h3 className="text-sm font-medium">HQ Structure Expansion & Commission Settings</h3>
         <Button
           variant="ghost"
           size="sm"
@@ -393,7 +393,7 @@ export default function HeadquartersLevelSettings({
                                   className="w-30 text-right ml-1"
                                   style={{ appearance: "textfield" }}
                                 />
-                                <span className="text-xs ml-1 mr-6">명</span>
+                                <span className="text-xs ml-1 mr-6">members</span>
                               </div>
                               
                               {/* 하위 시청수 조건 */}
@@ -419,7 +419,7 @@ export default function HeadquartersLevelSettings({
                                   style={{ appearance: "textfield" }}
                                 />
                                 {/* <span className="text-xs ml-1">원</span> */}
-                                <span className="text-xs ml-1 mr-6">회</span>
+                                <span className="text-xs ml-1 mr-6">views</span>
                               </div>
                             </div>
                             

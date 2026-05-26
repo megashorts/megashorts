@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Copy, Share2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { QRCodeSVG } from "qrcode.react";
+import { useTranslations } from "next-intl";
 
 interface ReferralLinkModalProps {
   username: string;
@@ -17,6 +18,8 @@ interface ReferralLinkModalProps {
 export default function ReferralLinkModal({ username }: ReferralLinkModalProps) {
   const { user } = useSession();
   const { toast } = useToast();
+  const tUserMenu = useTranslations('UserMenu');
+  const tCommon = useTranslations('Common');
   const [open, setOpen] = useState(false);
   const [referralLink, setReferralLink] = useState("");
   
@@ -34,13 +37,13 @@ export default function ReferralLinkModal({ username }: ReferralLinkModalProps) 
     try {
       await navigator.clipboard.writeText(referralLink);
       toast({
-        description: "링크가 클립보드에 복사되었습니다.",
+        description: tUserMenu('referralCopySuccess'),
         duration: 1500,
       });
     } catch (error) {
-      console.error("클립보드 복사 실패:", error);
+      console.error("Copy failed:", error);
       toast({
-        description: "링크 복사에 실패했습니다.",
+        description: tUserMenu('referralCopyFailed'),
         variant: "destructive",
         duration: 1500,
       });
@@ -52,12 +55,12 @@ export default function ReferralLinkModal({ username }: ReferralLinkModalProps) 
     if (navigator.share) {
       try {
         await navigator.share({
-          title: "회원가입 추천 링크",
-          text: "이 링크를 통해 가입하시면 저를 추천인으로 등록됩니다.",
+          title: tUserMenu('referralShareTitle'),
+          text: tUserMenu('referralShareText'),
           url: referralLink,
         });
       } catch (error) {
-        console.error("공유 실패:", error);
+        console.error("Share failed:", error);
       }
     } else {
       copyToClipboard();
@@ -69,23 +72,23 @@ export default function ReferralLinkModal({ username }: ReferralLinkModalProps) 
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" className="ml-2">
           <Share2 className="w-4 h-4 mr-2" />
-          추천인 링크
+          {tUserMenu('referralLinkButton')}
         </Button>
       </DialogTrigger>
       <DialogContent className="w-full md:min-w-[450px] max-w-[90%] md:max-w-[30%] rounded-lg h-auto">
         <DialogHeader>
-          <DialogTitle>추천인 링크 및 QR 코드</DialogTitle>
+          <DialogTitle>{tUserMenu('referralLinkTitle')}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-4">
           <div className="flex flex-col items-center justify-center space-y-4">
             <QRCodeSVG value={referralLink} size={200} />
             <p className="text-sm text-muted-foreground">
-              이 QR 코드를 스캔하면 회원가입 시 추천인으로 등록됩니다.
+              {tUserMenu('referralQrDesc')}
             </p>
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="referralLink">추천인 링크</Label>
+            <Label htmlFor="referralLink">{tUserMenu('referralLinkButton')}</Label>
             <div className="flex space-x-2">
               <Input
                 id="referralLink"
@@ -98,14 +101,14 @@ export default function ReferralLinkModal({ username }: ReferralLinkModalProps) 
               </Button>
             </div>
             <p className="text-sm text-muted-foreground">
-              이 링크를 공유하면 회원가입 시 추천인으로 등록됩니다.
+              {tUserMenu('referralLinkDesc')}
             </p>
           </div>
           
           <div className="flex justify-end">
             <Button onClick={shareLink}>
               <Share2 className="w-4 h-4 mr-2" />
-              공유하기
+              {tCommon('share')}
             </Button>
           </div>
         </div>

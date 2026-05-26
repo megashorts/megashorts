@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import Cropper, { ReactCropperElement } from 'react-cropper';
 import 'cropperjs/dist/cropper.css';
+import { useTranslations } from 'next-intl';
 
 interface CropImageDialogProps {
   open: boolean;
@@ -21,6 +22,7 @@ export function CropImageDialog({
   onCrop,
 }: CropImageDialogProps) {
   const cropperRef = useRef<ReactCropperElement>(null);
+  const tUploader = useTranslations('VideoUploader');
 
   const handleCrop = useCallback(() => {
     const cropper = cropperRef.current?.cropper;
@@ -37,7 +39,7 @@ export function CropImageDialog({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-[800px]">
         <DialogHeader>
-          <DialogTitle>이미지 크롭</DialogTitle>
+          <DialogTitle>{tUploader('cropTitle')}</DialogTitle>
         </DialogHeader>
         
         <div className="mt-4">
@@ -54,10 +56,10 @@ export function CropImageDialog({
 
         <div className="flex justify-end gap-2 mt-4">
           <Button variant="outline" onClick={onClose}>
-            취소
+            {tUploader('cancel')}
           </Button>
           <Button onClick={handleCrop}>
-            적용
+            {tUploader('apply')}
           </Button>
         </div>
       </DialogContent>

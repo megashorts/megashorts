@@ -20,6 +20,7 @@ interface UserSearchInputProps {
   placeholder?: string;
   className?: string;
   disabled?: boolean;
+  roleFilter?: number | number[];
 }
 
 export default function UserSearchInput({
@@ -27,7 +28,8 @@ export default function UserSearchInput({
   selectedUser,
   placeholder = "유저네임 또는 이메일 검색...",
   className = "",
-  disabled = false
+  disabled = false,
+  roleFilter
 }: UserSearchInputProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [users, setUsers] = useState<User[]>([]);
@@ -74,7 +76,14 @@ export default function UserSearchInput({
 
     searchTimeoutRef.current = setTimeout(async () => {
       try {
-        const response = await fetch(`/api/admin/users/search?q=${encodeURIComponent(searchTerm)}`);
+        const params = new URLSearchParams({ q: searchTerm });
+        if (Array.isArray(roleFilter)) {
+          params.set("roles", roleFilter.join(","));
+        } else if (typeof roleFilter === "number") {
+          params.set("role", String(roleFilter));
+        }
+
+        const response = await fetch(`/api/admin/users/search?${params.toString()}`);
         if (!response.ok) throw new Error('Search failed');
         const data = await response.json();
         setUsers(data.users || []);

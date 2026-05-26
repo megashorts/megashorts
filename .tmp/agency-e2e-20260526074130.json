@@ -1,0 +1,3274 @@
+{
+  "runId": "20260526074130",
+  "targetDate": "2045-10-08",
+  "password": "MegaTest!2026",
+  "baseUrl": "https://www.megashorts.com",
+  "d1Reset": {
+    "skipped": false,
+    "date": "2045-10-08",
+    "existingRows": {
+      "groupedViews": 0,
+      "groupedViewDetails": 0,
+      "commissionBatch": 0,
+      "cfStats": 0
+    }
+  },
+  "systemSettingsSnapshot": [
+    {
+      "key": "coinToPoint",
+      "existed": true,
+      "row": {
+        "id": "cm8i6s5jh0008cvk2gfub79a9",
+        "key": "coinToPoint",
+        "value": {
+          "value": 120,
+          "enabled": true
+        },
+        "valueType": "number",
+        "defaultValue": null,
+        "description": null,
+        "updatedAt": "2026-05-26T05:50:49.340Z",
+        "updatedBy": null
+      }
+    },
+    {
+      "key": "viewCoinAmount",
+      "existed": true,
+      "row": {
+        "id": "cm8i6s6ys000dcvk2ocjmi5r9",
+        "key": "viewCoinAmount",
+        "value": {
+          "value": 2,
+          "enabled": true
+        },
+        "valueType": "number",
+        "defaultValue": null,
+        "description": null,
+        "updatedAt": "2026-05-26T05:50:49.403Z",
+        "updatedBy": null
+      }
+    },
+    {
+      "key": "subscriptionPackages",
+      "existed": true,
+      "row": {
+        "id": "cm8i6s4cq0006cvk2rpkgjrz4",
+        "key": "subscriptionPackages",
+        "value": {
+          "value": [
+            {
+              "type": "weekly",
+              "price": 8500,
+              "globalPrice": 9
+            },
+            {
+              "type": "yearly",
+              "price": 190000,
+              "globalPrice": 190
+            }
+          ],
+          "enabled": true
+        },
+        "valueType": "number",
+        "defaultValue": null,
+        "description": null,
+        "updatedAt": "2026-05-26T05:50:49.462Z",
+        "updatedBy": null
+      }
+    },
+    {
+      "key": "uploaderQualification",
+      "existed": true,
+      "row": {
+        "id": "cm8i6s5jh0009cvk2gm7pgodn",
+        "key": "uploaderQualification",
+        "value": {
+          "value": [
+            {
+              "level": 1,
+              "minViews": 1,
+              "shareRatio": 10
+            },
+            {
+              "level": 2,
+              "minViews": 100,
+              "shareRatio": 15
+            },
+            {
+              "level": 3,
+              "minViews": 300,
+              "shareRatio": 20
+            },
+            {
+              "level": 4,
+              "minViews": 500,
+              "shareRatio": 25
+            },
+            {
+              "level": 5,
+              "minViews": 1000,
+              "shareRatio": 30
+            },
+            {
+              "level": 6,
+              "minViews": 2000,
+              "shareRatio": 35
+            },
+            {
+              "level": 7,
+              "minViews": 5000,
+              "shareRatio": 40
+            },
+            {
+              "level": 8,
+              "minViews": 10000,
+              "shareRatio": 50
+            }
+          ],
+          "enabled": true
+        },
+        "valueType": "number",
+        "defaultValue": null,
+        "description": null,
+        "updatedAt": "2026-05-26T05:50:49.535Z",
+        "updatedBy": null
+      }
+    }
+  ],
+  "accounts": {
+    "admin": {
+      "id": "codex_agency_test_20260526074130_admin",
+      "username": "t-admin-4130",
+      "displayName": "검증 관리자",
+      "email": "t-admin-4130@ms.com",
+      "userRole": 100,
+      "referredBy": null,
+      "teamMaster": null,
+      "emailVerified": true,
+      "myLanguage": "KOREAN"
+    },
+    "creators": [
+      {
+        "id": "codex_agency_test_20260526074130_creator_lv1",
+        "username": "lv1-4130",
+        "displayName": "크리에이터 L1 10%",
+        "email": "lv1-4130@ms.com",
+        "userRole": 20,
+        "referredBy": null,
+        "teamMaster": null,
+        "emailVerified": true,
+        "myLanguage": "KOREAN"
+      },
+      {
+        "id": "codex_agency_test_20260526074130_creator_lv2",
+        "username": "lv2-4130",
+        "displayName": "크리에이터 L2 20%",
+        "email": "lv2-4130@ms.com",
+        "userRole": 22,
+        "referredBy": null,
+        "teamMaster": null,
+        "emailVerified": true,
+        "myLanguage": "KOREAN"
+      },
+      {
+        "id": "codex_agency_test_20260526074130_creator_lv3",
+        "username": "lv3-4130",
+        "displayName": "크리에이터 L3 30%",
+        "email": "lv3-4130@ms.com",
+        "userRole": 24,
+        "referredBy": null,
+        "teamMaster": null,
+        "emailVerified": true,
+        "myLanguage": "KOREAN"
+      }
+    ],
+    "teams": [
+      {
+        "key": "hq",
+        "label": "본부형 영업팀",
+        "masterType": "HEADQUARTERS",
+        "master": {
+          "id": "codex_agency_test_20260526074130_hq_master",
+          "username": "hq-4130",
+          "displayName": "본부형 영업팀 마스터",
+          "email": "hq-4130@ms.com",
+          "userRole": 50,
+          "referredBy": null,
+          "teamMaster": "codex_agency_test_20260526074130_hq_master",
+          "emailVerified": true,
+          "myLanguage": "KOREAN"
+        },
+        "members": [
+          {
+            "id": "codex_agency_test_20260526074130_hq_master",
+            "username": "hq-4130",
+            "displayName": "본부형 영업팀 마스터",
+            "email": "hq-4130@ms.com",
+            "userRole": 50,
+            "referredBy": null,
+            "teamMaster": "codex_agency_test_20260526074130_hq_master",
+            "emailVerified": true,
+            "myLanguage": "KOREAN"
+          },
+          {
+            "id": "codex_agency_test_20260526074130_hq_direct_a",
+            "username": "hq-a-4130",
+            "displayName": "본부형 영업팀 직속 A",
+            "email": "hq-a-4130@ms.com",
+            "userRole": 40,
+            "referredBy": "codex_agency_test_20260526074130_hq_master",
+            "teamMaster": "codex_agency_test_20260526074130_hq_master",
+            "emailVerified": true,
+            "myLanguage": "KOREAN"
+          },
+          {
+            "id": "codex_agency_test_20260526074130_hq_direct_b",
+            "username": "hq-b-4130",
+            "displayName": "본부형 영업팀 직속 B",
+            "email": "hq-b-4130@ms.com",
+            "userRole": 40,
+            "referredBy": "codex_agency_test_20260526074130_hq_master",
+            "teamMaster": "codex_agency_test_20260526074130_hq_master",
+            "emailVerified": true,
+            "myLanguage": "KOREAN"
+          },
+          {
+            "id": "codex_agency_test_20260526074130_hq_level2_a",
+            "username": "hq-l2a-4130",
+            "displayName": "본부형 영업팀 2단계 A",
+            "email": "hq-l2a-4130@ms.com",
+            "userRole": 40,
+            "referredBy": "codex_agency_test_20260526074130_hq_direct_a",
+            "teamMaster": "codex_agency_test_20260526074130_hq_master",
+            "emailVerified": true,
+            "myLanguage": "KOREAN"
+          },
+          {
+            "id": "codex_agency_test_20260526074130_hq_level2_b",
+            "username": "hq-l2b-4130",
+            "displayName": "본부형 영업팀 2단계 B",
+            "email": "hq-l2b-4130@ms.com",
+            "userRole": 40,
+            "referredBy": "codex_agency_test_20260526074130_hq_direct_b",
+            "teamMaster": "codex_agency_test_20260526074130_hq_master",
+            "emailVerified": true,
+            "myLanguage": "KOREAN"
+          },
+          {
+            "id": "codex_agency_test_20260526074130_hq_level3",
+            "username": "hq-l3-4130",
+            "displayName": "본부형 영업팀 3단계",
+            "email": "hq-l3-4130@ms.com",
+            "userRole": 40,
+            "referredBy": "codex_agency_test_20260526074130_hq_level2_a",
+            "teamMaster": "codex_agency_test_20260526074130_hq_master",
+            "emailVerified": true,
+            "myLanguage": "KOREAN"
+          }
+        ]
+      },
+      {
+        "key": "network",
+        "label": "네트워크 영업팀",
+        "masterType": "NETWORK",
+        "master": {
+          "id": "codex_agency_test_20260526074130_network_master",
+          "username": "net-4130",
+          "displayName": "네트워크 영업팀 마스터",
+          "email": "net-4130@ms.com",
+          "userRole": 50,
+          "referredBy": null,
+          "teamMaster": "codex_agency_test_20260526074130_network_master",
+          "emailVerified": true,
+          "myLanguage": "KOREAN"
+        },
+        "members": [
+          {
+            "id": "codex_agency_test_20260526074130_network_master",
+            "username": "net-4130",
+            "displayName": "네트워크 영업팀 마스터",
+            "email": "net-4130@ms.com",
+            "userRole": 50,
+            "referredBy": null,
+            "teamMaster": "codex_agency_test_20260526074130_network_master",
+            "emailVerified": true,
+            "myLanguage": "KOREAN"
+          },
+          {
+            "id": "codex_agency_test_20260526074130_network_direct_a",
+            "username": "net-a-4130",
+            "displayName": "네트워크 영업팀 직속 A",
+            "email": "net-a-4130@ms.com",
+            "userRole": 40,
+            "referredBy": "codex_agency_test_20260526074130_network_master",
+            "teamMaster": "codex_agency_test_20260526074130_network_master",
+            "emailVerified": true,
+            "myLanguage": "KOREAN"
+          },
+          {
+            "id": "codex_agency_test_20260526074130_network_direct_b",
+            "username": "net-b-4130",
+            "displayName": "네트워크 영업팀 직속 B",
+            "email": "net-b-4130@ms.com",
+            "userRole": 40,
+            "referredBy": "codex_agency_test_20260526074130_network_master",
+            "teamMaster": "codex_agency_test_20260526074130_network_master",
+            "emailVerified": true,
+            "myLanguage": "KOREAN"
+          },
+          {
+            "id": "codex_agency_test_20260526074130_network_level2_a",
+            "username": "net-l2a-4130",
+            "displayName": "네트워크 영업팀 2단계 A",
+            "email": "net-l2a-4130@ms.com",
+            "userRole": 40,
+            "referredBy": "codex_agency_test_20260526074130_network_direct_a",
+            "teamMaster": "codex_agency_test_20260526074130_network_master",
+            "emailVerified": true,
+            "myLanguage": "KOREAN"
+          },
+          {
+            "id": "codex_agency_test_20260526074130_network_level2_b",
+            "username": "net-l2b-4130",
+            "displayName": "네트워크 영업팀 2단계 B",
+            "email": "net-l2b-4130@ms.com",
+            "userRole": 40,
+            "referredBy": "codex_agency_test_20260526074130_network_direct_b",
+            "teamMaster": "codex_agency_test_20260526074130_network_master",
+            "emailVerified": true,
+            "myLanguage": "KOREAN"
+          },
+          {
+            "id": "codex_agency_test_20260526074130_network_level3",
+            "username": "net-l3-4130",
+            "displayName": "네트워크 영업팀 3단계",
+            "email": "net-l3-4130@ms.com",
+            "userRole": 40,
+            "referredBy": "codex_agency_test_20260526074130_network_level2_a",
+            "teamMaster": "codex_agency_test_20260526074130_network_master",
+            "emailVerified": true,
+            "myLanguage": "KOREAN"
+          }
+        ]
+      },
+      {
+        "key": "binary",
+        "label": "바이너리 네트워크 영업팀",
+        "masterType": "BINARY_NETWORK",
+        "master": {
+          "id": "codex_agency_test_20260526074130_binary_master",
+          "username": "bin-4130",
+          "displayName": "바이너리 네트워크 영업팀 마스터",
+          "email": "bin-4130@ms.com",
+          "userRole": 50,
+          "referredBy": null,
+          "teamMaster": "codex_agency_test_20260526074130_binary_master",
+          "emailVerified": true,
+          "myLanguage": "KOREAN"
+        },
+        "members": [
+          {
+            "id": "codex_agency_test_20260526074130_binary_master",
+            "username": "bin-4130",
+            "displayName": "바이너리 네트워크 영업팀 마스터",
+            "email": "bin-4130@ms.com",
+            "userRole": 50,
+            "referredBy": null,
+            "teamMaster": "codex_agency_test_20260526074130_binary_master",
+            "emailVerified": true,
+            "myLanguage": "KOREAN"
+          },
+          {
+            "id": "codex_agency_test_20260526074130_binary_direct_a",
+            "username": "bin-a-4130",
+            "displayName": "바이너리 네트워크 영업팀 직속 A",
+            "email": "bin-a-4130@ms.com",
+            "userRole": 40,
+            "referredBy": "codex_agency_test_20260526074130_binary_master",
+            "teamMaster": "codex_agency_test_20260526074130_binary_master",
+            "emailVerified": true,
+            "myLanguage": "KOREAN"
+          },
+          {
+            "id": "codex_agency_test_20260526074130_binary_direct_b",
+            "username": "bin-b-4130",
+            "displayName": "바이너리 네트워크 영업팀 직속 B",
+            "email": "bin-b-4130@ms.com",
+            "userRole": 40,
+            "referredBy": "codex_agency_test_20260526074130_binary_master",
+            "teamMaster": "codex_agency_test_20260526074130_binary_master",
+            "emailVerified": true,
+            "myLanguage": "KOREAN"
+          },
+          {
+            "id": "codex_agency_test_20260526074130_binary_level2_a",
+            "username": "bin-l2a-4130",
+            "displayName": "바이너리 네트워크 영업팀 2단계 A",
+            "email": "bin-l2a-4130@ms.com",
+            "userRole": 40,
+            "referredBy": "codex_agency_test_20260526074130_binary_direct_a",
+            "teamMaster": "codex_agency_test_20260526074130_binary_master",
+            "emailVerified": true,
+            "myLanguage": "KOREAN"
+          },
+          {
+            "id": "codex_agency_test_20260526074130_binary_level2_b",
+            "username": "bin-l2b-4130",
+            "displayName": "바이너리 네트워크 영업팀 2단계 B",
+            "email": "bin-l2b-4130@ms.com",
+            "userRole": 40,
+            "referredBy": "codex_agency_test_20260526074130_binary_direct_b",
+            "teamMaster": "codex_agency_test_20260526074130_binary_master",
+            "emailVerified": true,
+            "myLanguage": "KOREAN"
+          },
+          {
+            "id": "codex_agency_test_20260526074130_binary_level3",
+            "username": "bin-l3-4130",
+            "displayName": "바이너리 네트워크 영업팀 3단계",
+            "email": "bin-l3-4130@ms.com",
+            "userRole": 40,
+            "referredBy": "codex_agency_test_20260526074130_binary_level2_a",
+            "teamMaster": "codex_agency_test_20260526074130_binary_master",
+            "emailVerified": true,
+            "myLanguage": "KOREAN"
+          }
+        ]
+      }
+    ]
+  },
+  "posts": [
+    {
+      "creatorId": "codex_agency_test_20260526074130_creator_lv1",
+      "postId": "codex_agency_test_20260526074130_creator_lv1_post_1",
+      "videoId": "codex_agency_test_20260526074130_creator_lv1_video_1",
+      "index": 1
+    },
+    {
+      "creatorId": "codex_agency_test_20260526074130_creator_lv1",
+      "postId": "codex_agency_test_20260526074130_creator_lv1_post_2",
+      "videoId": "codex_agency_test_20260526074130_creator_lv1_video_2",
+      "index": 2
+    },
+    {
+      "creatorId": "codex_agency_test_20260526074130_creator_lv2",
+      "postId": "codex_agency_test_20260526074130_creator_lv2_post_1",
+      "videoId": "codex_agency_test_20260526074130_creator_lv2_video_1",
+      "index": 1
+    },
+    {
+      "creatorId": "codex_agency_test_20260526074130_creator_lv2",
+      "postId": "codex_agency_test_20260526074130_creator_lv2_post_2",
+      "videoId": "codex_agency_test_20260526074130_creator_lv2_video_2",
+      "index": 2
+    },
+    {
+      "creatorId": "codex_agency_test_20260526074130_creator_lv3",
+      "postId": "codex_agency_test_20260526074130_creator_lv3_post_1",
+      "videoId": "codex_agency_test_20260526074130_creator_lv3_video_1",
+      "index": 1
+    },
+    {
+      "creatorId": "codex_agency_test_20260526074130_creator_lv3",
+      "postId": "codex_agency_test_20260526074130_creator_lv3_post_2",
+      "videoId": "codex_agency_test_20260526074130_creator_lv3_video_2",
+      "index": 2
+    }
+  ],
+  "views": [
+    {
+      "id": "codex_agency_test_20260526074130_view_001",
+      "teamKey": "hq",
+      "teamType": "HEADQUARTERS",
+      "viewerId": "codex_agency_test_20260526074130_hq_direct_a",
+      "referrerId": "codex_agency_test_20260526074130_hq_master",
+      "teamMasterId": "codex_agency_test_20260526074130_hq_master",
+      "creatorId": "codex_agency_test_20260526074130_creator_lv1",
+      "postId": "codex_agency_test_20260526074130_creator_lv1_post_1",
+      "accessMethod": "COIN"
+    },
+    {
+      "id": "codex_agency_test_20260526074130_view_002",
+      "teamKey": "hq",
+      "teamType": "HEADQUARTERS",
+      "viewerId": "codex_agency_test_20260526074130_hq_level2_a",
+      "referrerId": "codex_agency_test_20260526074130_hq_direct_a",
+      "teamMasterId": "codex_agency_test_20260526074130_hq_master",
+      "creatorId": "codex_agency_test_20260526074130_creator_lv2",
+      "postId": "codex_agency_test_20260526074130_creator_lv2_post_1",
+      "accessMethod": "SUBSCRIPTION"
+    },
+    {
+      "id": "codex_agency_test_20260526074130_view_003",
+      "teamKey": "hq",
+      "teamType": "HEADQUARTERS",
+      "viewerId": "codex_agency_test_20260526074130_hq_level3",
+      "referrerId": "codex_agency_test_20260526074130_hq_level2_a",
+      "teamMasterId": "codex_agency_test_20260526074130_hq_master",
+      "creatorId": "codex_agency_test_20260526074130_creator_lv3",
+      "postId": "codex_agency_test_20260526074130_creator_lv3_post_1",
+      "accessMethod": "COIN"
+    },
+    {
+      "id": "codex_agency_test_20260526074130_view_004",
+      "teamKey": "hq",
+      "teamType": "HEADQUARTERS",
+      "viewerId": "codex_agency_test_20260526074130_hq_direct_b",
+      "referrerId": "codex_agency_test_20260526074130_hq_master",
+      "teamMasterId": "codex_agency_test_20260526074130_hq_master",
+      "creatorId": "codex_agency_test_20260526074130_creator_lv1",
+      "postId": "codex_agency_test_20260526074130_creator_lv1_post_2",
+      "accessMethod": "SUBSCRIPTION"
+    },
+    {
+      "id": "codex_agency_test_20260526074130_view_005",
+      "teamKey": "hq",
+      "teamType": "HEADQUARTERS",
+      "viewerId": "codex_agency_test_20260526074130_hq_level2_b",
+      "referrerId": "codex_agency_test_20260526074130_hq_direct_b",
+      "teamMasterId": "codex_agency_test_20260526074130_hq_master",
+      "creatorId": "codex_agency_test_20260526074130_creator_lv2",
+      "postId": "codex_agency_test_20260526074130_creator_lv2_post_2",
+      "accessMethod": "COIN"
+    },
+    {
+      "id": "codex_agency_test_20260526074130_view_006",
+      "teamKey": "network",
+      "teamType": "NETWORK",
+      "viewerId": "codex_agency_test_20260526074130_network_direct_a",
+      "referrerId": "codex_agency_test_20260526074130_network_master",
+      "teamMasterId": "codex_agency_test_20260526074130_network_master",
+      "creatorId": "codex_agency_test_20260526074130_creator_lv1",
+      "postId": "codex_agency_test_20260526074130_creator_lv1_post_1",
+      "accessMethod": "COIN"
+    },
+    {
+      "id": "codex_agency_test_20260526074130_view_007",
+      "teamKey": "network",
+      "teamType": "NETWORK",
+      "viewerId": "codex_agency_test_20260526074130_network_level2_a",
+      "referrerId": "codex_agency_test_20260526074130_network_direct_a",
+      "teamMasterId": "codex_agency_test_20260526074130_network_master",
+      "creatorId": "codex_agency_test_20260526074130_creator_lv2",
+      "postId": "codex_agency_test_20260526074130_creator_lv2_post_1",
+      "accessMethod": "SUBSCRIPTION"
+    },
+    {
+      "id": "codex_agency_test_20260526074130_view_008",
+      "teamKey": "network",
+      "teamType": "NETWORK",
+      "viewerId": "codex_agency_test_20260526074130_network_level3",
+      "referrerId": "codex_agency_test_20260526074130_network_level2_a",
+      "teamMasterId": "codex_agency_test_20260526074130_network_master",
+      "creatorId": "codex_agency_test_20260526074130_creator_lv3",
+      "postId": "codex_agency_test_20260526074130_creator_lv3_post_1",
+      "accessMethod": "COIN"
+    },
+    {
+      "id": "codex_agency_test_20260526074130_view_009",
+      "teamKey": "network",
+      "teamType": "NETWORK",
+      "viewerId": "codex_agency_test_20260526074130_network_direct_b",
+      "referrerId": "codex_agency_test_20260526074130_network_master",
+      "teamMasterId": "codex_agency_test_20260526074130_network_master",
+      "creatorId": "codex_agency_test_20260526074130_creator_lv1",
+      "postId": "codex_agency_test_20260526074130_creator_lv1_post_2",
+      "accessMethod": "SUBSCRIPTION"
+    },
+    {
+      "id": "codex_agency_test_20260526074130_view_010",
+      "teamKey": "network",
+      "teamType": "NETWORK",
+      "viewerId": "codex_agency_test_20260526074130_network_level2_b",
+      "referrerId": "codex_agency_test_20260526074130_network_direct_b",
+      "teamMasterId": "codex_agency_test_20260526074130_network_master",
+      "creatorId": "codex_agency_test_20260526074130_creator_lv2",
+      "postId": "codex_agency_test_20260526074130_creator_lv2_post_2",
+      "accessMethod": "COIN"
+    },
+    {
+      "id": "codex_agency_test_20260526074130_view_011",
+      "teamKey": "binary",
+      "teamType": "BINARY_NETWORK",
+      "viewerId": "codex_agency_test_20260526074130_binary_direct_a",
+      "referrerId": "codex_agency_test_20260526074130_binary_master",
+      "teamMasterId": "codex_agency_test_20260526074130_binary_master",
+      "creatorId": "codex_agency_test_20260526074130_creator_lv1",
+      "postId": "codex_agency_test_20260526074130_creator_lv1_post_1",
+      "accessMethod": "COIN"
+    },
+    {
+      "id": "codex_agency_test_20260526074130_view_012",
+      "teamKey": "binary",
+      "teamType": "BINARY_NETWORK",
+      "viewerId": "codex_agency_test_20260526074130_binary_level2_a",
+      "referrerId": "codex_agency_test_20260526074130_binary_direct_a",
+      "teamMasterId": "codex_agency_test_20260526074130_binary_master",
+      "creatorId": "codex_agency_test_20260526074130_creator_lv2",
+      "postId": "codex_agency_test_20260526074130_creator_lv2_post_1",
+      "accessMethod": "SUBSCRIPTION"
+    },
+    {
+      "id": "codex_agency_test_20260526074130_view_013",
+      "teamKey": "binary",
+      "teamType": "BINARY_NETWORK",
+      "viewerId": "codex_agency_test_20260526074130_binary_level3",
+      "referrerId": "codex_agency_test_20260526074130_binary_level2_a",
+      "teamMasterId": "codex_agency_test_20260526074130_binary_master",
+      "creatorId": "codex_agency_test_20260526074130_creator_lv3",
+      "postId": "codex_agency_test_20260526074130_creator_lv3_post_1",
+      "accessMethod": "COIN"
+    },
+    {
+      "id": "codex_agency_test_20260526074130_view_014",
+      "teamKey": "binary",
+      "teamType": "BINARY_NETWORK",
+      "viewerId": "codex_agency_test_20260526074130_binary_direct_b",
+      "referrerId": "codex_agency_test_20260526074130_binary_master",
+      "teamMasterId": "codex_agency_test_20260526074130_binary_master",
+      "creatorId": "codex_agency_test_20260526074130_creator_lv1",
+      "postId": "codex_agency_test_20260526074130_creator_lv1_post_2",
+      "accessMethod": "SUBSCRIPTION"
+    },
+    {
+      "id": "codex_agency_test_20260526074130_view_015",
+      "teamKey": "binary",
+      "teamType": "BINARY_NETWORK",
+      "viewerId": "codex_agency_test_20260526074130_binary_level2_b",
+      "referrerId": "codex_agency_test_20260526074130_binary_direct_b",
+      "teamMasterId": "codex_agency_test_20260526074130_binary_master",
+      "creatorId": "codex_agency_test_20260526074130_creator_lv2",
+      "postId": "codex_agency_test_20260526074130_creator_lv2_post_2",
+      "accessMethod": "COIN"
+    }
+  ],
+  "expected": {
+    "creatorShareRatios": [
+      {
+        "role": 20,
+        "level": 1,
+        "shareRatio": 10
+      },
+      {
+        "role": 22,
+        "level": 2,
+        "shareRatio": 20
+      },
+      {
+        "role": 24,
+        "level": 3,
+        "shareRatio": 30
+      }
+    ],
+    "systemPointSettings": {
+      "coinToPoint": 10,
+      "viewCoinAmount": 1,
+      "weeklySubscriptionRevenue": 6000,
+      "subscriptionViews": 6
+    },
+    "agencyTypes": [
+      {
+        "key": "hq",
+        "masterType": "HEADQUARTERS",
+        "defaultCommissionRate": 10
+      },
+      {
+        "key": "network",
+        "masterType": "NETWORK",
+        "defaultCommissionRate": 10
+      },
+      {
+        "key": "binary",
+        "masterType": "BINARY_NETWORK",
+        "defaultCommissionRate": 10
+      }
+    ]
+  },
+  "trigger": {
+    "triggeredAt": "2026-05-26T07:43:18.017Z",
+    "syncResults": [
+      {
+        "success": true,
+        "data": {
+          "success": true,
+          "userId": "codex_agency_test_20260526074130_hq_master",
+          "username": "hq-4130",
+          "action": "add",
+          "masterId": "codex_agency_test_20260526074130_hq_master",
+          "masterUsername": "hq-4130",
+          "updatedUplines": 0,
+          "timestamp": "2026-05-26T07:41:38.527Z"
+        },
+        "timestamp": "2026-05-26T07:41:38.527Z"
+      },
+      {
+        "success": true,
+        "data": {
+          "success": true,
+          "userId": "codex_agency_test_20260526074130_hq_direct_a",
+          "username": "hq-a-4130",
+          "action": "add",
+          "masterId": "codex_agency_test_20260526074130_hq_master",
+          "masterUsername": "hq-4130",
+          "updatedUplines": 1,
+          "timestamp": "2026-05-26T07:41:39.704Z"
+        },
+        "timestamp": "2026-05-26T07:41:39.704Z"
+      },
+      {
+        "success": true,
+        "data": {
+          "success": true,
+          "userId": "codex_agency_test_20260526074130_hq_direct_b",
+          "username": "hq-b-4130",
+          "action": "add",
+          "masterId": "codex_agency_test_20260526074130_hq_master",
+          "masterUsername": "hq-4130",
+          "updatedUplines": 1,
+          "timestamp": "2026-05-26T07:41:40.976Z"
+        },
+        "timestamp": "2026-05-26T07:41:40.976Z"
+      },
+      {
+        "success": true,
+        "data": {
+          "success": true,
+          "userId": "codex_agency_test_20260526074130_hq_level2_a",
+          "username": "hq-l2a-4130",
+          "action": "add",
+          "masterId": "codex_agency_test_20260526074130_hq_master",
+          "masterUsername": "hq-4130",
+          "updatedUplines": 2,
+          "timestamp": "2026-05-26T07:41:42.213Z"
+        },
+        "timestamp": "2026-05-26T07:41:42.213Z"
+      },
+      {
+        "success": true,
+        "data": {
+          "success": true,
+          "userId": "codex_agency_test_20260526074130_hq_level2_b",
+          "username": "hq-l2b-4130",
+          "action": "add",
+          "masterId": "codex_agency_test_20260526074130_hq_master",
+          "masterUsername": "hq-4130",
+          "updatedUplines": 2,
+          "timestamp": "2026-05-26T07:41:43.340Z"
+        },
+        "timestamp": "2026-05-26T07:41:43.340Z"
+      },
+      {
+        "success": true,
+        "data": {
+          "success": true,
+          "userId": "codex_agency_test_20260526074130_hq_level3",
+          "username": "hq-l3-4130",
+          "action": "add",
+          "masterId": "codex_agency_test_20260526074130_hq_master",
+          "masterUsername": "hq-4130",
+          "updatedUplines": 3,
+          "timestamp": "2026-05-26T07:41:44.615Z"
+        },
+        "timestamp": "2026-05-26T07:41:44.615Z"
+      },
+      {
+        "success": true,
+        "data": {
+          "success": true,
+          "userId": "codex_agency_test_20260526074130_network_master",
+          "username": "net-4130",
+          "action": "add",
+          "masterId": "codex_agency_test_20260526074130_network_master",
+          "masterUsername": "net-4130",
+          "updatedUplines": 0,
+          "timestamp": "2026-05-26T07:41:45.580Z"
+        },
+        "timestamp": "2026-05-26T07:41:45.580Z"
+      },
+      {
+        "success": true,
+        "data": {
+          "success": true,
+          "userId": "codex_agency_test_20260526074130_network_direct_a",
+          "username": "net-a-4130",
+          "action": "add",
+          "masterId": "codex_agency_test_20260526074130_network_master",
+          "masterUsername": "net-4130",
+          "updatedUplines": 1,
+          "timestamp": "2026-05-26T07:41:46.694Z"
+        },
+        "timestamp": "2026-05-26T07:41:46.694Z"
+      },
+      {
+        "success": true,
+        "data": {
+          "success": true,
+          "userId": "codex_agency_test_20260526074130_network_direct_b",
+          "username": "net-b-4130",
+          "action": "add",
+          "masterId": "codex_agency_test_20260526074130_network_master",
+          "masterUsername": "net-4130",
+          "updatedUplines": 1,
+          "timestamp": "2026-05-26T07:41:47.760Z"
+        },
+        "timestamp": "2026-05-26T07:41:47.760Z"
+      },
+      {
+        "success": true,
+        "data": {
+          "success": true,
+          "userId": "codex_agency_test_20260526074130_network_level2_a",
+          "username": "net-l2a-4130",
+          "action": "add",
+          "masterId": "codex_agency_test_20260526074130_network_master",
+          "masterUsername": "net-4130",
+          "updatedUplines": 2,
+          "timestamp": "2026-05-26T07:41:48.934Z"
+        },
+        "timestamp": "2026-05-26T07:41:48.934Z"
+      },
+      {
+        "success": true,
+        "data": {
+          "success": true,
+          "userId": "codex_agency_test_20260526074130_network_level2_b",
+          "username": "net-l2b-4130",
+          "action": "add",
+          "masterId": "codex_agency_test_20260526074130_network_master",
+          "masterUsername": "net-4130",
+          "updatedUplines": 2,
+          "timestamp": "2026-05-26T07:41:50.227Z"
+        },
+        "timestamp": "2026-05-26T07:41:50.227Z"
+      },
+      {
+        "success": true,
+        "data": {
+          "success": true,
+          "userId": "codex_agency_test_20260526074130_network_level3",
+          "username": "net-l3-4130",
+          "action": "add",
+          "masterId": "codex_agency_test_20260526074130_network_master",
+          "masterUsername": "net-4130",
+          "updatedUplines": 3,
+          "timestamp": "2026-05-26T07:41:51.442Z"
+        },
+        "timestamp": "2026-05-26T07:41:51.442Z"
+      },
+      {
+        "success": true,
+        "data": {
+          "success": true,
+          "userId": "codex_agency_test_20260526074130_binary_master",
+          "username": "bin-4130",
+          "action": "add",
+          "masterId": "codex_agency_test_20260526074130_binary_master",
+          "masterUsername": "bin-4130",
+          "updatedUplines": 0,
+          "timestamp": "2026-05-26T07:41:52.643Z"
+        },
+        "timestamp": "2026-05-26T07:41:52.643Z"
+      },
+      {
+        "success": true,
+        "data": {
+          "success": true,
+          "userId": "codex_agency_test_20260526074130_binary_direct_a",
+          "username": "bin-a-4130",
+          "action": "add",
+          "masterId": "codex_agency_test_20260526074130_binary_master",
+          "masterUsername": "bin-4130",
+          "updatedUplines": 1,
+          "timestamp": "2026-05-26T07:41:53.861Z"
+        },
+        "timestamp": "2026-05-26T07:41:53.861Z"
+      },
+      {
+        "success": true,
+        "data": {
+          "success": true,
+          "userId": "codex_agency_test_20260526074130_binary_direct_b",
+          "username": "bin-b-4130",
+          "action": "add",
+          "masterId": "codex_agency_test_20260526074130_binary_master",
+          "masterUsername": "bin-4130",
+          "updatedUplines": 1,
+          "timestamp": "2026-05-26T07:41:55.019Z"
+        },
+        "timestamp": "2026-05-26T07:41:55.019Z"
+      },
+      {
+        "success": true,
+        "data": {
+          "success": true,
+          "userId": "codex_agency_test_20260526074130_binary_level2_a",
+          "username": "bin-l2a-4130",
+          "action": "add",
+          "masterId": "codex_agency_test_20260526074130_binary_master",
+          "masterUsername": "bin-4130",
+          "updatedUplines": 2,
+          "timestamp": "2026-05-26T07:41:56.202Z"
+        },
+        "timestamp": "2026-05-26T07:41:56.202Z"
+      },
+      {
+        "success": true,
+        "data": {
+          "success": true,
+          "userId": "codex_agency_test_20260526074130_binary_level2_b",
+          "username": "bin-l2b-4130",
+          "action": "add",
+          "masterId": "codex_agency_test_20260526074130_binary_master",
+          "masterUsername": "bin-4130",
+          "updatedUplines": 2,
+          "timestamp": "2026-05-26T07:41:57.519Z"
+        },
+        "timestamp": "2026-05-26T07:41:57.519Z"
+      },
+      {
+        "success": true,
+        "data": {
+          "success": true,
+          "userId": "codex_agency_test_20260526074130_binary_level3",
+          "username": "bin-l3-4130",
+          "action": "add",
+          "masterId": "codex_agency_test_20260526074130_binary_master",
+          "masterUsername": "bin-4130",
+          "updatedUplines": 3,
+          "timestamp": "2026-05-26T07:41:59.031Z"
+        },
+        "timestamp": "2026-05-26T07:41:59.031Z"
+      }
+    ],
+    "viewgroup": {
+      "success": true,
+      "data": {
+        "date": "2045-10-08",
+        "status": "continue",
+        "lastId": "codex_agency_test_20260526074130_view_004",
+        "message": "4개의 시청 기록 처리 완료, 다음 배치 처리 필요",
+        "executionTime": 773,
+        "executionId": "k3MzHTk3",
+        "totalExecutionTime": 2693
+      },
+      "timestamp": "2026-05-26T07:42:02.865Z"
+    },
+    "groupedWait": {
+      "skipped": false,
+      "count": 15,
+      "expectedRows": 15,
+      "waitedMs": 26166
+    },
+    "commission": {
+      "final": {
+        "targetDate": "2045-10-08",
+        "status": "continue",
+        "lastId": "grouped:2045-10-08:codex_agency_test_20260526074130_creator_lv2:codex_agency_test_20260526074130_creator_lv2_post_1:codex_agency_test_20260526074130_binary_master:codex_agency_test_20260526074130_binary_direct_a",
+        "message": "7개의 시청 기록 처리 완료, 다음 배치 처리 필요",
+        "executionTime": 397,
+        "executionId": "7MWO5e5m"
+      },
+      "runs": [
+        {
+          "targetDate": "2045-10-08",
+          "status": "continue",
+          "lastId": "grouped:2045-10-08:codex_agency_test_20260526074130_creator_lv2:codex_agency_test_20260526074130_creator_lv2_post_1:codex_agency_test_20260526074130_binary_master:codex_agency_test_20260526074130_binary_direct_a",
+          "message": "7개의 시청 기록 처리 완료, 다음 배치 처리 필요",
+          "executionTime": 397,
+          "executionId": "7MWO5e5m"
+        }
+      ],
+      "continueCount": 0,
+      "exhausted": false,
+      "queueCompleted": true
+    },
+    "commissionWait": {
+      "skipped": false,
+      "counts": {
+        "total": 34,
+        "pending": 0,
+        "processed": 30,
+        "processing": 0,
+        "held": 4,
+        "byStatus": {
+          "1": 30,
+          "3": 4
+        }
+      },
+      "waitedMs": 36644
+    },
+    "withdrawalFixtures": [
+      {
+        "id": "cmpmbw07l000xfj3qwtep7bzi",
+        "userId": "codex_agency_test_20260526074130_binary_master",
+        "username": "bin-4130",
+        "pointsBeforeRequest": 113.99,
+        "amount": 56,
+        "status": "APPROVED"
+      },
+      {
+        "id": "cmpmbw0a5000zfj3q8a9z4f3i",
+        "userId": "codex_agency_test_20260526074130_hq_master",
+        "username": "hq-4130",
+        "pointsBeforeRequest": 244.8,
+        "amount": 122,
+        "status": "PENDING"
+      },
+      {
+        "id": "cmpmbw0d90011fj3qugh3pvzi",
+        "userId": "codex_agency_test_20260526074130_network_master",
+        "username": "net-4130",
+        "pointsBeforeRequest": 113.99,
+        "amount": 56,
+        "status": "APPROVED"
+      },
+      {
+        "id": "cmpmbw0ff0013fj3qe9my6ajp",
+        "userId": "codex_agency_test_20260526074130_hq_direct_a",
+        "username": "hq-a-4130",
+        "pointsBeforeRequest": 62,
+        "amount": 31,
+        "status": "PENDING"
+      },
+      {
+        "id": "cmpmbw0ib0015fj3q6kowjdyc",
+        "userId": "codex_agency_test_20260526074130_hq_direct_b",
+        "username": "hq-b-4130",
+        "pointsBeforeRequest": 12,
+        "amount": 6,
+        "status": "APPROVED"
+      },
+      {
+        "id": "cmpmbw0k90017fj3qi39k6b7e",
+        "userId": "codex_agency_test_20260526074130_hq_level2_a",
+        "username": "hq-l2a-4130",
+        "pointsBeforeRequest": 7.19,
+        "amount": 3,
+        "status": "PENDING"
+      }
+    ],
+    "cfStatsSeed": {
+      "skipped": false,
+      "source": "agency-e2e-fixture-cfstats-admin-schema",
+      "logs": 15,
+      "results": [
+        {
+          "period": "daily",
+          "totalMinutes": 36,
+          "topCountries": [
+            {
+              "country": "US",
+              "minutes": 9
+            },
+            {
+              "country": "TH",
+              "minutes": 9
+            },
+            {
+              "country": "KR",
+              "minutes": 6
+            },
+            {
+              "country": "JP",
+              "minutes": 6
+            },
+            {
+              "country": "VN",
+              "minutes": 6
+            }
+          ],
+          "requestList": {
+            "10": 5,
+            "11": 4,
+            "12": 6,
+            "13": 4,
+            "14": 5,
+            "15": 5,
+            "16": 2,
+            "09": 5
+          }
+        },
+        {
+          "period": "weekly",
+          "totalMinutes": 36,
+          "topCountries": [
+            {
+              "country": "US",
+              "minutes": 9
+            },
+            {
+              "country": "TH",
+              "minutes": 9
+            },
+            {
+              "country": "KR",
+              "minutes": 6
+            },
+            {
+              "country": "JP",
+              "minutes": 6
+            },
+            {
+              "country": "VN",
+              "minutes": 6
+            }
+          ],
+          "requestList": {
+            "2045-10-08": 36
+          }
+        },
+        {
+          "period": "monthly",
+          "totalMinutes": 36,
+          "topCountries": [
+            {
+              "country": "US",
+              "minutes": 9
+            },
+            {
+              "country": "TH",
+              "minutes": 9
+            },
+            {
+              "country": "KR",
+              "minutes": 6
+            },
+            {
+              "country": "JP",
+              "minutes": 6
+            },
+            {
+              "country": "VN",
+              "minutes": 6
+            }
+          ],
+          "requestList": {
+            "2045-10-08": 36
+          }
+        }
+      ],
+      "r2Writes": [
+        {
+          "skipped": true,
+          "key": "cf-stats/daily/2045-10-08.json",
+          "error": "Error: R2 put failed for cf-stats/daily/2045-10-08.json: 403 <?xml version=\"1.0\" encoding=\"UTF-8\"?><Error><Code>AccessDenied</Code><Message>Access Denied</Message></Error>"
+        },
+        {
+          "skipped": true,
+          "key": "cf-stats/daily/2045-10-08/creators/codex_agency_test_20260526074130_creator_lv1.json",
+          "error": "Error: R2 put failed for cf-stats/daily/2045-10-08/creators/codex_agency_test_20260526074130_creator_lv1.json: 403 <?xml version=\"1.0\" encoding=\"UTF-8\"?><Error><Code>AccessDenied</Code><Message>Access Denied</Message></Error>"
+        },
+        {
+          "skipped": true,
+          "key": "cf-stats/daily/2045-10-08/creators/codex_agency_test_20260526074130_creator_lv2.json",
+          "error": "Error: R2 put failed for cf-stats/daily/2045-10-08/creators/codex_agency_test_20260526074130_creator_lv2.json: 403 <?xml version=\"1.0\" encoding=\"UTF-8\"?><Error><Code>AccessDenied</Code><Message>Access Denied</Message></Error>"
+        },
+        {
+          "skipped": true,
+          "key": "cf-stats/daily/2045-10-08/creators/codex_agency_test_20260526074130_creator_lv3.json",
+          "error": "Error: R2 put failed for cf-stats/daily/2045-10-08/creators/codex_agency_test_20260526074130_creator_lv3.json: 403 <?xml version=\"1.0\" encoding=\"UTF-8\"?><Error><Code>AccessDenied</Code><Message>Access Denied</Message></Error>"
+        },
+        {
+          "skipped": true,
+          "key": "cf-stats/weekly/2045-10-08.json",
+          "error": "Error: R2 put failed for cf-stats/weekly/2045-10-08.json: 403 <?xml version=\"1.0\" encoding=\"UTF-8\"?><Error><Code>AccessDenied</Code><Message>Access Denied</Message></Error>"
+        },
+        {
+          "skipped": true,
+          "key": "cf-stats/weekly/2045-10-08/creators/codex_agency_test_20260526074130_creator_lv1.json",
+          "error": "Error: R2 put failed for cf-stats/weekly/2045-10-08/creators/codex_agency_test_20260526074130_creator_lv1.json: 403 <?xml version=\"1.0\" encoding=\"UTF-8\"?><Error><Code>AccessDenied</Code><Message>Access Denied</Message></Error>"
+        },
+        {
+          "skipped": true,
+          "key": "cf-stats/weekly/2045-10-08/creators/codex_agency_test_20260526074130_creator_lv2.json",
+          "error": "Error: R2 put failed for cf-stats/weekly/2045-10-08/creators/codex_agency_test_20260526074130_creator_lv2.json: 403 <?xml version=\"1.0\" encoding=\"UTF-8\"?><Error><Code>AccessDenied</Code><Message>Access Denied</Message></Error>"
+        },
+        {
+          "skipped": true,
+          "key": "cf-stats/weekly/2045-10-08/creators/codex_agency_test_20260526074130_creator_lv3.json",
+          "error": "Error: R2 put failed for cf-stats/weekly/2045-10-08/creators/codex_agency_test_20260526074130_creator_lv3.json: 403 <?xml version=\"1.0\" encoding=\"UTF-8\"?><Error><Code>AccessDenied</Code><Message>Access Denied</Message></Error>"
+        },
+        {
+          "skipped": true,
+          "key": "cf-stats/monthly/2045-10-08.json",
+          "error": "Error: R2 put failed for cf-stats/monthly/2045-10-08.json: 403 <?xml version=\"1.0\" encoding=\"UTF-8\"?><Error><Code>AccessDenied</Code><Message>Access Denied</Message></Error>"
+        },
+        {
+          "skipped": true,
+          "key": "cf-stats/monthly/2045-10-08/creators/codex_agency_test_20260526074130_creator_lv1.json",
+          "error": "Error: R2 put failed for cf-stats/monthly/2045-10-08/creators/codex_agency_test_20260526074130_creator_lv1.json: 403 <?xml version=\"1.0\" encoding=\"UTF-8\"?><Error><Code>AccessDenied</Code><Message>Access Denied</Message></Error>"
+        },
+        {
+          "skipped": true,
+          "key": "cf-stats/monthly/2045-10-08/creators/codex_agency_test_20260526074130_creator_lv2.json",
+          "error": "Error: R2 put failed for cf-stats/monthly/2045-10-08/creators/codex_agency_test_20260526074130_creator_lv2.json: 403 <?xml version=\"1.0\" encoding=\"UTF-8\"?><Error><Code>AccessDenied</Code><Message>Access Denied</Message></Error>"
+        },
+        {
+          "skipped": true,
+          "key": "cf-stats/monthly/2045-10-08/creators/codex_agency_test_20260526074130_creator_lv3.json",
+          "error": "Error: R2 put failed for cf-stats/monthly/2045-10-08/creators/codex_agency_test_20260526074130_creator_lv3.json: 403 <?xml version=\"1.0\" encoding=\"UTF-8\"?><Error><Code>AccessDenied</Code><Message>Access Denied</Message></Error>"
+        }
+      ]
+    },
+    "cfStats": {
+      "execId": "12dIXbY4HrhVuV5FLIfEM",
+      "queryDate": "2045-10-08",
+      "daily": {
+        "period": "daily",
+        "date": "2045-10-08",
+        "totalMinutes": 0
+      },
+      "weekly": {
+        "period": "weekly",
+        "date": "2045-10-08",
+        "totalMinutes": 0
+      },
+      "qualifications": {
+        "totalChanges": 0,
+        "message": "자격 변동 없음"
+      }
+    }
+  },
+  "globalSystemSettingsRestoredAt": "2026-05-26T07:43:18.279Z",
+  "verification": {
+    "verifiedAt": "2026-05-26T07:43:21.194Z",
+    "users": [
+      {
+        "id": "codex_agency_test_20260526074130_binary_master",
+        "username": "bin-4130",
+        "displayName": "바이너리 네트워크 영업팀 마스터",
+        "email": "bin-4130@ms.com",
+        "userRole": 50,
+        "points": 113.99,
+        "referredBy": null,
+        "teamMaster": "codex_agency_test_20260526074130_binary_master",
+        "emailVerified": true,
+        "CreatorInfo": {
+          "idCheck": true,
+          "bankName": "E2E Verification Bank",
+          "accountNumber": "000-20260526074130-n-4130"
+        }
+      },
+      {
+        "id": "codex_agency_test_20260526074130_binary_direct_a",
+        "username": "bin-a-4130",
+        "displayName": "바이너리 네트워크 영업팀 직속 A",
+        "email": "bin-a-4130@ms.com",
+        "userRole": 40,
+        "points": 0,
+        "referredBy": "codex_agency_test_20260526074130_binary_master",
+        "teamMaster": "codex_agency_test_20260526074130_binary_master",
+        "emailVerified": true,
+        "CreatorInfo": {
+          "idCheck": true,
+          "bankName": "E2E Verification Bank",
+          "accountNumber": "000-20260526074130-a-4130"
+        }
+      },
+      {
+        "id": "codex_agency_test_20260526074130_binary_direct_b",
+        "username": "bin-b-4130",
+        "displayName": "바이너리 네트워크 영업팀 직속 B",
+        "email": "bin-b-4130@ms.com",
+        "userRole": 40,
+        "points": 0,
+        "referredBy": "codex_agency_test_20260526074130_binary_master",
+        "teamMaster": "codex_agency_test_20260526074130_binary_master",
+        "emailVerified": true,
+        "CreatorInfo": {
+          "idCheck": true,
+          "bankName": "E2E Verification Bank",
+          "accountNumber": "000-20260526074130-b-4130"
+        }
+      },
+      {
+        "id": "codex_agency_test_20260526074130_binary_level2_a",
+        "username": "bin-l2a-4130",
+        "displayName": "바이너리 네트워크 영업팀 2단계 A",
+        "email": "bin-l2a-4130@ms.com",
+        "userRole": 40,
+        "points": 0,
+        "referredBy": "codex_agency_test_20260526074130_binary_direct_a",
+        "teamMaster": "codex_agency_test_20260526074130_binary_master",
+        "emailVerified": true,
+        "CreatorInfo": {
+          "idCheck": true,
+          "bankName": "E2E Verification Bank",
+          "accountNumber": "000-20260526074130-a-4130"
+        }
+      },
+      {
+        "id": "codex_agency_test_20260526074130_binary_level2_b",
+        "username": "bin-l2b-4130",
+        "displayName": "바이너리 네트워크 영업팀 2단계 B",
+        "email": "bin-l2b-4130@ms.com",
+        "userRole": 40,
+        "points": 0,
+        "referredBy": "codex_agency_test_20260526074130_binary_direct_b",
+        "teamMaster": "codex_agency_test_20260526074130_binary_master",
+        "emailVerified": true,
+        "CreatorInfo": {
+          "idCheck": true,
+          "bankName": "E2E Verification Bank",
+          "accountNumber": "000-20260526074130-b-4130"
+        }
+      },
+      {
+        "id": "codex_agency_test_20260526074130_binary_level3",
+        "username": "bin-l3-4130",
+        "displayName": "바이너리 네트워크 영업팀 3단계",
+        "email": "bin-l3-4130@ms.com",
+        "userRole": 40,
+        "points": 0,
+        "referredBy": "codex_agency_test_20260526074130_binary_level2_a",
+        "teamMaster": "codex_agency_test_20260526074130_binary_master",
+        "emailVerified": true,
+        "CreatorInfo": {
+          "idCheck": true,
+          "bankName": "E2E Verification Bank",
+          "accountNumber": "000-20260526074130-3-4130"
+        }
+      },
+      {
+        "id": "codex_agency_test_20260526074130_hq_master",
+        "username": "hq-4130",
+        "displayName": "본부형 영업팀 마스터",
+        "email": "hq-4130@ms.com",
+        "userRole": 50,
+        "points": 244.8,
+        "referredBy": null,
+        "teamMaster": "codex_agency_test_20260526074130_hq_master",
+        "emailVerified": true,
+        "CreatorInfo": {
+          "idCheck": true,
+          "bankName": "E2E Verification Bank",
+          "accountNumber": "000-20260526074130-q-4130"
+        }
+      },
+      {
+        "id": "codex_agency_test_20260526074130_hq_direct_a",
+        "username": "hq-a-4130",
+        "displayName": "본부형 영업팀 직속 A",
+        "email": "hq-a-4130@ms.com",
+        "userRole": 40,
+        "points": 62,
+        "referredBy": "codex_agency_test_20260526074130_hq_master",
+        "teamMaster": "codex_agency_test_20260526074130_hq_master",
+        "emailVerified": true,
+        "CreatorInfo": {
+          "idCheck": true,
+          "bankName": "E2E Verification Bank",
+          "accountNumber": "000-20260526074130-a-4130"
+        }
+      },
+      {
+        "id": "codex_agency_test_20260526074130_hq_direct_b",
+        "username": "hq-b-4130",
+        "displayName": "본부형 영업팀 직속 B",
+        "email": "hq-b-4130@ms.com",
+        "userRole": 40,
+        "points": 12,
+        "referredBy": "codex_agency_test_20260526074130_hq_master",
+        "teamMaster": "codex_agency_test_20260526074130_hq_master",
+        "emailVerified": true,
+        "CreatorInfo": {
+          "idCheck": true,
+          "bankName": "E2E Verification Bank",
+          "accountNumber": "000-20260526074130-b-4130"
+        }
+      },
+      {
+        "id": "codex_agency_test_20260526074130_hq_level2_a",
+        "username": "hq-l2a-4130",
+        "displayName": "본부형 영업팀 2단계 A",
+        "email": "hq-l2a-4130@ms.com",
+        "userRole": 40,
+        "points": 7.19,
+        "referredBy": "codex_agency_test_20260526074130_hq_direct_a",
+        "teamMaster": "codex_agency_test_20260526074130_hq_master",
+        "emailVerified": true,
+        "CreatorInfo": {
+          "idCheck": true,
+          "bankName": "E2E Verification Bank",
+          "accountNumber": "000-20260526074130-a-4130"
+        }
+      },
+      {
+        "id": "codex_agency_test_20260526074130_hq_level2_b",
+        "username": "hq-l2b-4130",
+        "displayName": "본부형 영업팀 2단계 B",
+        "email": "hq-l2b-4130@ms.com",
+        "userRole": 40,
+        "points": 0,
+        "referredBy": "codex_agency_test_20260526074130_hq_direct_b",
+        "teamMaster": "codex_agency_test_20260526074130_hq_master",
+        "emailVerified": true,
+        "CreatorInfo": {
+          "idCheck": true,
+          "bankName": "E2E Verification Bank",
+          "accountNumber": "000-20260526074130-b-4130"
+        }
+      },
+      {
+        "id": "codex_agency_test_20260526074130_hq_level3",
+        "username": "hq-l3-4130",
+        "displayName": "본부형 영업팀 3단계",
+        "email": "hq-l3-4130@ms.com",
+        "userRole": 40,
+        "points": 0,
+        "referredBy": "codex_agency_test_20260526074130_hq_level2_a",
+        "teamMaster": "codex_agency_test_20260526074130_hq_master",
+        "emailVerified": true,
+        "CreatorInfo": {
+          "idCheck": true,
+          "bankName": "E2E Verification Bank",
+          "accountNumber": "000-20260526074130-3-4130"
+        }
+      },
+      {
+        "id": "codex_agency_test_20260526074130_creator_lv1",
+        "username": "lv1-4130",
+        "displayName": "크리에이터 L1 10%",
+        "email": "lv1-4130@ms.com",
+        "userRole": 20,
+        "points": 372,
+        "referredBy": null,
+        "teamMaster": null,
+        "emailVerified": true,
+        "CreatorInfo": {
+          "idCheck": true,
+          "bankName": "E2E Verification Bank",
+          "accountNumber": "000-20260526074130-1-4130"
+        }
+      },
+      {
+        "id": "codex_agency_test_20260526074130_creator_lv2",
+        "username": "lv2-4130",
+        "displayName": "크리에이터 L2 20%",
+        "email": "lv2-4130@ms.com",
+        "userRole": 22,
+        "points": 372,
+        "referredBy": null,
+        "teamMaster": null,
+        "emailVerified": true,
+        "CreatorInfo": {
+          "idCheck": true,
+          "bankName": "E2E Verification Bank",
+          "accountNumber": "000-20260526074130-2-4130"
+        }
+      },
+      {
+        "id": "codex_agency_test_20260526074130_creator_lv3",
+        "username": "lv3-4130",
+        "displayName": "크리에이터 L3 30%",
+        "email": "lv3-4130@ms.com",
+        "userRole": 24,
+        "points": 72,
+        "referredBy": null,
+        "teamMaster": null,
+        "emailVerified": true,
+        "CreatorInfo": {
+          "idCheck": true,
+          "bankName": "E2E Verification Bank",
+          "accountNumber": "000-20260526074130-3-4130"
+        }
+      },
+      {
+        "id": "codex_agency_test_20260526074130_network_master",
+        "username": "net-4130",
+        "displayName": "네트워크 영업팀 마스터",
+        "email": "net-4130@ms.com",
+        "userRole": 50,
+        "points": 113.99,
+        "referredBy": null,
+        "teamMaster": "codex_agency_test_20260526074130_network_master",
+        "emailVerified": true,
+        "CreatorInfo": {
+          "idCheck": true,
+          "bankName": "E2E Verification Bank",
+          "accountNumber": "000-20260526074130-t-4130"
+        }
+      },
+      {
+        "id": "codex_agency_test_20260526074130_network_direct_a",
+        "username": "net-a-4130",
+        "displayName": "네트워크 영업팀 직속 A",
+        "email": "net-a-4130@ms.com",
+        "userRole": 40,
+        "points": 74.8,
+        "referredBy": "codex_agency_test_20260526074130_network_master",
+        "teamMaster": "codex_agency_test_20260526074130_network_master",
+        "emailVerified": true,
+        "CreatorInfo": {
+          "idCheck": true,
+          "bankName": "E2E Verification Bank",
+          "accountNumber": "000-20260526074130-a-4130"
+        }
+      },
+      {
+        "id": "codex_agency_test_20260526074130_network_direct_b",
+        "username": "net-b-4130",
+        "displayName": "네트워크 영업팀 직속 B",
+        "email": "net-b-4130@ms.com",
+        "userRole": 40,
+        "points": 16.79,
+        "referredBy": "codex_agency_test_20260526074130_network_master",
+        "teamMaster": "codex_agency_test_20260526074130_network_master",
+        "emailVerified": true,
+        "CreatorInfo": {
+          "idCheck": true,
+          "bankName": "E2E Verification Bank",
+          "accountNumber": "000-20260526074130-b-4130"
+        }
+      },
+      {
+        "id": "codex_agency_test_20260526074130_network_level2_a",
+        "username": "net-l2a-4130",
+        "displayName": "네트워크 영업팀 2단계 A",
+        "email": "net-l2a-4130@ms.com",
+        "userRole": 40,
+        "points": 16.79,
+        "referredBy": "codex_agency_test_20260526074130_network_direct_a",
+        "teamMaster": "codex_agency_test_20260526074130_network_master",
+        "emailVerified": true,
+        "CreatorInfo": {
+          "idCheck": true,
+          "bankName": "E2E Verification Bank",
+          "accountNumber": "000-20260526074130-a-4130"
+        }
+      },
+      {
+        "id": "codex_agency_test_20260526074130_network_level2_b",
+        "username": "net-l2b-4130",
+        "displayName": "네트워크 영업팀 2단계 B",
+        "email": "net-l2b-4130@ms.com",
+        "userRole": 40,
+        "points": 0,
+        "referredBy": "codex_agency_test_20260526074130_network_direct_b",
+        "teamMaster": "codex_agency_test_20260526074130_network_master",
+        "emailVerified": true,
+        "CreatorInfo": {
+          "idCheck": true,
+          "bankName": "E2E Verification Bank",
+          "accountNumber": "000-20260526074130-b-4130"
+        }
+      },
+      {
+        "id": "codex_agency_test_20260526074130_network_level3",
+        "username": "net-l3-4130",
+        "displayName": "네트워크 영업팀 3단계",
+        "email": "net-l3-4130@ms.com",
+        "userRole": 40,
+        "points": 0,
+        "referredBy": "codex_agency_test_20260526074130_network_level2_a",
+        "teamMaster": "codex_agency_test_20260526074130_network_master",
+        "emailVerified": true,
+        "CreatorInfo": {
+          "idCheck": true,
+          "bankName": "E2E Verification Bank",
+          "accountNumber": "000-20260526074130-3-4130"
+        }
+      },
+      {
+        "id": "codex_agency_test_20260526074130_admin",
+        "username": "t-admin-4130",
+        "displayName": "검증 관리자",
+        "email": "t-admin-4130@ms.com",
+        "userRole": 100,
+        "points": 0,
+        "referredBy": null,
+        "teamMaster": null,
+        "emailVerified": true,
+        "CreatorInfo": {
+          "idCheck": true,
+          "bankName": "E2E Verification Bank",
+          "accountNumber": "000-20260526074130-n-4130"
+        }
+      }
+    ],
+    "payments": [
+      {
+        "id": "cmpmbtw87000vfj3qkujtql0b",
+        "userId": "codex_agency_test_20260526074130_admin",
+        "type": "subscription",
+        "status": "success",
+        "amount": 6000,
+        "orderId": "codex_agency_test_20260526074130_subscription_revenue",
+        "method": "weekly",
+        "createdAt": "2045-10-08T03:00:00.000Z"
+      }
+    ],
+    "withdrawals": [
+      {
+        "id": "cmpmbw07l000xfj3qwtep7bzi",
+        "userId": "codex_agency_test_20260526074130_binary_master",
+        "amount": 56,
+        "status": "APPROVED",
+        "requestedAt": "2045-10-08T12:00:00.000Z",
+        "processedAt": "2045-10-08T12:00:00.000Z",
+        "processedBy": "codex_agency_test_20260526074130_admin",
+        "paymentAmount": 56,
+        "exchangeRate": 1
+      },
+      {
+        "id": "cmpmbw0a5000zfj3q8a9z4f3i",
+        "userId": "codex_agency_test_20260526074130_hq_master",
+        "amount": 122,
+        "status": "PENDING",
+        "requestedAt": "2045-10-08T12:00:00.000Z",
+        "processedAt": null,
+        "processedBy": null,
+        "paymentAmount": null,
+        "exchangeRate": null
+      },
+      {
+        "id": "cmpmbw0d90011fj3qugh3pvzi",
+        "userId": "codex_agency_test_20260526074130_network_master",
+        "amount": 56,
+        "status": "APPROVED",
+        "requestedAt": "2045-10-08T12:00:00.000Z",
+        "processedAt": "2045-10-08T12:00:00.000Z",
+        "processedBy": "codex_agency_test_20260526074130_admin",
+        "paymentAmount": 56,
+        "exchangeRate": 1
+      },
+      {
+        "id": "cmpmbw0ff0013fj3qe9my6ajp",
+        "userId": "codex_agency_test_20260526074130_hq_direct_a",
+        "amount": 31,
+        "status": "PENDING",
+        "requestedAt": "2045-10-08T12:00:00.000Z",
+        "processedAt": null,
+        "processedBy": null,
+        "paymentAmount": null,
+        "exchangeRate": null
+      },
+      {
+        "id": "cmpmbw0ib0015fj3q6kowjdyc",
+        "userId": "codex_agency_test_20260526074130_hq_direct_b",
+        "amount": 6,
+        "status": "APPROVED",
+        "requestedAt": "2045-10-08T12:00:00.000Z",
+        "processedAt": "2045-10-08T12:00:00.000Z",
+        "processedBy": "codex_agency_test_20260526074130_admin",
+        "paymentAmount": 6,
+        "exchangeRate": 1
+      },
+      {
+        "id": "cmpmbw0k90017fj3qi39k6b7e",
+        "userId": "codex_agency_test_20260526074130_hq_level2_a",
+        "amount": 3,
+        "status": "PENDING",
+        "requestedAt": "2045-10-08T12:00:00.000Z",
+        "processedAt": null,
+        "processedBy": null,
+        "paymentAmount": null,
+        "exchangeRate": null
+      }
+    ],
+    "d1": {
+      "groupedViews": [
+        {
+          "id": "grouped:2045-10-08:codex_agency_test_20260526074130_creator_lv1:codex_agency_test_20260526074130_creator_lv1_post_1:codex_agency_test_20260526074130_binary_master:codex_agency_test_20260526074130_binary_master",
+          "date": "2045-10-08",
+          "uploader_id": "codex_agency_test_20260526074130_creator_lv1",
+          "post_id": "codex_agency_test_20260526074130_creator_lv1_post_1",
+          "master_id": "codex_agency_test_20260526074130_binary_master",
+          "referrer_id": "codex_agency_test_20260526074130_binary_master",
+          "coin_view_count": 1,
+          "subscription_view_count": 0,
+          "created_at": "2026-05-26T07:42:18.748Z"
+        },
+        {
+          "id": "grouped:2045-10-08:codex_agency_test_20260526074130_creator_lv1:codex_agency_test_20260526074130_creator_lv1_post_1:codex_agency_test_20260526074130_hq_master:codex_agency_test_20260526074130_hq_master",
+          "date": "2045-10-08",
+          "uploader_id": "codex_agency_test_20260526074130_creator_lv1",
+          "post_id": "codex_agency_test_20260526074130_creator_lv1_post_1",
+          "master_id": "codex_agency_test_20260526074130_hq_master",
+          "referrer_id": "codex_agency_test_20260526074130_hq_master",
+          "coin_view_count": 1,
+          "subscription_view_count": 0,
+          "created_at": "2026-05-26T07:42:00.751Z"
+        },
+        {
+          "id": "grouped:2045-10-08:codex_agency_test_20260526074130_creator_lv1:codex_agency_test_20260526074130_creator_lv1_post_1:codex_agency_test_20260526074130_network_master:codex_agency_test_20260526074130_network_master",
+          "date": "2045-10-08",
+          "uploader_id": "codex_agency_test_20260526074130_creator_lv1",
+          "post_id": "codex_agency_test_20260526074130_creator_lv1_post_1",
+          "master_id": "codex_agency_test_20260526074130_network_master",
+          "referrer_id": "codex_agency_test_20260526074130_network_master",
+          "coin_view_count": 1,
+          "subscription_view_count": 0,
+          "created_at": "2026-05-26T07:42:09.231Z"
+        },
+        {
+          "id": "grouped:2045-10-08:codex_agency_test_20260526074130_creator_lv1:codex_agency_test_20260526074130_creator_lv1_post_2:codex_agency_test_20260526074130_binary_master:codex_agency_test_20260526074130_binary_master",
+          "date": "2045-10-08",
+          "uploader_id": "codex_agency_test_20260526074130_creator_lv1",
+          "post_id": "codex_agency_test_20260526074130_creator_lv1_post_2",
+          "master_id": "codex_agency_test_20260526074130_binary_master",
+          "referrer_id": "codex_agency_test_20260526074130_binary_master",
+          "coin_view_count": 0,
+          "subscription_view_count": 1,
+          "created_at": "2026-05-26T07:42:27.422Z"
+        },
+        {
+          "id": "grouped:2045-10-08:codex_agency_test_20260526074130_creator_lv1:codex_agency_test_20260526074130_creator_lv1_post_2:codex_agency_test_20260526074130_hq_master:codex_agency_test_20260526074130_hq_master",
+          "date": "2045-10-08",
+          "uploader_id": "codex_agency_test_20260526074130_creator_lv1",
+          "post_id": "codex_agency_test_20260526074130_creator_lv1_post_2",
+          "master_id": "codex_agency_test_20260526074130_hq_master",
+          "referrer_id": "codex_agency_test_20260526074130_hq_master",
+          "coin_view_count": 0,
+          "subscription_view_count": 1,
+          "created_at": "2026-05-26T07:42:00.751Z"
+        },
+        {
+          "id": "grouped:2045-10-08:codex_agency_test_20260526074130_creator_lv1:codex_agency_test_20260526074130_creator_lv1_post_2:codex_agency_test_20260526074130_network_master:codex_agency_test_20260526074130_network_master",
+          "date": "2045-10-08",
+          "uploader_id": "codex_agency_test_20260526074130_creator_lv1",
+          "post_id": "codex_agency_test_20260526074130_creator_lv1_post_2",
+          "master_id": "codex_agency_test_20260526074130_network_master",
+          "referrer_id": "codex_agency_test_20260526074130_network_master",
+          "coin_view_count": 0,
+          "subscription_view_count": 1,
+          "created_at": "2026-05-26T07:42:18.748Z"
+        },
+        {
+          "id": "grouped:2045-10-08:codex_agency_test_20260526074130_creator_lv2:codex_agency_test_20260526074130_creator_lv2_post_1:codex_agency_test_20260526074130_binary_master:codex_agency_test_20260526074130_binary_direct_a",
+          "date": "2045-10-08",
+          "uploader_id": "codex_agency_test_20260526074130_creator_lv2",
+          "post_id": "codex_agency_test_20260526074130_creator_lv2_post_1",
+          "master_id": "codex_agency_test_20260526074130_binary_master",
+          "referrer_id": "codex_agency_test_20260526074130_binary_direct_a",
+          "coin_view_count": 0,
+          "subscription_view_count": 1,
+          "created_at": "2026-05-26T07:42:18.748Z"
+        },
+        {
+          "id": "grouped:2045-10-08:codex_agency_test_20260526074130_creator_lv2:codex_agency_test_20260526074130_creator_lv2_post_1:codex_agency_test_20260526074130_hq_master:codex_agency_test_20260526074130_hq_direct_a",
+          "date": "2045-10-08",
+          "uploader_id": "codex_agency_test_20260526074130_creator_lv2",
+          "post_id": "codex_agency_test_20260526074130_creator_lv2_post_1",
+          "master_id": "codex_agency_test_20260526074130_hq_master",
+          "referrer_id": "codex_agency_test_20260526074130_hq_direct_a",
+          "coin_view_count": 0,
+          "subscription_view_count": 1,
+          "created_at": "2026-05-26T07:42:00.751Z"
+        },
+        {
+          "id": "grouped:2045-10-08:codex_agency_test_20260526074130_creator_lv2:codex_agency_test_20260526074130_creator_lv2_post_1:codex_agency_test_20260526074130_network_master:codex_agency_test_20260526074130_network_direct_a",
+          "date": "2045-10-08",
+          "uploader_id": "codex_agency_test_20260526074130_creator_lv2",
+          "post_id": "codex_agency_test_20260526074130_creator_lv2_post_1",
+          "master_id": "codex_agency_test_20260526074130_network_master",
+          "referrer_id": "codex_agency_test_20260526074130_network_direct_a",
+          "coin_view_count": 0,
+          "subscription_view_count": 1,
+          "created_at": "2026-05-26T07:42:09.231Z"
+        },
+        {
+          "id": "grouped:2045-10-08:codex_agency_test_20260526074130_creator_lv2:codex_agency_test_20260526074130_creator_lv2_post_2:codex_agency_test_20260526074130_binary_master:codex_agency_test_20260526074130_binary_direct_b",
+          "date": "2045-10-08",
+          "uploader_id": "codex_agency_test_20260526074130_creator_lv2",
+          "post_id": "codex_agency_test_20260526074130_creator_lv2_post_2",
+          "master_id": "codex_agency_test_20260526074130_binary_master",
+          "referrer_id": "codex_agency_test_20260526074130_binary_direct_b",
+          "coin_view_count": 1,
+          "subscription_view_count": 0,
+          "created_at": "2026-05-26T07:42:27.422Z"
+        },
+        {
+          "id": "grouped:2045-10-08:codex_agency_test_20260526074130_creator_lv2:codex_agency_test_20260526074130_creator_lv2_post_2:codex_agency_test_20260526074130_hq_master:codex_agency_test_20260526074130_hq_direct_b",
+          "date": "2045-10-08",
+          "uploader_id": "codex_agency_test_20260526074130_creator_lv2",
+          "post_id": "codex_agency_test_20260526074130_creator_lv2_post_2",
+          "master_id": "codex_agency_test_20260526074130_hq_master",
+          "referrer_id": "codex_agency_test_20260526074130_hq_direct_b",
+          "coin_view_count": 1,
+          "subscription_view_count": 0,
+          "created_at": "2026-05-26T07:42:09.231Z"
+        },
+        {
+          "id": "grouped:2045-10-08:codex_agency_test_20260526074130_creator_lv2:codex_agency_test_20260526074130_creator_lv2_post_2:codex_agency_test_20260526074130_network_master:codex_agency_test_20260526074130_network_direct_b",
+          "date": "2045-10-08",
+          "uploader_id": "codex_agency_test_20260526074130_creator_lv2",
+          "post_id": "codex_agency_test_20260526074130_creator_lv2_post_2",
+          "master_id": "codex_agency_test_20260526074130_network_master",
+          "referrer_id": "codex_agency_test_20260526074130_network_direct_b",
+          "coin_view_count": 1,
+          "subscription_view_count": 0,
+          "created_at": "2026-05-26T07:42:18.748Z"
+        },
+        {
+          "id": "grouped:2045-10-08:codex_agency_test_20260526074130_creator_lv3:codex_agency_test_20260526074130_creator_lv3_post_1:codex_agency_test_20260526074130_binary_master:codex_agency_test_20260526074130_binary_level2_a",
+          "date": "2045-10-08",
+          "uploader_id": "codex_agency_test_20260526074130_creator_lv3",
+          "post_id": "codex_agency_test_20260526074130_creator_lv3_post_1",
+          "master_id": "codex_agency_test_20260526074130_binary_master",
+          "referrer_id": "codex_agency_test_20260526074130_binary_level2_a",
+          "coin_view_count": 1,
+          "subscription_view_count": 0,
+          "created_at": "2026-05-26T07:42:27.422Z"
+        },
+        {
+          "id": "grouped:2045-10-08:codex_agency_test_20260526074130_creator_lv3:codex_agency_test_20260526074130_creator_lv3_post_1:codex_agency_test_20260526074130_hq_master:codex_agency_test_20260526074130_hq_level2_a",
+          "date": "2045-10-08",
+          "uploader_id": "codex_agency_test_20260526074130_creator_lv3",
+          "post_id": "codex_agency_test_20260526074130_creator_lv3_post_1",
+          "master_id": "codex_agency_test_20260526074130_hq_master",
+          "referrer_id": "codex_agency_test_20260526074130_hq_level2_a",
+          "coin_view_count": 1,
+          "subscription_view_count": 0,
+          "created_at": "2026-05-26T07:42:00.751Z"
+        },
+        {
+          "id": "grouped:2045-10-08:codex_agency_test_20260526074130_creator_lv3:codex_agency_test_20260526074130_creator_lv3_post_1:codex_agency_test_20260526074130_network_master:codex_agency_test_20260526074130_network_level2_a",
+          "date": "2045-10-08",
+          "uploader_id": "codex_agency_test_20260526074130_creator_lv3",
+          "post_id": "codex_agency_test_20260526074130_creator_lv3_post_1",
+          "master_id": "codex_agency_test_20260526074130_network_master",
+          "referrer_id": "codex_agency_test_20260526074130_network_level2_a",
+          "coin_view_count": 1,
+          "subscription_view_count": 0,
+          "created_at": "2026-05-26T07:42:09.231Z"
+        }
+      ],
+      "groupedViewDetails": [
+        {
+          "source_view_id": "codex_agency_test_20260526074130_view_001",
+          "date": "2045-10-08",
+          "viewer_id": "codex_agency_test_20260526074130_hq_direct_a",
+          "video_id": "codex_agency_test_20260526074130_creator_lv1_video_1",
+          "access_method": "COIN",
+          "view_count": 1,
+          "uploader_id": "codex_agency_test_20260526074130_creator_lv1",
+          "post_id": "codex_agency_test_20260526074130_creator_lv1_post_1",
+          "master_id": "codex_agency_test_20260526074130_hq_master",
+          "referrer_id": "codex_agency_test_20260526074130_hq_master",
+          "created_at": "2045-10-08T03:00:00",
+          "stored_at": "2026-05-26T07:42:00.856Z"
+        },
+        {
+          "source_view_id": "codex_agency_test_20260526074130_view_006",
+          "date": "2045-10-08",
+          "viewer_id": "codex_agency_test_20260526074130_network_direct_a",
+          "video_id": "codex_agency_test_20260526074130_creator_lv1_video_1",
+          "access_method": "COIN",
+          "view_count": 1,
+          "uploader_id": "codex_agency_test_20260526074130_creator_lv1",
+          "post_id": "codex_agency_test_20260526074130_creator_lv1_post_1",
+          "master_id": "codex_agency_test_20260526074130_network_master",
+          "referrer_id": "codex_agency_test_20260526074130_network_master",
+          "created_at": "2045-10-08T03:00:00",
+          "stored_at": "2026-05-26T07:42:09.668Z"
+        },
+        {
+          "source_view_id": "codex_agency_test_20260526074130_view_011",
+          "date": "2045-10-08",
+          "viewer_id": "codex_agency_test_20260526074130_binary_direct_a",
+          "video_id": "codex_agency_test_20260526074130_creator_lv1_video_1",
+          "access_method": "COIN",
+          "view_count": 1,
+          "uploader_id": "codex_agency_test_20260526074130_creator_lv1",
+          "post_id": "codex_agency_test_20260526074130_creator_lv1_post_1",
+          "master_id": "codex_agency_test_20260526074130_binary_master",
+          "referrer_id": "codex_agency_test_20260526074130_binary_master",
+          "created_at": "2045-10-08T03:00:00",
+          "stored_at": "2026-05-26T07:42:19.183Z"
+        },
+        {
+          "source_view_id": "codex_agency_test_20260526074130_view_004",
+          "date": "2045-10-08",
+          "viewer_id": "codex_agency_test_20260526074130_hq_direct_b",
+          "video_id": "codex_agency_test_20260526074130_creator_lv1_video_2",
+          "access_method": "SUBSCRIPTION",
+          "view_count": 1,
+          "uploader_id": "codex_agency_test_20260526074130_creator_lv1",
+          "post_id": "codex_agency_test_20260526074130_creator_lv1_post_2",
+          "master_id": "codex_agency_test_20260526074130_hq_master",
+          "referrer_id": "codex_agency_test_20260526074130_hq_master",
+          "created_at": "2045-10-08T03:00:00",
+          "stored_at": "2026-05-26T07:42:00.856Z"
+        },
+        {
+          "source_view_id": "codex_agency_test_20260526074130_view_009",
+          "date": "2045-10-08",
+          "viewer_id": "codex_agency_test_20260526074130_network_direct_b",
+          "video_id": "codex_agency_test_20260526074130_creator_lv1_video_2",
+          "access_method": "SUBSCRIPTION",
+          "view_count": 1,
+          "uploader_id": "codex_agency_test_20260526074130_creator_lv1",
+          "post_id": "codex_agency_test_20260526074130_creator_lv1_post_2",
+          "master_id": "codex_agency_test_20260526074130_network_master",
+          "referrer_id": "codex_agency_test_20260526074130_network_master",
+          "created_at": "2045-10-08T03:00:00",
+          "stored_at": "2026-05-26T07:42:19.183Z"
+        },
+        {
+          "source_view_id": "codex_agency_test_20260526074130_view_014",
+          "date": "2045-10-08",
+          "viewer_id": "codex_agency_test_20260526074130_binary_direct_b",
+          "video_id": "codex_agency_test_20260526074130_creator_lv1_video_2",
+          "access_method": "SUBSCRIPTION",
+          "view_count": 1,
+          "uploader_id": "codex_agency_test_20260526074130_creator_lv1",
+          "post_id": "codex_agency_test_20260526074130_creator_lv1_post_2",
+          "master_id": "codex_agency_test_20260526074130_binary_master",
+          "referrer_id": "codex_agency_test_20260526074130_binary_master",
+          "created_at": "2045-10-08T03:00:00",
+          "stored_at": "2026-05-26T07:42:27.857Z"
+        },
+        {
+          "source_view_id": "codex_agency_test_20260526074130_view_002",
+          "date": "2045-10-08",
+          "viewer_id": "codex_agency_test_20260526074130_hq_level2_a",
+          "video_id": "codex_agency_test_20260526074130_creator_lv2_video_1",
+          "access_method": "SUBSCRIPTION",
+          "view_count": 1,
+          "uploader_id": "codex_agency_test_20260526074130_creator_lv2",
+          "post_id": "codex_agency_test_20260526074130_creator_lv2_post_1",
+          "master_id": "codex_agency_test_20260526074130_hq_master",
+          "referrer_id": "codex_agency_test_20260526074130_hq_direct_a",
+          "created_at": "2045-10-08T03:00:00",
+          "stored_at": "2026-05-26T07:42:00.856Z"
+        },
+        {
+          "source_view_id": "codex_agency_test_20260526074130_view_007",
+          "date": "2045-10-08",
+          "viewer_id": "codex_agency_test_20260526074130_network_level2_a",
+          "video_id": "codex_agency_test_20260526074130_creator_lv2_video_1",
+          "access_method": "SUBSCRIPTION",
+          "view_count": 1,
+          "uploader_id": "codex_agency_test_20260526074130_creator_lv2",
+          "post_id": "codex_agency_test_20260526074130_creator_lv2_post_1",
+          "master_id": "codex_agency_test_20260526074130_network_master",
+          "referrer_id": "codex_agency_test_20260526074130_network_direct_a",
+          "created_at": "2045-10-08T03:00:00",
+          "stored_at": "2026-05-26T07:42:09.668Z"
+        },
+        {
+          "source_view_id": "codex_agency_test_20260526074130_view_012",
+          "date": "2045-10-08",
+          "viewer_id": "codex_agency_test_20260526074130_binary_level2_a",
+          "video_id": "codex_agency_test_20260526074130_creator_lv2_video_1",
+          "access_method": "SUBSCRIPTION",
+          "view_count": 1,
+          "uploader_id": "codex_agency_test_20260526074130_creator_lv2",
+          "post_id": "codex_agency_test_20260526074130_creator_lv2_post_1",
+          "master_id": "codex_agency_test_20260526074130_binary_master",
+          "referrer_id": "codex_agency_test_20260526074130_binary_direct_a",
+          "created_at": "2045-10-08T03:00:00",
+          "stored_at": "2026-05-26T07:42:19.183Z"
+        },
+        {
+          "source_view_id": "codex_agency_test_20260526074130_view_005",
+          "date": "2045-10-08",
+          "viewer_id": "codex_agency_test_20260526074130_hq_level2_b",
+          "video_id": "codex_agency_test_20260526074130_creator_lv2_video_2",
+          "access_method": "COIN",
+          "view_count": 1,
+          "uploader_id": "codex_agency_test_20260526074130_creator_lv2",
+          "post_id": "codex_agency_test_20260526074130_creator_lv2_post_2",
+          "master_id": "codex_agency_test_20260526074130_hq_master",
+          "referrer_id": "codex_agency_test_20260526074130_hq_direct_b",
+          "created_at": "2045-10-08T03:00:00",
+          "stored_at": "2026-05-26T07:42:09.668Z"
+        },
+        {
+          "source_view_id": "codex_agency_test_20260526074130_view_010",
+          "date": "2045-10-08",
+          "viewer_id": "codex_agency_test_20260526074130_network_level2_b",
+          "video_id": "codex_agency_test_20260526074130_creator_lv2_video_2",
+          "access_method": "COIN",
+          "view_count": 1,
+          "uploader_id": "codex_agency_test_20260526074130_creator_lv2",
+          "post_id": "codex_agency_test_20260526074130_creator_lv2_post_2",
+          "master_id": "codex_agency_test_20260526074130_network_master",
+          "referrer_id": "codex_agency_test_20260526074130_network_direct_b",
+          "created_at": "2045-10-08T03:00:00",
+          "stored_at": "2026-05-26T07:42:19.183Z"
+        },
+        {
+          "source_view_id": "codex_agency_test_20260526074130_view_015",
+          "date": "2045-10-08",
+          "viewer_id": "codex_agency_test_20260526074130_binary_level2_b",
+          "video_id": "codex_agency_test_20260526074130_creator_lv2_video_2",
+          "access_method": "COIN",
+          "view_count": 1,
+          "uploader_id": "codex_agency_test_20260526074130_creator_lv2",
+          "post_id": "codex_agency_test_20260526074130_creator_lv2_post_2",
+          "master_id": "codex_agency_test_20260526074130_binary_master",
+          "referrer_id": "codex_agency_test_20260526074130_binary_direct_b",
+          "created_at": "2045-10-08T03:00:00",
+          "stored_at": "2026-05-26T07:42:27.857Z"
+        },
+        {
+          "source_view_id": "codex_agency_test_20260526074130_view_003",
+          "date": "2045-10-08",
+          "viewer_id": "codex_agency_test_20260526074130_hq_level3",
+          "video_id": "codex_agency_test_20260526074130_creator_lv3_video_1",
+          "access_method": "COIN",
+          "view_count": 1,
+          "uploader_id": "codex_agency_test_20260526074130_creator_lv3",
+          "post_id": "codex_agency_test_20260526074130_creator_lv3_post_1",
+          "master_id": "codex_agency_test_20260526074130_hq_master",
+          "referrer_id": "codex_agency_test_20260526074130_hq_level2_a",
+          "created_at": "2045-10-08T03:00:00",
+          "stored_at": "2026-05-26T07:42:00.856Z"
+        },
+        {
+          "source_view_id": "codex_agency_test_20260526074130_view_008",
+          "date": "2045-10-08",
+          "viewer_id": "codex_agency_test_20260526074130_network_level3",
+          "video_id": "codex_agency_test_20260526074130_creator_lv3_video_1",
+          "access_method": "COIN",
+          "view_count": 1,
+          "uploader_id": "codex_agency_test_20260526074130_creator_lv3",
+          "post_id": "codex_agency_test_20260526074130_creator_lv3_post_1",
+          "master_id": "codex_agency_test_20260526074130_network_master",
+          "referrer_id": "codex_agency_test_20260526074130_network_level2_a",
+          "created_at": "2045-10-08T03:00:00",
+          "stored_at": "2026-05-26T07:42:09.668Z"
+        },
+        {
+          "source_view_id": "codex_agency_test_20260526074130_view_013",
+          "date": "2045-10-08",
+          "viewer_id": "codex_agency_test_20260526074130_binary_level3",
+          "video_id": "codex_agency_test_20260526074130_creator_lv3_video_1",
+          "access_method": "COIN",
+          "view_count": 1,
+          "uploader_id": "codex_agency_test_20260526074130_creator_lv3",
+          "post_id": "codex_agency_test_20260526074130_creator_lv3_post_1",
+          "master_id": "codex_agency_test_20260526074130_binary_master",
+          "referrer_id": "codex_agency_test_20260526074130_binary_level2_a",
+          "created_at": "2045-10-08T03:00:00",
+          "stored_at": "2026-05-26T07:42:27.857Z"
+        }
+      ],
+      "commissionBatch": [
+        {
+          "id": "ijV6ArAw49PZ6qVWQYH52",
+          "user_id": "codex_agency_test_20260526074130_binary_direct_a",
+          "master_id": "codex_agency_test_20260526074130_binary_master",
+          "date": "2045-10-08",
+          "point_by_coin": 0,
+          "point_by_subscription": 70,
+          "commission_type": "NETWORK_LEVEL",
+          "view_count_coin": 0,
+          "view_count_subscription": 1,
+          "batch_id": "batch_20451008_7MWO5e5m",
+          "processed": 3,
+          "processed_at": null,
+          "created_at": "2026-05-26T07:42:35.432Z",
+          "post_id": "codex_agency_test_20260526074130_creator_lv2_post_1",
+          "updated_at": "2026-05-26T07:43:09.413Z",
+          "metadata": "{\"status\":\"held_until_payout_qualification\",\"heldAt\":\"2026-05-26T07:43:09.413Z\",\"executionId\":\"-Iqt0lrB\"}"
+        },
+        {
+          "id": "3MXth-yA2eI8hwwihAntR",
+          "user_id": "codex_agency_test_20260526074130_binary_direct_a",
+          "master_id": "codex_agency_test_20260526074130_binary_master",
+          "date": "2045-10-08",
+          "point_by_coin": 4.8,
+          "point_by_subscription": 0,
+          "commission_type": "NETWORK_LEVEL",
+          "view_count_coin": 1,
+          "view_count_subscription": 0,
+          "batch_id": "batch_20451008_2GsddahA",
+          "processed": 3,
+          "processed_at": null,
+          "created_at": "2026-05-26T07:42:46.548Z",
+          "post_id": "codex_agency_test_20260526074130_creator_lv3_post_1",
+          "updated_at": "2026-05-26T07:43:01.042Z",
+          "metadata": "{\"status\":\"held_until_payout_qualification\",\"heldAt\":\"2026-05-26T07:43:01.042Z\",\"executionId\":\"-Iqt0lrB\"}"
+        },
+        {
+          "id": "5JMDap4NibCSsEjhYx-uR",
+          "user_id": "codex_agency_test_20260526074130_binary_direct_b",
+          "master_id": "codex_agency_test_20260526074130_binary_master",
+          "date": "2045-10-08",
+          "point_by_coin": 16.79,
+          "point_by_subscription": 0,
+          "commission_type": "NETWORK_LEVEL",
+          "view_count_coin": 1,
+          "view_count_subscription": 0,
+          "batch_id": "batch_20451008_2GsddahA",
+          "processed": 3,
+          "processed_at": null,
+          "created_at": "2026-05-26T07:42:45.910Z",
+          "post_id": "codex_agency_test_20260526074130_creator_lv2_post_2",
+          "updated_at": "2026-05-26T07:43:01.042Z",
+          "metadata": "{\"status\":\"held_until_payout_qualification\",\"heldAt\":\"2026-05-26T07:43:01.042Z\",\"executionId\":\"-Iqt0lrB\"}"
+        },
+        {
+          "id": "3hg7DsEoUFZ97rvP6Ctu5",
+          "user_id": "codex_agency_test_20260526074130_binary_level2_a",
+          "master_id": "codex_agency_test_20260526074130_binary_master",
+          "date": "2045-10-08",
+          "point_by_coin": 16.79,
+          "point_by_subscription": 0,
+          "commission_type": "NETWORK_LEVEL",
+          "view_count_coin": 1,
+          "view_count_subscription": 0,
+          "batch_id": "batch_20451008_2GsddahA",
+          "processed": 3,
+          "processed_at": null,
+          "created_at": "2026-05-26T07:42:46.327Z",
+          "post_id": "codex_agency_test_20260526074130_creator_lv3_post_1",
+          "updated_at": "2026-05-26T07:43:01.042Z",
+          "metadata": "{\"status\":\"held_until_payout_qualification\",\"heldAt\":\"2026-05-26T07:43:01.042Z\",\"executionId\":\"-Iqt0lrB\"}"
+        },
+        {
+          "id": "J0pHblseEB_iADov1RrY1",
+          "user_id": "codex_agency_test_20260526074130_binary_master",
+          "master_id": "codex_agency_test_20260526074130_binary_master",
+          "date": "2045-10-08",
+          "point_by_coin": 16.79,
+          "point_by_subscription": 0,
+          "commission_type": "NETWORK_LEVEL",
+          "view_count_coin": 1,
+          "view_count_subscription": 0,
+          "batch_id": "batch_20451008_7MWO5e5m",
+          "processed": 1,
+          "processed_at": "2026-05-26T07:43:12.089Z",
+          "created_at": "2026-05-26T07:42:35.327Z",
+          "post_id": "codex_agency_test_20260526074130_creator_lv1_post_1",
+          "updated_at": "2026-05-26T07:42:35.327Z",
+          "metadata": "{\"processingStartedAt\":\"2026-05-26T07:43:10.614Z\",\"attemptedPoints\":106.79,\"executionId\":\"-Iqt0lrB\"}"
+        },
+        {
+          "id": "ArwoXPVsxxw088yo22K-t",
+          "user_id": "codex_agency_test_20260526074130_binary_master",
+          "master_id": "codex_agency_test_20260526074130_binary_master",
+          "date": "2045-10-08",
+          "point_by_coin": 0,
+          "point_by_subscription": 70,
+          "commission_type": "NETWORK_LEVEL",
+          "view_count_coin": 0,
+          "view_count_subscription": 1,
+          "batch_id": "batch_20451008_7MWO5e5m",
+          "processed": 1,
+          "processed_at": "2026-05-26T07:43:12.089Z",
+          "created_at": "2026-05-26T07:42:35.377Z",
+          "post_id": "codex_agency_test_20260526074130_creator_lv1_post_2",
+          "updated_at": "2026-05-26T07:42:35.377Z",
+          "metadata": "{\"processingStartedAt\":\"2026-05-26T07:43:10.614Z\",\"attemptedPoints\":106.79,\"executionId\":\"-Iqt0lrB\"}"
+        },
+        {
+          "id": "dIOfkn2hQGN0PxWJVuXMZ",
+          "user_id": "codex_agency_test_20260526074130_binary_master",
+          "master_id": "codex_agency_test_20260526074130_binary_master",
+          "date": "2045-10-08",
+          "point_by_coin": 0,
+          "point_by_subscription": 20,
+          "commission_type": "NETWORK_LEVEL",
+          "view_count_coin": 0,
+          "view_count_subscription": 1,
+          "batch_id": "batch_20451008_7MWO5e5m",
+          "processed": 1,
+          "processed_at": "2026-05-26T07:43:12.089Z",
+          "created_at": "2026-05-26T07:42:35.481Z",
+          "post_id": "codex_agency_test_20260526074130_creator_lv2_post_1",
+          "updated_at": "2026-05-26T07:42:35.481Z",
+          "metadata": "{\"processingStartedAt\":\"2026-05-26T07:43:10.614Z\",\"attemptedPoints\":106.79,\"executionId\":\"-Iqt0lrB\"}"
+        },
+        {
+          "id": "ZZtKqx2USPkDvLozacxNR",
+          "user_id": "codex_agency_test_20260526074130_binary_master",
+          "master_id": "codex_agency_test_20260526074130_binary_master",
+          "date": "2045-10-08",
+          "point_by_coin": 4.8,
+          "point_by_subscription": 0,
+          "commission_type": "NETWORK_LEVEL",
+          "view_count_coin": 1,
+          "view_count_subscription": 0,
+          "batch_id": "batch_20451008_2GsddahA",
+          "processed": 1,
+          "processed_at": "2026-05-26T07:43:06.182Z",
+          "created_at": "2026-05-26T07:42:46.117Z",
+          "post_id": "codex_agency_test_20260526074130_creator_lv2_post_2",
+          "updated_at": "2026-05-26T07:42:46.117Z",
+          "metadata": "{\"processingStartedAt\":\"2026-05-26T07:43:05.702Z\",\"attemptedPoints\":7.2,\"executionId\":\"-Iqt0lrB\"}"
+        },
+        {
+          "id": "MIrIjXC5LxXwPEgyP5ebx",
+          "user_id": "codex_agency_test_20260526074130_binary_master",
+          "master_id": "codex_agency_test_20260526074130_binary_master",
+          "date": "2045-10-08",
+          "point_by_coin": 2.4,
+          "point_by_subscription": 0,
+          "commission_type": "NETWORK_LEVEL",
+          "view_count_coin": 1,
+          "view_count_subscription": 0,
+          "batch_id": "batch_20451008_2GsddahA",
+          "processed": 1,
+          "processed_at": "2026-05-26T07:43:06.182Z",
+          "created_at": "2026-05-26T07:42:46.748Z",
+          "post_id": "codex_agency_test_20260526074130_creator_lv3_post_1",
+          "updated_at": "2026-05-26T07:42:46.748Z",
+          "metadata": "{\"processingStartedAt\":\"2026-05-26T07:43:05.702Z\",\"attemptedPoints\":7.2,\"executionId\":\"-Iqt0lrB\"}"
+        },
+        {
+          "id": "7-hhODBJ6rayAXv5mBHux",
+          "user_id": "codex_agency_test_20260526074130_creator_lv1",
+          "master_id": null,
+          "date": "2045-10-08",
+          "point_by_coin": 72,
+          "point_by_subscription": 0,
+          "commission_type": "CREATOR",
+          "view_count_coin": 3,
+          "view_count_subscription": 0,
+          "batch_id": "batch_20451008_7MWO5e5m",
+          "processed": 1,
+          "processed_at": "2026-05-26T07:43:12.089Z",
+          "created_at": "2026-05-26T07:42:35.266Z",
+          "post_id": "codex_agency_test_20260526074130_creator_lv1_post_1",
+          "updated_at": "2026-05-26T07:42:35.266Z",
+          "metadata": "{\"processingStartedAt\":\"2026-05-26T07:43:09.626Z\",\"attemptedPoints\":372,\"executionId\":\"-Iqt0lrB\"}"
+        },
+        {
+          "id": "2FW4XFf6B7zN-WMIQebDh",
+          "user_id": "codex_agency_test_20260526074130_creator_lv1",
+          "master_id": null,
+          "date": "2045-10-08",
+          "point_by_coin": 0,
+          "point_by_subscription": 300,
+          "commission_type": "CREATOR",
+          "view_count_coin": 0,
+          "view_count_subscription": 3,
+          "batch_id": "batch_20451008_7MWO5e5m",
+          "processed": 1,
+          "processed_at": "2026-05-26T07:43:12.089Z",
+          "created_at": "2026-05-26T07:42:35.266Z",
+          "post_id": "codex_agency_test_20260526074130_creator_lv1_post_2",
+          "updated_at": "2026-05-26T07:42:35.266Z",
+          "metadata": "{\"processingStartedAt\":\"2026-05-26T07:43:09.626Z\",\"attemptedPoints\":372,\"executionId\":\"-Iqt0lrB\"}"
+        },
+        {
+          "id": "mtlBlipbcOQRfTiWlTX80",
+          "user_id": "codex_agency_test_20260526074130_creator_lv2",
+          "master_id": null,
+          "date": "2045-10-08",
+          "point_by_coin": 0,
+          "point_by_subscription": 100,
+          "commission_type": "CREATOR",
+          "view_count_coin": 0,
+          "view_count_subscription": 1,
+          "batch_id": "batch_20451008_7MWO5e5m",
+          "processed": 1,
+          "processed_at": "2026-05-26T07:43:12.089Z",
+          "created_at": "2026-05-26T07:42:35.266Z",
+          "post_id": "codex_agency_test_20260526074130_creator_lv2_post_1",
+          "updated_at": "2026-05-26T07:42:35.266Z",
+          "metadata": "{\"processingStartedAt\":\"2026-05-26T07:43:10.119Z\",\"attemptedPoints\":100,\"executionId\":\"-Iqt0lrB\"}"
+        },
+        {
+          "id": "AtPK4JLQ6tP8W49dTXZvq",
+          "user_id": "codex_agency_test_20260526074130_creator_lv2",
+          "master_id": null,
+          "date": "2045-10-08",
+          "point_by_coin": 0,
+          "point_by_subscription": 200,
+          "commission_type": "CREATOR",
+          "view_count_coin": 0,
+          "view_count_subscription": 2,
+          "batch_id": "batch_20451008_2GsddahA",
+          "processed": 1,
+          "processed_at": "2026-05-26T07:43:06.182Z",
+          "created_at": "2026-05-26T07:42:43.446Z",
+          "post_id": "codex_agency_test_20260526074130_creator_lv2_post_1",
+          "updated_at": "2026-05-26T07:42:43.446Z",
+          "metadata": "{\"processingStartedAt\":\"2026-05-26T07:43:01.235Z\",\"attemptedPoints\":272,\"executionId\":\"-Iqt0lrB\"}"
+        },
+        {
+          "id": "5PP6RqS2eoMduPSxZJkGy",
+          "user_id": "codex_agency_test_20260526074130_creator_lv2",
+          "master_id": null,
+          "date": "2045-10-08",
+          "point_by_coin": 72,
+          "point_by_subscription": 0,
+          "commission_type": "CREATOR",
+          "view_count_coin": 3,
+          "view_count_subscription": 0,
+          "batch_id": "batch_20451008_2GsddahA",
+          "processed": 1,
+          "processed_at": "2026-05-26T07:43:06.182Z",
+          "created_at": "2026-05-26T07:42:43.446Z",
+          "post_id": "codex_agency_test_20260526074130_creator_lv2_post_2",
+          "updated_at": "2026-05-26T07:42:43.446Z",
+          "metadata": "{\"processingStartedAt\":\"2026-05-26T07:43:01.235Z\",\"attemptedPoints\":272,\"executionId\":\"-Iqt0lrB\"}"
+        },
+        {
+          "id": "gQm5tSw-ph_OYErXRFXvh",
+          "user_id": "codex_agency_test_20260526074130_creator_lv3",
+          "master_id": null,
+          "date": "2045-10-08",
+          "point_by_coin": 48,
+          "point_by_subscription": 0,
+          "commission_type": "CREATOR",
+          "view_count_coin": 2,
+          "view_count_subscription": 0,
+          "batch_id": "batch_20451008_2GsddahA",
+          "processed": 1,
+          "processed_at": "2026-05-26T07:43:06.182Z",
+          "created_at": "2026-05-26T07:42:43.446Z",
+          "post_id": "codex_agency_test_20260526074130_creator_lv3_post_1",
+          "updated_at": "2026-05-26T07:42:43.446Z",
+          "metadata": "{\"processingStartedAt\":\"2026-05-26T07:43:01.723Z\",\"attemptedPoints\":48,\"executionId\":\"-Iqt0lrB\"}"
+        },
+        {
+          "id": "B9I8EtcXdx51YOu_sLTbx",
+          "user_id": "codex_agency_test_20260526074130_creator_lv3",
+          "master_id": null,
+          "date": "2045-10-08",
+          "point_by_coin": 24,
+          "point_by_subscription": 0,
+          "commission_type": "CREATOR",
+          "view_count_coin": 1,
+          "view_count_subscription": 0,
+          "batch_id": "batch_20451008_-Iqt0lrB",
+          "processed": 1,
+          "processed_at": "2026-05-26T07:42:57.579Z",
+          "created_at": "2026-05-26T07:42:54.052Z",
+          "post_id": "codex_agency_test_20260526074130_creator_lv3_post_1",
+          "updated_at": "2026-05-26T07:42:54.052Z",
+          "metadata": "{\"processingStartedAt\":\"2026-05-26T07:42:55.649Z\",\"attemptedPoints\":24,\"executionId\":\"-Iqt0lrB\"}"
+        },
+        {
+          "id": "_bMj6dFle070A-CbDyisQ",
+          "user_id": "codex_agency_test_20260526074130_hq_direct_a",
+          "master_id": "codex_agency_test_20260526074130_hq_master",
+          "date": "2045-10-08",
+          "point_by_coin": 0,
+          "point_by_subscription": 50,
+          "commission_type": "DIRECT",
+          "view_count_coin": 0,
+          "view_count_subscription": 1,
+          "batch_id": "batch_20451008_2GsddahA",
+          "processed": 1,
+          "processed_at": "2026-05-26T07:43:06.182Z",
+          "created_at": "2026-05-26T07:42:43.657Z",
+          "post_id": "codex_agency_test_20260526074130_creator_lv2_post_1",
+          "updated_at": "2026-05-26T07:42:43.657Z",
+          "metadata": "{\"processingStartedAt\":\"2026-05-26T07:43:02.211Z\",\"attemptedPoints\":62,\"executionId\":\"-Iqt0lrB\"}"
+        },
+        {
+          "id": "i7wf_kwdzgUyV0bR_YY6N",
+          "user_id": "codex_agency_test_20260526074130_hq_direct_a",
+          "master_id": "codex_agency_test_20260526074130_hq_master",
+          "date": "2045-10-08",
+          "point_by_coin": 12,
+          "point_by_subscription": 0,
+          "commission_type": "INDIRECT",
+          "view_count_coin": 1,
+          "view_count_subscription": 0,
+          "batch_id": "batch_20451008_2GsddahA",
+          "processed": 1,
+          "processed_at": "2026-05-26T07:43:06.182Z",
+          "created_at": "2026-05-26T07:42:44.644Z",
+          "post_id": "codex_agency_test_20260526074130_creator_lv3_post_1",
+          "updated_at": "2026-05-26T07:42:44.644Z",
+          "metadata": "{\"processingStartedAt\":\"2026-05-26T07:43:02.211Z\",\"attemptedPoints\":62,\"executionId\":\"-Iqt0lrB\"}"
+        },
+        {
+          "id": "HyQbPo4O328yR261b2CUE",
+          "user_id": "codex_agency_test_20260526074130_hq_direct_b",
+          "master_id": "codex_agency_test_20260526074130_hq_master",
+          "date": "2045-10-08",
+          "point_by_coin": 12,
+          "point_by_subscription": 0,
+          "commission_type": "DIRECT",
+          "view_count_coin": 1,
+          "view_count_subscription": 0,
+          "batch_id": "batch_20451008_2GsddahA",
+          "processed": 1,
+          "processed_at": "2026-05-26T07:43:06.182Z",
+          "created_at": "2026-05-26T07:42:44.045Z",
+          "post_id": "codex_agency_test_20260526074130_creator_lv2_post_2",
+          "updated_at": "2026-05-26T07:42:44.045Z",
+          "metadata": "{\"processingStartedAt\":\"2026-05-26T07:43:03.185Z\",\"attemptedPoints\":12,\"executionId\":\"-Iqt0lrB\"}"
+        },
+        {
+          "id": "wE-kSDSsrFRgQeRGy__BN",
+          "user_id": "codex_agency_test_20260526074130_hq_level2_a",
+          "master_id": "codex_agency_test_20260526074130_hq_master",
+          "date": "2045-10-08",
+          "point_by_coin": 7.19,
+          "point_by_subscription": 0,
+          "commission_type": "DIRECT",
+          "view_count_coin": 1,
+          "view_count_subscription": 0,
+          "batch_id": "batch_20451008_2GsddahA",
+          "processed": 1,
+          "processed_at": "2026-05-26T07:43:06.182Z",
+          "created_at": "2026-05-26T07:42:44.440Z",
+          "post_id": "codex_agency_test_20260526074130_creator_lv3_post_1",
+          "updated_at": "2026-05-26T07:42:44.440Z",
+          "metadata": "{\"processingStartedAt\":\"2026-05-26T07:43:03.681Z\",\"attemptedPoints\":7.19,\"executionId\":\"-Iqt0lrB\"}"
+        },
+        {
+          "id": "AJLCdgIAV0V3LH5LuD452",
+          "user_id": "codex_agency_test_20260526074130_hq_master",
+          "master_id": "codex_agency_test_20260526074130_hq_master",
+          "date": "2045-10-08",
+          "point_by_coin": 21.6,
+          "point_by_subscription": 0,
+          "commission_type": "DIRECT",
+          "view_count_coin": 1,
+          "view_count_subscription": 0,
+          "batch_id": "batch_20451008_7MWO5e5m",
+          "processed": 1,
+          "processed_at": "2026-05-26T07:43:12.089Z",
+          "created_at": "2026-05-26T07:42:35.538Z",
+          "post_id": "codex_agency_test_20260526074130_creator_lv1_post_1",
+          "updated_at": "2026-05-26T07:42:35.538Z",
+          "metadata": "{\"processingStartedAt\":\"2026-05-26T07:43:11.119Z\",\"attemptedPoints\":111.6,\"executionId\":\"-Iqt0lrB\"}"
+        },
+        {
+          "id": "8PXt5i5glGdDEFd08LFaL",
+          "user_id": "codex_agency_test_20260526074130_hq_master",
+          "master_id": "codex_agency_test_20260526074130_hq_master",
+          "date": "2045-10-08",
+          "point_by_coin": 0,
+          "point_by_subscription": 90,
+          "commission_type": "DIRECT",
+          "view_count_coin": 0,
+          "view_count_subscription": 1,
+          "batch_id": "batch_20451008_7MWO5e5m",
+          "processed": 1,
+          "processed_at": "2026-05-26T07:43:12.089Z",
+          "created_at": "2026-05-26T07:42:35.589Z",
+          "post_id": "codex_agency_test_20260526074130_creator_lv1_post_2",
+          "updated_at": "2026-05-26T07:42:35.589Z",
+          "metadata": "{\"processingStartedAt\":\"2026-05-26T07:43:11.119Z\",\"attemptedPoints\":111.6,\"executionId\":\"-Iqt0lrB\"}"
+        },
+        {
+          "id": "lzZ9dTSOgTZAR7utdrTha",
+          "user_id": "codex_agency_test_20260526074130_hq_master",
+          "master_id": "codex_agency_test_20260526074130_hq_master",
+          "date": "2045-10-08",
+          "point_by_coin": 0,
+          "point_by_subscription": 90,
+          "commission_type": "INDIRECT",
+          "view_count_coin": 0,
+          "view_count_subscription": 1,
+          "batch_id": "batch_20451008_2GsddahA",
+          "processed": 1,
+          "processed_at": "2026-05-26T07:43:06.182Z",
+          "created_at": "2026-05-26T07:42:43.853Z",
+          "post_id": "codex_agency_test_20260526074130_creator_lv2_post_1",
+          "updated_at": "2026-05-26T07:42:43.853Z",
+          "metadata": "{\"processingStartedAt\":\"2026-05-26T07:43:02.706Z\",\"attemptedPoints\":133.2,\"executionId\":\"-Iqt0lrB\"}"
+        },
+        {
+          "id": "hdOvHZ-zjaDdcRv9Z3dgx",
+          "user_id": "codex_agency_test_20260526074130_hq_master",
+          "master_id": "codex_agency_test_20260526074130_hq_master",
+          "date": "2045-10-08",
+          "point_by_coin": 21.6,
+          "point_by_subscription": 0,
+          "commission_type": "INDIRECT",
+          "view_count_coin": 1,
+          "view_count_subscription": 0,
+          "batch_id": "batch_20451008_2GsddahA",
+          "processed": 1,
+          "processed_at": "2026-05-26T07:43:06.182Z",
+          "created_at": "2026-05-26T07:42:44.240Z",
+          "post_id": "codex_agency_test_20260526074130_creator_lv2_post_2",
+          "updated_at": "2026-05-26T07:42:44.240Z",
+          "metadata": "{\"processingStartedAt\":\"2026-05-26T07:43:02.706Z\",\"attemptedPoints\":133.2,\"executionId\":\"-Iqt0lrB\"}"
+        },
+        {
+          "id": "Z_xdEInc9-9zKW_Sf1kAC",
+          "user_id": "codex_agency_test_20260526074130_hq_master",
+          "master_id": "codex_agency_test_20260526074130_hq_master",
+          "date": "2045-10-08",
+          "point_by_coin": 21.6,
+          "point_by_subscription": 0,
+          "commission_type": "INDIRECT",
+          "view_count_coin": 1,
+          "view_count_subscription": 0,
+          "batch_id": "batch_20451008_2GsddahA",
+          "processed": 1,
+          "processed_at": "2026-05-26T07:43:06.182Z",
+          "created_at": "2026-05-26T07:42:44.849Z",
+          "post_id": "codex_agency_test_20260526074130_creator_lv3_post_1",
+          "updated_at": "2026-05-26T07:42:44.849Z",
+          "metadata": "{\"processingStartedAt\":\"2026-05-26T07:43:02.706Z\",\"attemptedPoints\":133.2,\"executionId\":\"-Iqt0lrB\"}"
+        },
+        {
+          "id": "-dnLmoXlf8gFraK6pWDoX",
+          "user_id": "codex_agency_test_20260526074130_network_direct_a",
+          "master_id": "codex_agency_test_20260526074130_network_master",
+          "date": "2045-10-08",
+          "point_by_coin": 0,
+          "point_by_subscription": 70,
+          "commission_type": "NETWORK_LEVEL",
+          "view_count_coin": 0,
+          "view_count_subscription": 1,
+          "batch_id": "batch_20451008_2GsddahA",
+          "processed": 1,
+          "processed_at": "2026-05-26T07:43:06.182Z",
+          "created_at": "2026-05-26T07:42:45.063Z",
+          "post_id": "codex_agency_test_20260526074130_creator_lv2_post_1",
+          "updated_at": "2026-05-26T07:42:45.063Z",
+          "metadata": "{\"processingStartedAt\":\"2026-05-26T07:43:04.163Z\",\"attemptedPoints\":70,\"executionId\":\"-Iqt0lrB\"}"
+        },
+        {
+          "id": "TE2QzNkwijNOYvF4v9IDS",
+          "user_id": "codex_agency_test_20260526074130_network_direct_a",
+          "master_id": "codex_agency_test_20260526074130_network_master",
+          "date": "2045-10-08",
+          "point_by_coin": 4.8,
+          "point_by_subscription": 0,
+          "commission_type": "NETWORK_LEVEL",
+          "view_count_coin": 1,
+          "view_count_subscription": 0,
+          "batch_id": "batch_20451008_-Iqt0lrB",
+          "processed": 1,
+          "processed_at": "2026-05-26T07:42:57.579Z",
+          "created_at": "2026-05-26T07:42:54.471Z",
+          "post_id": "codex_agency_test_20260526074130_creator_lv3_post_1",
+          "updated_at": "2026-05-26T07:42:54.471Z",
+          "metadata": "{\"processingStartedAt\":\"2026-05-26T07:42:56.627Z\",\"attemptedPoints\":4.8,\"executionId\":\"-Iqt0lrB\"}"
+        },
+        {
+          "id": "GfXkkMGsUVIzH0XBYlPRV",
+          "user_id": "codex_agency_test_20260526074130_network_direct_b",
+          "master_id": "codex_agency_test_20260526074130_network_master",
+          "date": "2045-10-08",
+          "point_by_coin": 16.79,
+          "point_by_subscription": 0,
+          "commission_type": "NETWORK_LEVEL",
+          "view_count_coin": 1,
+          "view_count_subscription": 0,
+          "batch_id": "batch_20451008_2GsddahA",
+          "processed": 1,
+          "processed_at": "2026-05-26T07:43:06.182Z",
+          "created_at": "2026-05-26T07:42:45.496Z",
+          "post_id": "codex_agency_test_20260526074130_creator_lv2_post_2",
+          "updated_at": "2026-05-26T07:42:45.496Z",
+          "metadata": "{\"processingStartedAt\":\"2026-05-26T07:43:05.132Z\",\"attemptedPoints\":16.79,\"executionId\":\"-Iqt0lrB\"}"
+        },
+        {
+          "id": "1YNN4EcREXmGnuYbTYk6h",
+          "user_id": "codex_agency_test_20260526074130_network_level2_a",
+          "master_id": "codex_agency_test_20260526074130_network_master",
+          "date": "2045-10-08",
+          "point_by_coin": 16.79,
+          "point_by_subscription": 0,
+          "commission_type": "NETWORK_LEVEL",
+          "view_count_coin": 1,
+          "view_count_subscription": 0,
+          "batch_id": "batch_20451008_-Iqt0lrB",
+          "processed": 1,
+          "processed_at": "2026-05-26T07:42:57.579Z",
+          "created_at": "2026-05-26T07:42:54.263Z",
+          "post_id": "codex_agency_test_20260526074130_creator_lv3_post_1",
+          "updated_at": "2026-05-26T07:42:54.263Z",
+          "metadata": "{\"processingStartedAt\":\"2026-05-26T07:42:56.149Z\",\"attemptedPoints\":16.79,\"executionId\":\"-Iqt0lrB\"}"
+        },
+        {
+          "id": "MtHrlJQp6WmIOvRpEYfQe",
+          "user_id": "codex_agency_test_20260526074130_network_master",
+          "master_id": "codex_agency_test_20260526074130_network_master",
+          "date": "2045-10-08",
+          "point_by_coin": 16.79,
+          "point_by_subscription": 0,
+          "commission_type": "NETWORK_LEVEL",
+          "view_count_coin": 1,
+          "view_count_subscription": 0,
+          "batch_id": "batch_20451008_7MWO5e5m",
+          "processed": 1,
+          "processed_at": "2026-05-26T07:43:12.089Z",
+          "created_at": "2026-05-26T07:42:35.641Z",
+          "post_id": "codex_agency_test_20260526074130_creator_lv1_post_1",
+          "updated_at": "2026-05-26T07:42:35.641Z",
+          "metadata": "{\"processingStartedAt\":\"2026-05-26T07:43:11.622Z\",\"attemptedPoints\":86.79,\"executionId\":\"-Iqt0lrB\"}"
+        },
+        {
+          "id": "fDBh5Yn7WzAPYf8IYRoIq",
+          "user_id": "codex_agency_test_20260526074130_network_master",
+          "master_id": "codex_agency_test_20260526074130_network_master",
+          "date": "2045-10-08",
+          "point_by_coin": 0,
+          "point_by_subscription": 70,
+          "commission_type": "NETWORK_LEVEL",
+          "view_count_coin": 0,
+          "view_count_subscription": 1,
+          "batch_id": "batch_20451008_7MWO5e5m",
+          "processed": 1,
+          "processed_at": "2026-05-26T07:43:12.089Z",
+          "created_at": "2026-05-26T07:42:35.692Z",
+          "post_id": "codex_agency_test_20260526074130_creator_lv1_post_2",
+          "updated_at": "2026-05-26T07:42:35.692Z",
+          "metadata": "{\"processingStartedAt\":\"2026-05-26T07:43:11.622Z\",\"attemptedPoints\":86.79,\"executionId\":\"-Iqt0lrB\"}"
+        },
+        {
+          "id": "3Bfh5k1daiYVeuSwXp7pD",
+          "user_id": "codex_agency_test_20260526074130_network_master",
+          "master_id": "codex_agency_test_20260526074130_network_master",
+          "date": "2045-10-08",
+          "point_by_coin": 0,
+          "point_by_subscription": 20,
+          "commission_type": "NETWORK_LEVEL",
+          "view_count_coin": 0,
+          "view_count_subscription": 1,
+          "batch_id": "batch_20451008_2GsddahA",
+          "processed": 1,
+          "processed_at": "2026-05-26T07:43:06.182Z",
+          "created_at": "2026-05-26T07:42:45.278Z",
+          "post_id": "codex_agency_test_20260526074130_creator_lv2_post_1",
+          "updated_at": "2026-05-26T07:42:45.278Z",
+          "metadata": "{\"processingStartedAt\":\"2026-05-26T07:43:04.628Z\",\"attemptedPoints\":24.8,\"executionId\":\"-Iqt0lrB\"}"
+        },
+        {
+          "id": "MCD3RWtj05tLL5EvLUYTW",
+          "user_id": "codex_agency_test_20260526074130_network_master",
+          "master_id": "codex_agency_test_20260526074130_network_master",
+          "date": "2045-10-08",
+          "point_by_coin": 4.8,
+          "point_by_subscription": 0,
+          "commission_type": "NETWORK_LEVEL",
+          "view_count_coin": 1,
+          "view_count_subscription": 0,
+          "batch_id": "batch_20451008_2GsddahA",
+          "processed": 1,
+          "processed_at": "2026-05-26T07:43:06.182Z",
+          "created_at": "2026-05-26T07:42:45.712Z",
+          "post_id": "codex_agency_test_20260526074130_creator_lv2_post_2",
+          "updated_at": "2026-05-26T07:42:45.712Z",
+          "metadata": "{\"processingStartedAt\":\"2026-05-26T07:43:04.628Z\",\"attemptedPoints\":24.8,\"executionId\":\"-Iqt0lrB\"}"
+        },
+        {
+          "id": "PXa12kvgAifqSQ4sL6Iyl",
+          "user_id": "codex_agency_test_20260526074130_network_master",
+          "master_id": "codex_agency_test_20260526074130_network_master",
+          "date": "2045-10-08",
+          "point_by_coin": 2.4,
+          "point_by_subscription": 0,
+          "commission_type": "NETWORK_LEVEL",
+          "view_count_coin": 1,
+          "view_count_subscription": 0,
+          "batch_id": "batch_20451008_-Iqt0lrB",
+          "processed": 1,
+          "processed_at": "2026-05-26T07:42:57.579Z",
+          "created_at": "2026-05-26T07:42:54.696Z",
+          "post_id": "codex_agency_test_20260526074130_creator_lv3_post_1",
+          "updated_at": "2026-05-26T07:42:54.696Z",
+          "metadata": "{\"processingStartedAt\":\"2026-05-26T07:42:57.103Z\",\"attemptedPoints\":2.4,\"executionId\":\"-Iqt0lrB\"}"
+        }
+      ],
+      "cfStats": [
+        {
+          "period": "daily",
+          "date": "2045-10-08",
+          "total_minutes": 36,
+          "total_requests": 15,
+          "top_countries": "[{\"country\":\"US\",\"minutes\":9},{\"country\":\"TH\",\"minutes\":9},{\"country\":\"KR\",\"minutes\":6},{\"country\":\"JP\",\"minutes\":6},{\"country\":\"VN\",\"minutes\":6}]",
+          "top_posts": null,
+          "top_creators": null,
+          "request_list": "{\"10\":5,\"11\":4,\"12\":6,\"13\":4,\"14\":5,\"15\":5,\"16\":2,\"09\":5}",
+          "commission_data": "{\"period\":{\"startDate\":\"2045-10-08\",\"endDate\":\"2045-10-08\",\"targetDate\":\"2045-10-08\"},\"pointSettings\":{\"coinPerPoint\":120,\"subscriptionPerPoint\":1000,\"viewCoinAmount\":2,\"calculationPeriod\":{\"startDate\":\"2045-10-02\",\"endDate\":\"2045-10-08\",\"weekNumber\":41,\"year\":2045},\"subscriptionRevenue\":{\"weeklyPayments\":{\"count\":1,\"amount\":6000},\"yearlySubscriptions\":{\"activeCount\":0,\"yearlyPrice\":0,\"weeklyAllocatedAmount\":0},\"totalWeeklyRevenue\":6000},\"viewStats\":{\"totalCoinViews\":9,\"totalSubscriptionViews\":6},\"calculatedAt\":\"2026-05-26T07:42:34.907Z\",\"executionId\":\"7MWO5e5m\",\"uploaderQualifications\":{}},\"individualCreators\":{\"userCount\":3,\"coinViews\":9,\"subscriptionViews\":6,\"coinPoints\":216,\"subscriptionPoints\":600,\"totalPoints\":816},\"teamSummaries\":{\"codex_agency_test_20260526074130_network_master\":{\"teamType\":\"network\",\"creators\":{\"userCount\":0,\"coinViews\":0,\"subscriptionViews\":0,\"coinPoints\":0,\"subscriptionPoints\":0,\"totalPoints\":0},\"directReferrers\":{\"userCount\":0,\"coinViews\":0,\"subscriptionViews\":0,\"coinPoints\":0,\"subscriptionPoints\":0,\"totalPoints\":0},\"indirectReferrers\":{\"userCount\":0,\"coinViews\":0,\"subscriptionViews\":0,\"coinPoints\":0,\"subscriptionPoints\":0,\"totalPoints\":0},\"teamTotal\":222.37,\"topMembers\":[]},\"codex_agency_test_20260526074130_hq_master\":{\"teamType\":\"headquarter\",\"creators\":{\"userCount\":0,\"coinViews\":0,\"subscriptionViews\":0,\"coinPoints\":0,\"subscriptionPoints\":0,\"totalPoints\":0},\"directReferrers\":{\"userCount\":4,\"coinViews\":3,\"subscriptionViews\":2,\"coinPoints\":40.790000000000006,\"subscriptionPoints\":140,\"totalPoints\":180.79},\"indirectReferrers\":{\"userCount\":2,\"coinViews\":3,\"subscriptionViews\":1,\"coinPoints\":55.2,\"subscriptionPoints\":90,\"totalPoints\":145.2},\"teamTotal\":325.99,\"topMembers\":[{\"userId\":\"codex_agency_test_20260526074130_hq_master\",\"directPoints\":111.6,\"indirectPoints\":133.2,\"totalPoints\":244.79999999999998,\"totalViews\":5},{\"userId\":\"codex_agency_test_20260526074130_hq_direct_a\",\"directPoints\":50,\"indirectPoints\":12,\"totalPoints\":62,\"totalViews\":2},{\"userId\":\"codex_agency_test_20260526074130_hq_direct_b\",\"directPoints\":12,\"indirectPoints\":0,\"totalPoints\":12,\"totalViews\":1},{\"userId\":\"codex_agency_test_20260526074130_hq_level2_a\",\"directPoints\":7.19,\"indirectPoints\":0,\"totalPoints\":7.19,\"totalViews\":1}]},\"codex_agency_test_20260526074130_binary_master\":{\"teamType\":\"binary_network\",\"creators\":{\"userCount\":0,\"coinViews\":0,\"subscriptionViews\":0,\"coinPoints\":0,\"subscriptionPoints\":0,\"totalPoints\":0},\"directReferrers\":{\"userCount\":0,\"coinViews\":0,\"subscriptionViews\":0,\"coinPoints\":0,\"subscriptionPoints\":0,\"totalPoints\":0},\"indirectReferrers\":{\"userCount\":0,\"coinViews\":0,\"subscriptionViews\":0,\"coinPoints\":0,\"subscriptionPoints\":0,\"totalPoints\":0},\"teamTotal\":113.99,\"topMembers\":[]}},\"grandTotal\":{\"totalUsers\":12,\"totalCommissions\":30,\"totalCoinViews\":24,\"totalSubscriptionViews\":14,\"totalCoinPoints\":398.3500000000001,\"totalSubscriptionPoints\":1080,\"totalPoints\":1478.35},\"postAnalytics\":{\"totalPosts\":5,\"creatorPosts\":5,\"teamPosts\":0,\"totalPostPoints\":816,\"totalPostViews\":15,\"topPerformingPosts\":[{\"postId\":\"codex_agency_test_20260526074130_creator_lv1_post_2\",\"uploaderId\":\"codex_agency_test_20260526074130_creator_lv1\",\"masterId\":null,\"totalPoints\":300,\"totalViews\":3},{\"postId\":\"codex_agency_test_20260526074130_creator_lv2_post_1\",\"uploaderId\":\"codex_agency_test_20260526074130_creator_lv2\",\"masterId\":null,\"totalPoints\":300,\"totalViews\":3},{\"postId\":\"codex_agency_test_20260526074130_creator_lv1_post_1\",\"uploaderId\":\"codex_agency_test_20260526074130_creator_lv1\",\"masterId\":null,\"totalPoints\":72,\"totalViews\":3},{\"postId\":\"codex_agency_test_20260526074130_creator_lv2_post_2\",\"uploaderId\":\"codex_agency_test_20260526074130_creator_lv2\",\"masterId\":null,\"totalPoints\":72,\"totalViews\":3},{\"postId\":\"codex_agency_test_20260526074130_creator_lv3_post_1\",\"uploaderId\":\"codex_agency_test_20260526074130_creator_lv3\",\"masterId\":null,\"totalPoints\":72,\"totalViews\":3}],\"topUploaders\":[{\"uploaderId\":\"codex_agency_test_20260526074130_creator_lv1\",\"masterId\":null,\"totalPoints\":372,\"totalViews\":6,\"postCount\":2},{\"uploaderId\":\"codex_agency_test_20260526074130_creator_lv2\",\"masterId\":null,\"totalPoints\":372,\"totalViews\":6,\"postCount\":2},{\"uploaderId\":\"codex_agency_test_20260526074130_creator_lv3\",\"masterId\":null,\"totalPoints\":72,\"totalViews\":3,\"postCount\":1}]}}"
+        },
+        {
+          "period": "monthly",
+          "date": "2045-10-08",
+          "total_minutes": 36,
+          "total_requests": 15,
+          "top_countries": "[{\"country\":\"US\",\"minutes\":9},{\"country\":\"TH\",\"minutes\":9},{\"country\":\"KR\",\"minutes\":6},{\"country\":\"JP\",\"minutes\":6},{\"country\":\"VN\",\"minutes\":6}]",
+          "top_posts": null,
+          "top_creators": null,
+          "request_list": "{\"2045-10-08\":36}",
+          "commission_data": null
+        },
+        {
+          "period": "weekly",
+          "date": "2045-10-08",
+          "total_minutes": 36,
+          "total_requests": 15,
+          "top_countries": "[{\"country\":\"US\",\"minutes\":9},{\"country\":\"TH\",\"minutes\":9},{\"country\":\"KR\",\"minutes\":6},{\"country\":\"JP\",\"minutes\":6},{\"country\":\"VN\",\"minutes\":6}]",
+          "top_posts": null,
+          "top_creators": null,
+          "request_list": "{\"2045-10-08\":36}",
+          "commission_data": "{\"period\":{\"startDate\":\"2045-10-02\",\"endDate\":\"2045-10-08\",\"targetDate\":\"2045-10-08\"},\"pointSettings\":{\"coinPerPoint\":120,\"subscriptionPerPoint\":1000,\"viewCoinAmount\":2,\"calculationPeriod\":{\"startDate\":\"2045-10-02\",\"endDate\":\"2045-10-08\",\"weekNumber\":41,\"year\":2045},\"subscriptionRevenue\":{\"weeklyPayments\":{\"count\":1,\"amount\":6000},\"yearlySubscriptions\":{\"activeCount\":0,\"yearlyPrice\":0,\"weeklyAllocatedAmount\":0},\"totalWeeklyRevenue\":6000},\"viewStats\":{\"totalCoinViews\":9,\"totalSubscriptionViews\":6},\"calculatedAt\":\"2026-05-26T07:42:34.907Z\",\"executionId\":\"7MWO5e5m\",\"uploaderQualifications\":{}},\"individualCreators\":{\"userCount\":3,\"coinViews\":9,\"subscriptionViews\":6,\"coinPoints\":216,\"subscriptionPoints\":600,\"totalPoints\":816},\"teamSummaries\":{\"codex_agency_test_20260526074130_network_master\":{\"teamType\":\"network\",\"creators\":{\"userCount\":0,\"coinViews\":0,\"subscriptionViews\":0,\"coinPoints\":0,\"subscriptionPoints\":0,\"totalPoints\":0},\"directReferrers\":{\"userCount\":0,\"coinViews\":0,\"subscriptionViews\":0,\"coinPoints\":0,\"subscriptionPoints\":0,\"totalPoints\":0},\"indirectReferrers\":{\"userCount\":0,\"coinViews\":0,\"subscriptionViews\":0,\"coinPoints\":0,\"subscriptionPoints\":0,\"totalPoints\":0},\"teamTotal\":222.37,\"topMembers\":[]},\"codex_agency_test_20260526074130_hq_master\":{\"teamType\":\"headquarter\",\"creators\":{\"userCount\":0,\"coinViews\":0,\"subscriptionViews\":0,\"coinPoints\":0,\"subscriptionPoints\":0,\"totalPoints\":0},\"directReferrers\":{\"userCount\":4,\"coinViews\":3,\"subscriptionViews\":2,\"coinPoints\":40.790000000000006,\"subscriptionPoints\":140,\"totalPoints\":180.79},\"indirectReferrers\":{\"userCount\":2,\"coinViews\":3,\"subscriptionViews\":1,\"coinPoints\":55.2,\"subscriptionPoints\":90,\"totalPoints\":145.2},\"teamTotal\":325.99,\"topMembers\":[{\"userId\":\"codex_agency_test_20260526074130_hq_master\",\"directPoints\":111.6,\"indirectPoints\":133.2,\"totalPoints\":244.79999999999998,\"totalViews\":5},{\"userId\":\"codex_agency_test_20260526074130_hq_direct_a\",\"directPoints\":50,\"indirectPoints\":12,\"totalPoints\":62,\"totalViews\":2},{\"userId\":\"codex_agency_test_20260526074130_hq_direct_b\",\"directPoints\":12,\"indirectPoints\":0,\"totalPoints\":12,\"totalViews\":1},{\"userId\":\"codex_agency_test_20260526074130_hq_level2_a\",\"directPoints\":7.19,\"indirectPoints\":0,\"totalPoints\":7.19,\"totalViews\":1}]},\"codex_agency_test_20260526074130_binary_master\":{\"teamType\":\"binary_network\",\"creators\":{\"userCount\":0,\"coinViews\":0,\"subscriptionViews\":0,\"coinPoints\":0,\"subscriptionPoints\":0,\"totalPoints\":0},\"directReferrers\":{\"userCount\":0,\"coinViews\":0,\"subscriptionViews\":0,\"coinPoints\":0,\"subscriptionPoints\":0,\"totalPoints\":0},\"indirectReferrers\":{\"userCount\":0,\"coinViews\":0,\"subscriptionViews\":0,\"coinPoints\":0,\"subscriptionPoints\":0,\"totalPoints\":0},\"teamTotal\":113.99,\"topMembers\":[]}},\"grandTotal\":{\"totalUsers\":12,\"totalCommissions\":30,\"totalCoinViews\":24,\"totalSubscriptionViews\":14,\"totalCoinPoints\":398.3500000000001,\"totalSubscriptionPoints\":1080,\"totalPoints\":1478.35},\"postAnalytics\":{\"totalPosts\":5,\"creatorPosts\":5,\"teamPosts\":0,\"totalPostPoints\":816,\"totalPostViews\":15,\"topPerformingPosts\":[{\"postId\":\"codex_agency_test_20260526074130_creator_lv1_post_2\",\"uploaderId\":\"codex_agency_test_20260526074130_creator_lv1\",\"masterId\":null,\"totalPoints\":300,\"totalViews\":3},{\"postId\":\"codex_agency_test_20260526074130_creator_lv2_post_1\",\"uploaderId\":\"codex_agency_test_20260526074130_creator_lv2\",\"masterId\":null,\"totalPoints\":300,\"totalViews\":3},{\"postId\":\"codex_agency_test_20260526074130_creator_lv1_post_1\",\"uploaderId\":\"codex_agency_test_20260526074130_creator_lv1\",\"masterId\":null,\"totalPoints\":72,\"totalViews\":3},{\"postId\":\"codex_agency_test_20260526074130_creator_lv2_post_2\",\"uploaderId\":\"codex_agency_test_20260526074130_creator_lv2\",\"masterId\":null,\"totalPoints\":72,\"totalViews\":3},{\"postId\":\"codex_agency_test_20260526074130_creator_lv3_post_1\",\"uploaderId\":\"codex_agency_test_20260526074130_creator_lv3\",\"masterId\":null,\"totalPoints\":72,\"totalViews\":3}],\"topUploaders\":[{\"uploaderId\":\"codex_agency_test_20260526074130_creator_lv1\",\"masterId\":null,\"totalPoints\":372,\"totalViews\":6,\"postCount\":2},{\"uploaderId\":\"codex_agency_test_20260526074130_creator_lv2\",\"masterId\":null,\"totalPoints\":372,\"totalViews\":6,\"postCount\":2},{\"uploaderId\":\"codex_agency_test_20260526074130_creator_lv3\",\"masterId\":null,\"totalPoints\":72,\"totalViews\":3,\"postCount\":1}]}}"
+        }
+      ]
+    },
+    "summaries": {
+      "admin": {
+        "source": "cloudflare-d1-commission_batch",
+        "targetDate": "2045-10-08",
+        "scope": "admin",
+        "rows": [
+          {
+            "user_id": "codex_agency_test_20260526074130_binary_master",
+            "master_id": "codex_agency_test_20260526074130_binary_master",
+            "commission_type": "NETWORK_LEVEL",
+            "post_id": "codex_agency_test_20260526074130_creator_lv1_post_1",
+            "point_by_coin": 16.79,
+            "point_by_subscription": 0,
+            "view_count_coin": 1,
+            "view_count_subscription": 0
+          },
+          {
+            "user_id": "codex_agency_test_20260526074130_binary_master",
+            "master_id": "codex_agency_test_20260526074130_binary_master",
+            "commission_type": "NETWORK_LEVEL",
+            "post_id": "codex_agency_test_20260526074130_creator_lv1_post_2",
+            "point_by_coin": 0,
+            "point_by_subscription": 70,
+            "view_count_coin": 0,
+            "view_count_subscription": 1
+          },
+          {
+            "user_id": "codex_agency_test_20260526074130_binary_master",
+            "master_id": "codex_agency_test_20260526074130_binary_master",
+            "commission_type": "NETWORK_LEVEL",
+            "post_id": "codex_agency_test_20260526074130_creator_lv2_post_1",
+            "point_by_coin": 0,
+            "point_by_subscription": 20,
+            "view_count_coin": 0,
+            "view_count_subscription": 1
+          },
+          {
+            "user_id": "codex_agency_test_20260526074130_binary_master",
+            "master_id": "codex_agency_test_20260526074130_binary_master",
+            "commission_type": "NETWORK_LEVEL",
+            "post_id": "codex_agency_test_20260526074130_creator_lv2_post_2",
+            "point_by_coin": 4.8,
+            "point_by_subscription": 0,
+            "view_count_coin": 1,
+            "view_count_subscription": 0
+          },
+          {
+            "user_id": "codex_agency_test_20260526074130_binary_master",
+            "master_id": "codex_agency_test_20260526074130_binary_master",
+            "commission_type": "NETWORK_LEVEL",
+            "post_id": "codex_agency_test_20260526074130_creator_lv3_post_1",
+            "point_by_coin": 2.4,
+            "point_by_subscription": 0,
+            "view_count_coin": 1,
+            "view_count_subscription": 0
+          },
+          {
+            "user_id": "codex_agency_test_20260526074130_creator_lv1",
+            "master_id": null,
+            "commission_type": "CREATOR",
+            "post_id": "codex_agency_test_20260526074130_creator_lv1_post_1",
+            "point_by_coin": 72,
+            "point_by_subscription": 0,
+            "view_count_coin": 3,
+            "view_count_subscription": 0
+          },
+          {
+            "user_id": "codex_agency_test_20260526074130_creator_lv1",
+            "master_id": null,
+            "commission_type": "CREATOR",
+            "post_id": "codex_agency_test_20260526074130_creator_lv1_post_2",
+            "point_by_coin": 0,
+            "point_by_subscription": 300,
+            "view_count_coin": 0,
+            "view_count_subscription": 3
+          },
+          {
+            "user_id": "codex_agency_test_20260526074130_creator_lv2",
+            "master_id": null,
+            "commission_type": "CREATOR",
+            "post_id": "codex_agency_test_20260526074130_creator_lv2_post_1",
+            "point_by_coin": 0,
+            "point_by_subscription": 300,
+            "view_count_coin": 0,
+            "view_count_subscription": 3
+          },
+          {
+            "user_id": "codex_agency_test_20260526074130_creator_lv2",
+            "master_id": null,
+            "commission_type": "CREATOR",
+            "post_id": "codex_agency_test_20260526074130_creator_lv2_post_2",
+            "point_by_coin": 72,
+            "point_by_subscription": 0,
+            "view_count_coin": 3,
+            "view_count_subscription": 0
+          },
+          {
+            "user_id": "codex_agency_test_20260526074130_creator_lv3",
+            "master_id": null,
+            "commission_type": "CREATOR",
+            "post_id": "codex_agency_test_20260526074130_creator_lv3_post_1",
+            "point_by_coin": 72,
+            "point_by_subscription": 0,
+            "view_count_coin": 3,
+            "view_count_subscription": 0
+          },
+          {
+            "user_id": "codex_agency_test_20260526074130_hq_direct_a",
+            "master_id": "codex_agency_test_20260526074130_hq_master",
+            "commission_type": "DIRECT",
+            "post_id": "codex_agency_test_20260526074130_creator_lv2_post_1",
+            "point_by_coin": 0,
+            "point_by_subscription": 50,
+            "view_count_coin": 0,
+            "view_count_subscription": 1
+          },
+          {
+            "user_id": "codex_agency_test_20260526074130_hq_direct_a",
+            "master_id": "codex_agency_test_20260526074130_hq_master",
+            "commission_type": "INDIRECT",
+            "post_id": "codex_agency_test_20260526074130_creator_lv3_post_1",
+            "point_by_coin": 12,
+            "point_by_subscription": 0,
+            "view_count_coin": 1,
+            "view_count_subscription": 0
+          },
+          {
+            "user_id": "codex_agency_test_20260526074130_hq_direct_b",
+            "master_id": "codex_agency_test_20260526074130_hq_master",
+            "commission_type": "DIRECT",
+            "post_id": "codex_agency_test_20260526074130_creator_lv2_post_2",
+            "point_by_coin": 12,
+            "point_by_subscription": 0,
+            "view_count_coin": 1,
+            "view_count_subscription": 0
+          },
+          {
+            "user_id": "codex_agency_test_20260526074130_hq_level2_a",
+            "master_id": "codex_agency_test_20260526074130_hq_master",
+            "commission_type": "DIRECT",
+            "post_id": "codex_agency_test_20260526074130_creator_lv3_post_1",
+            "point_by_coin": 7.19,
+            "point_by_subscription": 0,
+            "view_count_coin": 1,
+            "view_count_subscription": 0
+          },
+          {
+            "user_id": "codex_agency_test_20260526074130_hq_master",
+            "master_id": "codex_agency_test_20260526074130_hq_master",
+            "commission_type": "DIRECT",
+            "post_id": "codex_agency_test_20260526074130_creator_lv1_post_1",
+            "point_by_coin": 21.6,
+            "point_by_subscription": 0,
+            "view_count_coin": 1,
+            "view_count_subscription": 0
+          },
+          {
+            "user_id": "codex_agency_test_20260526074130_hq_master",
+            "master_id": "codex_agency_test_20260526074130_hq_master",
+            "commission_type": "DIRECT",
+            "post_id": "codex_agency_test_20260526074130_creator_lv1_post_2",
+            "point_by_coin": 0,
+            "point_by_subscription": 90,
+            "view_count_coin": 0,
+            "view_count_subscription": 1
+          },
+          {
+            "user_id": "codex_agency_test_20260526074130_hq_master",
+            "master_id": "codex_agency_test_20260526074130_hq_master",
+            "commission_type": "INDIRECT",
+            "post_id": "codex_agency_test_20260526074130_creator_lv2_post_1",
+            "point_by_coin": 0,
+            "point_by_subscription": 90,
+            "view_count_coin": 0,
+            "view_count_subscription": 1
+          },
+          {
+            "user_id": "codex_agency_test_20260526074130_hq_master",
+            "master_id": "codex_agency_test_20260526074130_hq_master",
+            "commission_type": "INDIRECT",
+            "post_id": "codex_agency_test_20260526074130_creator_lv2_post_2",
+            "point_by_coin": 21.6,
+            "point_by_subscription": 0,
+            "view_count_coin": 1,
+            "view_count_subscription": 0
+          },
+          {
+            "user_id": "codex_agency_test_20260526074130_hq_master",
+            "master_id": "codex_agency_test_20260526074130_hq_master",
+            "commission_type": "INDIRECT",
+            "post_id": "codex_agency_test_20260526074130_creator_lv3_post_1",
+            "point_by_coin": 21.6,
+            "point_by_subscription": 0,
+            "view_count_coin": 1,
+            "view_count_subscription": 0
+          },
+          {
+            "user_id": "codex_agency_test_20260526074130_network_direct_a",
+            "master_id": "codex_agency_test_20260526074130_network_master",
+            "commission_type": "NETWORK_LEVEL",
+            "post_id": "codex_agency_test_20260526074130_creator_lv2_post_1",
+            "point_by_coin": 0,
+            "point_by_subscription": 70,
+            "view_count_coin": 0,
+            "view_count_subscription": 1
+          },
+          {
+            "user_id": "codex_agency_test_20260526074130_network_direct_a",
+            "master_id": "codex_agency_test_20260526074130_network_master",
+            "commission_type": "NETWORK_LEVEL",
+            "post_id": "codex_agency_test_20260526074130_creator_lv3_post_1",
+            "point_by_coin": 4.8,
+            "point_by_subscription": 0,
+            "view_count_coin": 1,
+            "view_count_subscription": 0
+          },
+          {
+            "user_id": "codex_agency_test_20260526074130_network_direct_b",
+            "master_id": "codex_agency_test_20260526074130_network_master",
+            "commission_type": "NETWORK_LEVEL",
+            "post_id": "codex_agency_test_20260526074130_creator_lv2_post_2",
+            "point_by_coin": 16.79,
+            "point_by_subscription": 0,
+            "view_count_coin": 1,
+            "view_count_subscription": 0
+          },
+          {
+            "user_id": "codex_agency_test_20260526074130_network_level2_a",
+            "master_id": "codex_agency_test_20260526074130_network_master",
+            "commission_type": "NETWORK_LEVEL",
+            "post_id": "codex_agency_test_20260526074130_creator_lv3_post_1",
+            "point_by_coin": 16.79,
+            "point_by_subscription": 0,
+            "view_count_coin": 1,
+            "view_count_subscription": 0
+          },
+          {
+            "user_id": "codex_agency_test_20260526074130_network_master",
+            "master_id": "codex_agency_test_20260526074130_network_master",
+            "commission_type": "NETWORK_LEVEL",
+            "post_id": "codex_agency_test_20260526074130_creator_lv1_post_1",
+            "point_by_coin": 16.79,
+            "point_by_subscription": 0,
+            "view_count_coin": 1,
+            "view_count_subscription": 0
+          },
+          {
+            "user_id": "codex_agency_test_20260526074130_network_master",
+            "master_id": "codex_agency_test_20260526074130_network_master",
+            "commission_type": "NETWORK_LEVEL",
+            "post_id": "codex_agency_test_20260526074130_creator_lv1_post_2",
+            "point_by_coin": 0,
+            "point_by_subscription": 70,
+            "view_count_coin": 0,
+            "view_count_subscription": 1
+          },
+          {
+            "user_id": "codex_agency_test_20260526074130_network_master",
+            "master_id": "codex_agency_test_20260526074130_network_master",
+            "commission_type": "NETWORK_LEVEL",
+            "post_id": "codex_agency_test_20260526074130_creator_lv2_post_1",
+            "point_by_coin": 0,
+            "point_by_subscription": 20,
+            "view_count_coin": 0,
+            "view_count_subscription": 1
+          },
+          {
+            "user_id": "codex_agency_test_20260526074130_network_master",
+            "master_id": "codex_agency_test_20260526074130_network_master",
+            "commission_type": "NETWORK_LEVEL",
+            "post_id": "codex_agency_test_20260526074130_creator_lv2_post_2",
+            "point_by_coin": 4.8,
+            "point_by_subscription": 0,
+            "view_count_coin": 1,
+            "view_count_subscription": 0
+          },
+          {
+            "user_id": "codex_agency_test_20260526074130_network_master",
+            "master_id": "codex_agency_test_20260526074130_network_master",
+            "commission_type": "NETWORK_LEVEL",
+            "post_id": "codex_agency_test_20260526074130_creator_lv3_post_1",
+            "point_by_coin": 2.4,
+            "point_by_subscription": 0,
+            "view_count_coin": 1,
+            "view_count_subscription": 0
+          }
+        ],
+        "totalPoints": 1478.3499999999997,
+        "totalViews": 38
+      },
+      "creators": {
+        "codex_agency_test_20260526074130_creator_lv1": {
+          "source": "cloudflare-d1-commission_batch",
+          "targetDate": "2045-10-08",
+          "scope": "creator",
+          "userId": "codex_agency_test_20260526074130_creator_lv1",
+          "rows": [
+            {
+              "user_id": "codex_agency_test_20260526074130_creator_lv1",
+              "master_id": null,
+              "commission_type": "CREATOR",
+              "post_id": "codex_agency_test_20260526074130_creator_lv1_post_1",
+              "point_by_coin": 72,
+              "point_by_subscription": 0,
+              "view_count_coin": 3,
+              "view_count_subscription": 0
+            },
+            {
+              "user_id": "codex_agency_test_20260526074130_creator_lv1",
+              "master_id": null,
+              "commission_type": "CREATOR",
+              "post_id": "codex_agency_test_20260526074130_creator_lv1_post_2",
+              "point_by_coin": 0,
+              "point_by_subscription": 300,
+              "view_count_coin": 0,
+              "view_count_subscription": 3
+            }
+          ],
+          "totalPoints": 372,
+          "totalViews": 6
+        },
+        "codex_agency_test_20260526074130_creator_lv2": {
+          "source": "cloudflare-d1-commission_batch",
+          "targetDate": "2045-10-08",
+          "scope": "creator",
+          "userId": "codex_agency_test_20260526074130_creator_lv2",
+          "rows": [
+            {
+              "user_id": "codex_agency_test_20260526074130_creator_lv2",
+              "master_id": null,
+              "commission_type": "CREATOR",
+              "post_id": "codex_agency_test_20260526074130_creator_lv2_post_1",
+              "point_by_coin": 0,
+              "point_by_subscription": 300,
+              "view_count_coin": 0,
+              "view_count_subscription": 3
+            },
+            {
+              "user_id": "codex_agency_test_20260526074130_creator_lv2",
+              "master_id": null,
+              "commission_type": "CREATOR",
+              "post_id": "codex_agency_test_20260526074130_creator_lv2_post_2",
+              "point_by_coin": 72,
+              "point_by_subscription": 0,
+              "view_count_coin": 3,
+              "view_count_subscription": 0
+            }
+          ],
+          "totalPoints": 372,
+          "totalViews": 6
+        },
+        "codex_agency_test_20260526074130_creator_lv3": {
+          "source": "cloudflare-d1-commission_batch",
+          "targetDate": "2045-10-08",
+          "scope": "creator",
+          "userId": "codex_agency_test_20260526074130_creator_lv3",
+          "rows": [
+            {
+              "user_id": "codex_agency_test_20260526074130_creator_lv3",
+              "master_id": null,
+              "commission_type": "CREATOR",
+              "post_id": "codex_agency_test_20260526074130_creator_lv3_post_1",
+              "point_by_coin": 72,
+              "point_by_subscription": 0,
+              "view_count_coin": 3,
+              "view_count_subscription": 0
+            }
+          ],
+          "totalPoints": 72,
+          "totalViews": 3
+        }
+      },
+      "agencies": {
+        "codex_agency_test_20260526074130_hq_master": {
+          "source": "cloudflare-d1-commission_batch",
+          "targetDate": "2045-10-08",
+          "scope": "agency",
+          "userId": "codex_agency_test_20260526074130_hq_master",
+          "rows": [
+            {
+              "user_id": "codex_agency_test_20260526074130_hq_master",
+              "master_id": "codex_agency_test_20260526074130_hq_master",
+              "commission_type": "DIRECT",
+              "post_id": "codex_agency_test_20260526074130_creator_lv1_post_1",
+              "point_by_coin": 21.6,
+              "point_by_subscription": 0,
+              "view_count_coin": 1,
+              "view_count_subscription": 0
+            },
+            {
+              "user_id": "codex_agency_test_20260526074130_hq_master",
+              "master_id": "codex_agency_test_20260526074130_hq_master",
+              "commission_type": "DIRECT",
+              "post_id": "codex_agency_test_20260526074130_creator_lv1_post_2",
+              "point_by_coin": 0,
+              "point_by_subscription": 90,
+              "view_count_coin": 0,
+              "view_count_subscription": 1
+            },
+            {
+              "user_id": "codex_agency_test_20260526074130_hq_master",
+              "master_id": "codex_agency_test_20260526074130_hq_master",
+              "commission_type": "INDIRECT",
+              "post_id": "codex_agency_test_20260526074130_creator_lv2_post_1",
+              "point_by_coin": 0,
+              "point_by_subscription": 90,
+              "view_count_coin": 0,
+              "view_count_subscription": 1
+            },
+            {
+              "user_id": "codex_agency_test_20260526074130_hq_master",
+              "master_id": "codex_agency_test_20260526074130_hq_master",
+              "commission_type": "INDIRECT",
+              "post_id": "codex_agency_test_20260526074130_creator_lv2_post_2",
+              "point_by_coin": 21.6,
+              "point_by_subscription": 0,
+              "view_count_coin": 1,
+              "view_count_subscription": 0
+            },
+            {
+              "user_id": "codex_agency_test_20260526074130_hq_master",
+              "master_id": "codex_agency_test_20260526074130_hq_master",
+              "commission_type": "INDIRECT",
+              "post_id": "codex_agency_test_20260526074130_creator_lv3_post_1",
+              "point_by_coin": 21.6,
+              "point_by_subscription": 0,
+              "view_count_coin": 1,
+              "view_count_subscription": 0
+            }
+          ],
+          "totalPoints": 244.79999999999998,
+          "totalViews": 5
+        },
+        "codex_agency_test_20260526074130_network_master": {
+          "source": "cloudflare-d1-commission_batch",
+          "targetDate": "2045-10-08",
+          "scope": "agency",
+          "userId": "codex_agency_test_20260526074130_network_master",
+          "rows": [
+            {
+              "user_id": "codex_agency_test_20260526074130_network_master",
+              "master_id": "codex_agency_test_20260526074130_network_master",
+              "commission_type": "NETWORK_LEVEL",
+              "post_id": "codex_agency_test_20260526074130_creator_lv1_post_1",
+              "point_by_coin": 16.79,
+              "point_by_subscription": 0,
+              "view_count_coin": 1,
+              "view_count_subscription": 0
+            },
+            {
+              "user_id": "codex_agency_test_20260526074130_network_master",
+              "master_id": "codex_agency_test_20260526074130_network_master",
+              "commission_type": "NETWORK_LEVEL",
+              "post_id": "codex_agency_test_20260526074130_creator_lv1_post_2",
+              "point_by_coin": 0,
+              "point_by_subscription": 70,
+              "view_count_coin": 0,
+              "view_count_subscription": 1
+            },
+            {
+              "user_id": "codex_agency_test_20260526074130_network_master",
+              "master_id": "codex_agency_test_20260526074130_network_master",
+              "commission_type": "NETWORK_LEVEL",
+              "post_id": "codex_agency_test_20260526074130_creator_lv2_post_1",
+              "point_by_coin": 0,
+              "point_by_subscription": 20,
+              "view_count_coin": 0,
+              "view_count_subscription": 1
+            },
+            {
+              "user_id": "codex_agency_test_20260526074130_network_master",
+              "master_id": "codex_agency_test_20260526074130_network_master",
+              "commission_type": "NETWORK_LEVEL",
+              "post_id": "codex_agency_test_20260526074130_creator_lv2_post_2",
+              "point_by_coin": 4.8,
+              "point_by_subscription": 0,
+              "view_count_coin": 1,
+              "view_count_subscription": 0
+            },
+            {
+              "user_id": "codex_agency_test_20260526074130_network_master",
+              "master_id": "codex_agency_test_20260526074130_network_master",
+              "commission_type": "NETWORK_LEVEL",
+              "post_id": "codex_agency_test_20260526074130_creator_lv3_post_1",
+              "point_by_coin": 2.4,
+              "point_by_subscription": 0,
+              "view_count_coin": 1,
+              "view_count_subscription": 0
+            }
+          ],
+          "totalPoints": 113.99,
+          "totalViews": 5
+        },
+        "codex_agency_test_20260526074130_binary_master": {
+          "source": "cloudflare-d1-commission_batch",
+          "targetDate": "2045-10-08",
+          "scope": "agency",
+          "userId": "codex_agency_test_20260526074130_binary_master",
+          "rows": [
+            {
+              "user_id": "codex_agency_test_20260526074130_binary_master",
+              "master_id": "codex_agency_test_20260526074130_binary_master",
+              "commission_type": "NETWORK_LEVEL",
+              "post_id": "codex_agency_test_20260526074130_creator_lv1_post_1",
+              "point_by_coin": 16.79,
+              "point_by_subscription": 0,
+              "view_count_coin": 1,
+              "view_count_subscription": 0
+            },
+            {
+              "user_id": "codex_agency_test_20260526074130_binary_master",
+              "master_id": "codex_agency_test_20260526074130_binary_master",
+              "commission_type": "NETWORK_LEVEL",
+              "post_id": "codex_agency_test_20260526074130_creator_lv1_post_2",
+              "point_by_coin": 0,
+              "point_by_subscription": 70,
+              "view_count_coin": 0,
+              "view_count_subscription": 1
+            },
+            {
+              "user_id": "codex_agency_test_20260526074130_binary_master",
+              "master_id": "codex_agency_test_20260526074130_binary_master",
+              "commission_type": "NETWORK_LEVEL",
+              "post_id": "codex_agency_test_20260526074130_creator_lv2_post_1",
+              "point_by_coin": 0,
+              "point_by_subscription": 20,
+              "view_count_coin": 0,
+              "view_count_subscription": 1
+            },
+            {
+              "user_id": "codex_agency_test_20260526074130_binary_master",
+              "master_id": "codex_agency_test_20260526074130_binary_master",
+              "commission_type": "NETWORK_LEVEL",
+              "post_id": "codex_agency_test_20260526074130_creator_lv2_post_2",
+              "point_by_coin": 4.8,
+              "point_by_subscription": 0,
+              "view_count_coin": 1,
+              "view_count_subscription": 0
+            },
+            {
+              "user_id": "codex_agency_test_20260526074130_binary_master",
+              "master_id": "codex_agency_test_20260526074130_binary_master",
+              "commission_type": "NETWORK_LEVEL",
+              "post_id": "codex_agency_test_20260526074130_creator_lv3_post_1",
+              "point_by_coin": 2.4,
+              "point_by_subscription": 0,
+              "view_count_coin": 1,
+              "view_count_subscription": 0
+            }
+          ],
+          "totalPoints": 113.99,
+          "totalViews": 5
+        }
+      }
+    },
+    "checks": {
+      "accountCount": 22,
+      "creatorCount": 3,
+      "teamCount": 3,
+      "postCount": 6,
+      "viewCount": 15,
+      "usersWithPositivePoints": 12,
+      "d1CommissionRows": 34,
+      "d1GroupedViewRows": 15,
+      "d1GroupedViewDetailRows": 15,
+      "cfStatsRows": 3,
+      "hasCountryStats": true,
+      "withdrawalRows": 6,
+      "commissionStatusCounts": {
+        "1": 30,
+        "3": 4
+      },
+      "passed": true
+    }
+  }
+}

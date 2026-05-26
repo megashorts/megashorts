@@ -4,8 +4,10 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 export function OrientationModal() {
+  const t = useTranslations('Orientation');
   const [isLandscape, setIsLandscape] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [isMobileDevice, setIsMobileDevice] = useState(false);
@@ -102,13 +104,13 @@ export function OrientationModal() {
             className="text-center text-base font-medium text-muted-foreground"
             style={{ whiteSpace: 'pre-line' }}
           >
-            메가쇼츠는 세로컨텐츠 전용 플랫폼입니다.{'\n'}디바이스를 세로로 이용하세요!
+            {t('portraitOnly')}
           </p>
           <Link
             href=""
             className="w-auto text-sm px-4 py-2 bg-primary text-white text-center rounded-md hover:bg-primary/90 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
           >
-            디바이스 세로고정 안내
+            {t('portraitLockGuide')}
           </Link>
         </div>
       </div>

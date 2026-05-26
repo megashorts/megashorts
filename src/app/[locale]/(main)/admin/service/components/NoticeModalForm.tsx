@@ -29,6 +29,16 @@ export function NoticeModalForm({ open, onClose, onSubmit, initialData }: Notice
   const [buttonUrl, setButtonUrl] = useState('');
   const [i18nData, setI18nData] = useState<NoticeModalFormData['i18nData']>({});
   const [isUploading, setIsUploading] = useState(false);
+  const uploaderTextOverrides = {
+    imageCropRequired: 'Please crop the image before upload.',
+    imageLoadFailed: 'Failed to load image.',
+    imageReady: 'Image is ready to upload.',
+    imageProcessFailed: 'Failed to process image.',
+    imageDropHint: 'Click or drag and drop an image',
+    imageFileGuide: 'PNG, JPG, JPEG, WEBP / max 5MB',
+    recrop: 'Re-crop',
+    cropCancelled: 'Image cropping was canceled.',
+  } as const;
 
   // 컴포넌트 마운트 시 한 번만 실행되는 useEffect
   const initialDataRef = useRef(initialData);
@@ -162,7 +172,7 @@ export function NoticeModalForm({ open, onClose, onSubmit, initialData }: Notice
 
   const handleSubmit = () => {
     if (!title.trim()) {
-      alert('제목을 입력해주세요.');
+      alert('Please enter a title.');
       return;
     }
   
@@ -232,7 +242,7 @@ export function NoticeModalForm({ open, onClose, onSubmit, initialData }: Notice
       <DialogContent className="w-[calc(100vw-2rem)] sm:w-[425px] px-6 py-8 max-h-[90vh] overflow-y-auto">
         <DialogHeader className="mb-6">
           <DialogTitle className="text-base">
-            {initialData ? '모달 수정' : '새 모달'}
+            {initialData ? 'Edit Modal' : 'New Modal'}
           </DialogTitle>
         </DialogHeader>
 
@@ -240,7 +250,7 @@ export function NoticeModalForm({ open, onClose, onSubmit, initialData }: Notice
           <Input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="모달 제목"
+            placeholder="Modal title"
             className="text-sm"
           />
 
@@ -264,9 +274,9 @@ export function NoticeModalForm({ open, onClose, onSubmit, initialData }: Notice
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="ALWAYS">항상 보기</SelectItem>
-                  <SelectItem value="DAY">오늘은 보지 않기</SelectItem>
-                  <SelectItem value="NEVER">다시 보지 않기</SelectItem>
+                  <SelectItem value="ALWAYS">Always show</SelectItem>
+                  <SelectItem value="DAY">Hide for today</SelectItem>
+                  <SelectItem value="NEVER">Never show again</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -281,7 +291,7 @@ export function NoticeModalForm({ open, onClose, onSubmit, initialData }: Notice
               type="url"
               value={linkUrl}
               onChange={(e) => setLinkUrl(e.target.value)}
-              placeholder="이미지 클릭시 이동할 URL"
+              placeholder="URL to open when image is clicked"
               className="text-sm"
             />
           </div>
@@ -295,14 +305,14 @@ export function NoticeModalForm({ open, onClose, onSubmit, initialData }: Notice
               type="url"
               value={buttonUrl}
               onChange={(e) => setButtonUrl(e.target.value)}
-              placeholder="버튼 URL"
+              placeholder="Button URL"
               className="text-sm"
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium mb-2">
-              이미지 업로드
+              Image Upload
             </label>
             <MultiLanguageImageUploader
               onImagesUploaded={handleImagesUploaded}
@@ -312,6 +322,7 @@ export function NoticeModalForm({ open, onClose, onSubmit, initialData }: Notice
               buttonTexts={getButtonTexts()}
               initialImages={getInitialImages()}
               username={user?.username}
+              uploaderTextOverrides={uploaderTextOverrides}
             />
           </div>
         </div>

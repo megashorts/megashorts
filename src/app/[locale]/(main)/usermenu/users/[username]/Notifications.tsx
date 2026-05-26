@@ -12,8 +12,10 @@ import {
 import { Loader2, Trash2 } from "lucide-react";
 import { useEffect } from "react";
 import Notification from "./Notification";
+import { useTranslations } from "next-intl";
 
 export default function Notifications() {
+  const tNotification = useTranslations('Notification');
   const {
     data,
     fetchNextPage,
@@ -99,7 +101,7 @@ export default function Notifications() {
   if (status === "success" && !notifications.length && !hasNextPage) {
     return (
       <p className="text-center text-muted-foreground mt-8">
-        새로운 알림이 없습니다.
+        {tNotification('noNotifications')}
       </p>
     );
   }
@@ -107,7 +109,7 @@ export default function Notifications() {
   if (status === "error") {
     return (
       <p className="text-center text-destructive mt-8">
-        알림 불러오기에 실패하였습니다.
+        {tNotification('loadFailed')}
       </p>
     );
   }
@@ -125,7 +127,7 @@ export default function Notifications() {
           ) : (
             <Trash2 className="w-4 h-4" />
           )}
-          <span>{isDeleteAllPending ? '삭제 중...' : '전체 알림 삭제'}</span>
+          <span>{isDeleteAllPending ? tNotification('deleting') : tNotification('deleteAll')}</span>
         </button>
       </div>
       <InfiniteScrollContainer

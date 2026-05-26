@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ImageUploader } from '@/components/ImageUploader';
 import { getThumbnailUrl } from '@/lib/constants';
+import LanguageFlag from '@/components/LanguageFlag';
 
 interface MultiLanguageImageUploaderProps {
   onImagesUploaded: (files: { file: File; locale: Language }[]) => void;
@@ -18,6 +19,16 @@ interface MultiLanguageImageUploaderProps {
   className?: string;
   username?: string;
   initialImages?: Record<string, { imageId: string }>;
+  uploaderTextOverrides?: Partial<{
+    imageCropRequired: string;
+    imageLoadFailed: string;
+    imageReady: string;
+    imageProcessFailed: string;
+    imageDropHint: string;
+    imageFileGuide: string;
+    recrop: string;
+    cropCancelled: string;
+  }>;
 }
 
 const LANGUAGE_CODES = {
@@ -30,17 +41,6 @@ const LANGUAGE_CODES = {
   id: 'INDONESIAN',
   vn: 'VIETNAMESE',
 } as const;
-
-const FLAGS: Record<Language, string> = {
-  KOREAN: '🇰🇷',
-  ENGLISH: '🇺🇸',
-  CHINESE: '🇨🇳',
-  JAPANESE: '🇯🇵',
-  THAI: '🇹🇭',
-  SPANISH: '🇪🇸',
-  INDONESIAN: '🇮🇩',
-  VIETNAMESE: '🇻🇳',
-};
 
 interface PreviewImage {
   file: File;
@@ -57,7 +57,8 @@ export function MultiLanguageImageUploader({
   buttonTexts = {}, 
   className, 
   username,
-  initialImages = {}
+  initialImages = {},
+  uploaderTextOverrides,
 }: MultiLanguageImageUploaderProps) {
   const [previewImages, setPreviewImages] = useState<PreviewImage[]>(() => {
     return Object.entries(initialImages).map(([locale, data]) => ({
@@ -141,6 +142,7 @@ export function MultiLanguageImageUploader({
           aspectRatio={2/3}
           hidePreview
           username={`notice_modal_${username || 'unknown'}`}
+          textOverrides={uploaderTextOverrides}
         />
 
         {/* 이미지 프리뷰 */}
@@ -168,7 +170,7 @@ export function MultiLanguageImageUploader({
                 {/* 디폴트 이미지가 아닌 경우에만 국기 표시 */}
                 {!image.isDefault && (
                   <span className="absolute -bottom-1 -right-1 text-xs bg-black/50 text-white px-1 rounded">
-                    {FLAGS[image.locale]}
+                    <LanguageFlag language={image.locale} className="h-3.5 w-3.5" />
                   </span>
                 )}
                 {/* 디폴트 이미지인 경우 '기본' 표시 */}
@@ -191,7 +193,7 @@ export function MultiLanguageImageUploader({
               <Input
                 value={buttonTexts.default || ''}
                 onChange={(e) => onDefaultButtonTextChange(e.target.value)}
-                placeholder="버튼 텍스트"
+                placeholder="Button Text"
                 className="text-sm h-8"
               />
             </div>
@@ -207,11 +209,11 @@ export function MultiLanguageImageUploader({
                 .filter(image => !image.isDefault) // 디폴트 이미지는 버튼 텍스트 입력에서 제외
                 .map((image) => (
                   <div key={image.locale} className="flex items-center gap-2">
-                    <span className="text-sm">{FLAGS[image.locale]}</span>
+                    <LanguageFlag language={image.locale} className="h-4 w-4" />
                     <Input
                       value={buttonTexts[image.locale.toLowerCase()] || ''}
                       onChange={(e) => onButtonTextChange(image.locale.toLowerCase(), e.target.value)}
-                      placeholder="버튼 텍스트"
+                      placeholder="Button Text"
                       className="text-sm h-8"
                     />
                   </div>

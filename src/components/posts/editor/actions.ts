@@ -7,6 +7,8 @@ import prisma from "@/lib/prisma";
 import { getPostDataInclude } from '@/lib/types';
 import { PostFormData, postSchema } from "@/lib/validation";
 import { CategoryType, Language, PostStatus } from "@prisma/client";
+import { USER_ROLE } from "@/lib/constants";
+import { invalidatePostContent } from "@/lib/content-revalidation";
 
 interface VideoData {
   url: string;
@@ -19,6 +21,16 @@ export async function submitPost(input: PostFormData) {
   if (!user) throw new Error("Unauthorized");
 
   const validatedData = postSchema.parse(input);
+  const hasRestrictedCategory = validatedData.categories.some(
+    (category) => category === CategoryType.NOTIFICATION || category === CategoryType.MSPOST,
+  );
+
+  if (hasRestrictedCategory && user.userRole < USER_ROLE.OPERATION1) {
+    throw new Error("Insufficient role for notice/blog categories");
+  }
+
+  const mergeCategories = (...sets: CategoryType[][]): CategoryType[] =>
+    Array.from(new Set(sets.flat()));
 
   // Cloudflare 메타데이터 업데이트를 트랜잭션 밖으로 분리
   if (input.videos?.length > 0) {
@@ -49,6 +61,9 @@ export async function submitPost(input: PostFormData) {
     );
   }
 
+  let previousStatus: PostStatus | null = null;
+  let previousCategories: CategoryType[] = [];
+
   const newPost = await prisma.$transaction(async (tx) => {
     // 기존 포스트 조회 (수정인 경우)
     const existingPost = input.id ? await tx.post.findUnique({
@@ -57,6 +72,11 @@ export async function submitPost(input: PostFormData) {
         videos: true  // 기존 비디오 정보 포함
       }
     }) : null;
+
+    if (existingPost) {
+      previousStatus = existingPost.status;
+      previousCategories = existingPost.categories;
+    }
 
     const lastPost = await tx.post.findFirst({
       orderBy: { postNum: 'desc' }
@@ -71,11 +91,14 @@ export async function submitPost(input: PostFormData) {
         data: {
           title: validatedData.title,
           titleOriginal: validatedData.titleOriginal,
+          titleI18n: validatedData.titleI18n,
           content: validatedData.content,
+          contentI18n: validatedData.contentI18n,
           thumbnailId: validatedData.thumbnailId || null,
           status: validatedData.status,
           categories: validatedData.categories,
           ageLimit: validatedData.ageLimit,
+          postLanguage: validatedData.postLanguage,
           featured: validatedData.featured,
           priority: validatedData.priority,
           videoCount: input.videos?.length || 0,
@@ -90,12 +113,15 @@ export async function submitPost(input: PostFormData) {
           postNum: nextPostNum,
           title: validatedData.title,
           titleOriginal: validatedData.titleOriginal,
+          titleI18n: validatedData.titleI18n,
           content: validatedData.content,
+          contentI18n: validatedData.contentI18n,
           thumbnailId: validatedData.thumbnailId || null,
           userId: user.id,
           status: validatedData.status,
           categories: validatedData.categories,
           ageLimit: validatedData.ageLimit,
+          postLanguage: validatedData.postLanguage,
           featured: validatedData.featured,
           priority: validatedData.priority,
           videoCount: input.videos?.length || 0,
@@ -151,13 +177,17 @@ export async function submitPost(input: PostFormData) {
           });
         }
 
-        // 2. sequence 또는 isPremium 변경된 비디오 처리
+        // 2. sequence, isPremium, subtitle 변경된 비디오 처리
         const existingVideos = existingPost.videos;
         const updatedVideos = input.videos.filter(v => {
           const existingVideo = existingVideos.find(ev => ev.id === v.id);
+          const existingSubtitles = existingVideo?.subtitle || [];
+          const nextSubtitles = v.subtitle || [];
           return existingVideo && (
             existingVideo.sequence !== v.sequence || 
-            existingVideo.isPremium !== v.isPremium
+            existingVideo.isPremium !== v.isPremium ||
+            existingSubtitles.length !== nextSubtitles.length ||
+            existingSubtitles.some(lang => !nextSubtitles.includes(lang))
           );
         });
 
@@ -167,14 +197,19 @@ export async function submitPost(input: PostFormData) {
             where: { id: video.id },
             data: { 
               sequence: -video.sequence,  // 임시값
-              isPremium: video.isPremium  // isPremium 값 업데이트
+              isPremium: video.isPremium,  // isPremium 값 업데이트
+              subtitle: video.subtitle || [],
             }
           });
         }
         for (const video of updatedVideos) {
           await tx.video.update({
             where: { id: video.id },
-            data: { sequence: video.sequence }  // 최종값
+            data: {
+              sequence: video.sequence,  // 최종값
+              isPremium: video.isPremium,
+              subtitle: video.subtitle || [],
+            }
           });
         }
 
@@ -282,6 +317,16 @@ export async function submitPost(input: PostFormData) {
 
     return post;
   });
+
+  const shouldInvalidateContent =
+    newPost.status === PostStatus.PUBLISHED || previousStatus === PostStatus.PUBLISHED;
+
+  if (shouldInvalidateContent) {
+    invalidatePostContent({
+      postId: newPost.id,
+      categories: mergeCategories(previousCategories, newPost.categories),
+    });
+  }
 
   return newPost;
 }

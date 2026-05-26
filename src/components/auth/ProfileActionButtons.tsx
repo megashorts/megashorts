@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import UserPasswordReset from "./UserPasswordReset";
 import CancelSubscriptionDialog from "./CancelSubscriptionDialog";
 import DeleteAccountDialog from "./DeleteAccountDialog";
+import { useTranslations } from "next-intl";
 
 interface ProfileActionButtonsProps {
   subscriptionStatus?: string;
@@ -18,30 +19,31 @@ export default function ProfileActionButtons({
   const [showPasswordReset, setShowPasswordReset] = useState(false);
   const [showCancelSubscription, setShowCancelSubscription] = useState(false);
   const [showDeleteAccount, setShowDeleteAccount] = useState(false);
+  const tProfile = useTranslations('Profile');
 
   return (
     <>
-      <div className="flex flex-wrap gap-4 justify-start md:justify-start">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
         <Button
           type="button"
           onClick={() => setShowPasswordReset(true)}
-          className="px-4 py-2 text-sm font-medium rounded-md w-full md:w-[120px] flex-1"
+          className="w-full h-auto min-h-10 px-3 py-2 text-[13px] sm:text-sm leading-tight whitespace-normal break-words"
         >
-          비밀번호 변경
+          {tProfile('changePassword')}
         </Button>
         <Button
           type="button"
           onClick={() => setShowCancelSubscription(true)}
-          className="px-4 py-2 text-sm text-black hover:text-white border-gray-50 bg-white font-medium rounded-md w-full md:w-[120px] flex-1"
+          className="w-full h-auto min-h-10 px-3 py-2 text-[13px] sm:text-sm leading-tight whitespace-normal break-words text-black hover:text-white border-gray-50 bg-white"
         >
-          구독취소
+          {tProfile('cancelSubscription')}
         </Button>
         <Button
           type="button"
           onClick={() => setShowDeleteAccount(true)}
-          className="px-4 py-2 text-sm text-black hover:text-white border-gray-50 bg-white font-medium rounded-md w-full md:w-[120px] flex-1"
+          className="w-full h-auto min-h-10 px-3 py-2 text-[13px] sm:text-sm leading-tight whitespace-normal break-words text-black hover:text-white border-gray-50 bg-white"
         >
-          회원탈퇴
+          {tProfile('deleteAccount')}
         </Button>
       </div>
 

@@ -265,7 +265,7 @@ export default function AdminInquiryList({ isAdmin = true }: { isAdmin?: boolean
         </div>
         <form onSubmit={handleUsernameSubmit} className="flex gap-1">
           <Input
-            placeholder="사용자 검색"
+            placeholder="Search user"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             className="w-[100px] h-8 text-sm text-center"
@@ -302,7 +302,7 @@ export default function AdminInquiryList({ isAdmin = true }: { isAdmin?: boolean
             {!data?.inquiries || data.inquiries.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
-                  문의 내역이 없습니다
+                  No inquiries found
                 </TableCell>
               </TableRow>
             ) : (

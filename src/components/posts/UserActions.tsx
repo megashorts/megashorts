@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { LikeInfo, PostData } from "@/lib/types";
 import kyInstance from "@/lib/ky";
 import { useSession } from "@/components/SessionProvider";
+import { useTranslations } from "next-intl";
 
 interface UserActionsProps {
   post: PostData;
@@ -13,6 +14,7 @@ interface UserActionsProps {
 
 export default function UserActions({ post }: UserActionsProps) {
   const { user } = useSession();
+  const tVideo = useTranslations('Video');
   const { data } = useQuery({
     queryKey: ["like-info", post.id],
     queryFn: () =>
@@ -50,7 +52,7 @@ export default function UserActions({ post }: UserActionsProps) {
           />
         </div>
         <span className="ml-3 text-sm font-medium tabular-nums text-white">
-          {data.likes} <span className="hidden sm:inline">likes</span>
+          {data.likes} <span className="hidden sm:inline">{tVideo('likes')}</span>
         </span>
       </div>
     </div>

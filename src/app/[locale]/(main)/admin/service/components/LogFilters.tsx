@@ -43,15 +43,15 @@ type CountryOption = {
 };
 
 const COUNTRY_OPTIONS: CountryOption[] = [
-  { code: null, label: '모든 국가' },
-  { code: Language.KOREAN, label: '대한민국' },
-  { code: Language.ENGLISH, label: '영어권' },
-  { code: Language.CHINESE, label: '중국' },
-  { code: Language.JAPANESE, label: '일본' },
-  { code: Language.THAI, label: '태국' },
-  { code: Language.SPANISH, label: '스페인어권' },
-  { code: Language.INDONESIAN, label: '인도네시아' },
-  { code: Language.VIETNAMESE, label: '베트남' },
+  { code: null, label: 'All Countries' },
+  { code: Language.KOREAN, label: 'South Korea' },
+  { code: Language.ENGLISH, label: 'English Speaking' },
+  { code: Language.CHINESE, label: 'China' },
+  { code: Language.JAPANESE, label: 'Japan' },
+  { code: Language.THAI, label: 'Thailand' },
+  { code: Language.SPANISH, label: 'Spanish Speaking' },
+  { code: Language.INDONESIAN, label: 'Indonesia' },
+  { code: Language.VIETNAMESE, label: 'Vietnam' },
 ];
 
 export function LogFilters({ filters, onFiltersChange }: LogFiltersProps) {
@@ -172,7 +172,7 @@ export function LogFilters({ filters, onFiltersChange }: LogFiltersProps) {
 
   // 날짜 표시 형식
   const formatDateDisplay = (range: DateRange | null) => {
-    if (!range) return '날짜 선택';
+    if (!range) return 'Select Date';
     
     // 같은 날짜인 경우 (단일 날짜 선택)
     if (range.from.getTime() === range.to.getTime()) {
@@ -185,7 +185,7 @@ export function LogFilters({ filters, onFiltersChange }: LogFiltersProps) {
     oneHourAgo.setHours(now.getHours() - 1);
     if (Math.abs(range.from.getTime() - oneHourAgo.getTime()) < 60000 && 
         Math.abs(range.to.getTime() - now.getTime()) < 60000) {
-      return '최근 1시간';
+      return 'Last 1 Hour';
     }
     
     // 오늘인 경우
@@ -196,7 +196,7 @@ export function LogFilters({ filters, onFiltersChange }: LogFiltersProps) {
     todayEnd.setHours(23, 59, 59, 999);
     if (Math.abs(range.from.getTime() - todayStart.getTime()) < 60000 && 
         Math.abs(range.to.getTime() - todayEnd.getTime()) < 60000) {
-      return '오늘';
+      return 'Today';
     }
     
     // 최근 2일인 경우
@@ -204,7 +204,7 @@ export function LogFilters({ filters, onFiltersChange }: LogFiltersProps) {
     yesterday.setDate(yesterday.getDate() - 1);
     if (Math.abs(range.from.getTime() - yesterday.getTime()) < 60000 && 
         Math.abs(range.to.getTime() - todayEnd.getTime()) < 60000) {
-      return '최근 2일';
+      return 'Last 2 Days';
     }
     
     // 일반 날짜 범위
@@ -235,7 +235,7 @@ export function LogFilters({ filters, onFiltersChange }: LogFiltersProps) {
                     className="w-full justify-start text-xs h-7"
                     onClick={() => handleDateSelect('1hour')}
                   >
-                    최근 1시간
+                    Last 1 Hour
                   </Button>
                   <Button
                     variant="ghost"
@@ -243,7 +243,7 @@ export function LogFilters({ filters, onFiltersChange }: LogFiltersProps) {
                     className="w-full justify-start text-xs h-7"
                     onClick={() => handleDateSelect('today')}
                   >
-                    오늘
+                    Today
                   </Button>
                   <Button
                     variant="ghost"
@@ -251,7 +251,7 @@ export function LogFilters({ filters, onFiltersChange }: LogFiltersProps) {
                     className="w-full justify-start text-xs h-7"
                     onClick={() => handleDateSelect('2days')}
                   >
-                    최근 2일
+                    Last 2 Days
                   </Button>
                 </div>
                 
@@ -261,7 +261,6 @@ export function LogFilters({ filters, onFiltersChange }: LogFiltersProps) {
                     selected={dateRange ? { from: dateRange.from, to: dateRange.to } : undefined}
                     onSelect={handleRangeSelect}
                     initialFocus
-                    locale={ko}
                     className="text-xs scale-[0.9]"
                   />
                 </div>
@@ -272,7 +271,7 @@ export function LogFilters({ filters, onFiltersChange }: LogFiltersProps) {
                   onClick={() => setMobileOpen(false)}
                   disabled={!dateRange}
                 >
-                  기간 선택 완료
+                  Done
                 </Button>
               </div>
             </PopoverContent>
@@ -365,21 +364,21 @@ export function LogFilters({ filters, onFiltersChange }: LogFiltersProps) {
                   className="w-full justify-start text-sm"
                   onClick={() => handleDateSelect('1hour')}
                 >
-                  최근 1시간
+                  Last 1 Hour
                 </Button>
                 <Button
                   variant="ghost"
                   className="w-full justify-start text-sm"
                   onClick={() => handleDateSelect('today')}
                 >
-                  오늘
+                  Today
                 </Button>
                 <Button
                   variant="ghost"
                   className="w-full justify-start text-sm"
                   onClick={() => handleDateSelect('2days')}
                 >
-                  최근 2일
+                  Last 2 Days
                 </Button>
               </div>
               
@@ -388,7 +387,6 @@ export function LogFilters({ filters, onFiltersChange }: LogFiltersProps) {
                 selected={dateRange ? { from: dateRange.from, to: dateRange.to } : undefined}
                 onSelect={handleRangeSelect}
                 initialFocus
-                locale={ko}
                 className="text-sm"
               />
               
@@ -397,7 +395,7 @@ export function LogFilters({ filters, onFiltersChange }: LogFiltersProps) {
                 onClick={() => setDesktopOpen(false)}
                 disabled={!dateRange}
               >
-                기간 선택 완료
+                Done
               </Button>
             </div>
           </PopoverContent>
@@ -407,7 +405,7 @@ export function LogFilters({ filters, onFiltersChange }: LogFiltersProps) {
           <div className="relative">
             <User2 className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="사용자 ID"
+              placeholder="User ID"
               value={filters.userId}
               onChange={(e) => handleInputChange('userId', e.target.value)}
               className="w-full pl-9 text-sm"

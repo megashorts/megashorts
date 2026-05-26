@@ -1,0 +1,312 @@
+[
+  {
+    "label": "unauthorized_check",
+    "status": 401,
+    "ok": false,
+    "body": "{\"success\":false,\"error\":\"Unauthorized\",\"timestamp\":\"2026-05-17T21:49:30.853Z\"}"
+  },
+  {
+    "label": "hq:master",
+    "status": 200,
+    "ok": true,
+    "body": {
+      "success": true,
+      "data": {
+        "success": true,
+        "userId": "codex_agency_test_20260517214433_hq_master",
+        "username": "codex_agency_test_20260517214433_hq_master",
+        "action": "add",
+        "masterId": "codex_agency_test_20260517214433_hq_master",
+        "masterUsername": "codex_agency_test_20260517214433_hq_master",
+        "updatedUplines": 0,
+        "timestamp": "2026-05-17T21:49:31.039Z"
+      },
+      "timestamp": "2026-05-17T21:49:31.039Z"
+    }
+  },
+  {
+    "label": "hq:directA",
+    "status": 200,
+    "ok": true,
+    "body": {
+      "success": true,
+      "data": {
+        "success": true,
+        "userId": "codex_agency_test_20260517214433_hq_direct_a",
+        "username": "codex_agency_test_20260517214433_hq_direct_a",
+        "action": "add",
+        "masterId": "codex_agency_test_20260517214433_hq_master",
+        "masterUsername": "codex_agency_test_20260517214433_hq_master",
+        "updatedUplines": 1,
+        "timestamp": "2026-05-17T21:49:31.136Z"
+      },
+      "timestamp": "2026-05-17T21:49:31.136Z"
+    }
+  },
+  {
+    "label": "hq:directB",
+    "status": 200,
+    "ok": true,
+    "body": {
+      "success": true,
+      "data": {
+        "success": true,
+        "userId": "codex_agency_test_20260517214433_hq_direct_b",
+        "username": "codex_agency_test_20260517214433_hq_direct_b",
+        "action": "add",
+        "masterId": "codex_agency_test_20260517214433_hq_master",
+        "masterUsername": "codex_agency_test_20260517214433_hq_master",
+        "updatedUplines": 1,
+        "timestamp": "2026-05-17T21:49:31.245Z"
+      },
+      "timestamp": "2026-05-17T21:49:31.245Z"
+    }
+  },
+  {
+    "label": "hq:level2",
+    "status": 200,
+    "ok": true,
+    "body": {
+      "success": true,
+      "data": {
+        "success": true,
+        "userId": "codex_agency_test_20260517214433_hq_level2",
+        "username": "codex_agency_test_20260517214433_hq_level2",
+        "action": "add",
+        "masterId": "codex_agency_test_20260517214433_hq_master",
+        "masterUsername": "codex_agency_test_20260517214433_hq_master",
+        "updatedUplines": 2,
+        "timestamp": "2026-05-17T21:49:31.392Z"
+      },
+      "timestamp": "2026-05-17T21:49:31.392Z"
+    }
+  },
+  {
+    "label": "hq:level3",
+    "status": 200,
+    "ok": true,
+    "body": {
+      "success": true,
+      "data": {
+        "success": true,
+        "userId": "codex_agency_test_20260517214433_hq_level3",
+        "username": "codex_agency_test_20260517214433_hq_level3",
+        "action": "add",
+        "masterId": "codex_agency_test_20260517214433_hq_master",
+        "masterUsername": "codex_agency_test_20260517214433_hq_master",
+        "updatedUplines": 3,
+        "timestamp": "2026-05-17T21:49:31.527Z"
+      },
+      "timestamp": "2026-05-17T21:49:31.527Z"
+    }
+  },
+  {
+    "label": "network:master",
+    "status": 200,
+    "ok": true,
+    "body": {
+      "success": true,
+      "data": {
+        "success": true,
+        "userId": "codex_agency_test_20260517214433_network_master",
+        "username": "codex_agency_test_20260517214433_network_master",
+        "action": "add",
+        "masterId": "codex_agency_test_20260517214433_network_master",
+        "masterUsername": "codex_agency_test_20260517214433_network_master",
+        "updatedUplines": 0,
+        "timestamp": "2026-05-17T21:49:31.604Z"
+      },
+      "timestamp": "2026-05-17T21:49:31.604Z"
+    }
+  },
+  {
+    "label": "network:directA",
+    "status": 200,
+    "ok": true,
+    "body": {
+      "success": true,
+      "data": {
+        "success": true,
+        "userId": "codex_agency_test_20260517214433_network_direct_a",
+        "username": "codex_agency_test_20260517214433_network_direct_a",
+        "action": "add",
+        "masterId": "codex_agency_test_20260517214433_network_master",
+        "masterUsername": "codex_agency_test_20260517214433_network_master",
+        "updatedUplines": 1,
+        "timestamp": "2026-05-17T21:49:31.710Z"
+      },
+      "timestamp": "2026-05-17T21:49:31.710Z"
+    }
+  },
+  {
+    "label": "network:directB",
+    "status": 200,
+    "ok": true,
+    "body": {
+      "success": true,
+      "data": {
+        "success": true,
+        "userId": "codex_agency_test_20260517214433_network_direct_b",
+        "username": "codex_agency_test_20260517214433_network_direct_b",
+        "action": "add",
+        "masterId": "codex_agency_test_20260517214433_network_master",
+        "masterUsername": "codex_agency_test_20260517214433_network_master",
+        "updatedUplines": 1,
+        "timestamp": "2026-05-17T21:49:31.805Z"
+      },
+      "timestamp": "2026-05-17T21:49:31.805Z"
+    }
+  },
+  {
+    "label": "network:level2",
+    "status": 200,
+    "ok": true,
+    "body": {
+      "success": true,
+      "data": {
+        "success": true,
+        "userId": "codex_agency_test_20260517214433_network_level2",
+        "username": "codex_agency_test_20260517214433_network_level2",
+        "action": "add",
+        "masterId": "codex_agency_test_20260517214433_network_master",
+        "masterUsername": "codex_agency_test_20260517214433_network_master",
+        "updatedUplines": 2,
+        "timestamp": "2026-05-17T21:49:31.908Z"
+      },
+      "timestamp": "2026-05-17T21:49:31.908Z"
+    }
+  },
+  {
+    "label": "network:level3",
+    "status": 200,
+    "ok": true,
+    "body": {
+      "success": true,
+      "data": {
+        "success": true,
+        "userId": "codex_agency_test_20260517214433_network_level3",
+        "username": "codex_agency_test_20260517214433_network_level3",
+        "action": "add",
+        "masterId": "codex_agency_test_20260517214433_network_master",
+        "masterUsername": "codex_agency_test_20260517214433_network_master",
+        "updatedUplines": 3,
+        "timestamp": "2026-05-17T21:49:32.048Z"
+      },
+      "timestamp": "2026-05-17T21:49:32.048Z"
+    }
+  },
+  {
+    "label": "binary:master",
+    "status": 200,
+    "ok": true,
+    "body": {
+      "success": true,
+      "data": {
+        "success": true,
+        "userId": "codex_agency_test_20260517214433_binary_master",
+        "username": "codex_agency_test_20260517214433_binary_master",
+        "action": "add",
+        "masterId": "codex_agency_test_20260517214433_binary_master",
+        "masterUsername": "codex_agency_test_20260517214433_binary_master",
+        "updatedUplines": 0,
+        "timestamp": "2026-05-17T21:49:32.131Z"
+      },
+      "timestamp": "2026-05-17T21:49:32.131Z"
+    }
+  },
+  {
+    "label": "binary:directA",
+    "status": 200,
+    "ok": true,
+    "body": {
+      "success": true,
+      "data": {
+        "success": true,
+        "userId": "codex_agency_test_20260517214433_binary_direct_a",
+        "username": "codex_agency_test_20260517214433_binary_direct_a",
+        "action": "add",
+        "masterId": "codex_agency_test_20260517214433_binary_master",
+        "masterUsername": "codex_agency_test_20260517214433_binary_master",
+        "updatedUplines": 1,
+        "timestamp": "2026-05-17T21:49:32.217Z"
+      },
+      "timestamp": "2026-05-17T21:49:32.217Z"
+    }
+  },
+  {
+    "label": "binary:directB",
+    "status": 200,
+    "ok": true,
+    "body": {
+      "success": true,
+      "data": {
+        "success": true,
+        "userId": "codex_agency_test_20260517214433_binary_direct_b",
+        "username": "codex_agency_test_20260517214433_binary_direct_b",
+        "action": "add",
+        "masterId": "codex_agency_test_20260517214433_binary_master",
+        "masterUsername": "codex_agency_test_20260517214433_binary_master",
+        "updatedUplines": 1,
+        "timestamp": "2026-05-17T21:49:32.310Z"
+      },
+      "timestamp": "2026-05-17T21:49:32.310Z"
+    }
+  },
+  {
+    "label": "binary:level2",
+    "status": 200,
+    "ok": true,
+    "body": {
+      "success": true,
+      "data": {
+        "success": true,
+        "userId": "codex_agency_test_20260517214433_binary_level2",
+        "username": "codex_agency_test_20260517214433_binary_level2",
+        "action": "add",
+        "masterId": "codex_agency_test_20260517214433_binary_master",
+        "masterUsername": "codex_agency_test_20260517214433_binary_master",
+        "updatedUplines": 2,
+        "timestamp": "2026-05-17T21:49:32.421Z"
+      },
+      "timestamp": "2026-05-17T21:49:32.421Z"
+    }
+  },
+  {
+    "label": "binary:level3",
+    "status": 200,
+    "ok": true,
+    "body": {
+      "success": true,
+      "data": {
+        "success": true,
+        "userId": "codex_agency_test_20260517214433_binary_level3",
+        "username": "codex_agency_test_20260517214433_binary_level3",
+        "action": "add",
+        "masterId": "codex_agency_test_20260517214433_binary_master",
+        "masterUsername": "codex_agency_test_20260517214433_binary_master",
+        "updatedUplines": 3,
+        "timestamp": "2026-05-17T21:49:32.550Z"
+      },
+      "timestamp": "2026-05-17T21:49:32.550Z"
+    }
+  },
+  {
+    "label": "duplicate_network_level2",
+    "status": 200,
+    "ok": true,
+    "body": {
+      "success": true,
+      "data": {
+        "success": true,
+        "userId": "codex_agency_test_20260517214433_network_level2",
+        "username": "codex_agency_test_20260517214433_network_level2",
+        "action": "add",
+        "masterId": "codex_agency_test_20260517214433_network_master",
+        "masterUsername": "codex_agency_test_20260517214433_network_master",
+        "updatedUplines": 0,
+        "timestamp": "2026-05-17T21:49:32.605Z"
+      },
+      "timestamp": "2026-05-17T21:49:32.605Z"
+    }
+  }
+]

@@ -92,7 +92,15 @@ export async function POST(req: Request) {
         });
 
         // 기록이 없을 때만 새로 생성
-        if (!existingView) {
+        if (existingView) {
+          await tx.videoView.update({
+            where: { id: existingView.id },
+            data: {
+              viewCount: existingView.viewCount + 1,
+              createdAt: new Date(),
+            },
+          });
+        } else {
           await tx.videoView.create({
             data: {
               id: uuidv7(),

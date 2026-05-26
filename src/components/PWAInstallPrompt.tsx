@@ -6,18 +6,11 @@ import { X, Download } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 export function PWAInstallPrompt() {
+  const t = useTranslations('PWA');
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [showPrompt, setShowPrompt] = useState(false);
-  // t: translations can be added here, or hardcoded for now since it's global UI.
-  // const t = useTranslations('Common');
 
   useEffect(() => {
-    // 7일간 숨김 체크
-    const hiddenUntil = localStorage.getItem('hideInstallPromptUntil');
-    if (hiddenUntil && new Date().getTime() < parseInt(hiddenUntil, 10)) {
-      return;
-    }
-
     const handler = (e: any) => {
       e.preventDefault();
       setDeferredPrompt(e);
@@ -40,9 +33,6 @@ export function PWAInstallPrompt() {
 
   const handleDismiss = () => {
     setShowPrompt(false);
-    // 7일(밀리초) 뒤까지 다시 안 보임
-    const hideUntil = new Date().getTime() + 7 * 24 * 60 * 60 * 1000;
-    localStorage.setItem('hideInstallPromptUntil', hideUntil.toString());
   };
 
   return (
@@ -52,27 +42,28 @@ export function PWAInstallPrompt() {
           initial={{ y: 100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
-          className="fixed bottom-20 left-1/2 -translate-x-1/2 w-[90%] max-w-[400px] bg-zinc-900 border border-zinc-800 rounded-xl p-4 shadow-2xl z-50 flex items-center justify-between"
+          className="fixed bottom-20 left-1/2 z-50 flex w-[calc(100%-24px)] max-w-[440px] -translate-x-1/2 items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900 p-3 shadow-2xl sm:p-4"
         >
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center text-primary">
+          <div className="flex min-w-0 flex-1 items-center gap-2">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/20 text-primary">
               <Download size={20} />
             </div>
-            <div>
-              <p className="text-sm font-bold text-white">앱으로 더 편하게 보기</p>
-              <p className="text-xs text-zinc-400">빠른 로딩과 끊김없는 스와이프</p>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-bold text-white">{t('installTitle')}</p>
+              <p className="break-keep text-xs leading-snug text-zinc-400">{t('installDescription')}</p>
             </div>
           </div>
           
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-1.5">
             <button
               onClick={handleInstall}
-              className="bg-primary text-primary-foreground text-xs font-bold px-3 py-2 rounded-lg"
+              className="min-w-[56px] whitespace-nowrap rounded-lg bg-primary px-3 py-2 text-xs font-bold text-primary-foreground"
             >
-              설치
+              {t('installButton')}
             </button>
             <button
               onClick={handleDismiss}
+              aria-label={t('later')}
               className="p-2 text-zinc-500 hover:text-zinc-300 transition-colors"
             >
               <X size={16} />

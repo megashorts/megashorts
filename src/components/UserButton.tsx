@@ -20,6 +20,7 @@ import { useSession } from "@/components/SessionProvider";
 import { logActivity } from "@/lib/activity-logger/client";
 import { locationManager } from "@/lib/activity-logger/location-manager";
 import { USER_ROLE } from "@/lib/constants";
+import { isAgencyRole, isCreatorRole } from "@/lib/user-roles";
 import { useTranslations } from 'next-intl';
 
 interface UserButtonProps {
@@ -41,7 +42,7 @@ export default function UserButton({ className }: UserButtonProps) {
     return (
       <DropdownMenu onOpenChange={setIsOpen}>
         <DropdownMenuTrigger asChild>
-          <button className={cn("flex-none hover:bg-transparent", className)}>
+          <button className={cn("inline-flex h-6 w-6 items-center justify-center leading-none align-middle hover:bg-transparent", className)}>
             <UserCircle className="size-6" />
           </button>
         </DropdownMenuTrigger>
@@ -77,14 +78,14 @@ export default function UserButton({ className }: UserButtonProps) {
       }}
     >
       <DropdownMenuTrigger asChild>
-        <button className={cn("flex-none hover:bg-transparent", className)}>
+        <button className={cn("inline-flex h-6 w-6 items-center justify-center leading-none align-middle hover:bg-transparent", className)}>
           <UserCircle className="size-6" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
         sideOffset={20}
         align="end"
-        className="z-50 w-64 lg:w-72 text-lg md:text-base"
+        className="z-50 max-h-[min(720px,calc(100svh-7rem))] w-64 overflow-y-auto overscroll-contain pr-1 text-lg md:text-base lg:w-72"
       >
         <DropdownMenuLabel>{tCommon('welcomeUser', { username: user?.username })}</DropdownMenuLabel>
 
@@ -97,21 +98,21 @@ export default function UserButton({ className }: UserButtonProps) {
           </DropdownMenuItem>
         </Link>
           
-        {user?.userRole && user.userRole >= USER_ROLE.CREATOR_Lv1 && (
-          <>
+        {isCreatorRole(user?.userRole) && (
             <Link href={`/usermenu/earnings`}>
               <DropdownMenuItem>
                 <BarChart3 className="mr-2 size-4" />
                 {tNav('earnings')}
               </DropdownMenuItem>
             </Link>
+        )}
+        {isAgencyRole(user?.userRole) && (
             <Link href={`/usermenu/agency-earnings`}>
               <DropdownMenuItem>
                 <BarChart3 className="mr-2 size-4" />
                 {tNav('agencyEarnings')}
               </DropdownMenuItem>
             </Link>
-          </>
         )}
 
         <DropdownMenuSeparator />
@@ -150,22 +151,26 @@ export default function UserButton({ className }: UserButtonProps) {
           </DropdownMenuItem>
         </Link>
 
-        { user?.userRole && user.userRole >= USER_ROLE.OPERATION1 && (
+        { user?.userRole && user.userRole >= USER_ROLE.TEAM_MASTER && (
           <>
             <DropdownMenuSeparator />
             <div className="text-xs font-medium text-gray-600">{tNav('sectionAdmin')}</div>
-            <Link href={`/admin/service`}>
-              <DropdownMenuItem>
-                <NotebookPen className="mr-2 size-4" />
-                {tNav('serviceManage')}
-              </DropdownMenuItem>
-            </Link>
-            <Link href={`/admin/system`}>
-              <DropdownMenuItem>
-                <NotebookPen className="mr-2 size-4" />
-                {tNav('systemManage')}
-              </DropdownMenuItem>
-            </Link>
+            {user.userRole >= USER_ROLE.OPERATION1 && (
+              <>
+                <Link href={`/admin/service`}>
+                  <DropdownMenuItem>
+                    <NotebookPen className="mr-2 size-4" />
+                    {tNav('serviceManage')}
+                  </DropdownMenuItem>
+                </Link>
+                <Link href={`/admin/system`}>
+                  <DropdownMenuItem>
+                    <NotebookPen className="mr-2 size-4" />
+                    {tNav('systemManage')}
+                  </DropdownMenuItem>
+                </Link>
+              </>
+            )}
             <Link href={`/admin/agency`}>
               <DropdownMenuItem>
                 <Network className="mr-2 size-4" />

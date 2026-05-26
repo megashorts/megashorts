@@ -10,6 +10,8 @@ import LikeButtonOnly from "./LikeButtonOnly";
 import { PostData } from "@/lib/types";
 import { useSession } from "@/components/SessionProvider";
 import { getThumbnailUrl } from "@/lib/constants";
+import { useLocale } from "next-intl";
+import { getLocalizedPostTitle } from "@/lib/content-language";
 
 interface PostProps {
   post: PostData;
@@ -18,6 +20,8 @@ interface PostProps {
 export default function PostCard({ post }: PostProps) {
   const { user } = useSession();
   const [showModal, setShowModal] = useState(false);
+  const locale = useLocale();
+  const localizedTitle = getLocalizedPostTitle(post, locale);
 
   return (
     <>
@@ -31,7 +35,7 @@ export default function PostCard({ post }: PostProps) {
         >
           <Image
             src={getThumbnailUrl(post.thumbnailId)}
-            alt={`타이틀 ${post.title || ''} - ${post.categories || ''} 컨텐츠의 대표 이미지`}
+            alt={`타이틀 ${localizedTitle} - ${post.categories || ''} 컨텐츠의 대표 이미지`}
             fill
             className="object-cover transition-transform duration-300 group-hover:scale-105"
             sizes="(max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
@@ -41,7 +45,7 @@ export default function PostCard({ post }: PostProps) {
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <div className="absolute bottom-0 left-0 right-0 p-4">
               <h3 className="text-sm text-white font-medium line-clamp-2">
-                {post.title}
+                {localizedTitle}
               </h3>
             </div>
           </div>

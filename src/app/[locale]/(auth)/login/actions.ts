@@ -3,6 +3,11 @@
 
 import { lucia } from '@/auth';
 import prisma from "@/lib/prisma";
+import {
+  PWA_STANDALONE_COOKIE,
+  getPwaSessionExpiresAt,
+  withPwaSessionCookieAttributes,
+} from "@/lib/pwa-session";
 import { loginSchema, LoginValues } from "@/lib/validation";
 import { verify } from "@node-rs/argon2";
 import { cookies } from "next/headers";
@@ -88,10 +93,22 @@ export async function login(
     // 새 세션 생성
     const session = await lucia.createSession(existingUser.id, {});
     const sessionCookie = lucia.createSessionCookie(session.id);
-    (await cookies()).set(
+    const cookieStore = await cookies();
+    const isPwaStandalone = cookieStore.get(PWA_STANDALONE_COOKIE)?.value === "1";
+
+    if (isPwaStandalone) {
+      await prisma.session.update({
+        where: { id: session.id },
+        data: { expiresAt: getPwaSessionExpiresAt() },
+      });
+    }
+
+    cookieStore.set(
       sessionCookie.name,
       sessionCookie.value,
-      sessionCookie.attributes
+      isPwaStandalone
+        ? withPwaSessionCookieAttributes(sessionCookie.attributes)
+        : sessionCookie.attributes
     );
 
     // 리다이렉트 대신 성공 반환

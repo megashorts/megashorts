@@ -1,0 +1,214 @@
+
+--- 2026-05-18T17:12:44.683Z debug
+🪵  Writing logs to "/Users/kimryan/Desktop/megas/.tmp/wrangler-logs/wrangler-2026-05-18_17-12-44_610.log"
+---
+
+--- 2026-05-18T17:12:44.683Z debug
+Metrics dispatcher: Dispatching disabled - would have sent {"deviceId":"c8397d8f-15b6-4383-ac87-c9f1f1083fc4","event":"wrangler command started","timestamp":1779124364683,"properties":{"amplitude_session_id":1779124364682,"amplitude_event_id":0,"wranglerVersion":"4.0.0","osPlatform":"Mac OS","osVersion":"Darwin Kernel Version 22.6.0: Sun Dec 17 22:14:25 PST 2023; root:xnu-8796.141.3.703.2~2/RELEASE_ARM64_T8112","nodeVersion":24,"packageManager":"npm","isFirstUsage":false,"configFileType":"toml","isCI":false,"isPagesCI":false,"isWorkersCI":false,"isInteractive":false,"hasAssets":false,"argsUsed":["command","remote"],"argsCombination":"command, remote","command":"wrangler d1 execute","args":{"remote":true,"command":"<REDACTED>","xJsonConfig":true,"j":true,"json":false,"preview":false,"database":"<REDACTED>"}}}.
+---
+
+--- 2026-05-18T17:12:44.684Z debug
+.env file not found at ".env". Continuing... For more details, refer to https://developers.cloudflare.com/workers/wrangler/system-environment-variables/
+---
+
+--- 2026-05-18T17:12:44.689Z log
+
+ ⛅️ wrangler 4.0.0 (update available 4.92.0)
+--------------------------------------------
+
+---
+
+--- 2026-05-18T17:12:44.691Z debug
+No experimental flag store instantiated
+---
+
+--- 2026-05-18T17:12:44.691Z debug
+Attempted to use flag "RESOURCES_PROVISION" which has not been instantiated
+---
+
+--- 2026-05-18T17:12:44.691Z debug
+No experimental flag store instantiated
+---
+
+--- 2026-05-18T17:12:44.691Z debug
+Attempted to use flag "RESOURCES_PROVISION" which has not been instantiated
+---
+
+--- 2026-05-18T17:12:44.692Z debug
+Saving to cache: {"account":{"id":"923201050a960d4c64fb9b90a88cb956","name":""}}
+---
+
+--- 2026-05-18T17:12:44.693Z log
+🌀 Executing on remote database megashorts-db (52d25396-2a61-42a8-904f-2d7956cede44):
+---
+
+--- 2026-05-18T17:12:44.693Z log
+🌀 To execute on your local development database, remove the --remote flag from your wrangler command.
+---
+
+--- 2026-05-18T17:12:44.693Z debug
+-- START CF API REQUEST: POST https://api.cloudflare.com/client/v4/accounts/923201050a960d4c64fb9b90a88cb956/d1/database/52d25396-2a61-42a8-904f-2d7956cede44/query
+---
+
+--- 2026-05-18T17:12:44.693Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T17:12:44.693Z debug
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T17:12:44.693Z debug
+-- END CF API REQUEST
+---
+
+--- 2026-05-18T17:12:44.935Z debug
+-- START CF API RESPONSE: OK 200
+---
+
+--- 2026-05-18T17:12:44.936Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T17:12:44.936Z debug
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T17:12:44.936Z debug
+-- END CF API RESPONSE
+---
+
+--- 2026-05-18T17:12:44.937Z log
+🚣 Executed 5 commands in 1.6132ms
+---
+
+--- 2026-05-18T17:12:44.938Z log
+[
+  {
+    "results": [],
+    "success": true,
+    "meta": {
+      "served_by": "v3-prod",
+      "served_by_region": "APAC",
+      "served_by_colo": "HKG",
+      "served_by_primary": true,
+      "timings": {
+        "sql_duration_ms": 0.627
+      },
+      "duration": 0.627,
+      "changes": 46,
+      "last_row_id": 0,
+      "changed_db": true,
+      "size_after": 315392,
+      "rows_read": 59,
+      "rows_written": 46,
+      "total_attempts": 1
+    }
+  },
+  {
+    "results": [],
+    "success": true,
+    "meta": {
+      "served_by": "v3-prod",
+      "served_by_region": "APAC",
+      "served_by_colo": "HKG",
+      "served_by_primary": true,
+      "timings": {
+        "sql_duration_ms": 0.356
+      },
+      "duration": 0.356,
+      "changes": 45,
+      "last_row_id": 0,
+      "changed_db": true,
+      "size_after": 278528,
+      "rows_read": 59,
+      "rows_written": 45,
+      "total_attempts": 1
+    }
+  },
+  {
+    "results": [],
+    "success": true,
+    "meta": {
+      "served_by": "v3-prod",
+      "served_by_region": "APAC",
+      "served_by_colo": "HKG",
+      "served_by_primary": true,
+      "timings": {
+        "sql_duration_ms": 0.1947
+      },
+      "duration": 0.1947,
+      "changes": 32,
+      "last_row_id": 0,
+      "changed_db": true,
+      "size_after": 262144,
+      "rows_read": 35,
+      "rows_written": 32,
+      "total_attempts": 1
+    }
+  },
+  {
+    "results": [],
+    "success": true,
+    "meta": {
+      "served_by": "v3-prod",
+      "served_by_region": "APAC",
+      "served_by_colo": "HKG",
+      "served_by_primary": true,
+      "timings": {
+        "sql_duration_ms": 0.1547
+      },
+      "duration": 0.1547,
+      "changes": 15,
+      "last_row_id": 0,
+      "changed_db": true,
+      "size_after": 262144,
+      "rows_read": 22,
+      "rows_written": 15,
+      "total_attempts": 1
+    }
+  },
+  {
+    "results": [
+      {
+        "table_name": "commission_batch",
+        "cnt": 0
+      },
+      {
+        "table_name": "grouped_views",
+        "cnt": 0
+      },
+      {
+        "table_name": "referral_structure",
+        "cnt": 0
+      },
+      {
+        "table_name": "post_view_stats",
+        "cnt": 0
+      }
+    ],
+    "success": true,
+    "meta": {
+      "served_by": "v3-prod",
+      "served_by_region": "APAC",
+      "served_by_colo": "HKG",
+      "served_by_primary": true,
+      "timings": {
+        "sql_duration_ms": 0.2808
+      },
+      "duration": 0.2808,
+      "changes": 0,
+      "last_row_id": 0,
+      "changed_db": false,
+      "size_after": 262144,
+      "rows_read": 37,
+      "rows_written": 0,
+      "total_attempts": 1
+    }
+  }
+]
+---
+
+--- 2026-05-18T17:12:44.938Z debug
+Metrics dispatcher: Dispatching disabled - would have sent {"deviceId":"c8397d8f-15b6-4383-ac87-c9f1f1083fc4","event":"wrangler command completed","timestamp":1779124364938,"properties":{"amplitude_session_id":1779124364682,"amplitude_event_id":1,"wranglerVersion":"4.0.0","osPlatform":"Mac OS","osVersion":"Darwin Kernel Version 22.6.0: Sun Dec 17 22:14:25 PST 2023; root:xnu-8796.141.3.703.2~2/RELEASE_ARM64_T8112","nodeVersion":24,"packageManager":"npm","isFirstUsage":false,"configFileType":"toml","isCI":false,"isPagesCI":false,"isWorkersCI":false,"isInteractive":false,"hasAssets":false,"argsUsed":["command","remote"],"argsCombination":"command, remote","command":"wrangler d1 execute","args":{"remote":true,"command":"<REDACTED>","xJsonConfig":true,"j":true,"json":false,"preview":false,"database":"<REDACTED>"},"durationMs":264,"durationSeconds":0.264,"durationMinutes":0.0044}}.
+---

@@ -9,32 +9,13 @@ export default function RevalidatePage() {
   const handleRevalidate = async () => {
     setIsLoading(true);
     try {
-      const paths = [
-        '/',
-        '/categories/recent',
-        '/categories/action',
-        '/categories/romance',
-        '/categories/drama',
-        '/categories/comic',
-        '/categories/thriller',
-        '/categories/periodplay',
-        '/categories/fantasy',
-        '/categories/highteen',
-        '/categories/adult',
-        '/recommended-videos'
-      ];
-
-      await Promise.all(
-        paths.map(path =>
-          fetch('/api/revalidate', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ path })
-          })
-        )
-      );
+      await fetch('/api/revalidate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ scope: 'content' })
+      });
 
       alert('모든 페이지가 재생성되었습니다.');
     } catch (error) {

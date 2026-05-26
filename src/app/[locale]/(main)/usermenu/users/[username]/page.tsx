@@ -1,28 +1,20 @@
 import { validateRequest } from '@/auth';
-import FollowButton from "@/components/FollowButton";
 import Linkify from "@/components/Linkify";
 import prisma from "@/lib/prisma";
-import { FollowerInfo, getUserDataSelect, UserData } from "@/lib/types";
+import { getUserDataSelect, UserData } from "@/lib/types";
 import { formatNumber } from "@/lib/utils";
 import { formatDate } from "date-fns";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import EditProfileButton from "./EditProfileButton";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import YourPosts from '../../yourposts/Yourposts';
 import LanguageFlag from '@/components/LanguageFlag';
-import { Language } from '@prisma/client';
-import { WalletCards } from 'lucide-react';
 import { Label } from '@/components/ui/label';
-import Notifications from './Notifications';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { AuthButton } from './AuthButton';
-import PaymentHistory from './PaymentHistory';
 import UserTabsClient from './UserTabsClient';
-import ReferralLinkButton from './ReferralLinkButton';
-import EmailVerificationButton from './EmailVerificationButton';
+import { getTranslations } from 'next-intl/server';
 
 
 interface PageProps {
@@ -61,11 +53,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function Page({ params }: PageProps) {
   const resolvedParams = await params;
   const { user: loggedInUser } = await validateRequest();
+  const tUserMenu = await getTranslations('UserMenu');
 
   if (!loggedInUser) {
     return (
       <p className="text-destructive">
-        You&apos;re not authorized to view this page.
+        {tUserMenu('unauthorized')}
       </p>
     );
   }
@@ -78,7 +71,7 @@ export default async function Page({ params }: PageProps) {
         <UserProfile user={user} loggedInUserId={loggedInUser.id} />
         <div className="rounded-2xl bg-card p-3 shadow-sm">
           <h2 className="text-center text-base text-zinc-400 font-bold">
-            {user.displayName}&apos;의 이용내역
+            {tUserMenu('usageHistory', { name: user.displayName })}
           </h2>
         </div>
         <UserTabsClient />
@@ -93,128 +86,89 @@ interface UserProfileProps {
 }
 
 async function UserProfile({ user, loggedInUserId }: UserProfileProps) {
-  const followerInfo: FollowerInfo = {
-    followers: user._count.followers,
-    isFollowedByUser: user.followers.some(
-      ({ followerId }) => followerId === loggedInUserId,
-    ),
-  };
+  const tUserMenu = await getTranslations('UserMenu');
+  const signupLabel = user.googleId
+    ? tUserMenu('googleSignup', { email: user.email || '' })
+    : user.naverId
+      ? tUserMenu('naverSignup', { email: user.email || '' })
+      : user.kakaoId
+        ? tUserMenu('kakaoSignup', { email: user.email || '' })
+        : tUserMenu('emailSignup', { email: user.email || '' });
 
   return (
-    <div className="h-fit w-full space-y-8 rounded-2xl bg-card p-8 shadow-sm">
-      {/* <UserAvatar
-        avatarUrl={user.avatarUrl}
-        size={250}
-        className="mx-auto size-full max-h-60 max-w-60 rounded-full"
-      /> */}
-      <div className="flex flex-wrap gap-3 sm:flex-nowrap">
-        <div className="me-auto space-y-4 my-2 text-white/70">
-          <div>
-            <h1 className="text-3xl font-bold text-white">{user.displayName}</h1>
-            <div className="text-muted-foreground">@{user.username}</div>
+    <div className="h-fit w-full space-y-5 rounded-2xl bg-card p-4 sm:p-6 shadow-sm">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white break-words">{user.displayName}</h1>
+          <div className="text-sm text-muted-foreground">@{user.username}</div>
+        </div>
+        {user.id === loggedInUserId ? (
+          <EditProfileButton user={JSON.parse(JSON.stringify(user))} />
+        ) : (
+          <Label />
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <section className="rounded-xl border border-white/10 bg-white/5 p-4">
+          <h3 className="text-sm font-semibold text-white mb-3">Account Info</h3>
+          <div className="divide-y divide-white/10 text-sm">
+            <div className="flex min-h-10 items-center justify-between gap-3 py-2">
+              <span className="text-muted-foreground">Date Join</span>
+              <span className="text-right text-white">{formatDate(user.createdAt, "yyyy-MM-dd")}</span>
+            </div>
+            <div className="flex min-h-10 items-center justify-between gap-3 py-2">
+              <span className="text-muted-foreground">Email</span>
+              <span className="max-w-[68%] truncate text-right text-white" title={signupLabel}>{signupLabel}</span>
+            </div>
+            <div className="flex min-h-10 items-center justify-between gap-3 py-2">
+              <span className="text-muted-foreground">Language</span>
+              <LanguageFlag language={user.myLanguage} className="h-5 w-5" />
+            </div>
           </div>
-          <div>{formatDate(user.createdAt, "MMM d, yyyy")}{" "}
-            <br />
-            {user.googleId
-              ? `구글아이디 가입 ${user.email}`
-              : user.naverId
-              ? `네이버아이디 가입 ${user.email}`
-              : user.kakaoId
-              ? `카카오아이디 가입 ${user.email}`
-              : `이메일 가입 ${user.email}`}
-          </div>
+        </section>
 
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <LanguageFlag language={user.myLanguage} />{"  /  "}{user.userRole === 10 ? "사용자 계정" : user.userRole === 15 ? "크리에이터 계정" : ""}
-              {/* {user.id === loggedInUserId && user.userRole >= 20 && (
-                <ReferralLinkButton username={user.username} userRole={user.userRole} />
-              )} */}
-              추천인 정보영역
+        <section className="rounded-xl border border-white/10 bg-white/5 p-4">
+          <h3 className="text-sm font-semibold text-white mb-3">Status</h3>
+          <div className="divide-y divide-white/10 text-sm">
+            <div className="flex min-h-10 items-center justify-between gap-3 py-2">
+              <span className="text-muted-foreground">{tUserMenu('msCoin')}</span>
+              <span className="text-right text-white">💎 {formatNumber(user.mscoin)}</span>
             </div>
-            
-            {/* <div className="flex items-center">
-              {" "} <LanguageFlag language={user.myLanguage} />
-            </div> */}
-
-            <div className="flex items-center">
-                💎 {formatNumber(user.mscoin)} MS코인
-                {/* <svg 
-                  className="w-4 h-4 ml-2 mr-1" 
-                  viewBox="0 0 24 24" 
-                  fill="gold"
-                >
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
-                  <circle cx="12" cy="12" r="5" fill="gold"/>
-                </svg> */}
-              {/* <WalletCards className="mr-2 size-4" /> */}
-              {/* {formatNumber(user.points)} */}
+            <div className="flex min-h-10 items-center justify-between gap-3 py-2">
+              <span className="text-muted-foreground">Adult Verification</span>
+              <div className="flex items-center gap-2">
+                <span className={`led-indicator ${user.adultauth ? 'led-blue' : 'led-red'}`}></span>
+                <span className="text-white">{user.adultauth ? tUserMenu('adultVerified') : tUserMenu('adultNotVerified')}</span>
+                <AuthButton isAuthenticated={user.adultauth} />
+              </div>
             </div>
-
-            <div className="flex items-center">
-              <span className={`led-indicator ${user.adultauth ? 'led-blue' : 'led-red'}`}></span>
-              {user.adultauth ? '성인인증 완료' : '성인인증 미완료'}
-              <AuthButton isAuthenticated={user.adultauth} />
-            </div>
-
-            {/* <div className="flex items-center">
-              <span className={`led-indicator ${user.emailVerified ? 'led-blue' : 'led-red'}`}></span>
-              {user.emailVerified ? '이메일 인증 완료' : '이메일 인증 필요'}
-              <EmailVerificationButton email={user.email || ''} isVerified={!!user.emailVerified} />
-            </div> */}
-
-            <div className="flex items-center">
-              <span className={`led-indicator ${user.subscription ? 'led-blue' : 'led-red'}`}></span>
-                {user.subscription ? '현재 구독중' : '현재 미구독중'}
-                {/* {user.subscription && user.subscription.status === 'active' && user.subscriptionEndDate && (
-                  <span className="ml-2">/ 구독갱신 {formatDate(user.subscriptionEndDate, "yyyy-MM-dd")}</span>
-                )}
-                {user.subscription && user.subscription.status === 'cancelled' && user.subscriptionEndDate && (
-                  <span className="ml-2">/ 구독만료 {formatDate(user.subscriptionEndDate, "yyyy-MM-dd")}</span>
-                )} */}
-                {user.subscription && user.subscription.status === 'active' && user.subscription.currentPeriodEnd && (
-                  <span className="ml-2">/ 구독갱신 {formatDate(user.subscription.currentPeriodEnd, "yyyy-MM-dd")}</span>
-                )}
-                {user.subscription && user.subscription.status === 'cancelled' && user.subscription.currentPeriodEnd && (
-                  <span className="ml-2">/ 구독만료 {formatDate(user.subscription.currentPeriodEnd, "yyyy-MM-dd")}</span>
-                )}
+            <div className="flex min-h-10 items-center justify-between gap-3 py-2">
+              <span className="text-muted-foreground">Subscription</span>
+              <div className="flex items-center gap-2 text-right text-white">
+                <span>{user.subscription ? tUserMenu('subscribed') : tUserMenu('notSubscribed')}</span>
                 {!user.subscription && (
-                  <Link href="/subscription">
-                    <Button 
-                      variant="outline" 
-                      className='ml-2'
-                      size="sm"
-                    >
-                      구독신청
-                    </Button>
-                  </Link>
+                <Link href="/subscription" className="block">
+                  <Button variant="outline" size="sm" className="h-6 px-2 text-xs">
+                    {tUserMenu('subscribeApply')}
+                  </Button>
+                </Link>
                 )}
               </div>
             </div>
-
-            {user.bio && (
-              <>
-                <hr />
-                <Linkify>
-                  <div className="overflow-hidden whitespace-pre-line break-words">
-                    {user.bio}
-                  </div>
-                </Linkify>
-              </>
-            )}
           </div>
-
-        
-          {user.id === loggedInUserId ? (
-            <div className="flex items-start">
-              <EditProfileButton user={JSON.parse(JSON.stringify(user))} />
-              {/* 추천인 링크 모달 버튼 추가 */}
-            </div>
-          ) : (
-            // <FollowButton userId={user.id} initialState={followerInfo} />
-            <Label></Label>
-          )}
-        </div>
+        </section>
       </div>
+
+      {user.bio && (
+        <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-4">
+          <Linkify>
+            <div className="overflow-hidden whitespace-pre-line break-words text-sm text-white/85">
+              {user.bio}
+            </div>
+          </Linkify>
+        </div>
+      )}
+    </div>
   );
 }

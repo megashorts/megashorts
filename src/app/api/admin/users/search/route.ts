@@ -19,6 +19,8 @@ export async function GET(request: NextRequest) {
     
     const { searchParams } = new URL(request.url);
     const query = searchParams.get("q");
+    const role = searchParams.get("role");
+    const roles = searchParams.get("roles");
     
     if (!query || query.length < 2) {
       return Response.json(
@@ -27,9 +29,16 @@ export async function GET(request: NextRequest) {
       );
     }
     
+    const roleFilter = roles
+      ? roles.split(",").map((value) => Number(value.trim())).filter(Number.isFinite)
+      : role
+        ? [Number(role)].filter(Number.isFinite)
+        : [];
+
     // 사용자 검색 (유저네임 또는 이메일)
     const users = await prisma.user.findMany({
       where: {
+        ...(roleFilter.length > 0 ? { userRole: { in: roleFilter } } : {}),
         OR: [
           { username: { contains: query, mode: 'insensitive' } },
           { email: { contains: query, mode: 'insensitive' } },

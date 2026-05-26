@@ -9,11 +9,17 @@ import NoticeSidebar from "@/components/NoticeSidebar";
 import Image from "next/image";
 import { Pin } from "lucide-react";
 import { getTranslations } from "next-intl/server";
+import { getLocalizedPostTitle } from "@/lib/content-language";
 
 
 export const dynamic = 'force-dynamic';
 
-export default async function NoticeListPage() {
+export default async function NoticeListPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
   const t = await getTranslations('Notice');
   // 공지사항 데이터
   const noticePosts = await prisma.post.findMany({
@@ -74,7 +80,7 @@ export default async function NoticeListPage() {
                     <TableCell className="text-muted-foreground text-xs">{format(post.createdAt, 'yyyy.MM.dd')}</TableCell>
                     <TableCell>
                       <Link href={`/notice/${post.id}`} className="hover:text-red-500">
-                        {post.title}
+                        {getLocalizedPostTitle(post, locale)}
                       </Link>
                     </TableCell>
                     <TableCell className="text-end text-muted-foreground text-xs">
@@ -94,7 +100,7 @@ export default async function NoticeListPage() {
             {noticePosts.map((post) => (
               <div key={post.id} className="border-b py-2">
                 <Link href={`/notice/${post.id}`} className="block mt-2 hover:underline">
-                  {post.title}
+                  {getLocalizedPostTitle(post, locale)}
                 </Link>
                 <div className="flex justify-between text-xs text-muted-foreground">
                   <span>

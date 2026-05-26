@@ -31,22 +31,22 @@ export const EXCLUDED_ROUTES = [
 
 // HTTP 상태 코드 메시지
 export const STATUS_MESSAGES = {
-  200: '성공',
-  201: '생성됨',
-  400: '잘못된 요청',
-  401: '인증 필요',
-  403: '권한 없음',
-  404: '찾을 수 없음',
-  500: '서버 오류'
+  200: 'Success',
+  201: 'Created',
+  400: 'Bad Request',
+  401: 'Unauthorized',
+  403: 'Forbidden',
+  404: 'Not Found',
+  500: 'Internal Server Error'
 } as const;
 
 // 로그 타입별 표시 이름
 export const TYPE_DISPLAY_NAMES = {
-  auth: '인증',
-  video: '비디오',
-  post: '게시물',
-  payment: '결제',
-  system: '시스템'
+  auth: 'Authentication',
+  video: 'Video',
+  post: 'Post',
+  payment: 'Payment',
+  system: 'System'
 } as const;
 
 // 기본 조회 설정

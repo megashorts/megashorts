@@ -5,12 +5,14 @@ import { validateRequest } from "@/auth";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import WatchingContent from "./WatchingContent";
+import { getTranslations } from "next-intl/server";
 
 export const metadata: Metadata = {
   title: "Bookmarks",
 };
 
 export default async function Page() {
+  const tUserMenu = await getTranslations('UserMenu');
 
   const { user } = await validateRequest();
   
@@ -30,12 +32,12 @@ export default async function Page() {
     <main className="flex w-full min-w-0 gap-5">
       <div className="w-full min-w-0 space-y-2 mx-5 md:mx-1 lg:mx-1 xl:mx-1">
         <div className="rounded-xl bg-card p-2 sm:p-3 mx-auto shadow-sm">
-          <h1 className="text-center text-base sm:text-xl font-bold">나의 컨텐츠</h1>
+          <h1 className="text-center text-base sm:text-xl font-bold">{tUserMenu('myContent')}</h1>
         </div>
         <Tabs defaultValue="published">
           <TabsList>
-            <TabsTrigger value="published">북마크 컨텐츠</TabsTrigger>
-            <TabsTrigger value="draft">시청중인 컨텐츠</TabsTrigger>
+            <TabsTrigger value="published">{tUserMenu('bookmarkContent')}</TabsTrigger>
+            <TabsTrigger value="draft">{tUserMenu('watchingContent')}</TabsTrigger>
           </TabsList>
           <TabsContent value="published">
             <Bookmarks />

@@ -9,6 +9,9 @@ import type { PostWithVideos } from '../../lib/types';
 import type { Swiper as SwiperType } from 'swiper';
 import VideoPlayer from './VideoPlayer';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
+import { getLocalizedPostContent, getLocalizedPostTitle, localeToVideoUserLanguage } from '@/lib/content-language';
 
 import 'swiper/css';
 import 'swiper/css/virtual';
@@ -125,6 +128,11 @@ interface VideoSlideProps {
 }
 
 function VideoSlide({ post, isActive, onVideoEnd }: VideoSlideProps) {
+  const locale = useLocale();
+  const tContent = useTranslations('Content');
+  const localizedTitle = getLocalizedPostTitle(post, locale);
+  const localizedContent = getLocalizedPostContent(post, locale);
+  const userLanguage = localeToVideoUserLanguage(locale);
   const [showControls, setShowControls] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const videoContainerRef = useRef<HTMLDivElement>(null);
@@ -188,7 +196,8 @@ function VideoSlide({ post, isActive, onVideoEnd }: VideoSlideProps) {
         sequence={currentVideo.sequence || 1}
         isActive={isActive}
         onEnded={onVideoEnd}
-        title={post.title || ''}
+        title={localizedTitle}
+        userLanguage={userLanguage}
         isPremium={currentVideo.isPremium || false}
         muted={false}
         className={cn(
@@ -206,7 +215,7 @@ function VideoSlide({ post, isActive, onVideoEnd }: VideoSlideProps) {
                 {isFullscreen ? (
                   <h2 className="text-sm text-white text-left">← 전체화면 나가기</h2>
                 ) : (
-                  <h2 className="text-sm text-white text-left">{post.title} 바로보기 👀</h2>
+                  <h2 className="text-sm text-white text-left">{tContent('quickWatch', { title: localizedTitle })} 👀</h2>
                 )}
               </button>
   
@@ -218,8 +227,8 @@ function VideoSlide({ post, isActive, onVideoEnd }: VideoSlideProps) {
                 onBookmark={() => {}}
                 onShare={() => {
                   navigator.share?.({
-                    title: post.title || '',
-                    text: post.content || '',
+                    title: localizedTitle,
+                    text: localizedContent,
                     url: window.location.href,
                   });
                 }}

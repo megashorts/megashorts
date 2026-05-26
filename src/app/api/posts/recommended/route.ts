@@ -1,16 +1,21 @@
 import { NextRequest } from 'next/server';
 import { CategoryType } from '@prisma/client';
 import prisma from '@/lib/prisma';
+import { getContentLanguagePolicy, getContentLanguageWhere } from '@/lib/content-language-server';
 
 export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;
   const skip = parseInt(searchParams.get('skip') || '0');
   const take = parseInt(searchParams.get('take') || '5');
+  const locale = searchParams.get('locale') || req.cookies.get('NEXT_LOCALE')?.value || 'en';
 
   try {
+    const contentLanguagePolicy = await getContentLanguagePolicy();
+
     const posts = await prisma.post.findMany({
       where: {
         status: 'PUBLISHED',
+        ...getContentLanguageWhere(locale, contentLanguagePolicy),
         NOT: {
           categories: {
             hasSome: [CategoryType.MSPOST, CategoryType.NOTIFICATION]
@@ -26,6 +31,10 @@ export async function GET(req: NextRequest) {
       select: {  // include 대신 select 사용
         id: true,
         title: true,
+        titleI18n: true,
+        content: true,
+        contentI18n: true,
+        postLanguage: true,
         featured: true,
         priority: true,
         videos: {
@@ -36,6 +45,7 @@ export async function GET(req: NextRequest) {
           select: {
             id: true,
             sequence: true,
+            subtitle: true,
           }
         }
       },

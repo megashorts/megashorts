@@ -4,7 +4,7 @@ import prisma from '@/lib/prisma';
 import { VideoViewClient } from './VideoViewClient';
 
 interface PageProps {
-    params: Promise<{ postId: string }>;
+    params: Promise<{ locale: string; postId: string }>;
     searchParams: Promise<{ sequence?: string; t?: string }>;
   }
   
@@ -22,12 +22,17 @@ interface PageProps {
         id: true,
         ageLimit: true,
         title: true,
+        titleI18n: true,
+        content: true,
+        contentI18n: true,
+        postLanguage: true,
         userId: true,
         videos: {
           select: {
             id: true,
             sequence: true,
-            isPremium: true 
+            isPremium: true,
+            subtitle: true,
           },
           orderBy: {
             sequence: 'asc'

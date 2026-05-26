@@ -179,7 +179,7 @@ export async function signUp(
             type: NotificationType.COIN,
             metadata: {
               amount: addcoinUser,
-              reason: '추천인 가입'
+              reason: 'referral_signup'
             }
           },
         });
@@ -191,7 +191,7 @@ export async function signUp(
             type: NotificationType.COIN,
             metadata: {
               amount: addcoinRefferer,
-              reason: '추천인 가입'
+              reason: 'referral_signup'
             }
           },
         });
@@ -204,7 +204,7 @@ export async function signUp(
           issuerId: userId,
           type: 'COMMENT',
           metadata: {
-            reason: '가입을 환영합니다! 🎉🎉'
+            reason: 'welcome_msg'
           }
         }
       });

@@ -1,10 +1,8 @@
 // src/components/posts/editor/mutations.ts : React Query로 액션티에스의 submitPost() 호출, 성공 시 UI 상태 업데이트 및 페이지 이동 등 후처리
 
-import { useSession } from "@/components/SessionProvider";
 import { PostsPage } from "@/lib/types";
 import {
   InfiniteData,
-  Query,
   QueryFilters,
   useMutation,
   useQueryClient,
@@ -14,43 +12,16 @@ import { useRouter } from "next/navigation";
 
 export function useSubmitPostMutation() {
   const queryClient = useQueryClient();
-  const { user } = useSession();
   const router = useRouter();
 
   const mutation = useMutation({
     mutationFn: submitPost,
     onSuccess: async (newPost) => {
       try {
-        // 1. 먼저 페이지들 재생성
-        const revalidatePaths = [
-          '/',  // 메인 페이지
-          '/categories/recent'
-        ];
-
-        newPost.categories.forEach(category => {
-          revalidatePaths.push(`/categories/${category.toLowerCase()}`);
-        });
-
-        if (newPost.id) {
-          revalidatePaths.push(`/posts/${newPost.id}`);
-        }
-
-        await Promise.all(
-          revalidatePaths.map(path =>
-            fetch('/api/revalidate', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ path })
-            })
-          )
-        );
-
-        // 2. 서버 컴포넌트 리프레시
+        // 서버 액션에서 on-demand 무효화를 처리하므로 클라이언트는 refresh만 수행
         router.refresh();
 
-        // 3. 클라이언트 상태 업데이트
+        // 클라이언트 상태 업데이트
         // const queryFilter = {
         //   queryKey: ["post-feed"],
         //   predicate(query) {
@@ -62,23 +33,9 @@ export function useSubmitPostMutation() {
         //   },
         // } satisfies QueryFilters;
 
-        const queryFilter: QueryFilters<
-        InfiniteData<PostsPage, string | null>,
-        Error,
-        InfiniteData<PostsPage, string | null>,
-        readonly unknown[]
-      > = {
+        const queryFilter: QueryFilters = {
         queryKey: ['posts'],
-        predicate: (
-          query: Query<
-            InfiniteData<PostsPage, string | null>,
-            Error,
-            InfiniteData<PostsPage, string | null>,
-            readonly unknown[]
-          >
-        ) => {
-          return true;
-        },
+        predicate: () => true,
       };
 
 
@@ -129,30 +86,13 @@ export function useSubmitPostMutation() {
           }
         );
 
-        // 4. 메인페이지 새로고침 후 상세페이지로 이동
+        // 상세페이지 이동
         if (newPost.id) {
-          // 메인페이지를 백그라운드에서 열고 새로고침
-          const mainWindow = window.open('/', '_blank');
-          if (mainWindow) {
-            mainWindow.addEventListener('load', () => {
-              mainWindow.location.reload();
-              mainWindow.close();
-              // 메인페이지 새로고침 후 상세페이지로 이동
-              router.push(`/posts/${newPost.id}?t=${Date.now()}`);
-            });
-          } else {
-            // 팝업이 차단된 경우 바로 상세페이지로 이동
-            router.push(`/posts/${newPost.id}?t=${Date.now()}`);
-          }
+          router.push(`/posts/${newPost.id}?t=${Date.now()}`);
         }
 
-        // 4. 페이지 이동
-        // if (newPost.id) {
-        //   router.push(`/posts/${newPost.id}?t=${Date.now()}`);
-        // }
-
       } catch (error) {
-        console.error('Failed to revalidate paths:', error);
+        console.error('Post submit follow-up failed:', error);
       }
     },
     onError(error) {

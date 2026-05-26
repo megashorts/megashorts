@@ -5,6 +5,19 @@ export interface PeriodRange {
   end?: Date;
 }
 
+export interface RecentIsoWeekOption {
+  value: string;
+  key: string;
+  label: string;
+  year: number;
+  week: number;
+  start: Date;
+  end: Date;
+  isCurrent: boolean;
+}
+
+export type StatsPeriodUnit = "daily" | "weekly" | "monthly";
+
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 export function startOfUtcDay(date: Date) {
@@ -23,11 +36,17 @@ export function getIsoWeekStart(year: number, week: number) {
   return new Date(week1Monday.getTime() + (week - 1) * 7 * DAY_MS);
 }
 
-export function getIsoWeekLabel(year: number, week: number) {
+export function getIsoWeekLabel(year: number, week: number, locale = "ko") {
   const start = getIsoWeekStart(year, week);
   const end = new Date(start.getTime() + 6 * DAY_MS);
   const format = (date: Date) => `${date.getUTCMonth() + 1}/${date.getUTCDate()}`;
 
+  if (locale === "zh") {
+    return `${year}年 第${week}周 (${format(start)} ~ ${format(end)})`;
+  }
+  if (locale === "en") {
+    return `Week ${week}, ${year} (${format(start)} ~ ${format(end)})`;
+  }
   return `${year}년 ${week}주차 (${format(start)} ~ ${format(end)})`;
 }
 
@@ -44,7 +63,7 @@ export function getCurrentIsoWeek(date = new Date()) {
   };
 }
 
-export function parseStatsPeriod(period = "current"): PeriodRange {
+export function parseStatsPeriod(period = "current", locale = "ko"): PeriodRange {
   const now = new Date();
 
   if (!period || period === "current") {
@@ -53,14 +72,17 @@ export function parseStatsPeriod(period = "current"): PeriodRange {
 
     return {
       key: `${year}-W${String(week).padStart(2, "0")}`,
-      label: getIsoWeekLabel(year, week),
+      label: getIsoWeekLabel(year, week, locale),
       start,
       end: new Date(start.getTime() + 7 * DAY_MS - 1),
     };
   }
 
   if (period === "all") {
-    return { key: "all", label: "전체 기간" };
+    return {
+      key: "all",
+      label: locale === "zh" ? "全部期间" : locale === "en" ? "All Periods" : "전체 기간"
+    };
   }
 
   const rollingMatch = period.match(/^(\d+)days$/);
@@ -71,7 +93,7 @@ export function parseStatsPeriod(period = "current"): PeriodRange {
 
     return {
       key: period,
-      label: `최근 ${days}일`,
+      label: locale === "zh" ? `最近 ${days}天` : locale === "en" ? `Last ${days} Days` : `최근 ${days}일`,
       start,
       end,
     };
@@ -85,7 +107,7 @@ export function parseStatsPeriod(period = "current"): PeriodRange {
 
     return {
       key: `${year}-W${String(week).padStart(2, "0")}`,
-      label: getIsoWeekLabel(year, week),
+      label: getIsoWeekLabel(year, week, locale),
       start,
       end: new Date(start.getTime() + 7 * DAY_MS - 1),
     };
@@ -100,7 +122,7 @@ export function parseStatsPeriod(period = "current"): PeriodRange {
 
     return {
       key: period,
-      label: `${year}년 ${month + 1}월`,
+      label: locale === "zh" ? `${year}年 ${month + 1}月` : locale === "en" ? `${month + 1}/${year}` : `${year}년 ${month + 1}월`,
       start,
       end,
     };
@@ -118,7 +140,40 @@ export function parseStatsPeriod(period = "current"): PeriodRange {
     };
   }
 
-  return parseStatsPeriod("current");
+  return parseStatsPeriod("current", locale);
+}
+
+export function inferStatsPeriodUnit(period = "current"): StatsPeriodUnit {
+  if (/^\d{4}-\d{2}-\d{2}$/.test(period)) return "daily";
+  if (/^\d{4}-\d{2}$/.test(period)) return "monthly";
+  return "weekly";
+}
+
+export function getCurrentStatsPeriod(unit: StatsPeriodUnit = "weekly") {
+  const now = new Date();
+
+  if (unit === "daily") {
+    return startOfUtcDay(now).toISOString().slice(0, 10);
+  }
+
+  if (unit === "monthly") {
+    const month = String(now.getUTCMonth() + 1).padStart(2, "0");
+    return `${now.getUTCFullYear()}-${month}`;
+  }
+
+  const { year, week } = getCurrentIsoWeek(now);
+  return `${year}-W${String(week).padStart(2, "0")}`;
+}
+
+export function periodDateKey(period: string, unit: StatsPeriodUnit = inferStatsPeriodUnit(period)) {
+  const explicitPeriod = period && period !== "current" ? period : getCurrentStatsPeriod(unit);
+  const range = parseStatsPeriod(explicitPeriod);
+
+  return range.end ? range.end.toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10);
+}
+
+export function getStatsPeriodLabel(period: string, locale = "ko") {
+  return parseStatsPeriod(period, locale).label;
 }
 
 export function createdAtFilter(range: PeriodRange) {
@@ -143,22 +198,93 @@ export function requestedAtFilter(range: PeriodRange) {
   };
 }
 
-export function getRecentIsoWeeks(count = 8) {
+export function getRecentIsoWeeks(count = 8, locale = "ko"): RecentIsoWeekOption[] {
   const current = getCurrentIsoWeek();
-  const weeks = [];
+  const weeks: RecentIsoWeekOption[] = [];
 
   for (let index = 0; index < count; index += 1) {
     const currentStart = getIsoWeekStart(current.year, current.week);
     const start = new Date(currentStart.getTime() - index * 7 * DAY_MS);
     const weekInfo = getCurrentIsoWeek(start);
     const key = `${weekInfo.year}-W${String(weekInfo.week).padStart(2, "0")}`;
+    const end = new Date(start.getTime() + 7 * DAY_MS - 1);
+    const isCurrent = index === 0;
+
+    const currentLabel = locale === "zh"
+      ? `当前周 (${getIsoWeekLabel(weekInfo.year, weekInfo.week, locale)})`
+      : locale === "en"
+      ? `Current Week (${getIsoWeekLabel(weekInfo.year, weekInfo.week, locale)})`
+      : `현재 주차 (${getIsoWeekLabel(weekInfo.year, weekInfo.week, locale)})`;
 
     weeks.push({
-      value: index === 0 ? "current" : key,
+      value: isCurrent ? "current" : key,
       key,
-      label: index === 0 ? `현재 주차 (${getIsoWeekLabel(weekInfo.year, weekInfo.week)})` : getIsoWeekLabel(weekInfo.year, weekInfo.week),
+      label: isCurrent ? currentLabel : getIsoWeekLabel(weekInfo.year, weekInfo.week, locale),
+      year: weekInfo.year,
+      week: weekInfo.week,
+      start,
+      end,
+      isCurrent,
     });
   }
 
   return weeks;
+}
+
+export function getRecentStatsPeriods(unit: StatsPeriodUnit = "weekly", count = 8, locale = "ko") {
+  if (unit === "weekly") {
+    return getRecentIsoWeeks(count, locale).map((option) => ({
+      value: option.key,
+      key: option.key,
+      label: option.isCurrent
+        ? locale === "zh"
+          ? `当前周（${getIsoWeekLabel(option.year, option.week, locale)}）`
+          : locale === "en"
+            ? `Current Week (${getIsoWeekLabel(option.year, option.week, locale)})`
+            : `현재 주차 (${getIsoWeekLabel(option.year, option.week, locale)})`
+        : option.label,
+      start: option.start,
+      end: option.end,
+      unit,
+      isCurrent: option.isCurrent,
+    }));
+  }
+
+  const now = startOfUtcDay(new Date());
+  const options = [];
+
+  for (let index = 0; index < count; index += 1) {
+    if (unit === "daily") {
+      const date = new Date(now.getTime() - index * DAY_MS);
+      const value = date.toISOString().slice(0, 10);
+      options.push({
+        value,
+        key: value,
+        label: index === 0
+          ? locale === "zh" ? `今天 (${value})` : locale === "en" ? `Today (${value})` : `오늘 (${value})`
+          : value,
+        start: startOfUtcDay(date),
+        end: endOfUtcDay(date),
+        unit,
+        isCurrent: index === 0,
+      });
+    } else {
+      const date = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - index, 1));
+      const value = `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, "0")}`;
+      const label = getStatsPeriodLabel(value, locale);
+      options.push({
+        value,
+        key: value,
+        label: index === 0
+          ? locale === "zh" ? `本月 (${label})` : locale === "en" ? `This Month (${label})` : `이번 달 (${label})`
+          : label,
+        start: parseStatsPeriod(value).start,
+        end: parseStatsPeriod(value).end,
+        unit,
+        isCurrent: index === 0,
+      });
+    }
+  }
+
+  return options;
 }

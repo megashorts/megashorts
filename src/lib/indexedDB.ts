@@ -1,7 +1,19 @@
 // 브라우저의 최소 정보 저장/관리만 담당
 
 const DB_NAME = 'video-system';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
+
+export type OfflineActionMethod = 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+
+export interface OfflineAction {
+  id: string;
+  url: string;
+  method: OfflineActionMethod;
+  headers?: Record<string, string>;
+  body?: string;
+  createdAt: number;
+  description?: string;
+}
 
 interface VideoViewStore {
   // 시청한 동영상 ID만 저장
@@ -44,6 +56,11 @@ class VideoDBManager {
         // 포스트별 마지막 시청 정보 저장소 (최소 정보만)
         if (!db.objectStoreNames.contains('lastViews')) {
           db.createObjectStore('lastViews', { keyPath: 'postId' });
+        }
+
+        if (!db.objectStoreNames.contains('offlineActions')) {
+          const offlineActions = db.createObjectStore('offlineActions', { keyPath: 'id' });
+          offlineActions.createIndex('createdAt', 'createdAt');
         }
       };
     });
@@ -215,6 +232,84 @@ class VideoDBManager {
     });
   }
 
+  async queueOfflineAction(action: Omit<OfflineAction, 'id' | 'createdAt'> & Partial<Pick<OfflineAction, 'id' | 'createdAt'>>) {
+    await this.init();
+    if (!this.db) throw new Error('Database not initialized');
+
+    const record: OfflineAction = {
+      ...action,
+      id: action.id ?? `${Date.now()}-${crypto.randomUUID?.() ?? Math.random().toString(36).slice(2)}`,
+      createdAt: action.createdAt ?? Date.now(),
+    };
+
+    return new Promise<void>((resolve, reject) => {
+      const transaction = this.db!.transaction(['offlineActions'], 'readwrite');
+      const store = transaction.objectStore('offlineActions');
+      const request = store.put(record);
+
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => resolve();
+    });
+  }
+
+  async getOfflineActions() {
+    await this.init();
+    if (!this.db) throw new Error('Database not initialized');
+
+    return new Promise<OfflineAction[]>((resolve, reject) => {
+      const transaction = this.db!.transaction(['offlineActions'], 'readonly');
+      const store = transaction.objectStore('offlineActions');
+      const request = store.getAll();
+
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => {
+        const records = (request.result || []) as OfflineAction[];
+        resolve(records.sort((a, b) => a.createdAt - b.createdAt));
+      };
+    });
+  }
+
+  async deleteOfflineAction(id: string) {
+    await this.init();
+    if (!this.db) throw new Error('Database not initialized');
+
+    return new Promise<void>((resolve, reject) => {
+      const transaction = this.db!.transaction(['offlineActions'], 'readwrite');
+      const store = transaction.objectStore('offlineActions');
+      const request = store.delete(id);
+
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => resolve();
+    });
+  }
+
+  async flushOfflineActions() {
+    if (typeof navigator !== 'undefined' && !navigator.onLine) return;
+
+    const actions = await this.getOfflineActions();
+
+    for (const action of actions) {
+      try {
+        const response = await fetch(action.url, {
+          method: action.method,
+          headers: action.headers,
+          body: action.body,
+        });
+
+        if (!response.ok) {
+          if (response.status >= 400 && response.status < 500) {
+            await this.deleteOfflineAction(action.id);
+          }
+          continue;
+        }
+
+        await this.deleteOfflineAction(action.id);
+      } catch {
+        return;
+      }
+    }
+  }
+
   // 다른 사용자 로그인 시에만 호출되는 초기화 메서드
   async clearForNewUser() {
     await this.init();
@@ -232,6 +327,14 @@ class VideoDBManager {
       new Promise<void>((resolve, reject) => {
         const transaction = this.db!.transaction(['lastViews'], 'readwrite');
         const store = transaction.objectStore('lastViews');
+        const request = store.clear();
+
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve();
+      }),
+      new Promise<void>((resolve, reject) => {
+        const transaction = this.db!.transaction(['offlineActions'], 'readwrite');
+        const store = transaction.objectStore('offlineActions');
         const request = store.clear();
 
         request.onerror = () => reject(request.error);

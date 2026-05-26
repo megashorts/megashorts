@@ -2,18 +2,22 @@ import { NextRequest } from "next/server";
 import { CategoryType, PostStatus } from "@prisma/client";  // PostStatus 추가
 import prisma from "@/lib/prisma";
 import { getPostDataInclude, PostsPage } from "@/lib/types";
+import { getContentLanguagePolicy, getContentLanguageWhere } from "@/lib/content-language-server";
 
 export async function GET(req: NextRequest) {
   try {
     const cursor = req.nextUrl.searchParams.get("cursor") || undefined;
     const category = req.nextUrl.searchParams.get("category");
     const isMobile = req.nextUrl.searchParams.get("isMobile") === "true";
+    const locale = req.nextUrl.searchParams.get("locale") || req.cookies.get("NEXT_LOCALE")?.value || "en";
     
     const pageSize = isMobile ? 12 : 20;
+    const contentLanguagePolicy = await getContentLanguagePolicy();
 
     // PostStatus enum 사용
     const where = {
       status: PostStatus.PUBLISHED,
+      ...getContentLanguageWhere(locale, contentLanguagePolicy),
       ...(category ? {
         categories: {
           has: category.toUpperCase() as CategoryType

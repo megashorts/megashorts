@@ -1,0 +1,302 @@
+
+--- 2026-05-18T16:47:28.994Z debug
+🪵  Writing logs to "/Users/kimryan/Desktop/megas/.tmp/wrangler-logs/wrangler-2026-05-18_16-47-28_954.log"
+---
+
+--- 2026-05-18T16:47:28.994Z debug
+Metrics dispatcher: Dispatching disabled - would have sent {"deviceId":"c8397d8f-15b6-4383-ac87-c9f1f1083fc4","event":"wrangler command started","timestamp":1779122848994,"properties":{"amplitude_session_id":1779122848993,"amplitude_event_id":0,"wranglerVersion":"4.0.0","osPlatform":"Mac OS","osVersion":"Darwin Kernel Version 22.6.0: Sun Dec 17 22:14:25 PST 2023; root:xnu-8796.141.3.703.2~2/RELEASE_ARM64_T8112","nodeVersion":24,"packageManager":"npm","isFirstUsage":false,"configFileType":"toml","isCI":false,"isPagesCI":false,"isWorkersCI":false,"isInteractive":false,"hasAssets":false,"argsUsed":["c","config"],"argsCombination":"c, config","command":"wrangler deploy","args":{"config":"<REDACTED>","c":"<REDACTED>","xJsonConfig":true,"j":true,"noBundle":false,"latest":false,"keepVars":false,"xAutoCreate":true}}}.
+---
+
+--- 2026-05-18T16:47:28.995Z debug
+.env file not found at ".env". Continuing... For more details, refer to https://developers.cloudflare.com/workers/wrangler/system-environment-variables/
+---
+
+--- 2026-05-18T16:47:29.000Z log
+
+ ⛅️ wrangler 4.0.0 (update available 4.92.0)
+--------------------------------------------
+
+---
+
+--- 2026-05-18T16:47:29.010Z debug
+Saving to cache: {"account":{"id":"923201050a960d4c64fb9b90a88cb956","name":""}}
+---
+
+--- 2026-05-18T16:47:29.010Z debug
+Starting verifyWorkerMatchesCITag() with tag: undefined, name: referral-structure-worker
+---
+
+--- 2026-05-18T16:47:29.010Z debug
+No WRANGLER_CI_MATCH_TAG variable provided, aborting verifyWorkerMatchesCITag()
+---
+
+--- 2026-05-18T16:47:29.010Z debug
+-- START CF API REQUEST: GET https://api.cloudflare.com/client/v4/accounts/923201050a960d4c64fb9b90a88cb956/workers/services/referral-structure-worker
+---
+
+--- 2026-05-18T16:47:29.010Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:29.010Z debug
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:29.010Z debug
+-- END CF API REQUEST
+---
+
+--- 2026-05-18T16:47:29.315Z debug
+-- START CF API RESPONSE: OK 200
+---
+
+--- 2026-05-18T16:47:29.315Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:29.315Z debug
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:29.315Z debug
+-- END CF API RESPONSE
+---
+
+--- 2026-05-18T16:47:29.317Z debug
+-- START CF API REQUEST: GET https://api.cloudflare.com/client/v4/accounts/923201050a960d4c64fb9b90a88cb956/workers/scripts/referral-structure-worker/deployments
+---
+
+--- 2026-05-18T16:47:29.317Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:29.317Z debug
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:29.317Z debug
+-- END CF API REQUEST
+---
+
+--- 2026-05-18T16:47:29.632Z debug
+-- START CF API RESPONSE: OK 200
+---
+
+--- 2026-05-18T16:47:29.632Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:29.632Z debug
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:29.632Z debug
+-- END CF API RESPONSE
+---
+
+--- 2026-05-18T16:47:29.705Z log
+Total Upload: 455.53 KiB / gzip: 89.45 KiB
+---
+
+--- 2026-05-18T16:47:29.708Z debug
+-- START CF API REQUEST: POST https://api.cloudflare.com/client/v4/accounts/923201050a960d4c64fb9b90a88cb956/workers/scripts/referral-structure-worker/versions
+---
+
+--- 2026-05-18T16:47:29.708Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:29.708Z debug
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:29.709Z debug
+BODY: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:29.709Z debug
+-- END CF API REQUEST
+---
+
+--- 2026-05-18T16:47:31.721Z debug
+-- START CF API RESPONSE: OK 200
+---
+
+--- 2026-05-18T16:47:31.721Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:31.721Z debug
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:31.721Z debug
+-- END CF API RESPONSE
+---
+
+--- 2026-05-18T16:47:31.722Z debug
+-- START CF API REQUEST: POST https://api.cloudflare.com/client/v4/accounts/923201050a960d4c64fb9b90a88cb956/workers/scripts/referral-structure-worker/deployments
+---
+
+--- 2026-05-18T16:47:31.722Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:31.722Z debug
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:31.722Z debug
+-- END CF API REQUEST
+---
+
+--- 2026-05-18T16:47:32.887Z debug
+-- START CF API RESPONSE: OK 200
+---
+
+--- 2026-05-18T16:47:32.888Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:32.888Z debug
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:32.888Z debug
+-- END CF API RESPONSE
+---
+
+--- 2026-05-18T16:47:32.888Z debug
+-- START CF API REQUEST: PATCH https://api.cloudflare.com/client/v4/accounts/923201050a960d4c64fb9b90a88cb956/workers/scripts/referral-structure-worker/script-settings
+---
+
+--- 2026-05-18T16:47:32.888Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:32.888Z debug
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:32.888Z debug
+-- END CF API REQUEST
+---
+
+--- 2026-05-18T16:47:33.350Z debug
+-- START CF API RESPONSE: OK 200
+---
+
+--- 2026-05-18T16:47:33.350Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:33.350Z debug
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:33.350Z debug
+-- END CF API RESPONSE
+---
+
+--- 2026-05-18T16:47:33.350Z log
+Worker Startup Time: 3 ms
+---
+
+--- 2026-05-18T16:47:33.353Z log
+Your worker has access to the following bindings:
+- D1 Databases:
+  - DB: megashorts-db (52d25396-2a61-42a8-904f-2d7956cede44)
+- R2 Buckets:
+  - POINTS_BUCKET: points-system-bucket
+  - LOGS_BUCKET: logs-bucket
+- Vars:
+  - SUPABASE_URL: "https://bpvmstecehkyztiflxqr.supabase..."
+---
+
+--- 2026-05-18T16:47:33.355Z log
+Uploaded referral-structure-worker (4.04 sec)
+---
+
+--- 2026-05-18T16:47:33.356Z debug
+-- START CF API REQUEST: GET https://api.cloudflare.com/client/v4/accounts/923201050a960d4c64fb9b90a88cb956/workers/scripts/referral-structure-worker/subdomain
+---
+
+--- 2026-05-18T16:47:33.356Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:33.356Z debug
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:33.356Z debug
+-- END CF API REQUEST
+---
+
+--- 2026-05-18T16:47:33.578Z debug
+-- START CF API RESPONSE: OK 200
+---
+
+--- 2026-05-18T16:47:33.578Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:33.578Z debug
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:33.578Z debug
+-- END CF API RESPONSE
+---
+
+--- 2026-05-18T16:47:33.578Z debug
+-- START CF API REQUEST: GET https://api.cloudflare.com/client/v4/accounts/923201050a960d4c64fb9b90a88cb956/workers/subdomain
+---
+
+--- 2026-05-18T16:47:33.578Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:33.578Z debug
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:33.578Z debug
+-- END CF API REQUEST
+---
+
+--- 2026-05-18T16:47:33.790Z debug
+-- START CF API RESPONSE: OK 200
+---
+
+--- 2026-05-18T16:47:33.791Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:33.791Z debug
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:33.791Z debug
+-- END CF API RESPONSE
+---
+
+--- 2026-05-18T16:47:33.792Z log
+Deployed referral-structure-worker triggers (0.21 sec)
+---
+
+--- 2026-05-18T16:47:33.792Z log
+  https://referral-structure-worker.msdevcm.workers.dev
+---
+
+--- 2026-05-18T16:47:33.792Z log
+Current Version ID: 59f6ee56-57ba-4411-9d60-7864d0f6082e
+---
+
+--- 2026-05-18T16:47:33.795Z debug
+Metrics dispatcher: Dispatching disabled - would have sent {"deviceId":"c8397d8f-15b6-4383-ac87-c9f1f1083fc4","event":"deploy worker script","timestamp":1779122853795,"properties":{"category":"Workers","wranglerVersion":"4.0.0","os":"darwin:arm64","usesTypeScript":true,"durationMs":4783}}.
+---
+
+--- 2026-05-18T16:47:33.797Z debug
+Metrics dispatcher: Dispatching disabled - would have sent {"deviceId":"c8397d8f-15b6-4383-ac87-c9f1f1083fc4","event":"wrangler command completed","timestamp":1779122853797,"properties":{"amplitude_session_id":1779122848993,"amplitude_event_id":1,"wranglerVersion":"4.0.0","osPlatform":"Mac OS","osVersion":"Darwin Kernel Version 22.6.0: Sun Dec 17 22:14:25 PST 2023; root:xnu-8796.141.3.703.2~2/RELEASE_ARM64_T8112","nodeVersion":24,"packageManager":"npm","isFirstUsage":false,"configFileType":"toml","isCI":false,"isPagesCI":false,"isWorkersCI":false,"isInteractive":false,"hasAssets":false,"argsUsed":["c","config"],"argsCombination":"c, config","command":"wrangler deploy","args":{"config":"<REDACTED>","c":"<REDACTED>","xJsonConfig":true,"j":true,"noBundle":false,"latest":false,"keepVars":false,"xAutoCreate":true},"durationMs":4811,"durationSeconds":4.811,"durationMinutes":0.08018333333333333}}.
+---

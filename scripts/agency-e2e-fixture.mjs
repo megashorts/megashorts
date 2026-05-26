@@ -1,6 +1,38 @@
-import "dotenv/config";
+try {
+  await import("dotenv/config");
+} catch (error) {
+  if (error?.code !== "ERR_MODULE_NOT_FOUND" && error?.code !== "ERR_PACKAGE_PATH_NOT_EXPORTED") {
+    throw error;
+  }
+  const { readFile: readEnvFile } = await import("node:fs/promises");
+  const loadedFallbackEnv = new Set();
+  for (const envFile of [".env", ".env.local"]) {
+    try {
+      const raw = await readEnvFile(envFile, "utf8");
+      for (const line of raw.split(/\r?\n/)) {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith("#") || !trimmed.includes("=")) continue;
+        const index = trimmed.indexOf("=");
+        const key = trimmed.slice(0, index).trim();
+        let value = trimmed.slice(index + 1).trim();
+        if (
+          (value.startsWith('"') && value.endsWith('"')) ||
+          (value.startsWith("'") && value.endsWith("'"))
+        ) {
+          value = value.slice(1, -1);
+        }
+        if (!key) continue;
+        if (process.env[key] === undefined || loadedFallbackEnv.has(key)) {
+          process.env[key] = value;
+          loadedFallbackEnv.add(key);
+        }
+      }
+    } catch {}
+  }
+}
 import { PrismaClient } from "@prisma/client";
 import { hash } from "@node-rs/argon2";
+import { createHash, createHmac } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
@@ -17,6 +49,9 @@ const CFSTATS_WORKER_URL = process.env.CFSTATS_ADMIN_WORKER_URL || "https://cfst
 const CF_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID;
 const CF_API_TOKEN = process.env.CLOUDFLARE_API_TOKEN;
 const CF_D1_DATABASE_ID = process.env.CLOUDFLARE_D1_DATABASE_ID || "52d25396-2a61-42a8-904f-2d7956cede44";
+const CF_R2_BUCKET = process.env.CLOUDFLARE_POINTS_R2_BUCKET_NAME || "points-system-bucket";
+const CF_R2_ACCESS_KEY_ID = process.env.CLOUDFLARE_R2_ACCESS_KEY_ID;
+const CF_R2_SECRET_ACCESS_KEY = process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY;
 
 function usage() {
   console.error("Usage: node scripts/agency-e2e-fixture.mjs <setup|trigger|verify|report|full|cleanup> [runId]");
@@ -28,6 +63,44 @@ function nowRunId() {
 
 function testId(runId, suffix) {
   return `${PREFIX}_${runId}_${suffix}`;
+}
+
+function suffixFromTestId(runId, id) {
+  const prefix = `${PREFIX}_${runId}_`;
+  if (!id.startsWith(prefix)) {
+    throw new Error(`Fixture id does not belong to run ${runId}: ${id}`);
+  }
+  return id.slice(prefix.length);
+}
+
+function shortLoginId(runId, suffix) {
+  const map = {
+    admin: "t-admin",
+    creator_lv1: "lv1",
+    creator_lv2: "lv2",
+    creator_lv3: "lv3",
+    hq_master: "hq",
+    hq_direct_a: "hq-a",
+    hq_direct_b: "hq-b",
+    hq_level2_a: "hq-l2a",
+    hq_level2_b: "hq-l2b",
+    hq_level3: "hq-l3",
+    network_master: "net",
+    network_direct_a: "net-a",
+    network_direct_b: "net-b",
+    network_level2_a: "net-l2a",
+    network_level2_b: "net-l2b",
+    network_level3: "net-l3",
+    binary_master: "bin",
+    binary_direct_a: "bin-a",
+    binary_direct_b: "bin-b",
+    binary_level2_a: "bin-l2a",
+    binary_level2_b: "bin-l2b",
+    binary_level3: "bin-l3",
+  };
+
+  const base = map[suffix] || suffix.replace(/_/g, "-");
+  return `${base}-${runId.slice(-4)}`;
 }
 
 function targetDateForRun(runId) {
@@ -76,12 +149,13 @@ function sleep(ms) {
 }
 
 function user(runId, suffix, role, options = {}) {
-  const username = testId(runId, suffix);
+  const id = testId(runId, suffix);
+  const username = shortLoginId(runId, suffix);
   return {
-    id: username,
+    id,
     username,
     displayName: options.displayName || username,
-    email: `${username}@example.invalid`,
+    email: `${username}@ms.com`,
     userRole: role,
     referredBy: options.referredBy || null,
     teamMaster: options.teamMaster || null,
@@ -283,6 +357,40 @@ async function d1Scalar(sql, params = [], column = "count") {
   return Number(rows[0]?.[column] || rows[0]?.["COUNT(*)"] || 0);
 }
 
+async function ensureGroupedViewDetailsTable() {
+  if (!CF_ACCOUNT_ID || !CF_API_TOKEN || !CF_D1_DATABASE_ID) return { skipped: true };
+
+  await d1Query(`
+    CREATE TABLE IF NOT EXISTS grouped_view_details (
+      source_view_id TEXT PRIMARY KEY,
+      date TEXT NOT NULL,
+      viewer_id TEXT NOT NULL,
+      video_id TEXT NOT NULL,
+      access_method TEXT NOT NULL,
+      view_count INTEGER NOT NULL DEFAULT 1,
+      uploader_id TEXT NOT NULL,
+      post_id TEXT NOT NULL,
+      master_id TEXT,
+      referrer_id TEXT,
+      created_at TEXT NOT NULL,
+      stored_at TEXT NOT NULL
+    )
+  `);
+
+  for (const statement of [
+    "CREATE INDEX IF NOT EXISTS idx_grouped_view_details_date ON grouped_view_details(date)",
+    "CREATE INDEX IF NOT EXISTS idx_grouped_view_details_post ON grouped_view_details(post_id)",
+    "CREATE INDEX IF NOT EXISTS idx_grouped_view_details_video ON grouped_view_details(video_id)",
+    "CREATE INDEX IF NOT EXISTS idx_grouped_view_details_uploader ON grouped_view_details(uploader_id)",
+    "CREATE INDEX IF NOT EXISTS idx_grouped_view_details_master ON grouped_view_details(master_id)",
+    "CREATE INDEX IF NOT EXISTS idx_grouped_view_details_referrer ON grouped_view_details(referrer_id)",
+  ]) {
+    await d1Query(statement);
+  }
+
+  return { skipped: false };
+}
+
 async function waitForGroupedViews(date, expectedRows) {
   if (!CF_ACCOUNT_ID || !CF_API_TOKEN) return { skipped: true };
 
@@ -392,18 +500,21 @@ async function waitForCommissionCompletion(date) {
 
 async function resetD1Date(date) {
   if (!CF_ACCOUNT_ID || !CF_API_TOKEN) return { skipped: true };
+  await ensureGroupedViewDetailsTable();
 
-  const [groupedViews, commissionBatch, cfStats] = await Promise.all([
+  const [groupedViews, groupedViewDetails, commissionBatch, cfStats] = await Promise.all([
     d1Scalar("SELECT COUNT(*) AS count FROM grouped_views WHERE date = ?", [date]),
+    d1Scalar("SELECT COUNT(*) AS count FROM grouped_view_details WHERE date = ?", [date]),
     d1Scalar("SELECT COUNT(*) AS count FROM commission_batch WHERE date = ?", [date]),
     d1Scalar("SELECT COUNT(*) AS count FROM cf_stats WHERE date = ?", [date]),
   ]);
   const existingRows = {
     groupedViews: groupedViews || 0,
+    groupedViewDetails: groupedViewDetails || 0,
     commissionBatch: commissionBatch || 0,
     cfStats: cfStats || 0,
   };
-  const existingTotal = existingRows.groupedViews + existingRows.commissionBatch + existingRows.cfStats;
+  const existingTotal = existingRows.groupedViews + existingRows.groupedViewDetails + existingRows.commissionBatch + existingRows.cfStats;
 
   if (existingTotal > 0 && process.env.AGENCY_E2E_ALLOW_D1_DATE_RESET !== "true") {
     return {
@@ -415,6 +526,7 @@ async function resetD1Date(date) {
   }
 
   await d1Query("DELETE FROM grouped_views WHERE date = ?", [date]);
+  await d1Query("DELETE FROM grouped_view_details WHERE date = ?", [date]);
   await d1Query("DELETE FROM commission_batch WHERE date = ?", [date]);
   await d1Query("DELETE FROM cf_stats WHERE period = 'weekly' AND date = ?", [date]);
   await d1Query("DELETE FROM cf_stats WHERE period = 'daily' AND date = ?", [date]);
@@ -428,6 +540,7 @@ function isGeneratedFutureTestDate(date) {
 
 async function cleanupD1Run(runId, date) {
   if (!CF_ACCOUNT_ID || !CF_API_TOKEN || !runId || runId === "all") return { skipped: true };
+  await ensureGroupedViewDetailsTable();
 
   const like = `%${PREFIX}_${runId}_%`;
   const startsWith = `${PREFIX}_${runId}_%`;
@@ -436,6 +549,11 @@ async function cleanupD1Run(runId, date) {
       `SELECT COUNT(*) AS count FROM grouped_views
        WHERE id LIKE ? OR uploader_id LIKE ? OR post_id LIKE ? OR master_id LIKE ? OR referrer_id LIKE ?`,
       [like, startsWith, startsWith, startsWith, startsWith],
+    ),
+    groupedViewDetails: await d1Scalar(
+      `SELECT COUNT(*) AS count FROM grouped_view_details
+       WHERE source_view_id LIKE ? OR viewer_id LIKE ? OR uploader_id LIKE ? OR post_id LIKE ? OR master_id LIKE ? OR referrer_id LIKE ?`,
+      [startsWith, startsWith, startsWith, startsWith, startsWith, startsWith],
     ),
     commissionBatch: await d1Scalar(
       `SELECT COUNT(*) AS count FROM commission_batch
@@ -453,6 +571,11 @@ async function cleanupD1Run(runId, date) {
     [like, startsWith, startsWith, startsWith, startsWith],
   );
   await d1Query(
+    `DELETE FROM grouped_view_details
+     WHERE source_view_id LIKE ? OR viewer_id LIKE ? OR uploader_id LIKE ? OR post_id LIKE ? OR master_id LIKE ? OR referrer_id LIKE ?`,
+    [startsWith, startsWith, startsWith, startsWith, startsWith, startsWith],
+  );
+  await d1Query(
     `DELETE FROM commission_batch
      WHERE user_id LIKE ? OR master_id LIKE ? OR post_id LIKE ? OR metadata LIKE ?`,
     [startsWith, startsWith, startsWith, like],
@@ -465,34 +588,191 @@ async function cleanupD1Run(runId, date) {
   return { skipped: false, date, before };
 }
 
-async function seedCloudflareStats(date, runId) {
+function buildSimulatedCfLogs(manifest) {
+  const countries = ["KR", "US", "JP", "TH", "VN"];
+
+  return manifest.views.map((view, index) => ({
+    uid: view.videoId,
+    creator: view.creatorId,
+    country: countries[index % countries.length],
+    minutesWatched: view.accessMethod === "SUBSCRIPTION" ? 3 : 2,
+    date: manifest.targetDate,
+    hour: `${manifest.targetDate}T${String(9 + (index % 8)).padStart(2, "0")}:00:00`,
+  }));
+}
+
+function aggregateSimulatedCfLogs(logs, period, date) {
+  const countryMap = new Map();
+  const requestList = {};
+
+  logs.forEach((log) => {
+    countryMap.set(log.country, Number(countryMap.get(log.country) || 0) + Number(log.minutesWatched || 0));
+
+    const requestKey = period === "daily"
+      ? String(log.hour || `${date}T00:00:00`).substring(11, 13)
+      : log.date;
+    requestList[requestKey] = Number(requestList[requestKey] || 0) + Number(log.minutesWatched || 0);
+  });
+
+  const topCountries = Array.from(countryMap.entries())
+    .map(([country, minutes]) => ({ country, minutes }))
+    .sort((a, b) => b.minutes - a.minutes)
+    .slice(0, 10);
+
+  return {
+    totalMinutes: topCountries.reduce((sum, item) => sum + Number(item.minutes || 0), 0),
+    topCountries,
+    requestList,
+  };
+}
+
+function hmac(key, value, encoding) {
+  return createHmac("sha256", key).update(value).digest(encoding);
+}
+
+function sha256(value) {
+  return createHash("sha256").update(value).digest("hex");
+}
+
+async function putR2JsonObject(key, payload) {
+  if (!CF_ACCOUNT_ID || !CF_R2_BUCKET || !CF_R2_ACCESS_KEY_ID || !CF_R2_SECRET_ACCESS_KEY) {
+    return { skipped: true, key, reason: "R2 credentials are not configured" };
+  }
+
+  const body = JSON.stringify(payload);
+  const host = `${CF_ACCOUNT_ID}.r2.cloudflarestorage.com`;
+  const encodedKey = key.split("/").map(encodeURIComponent).join("/");
+  const canonicalUri = `/${CF_R2_BUCKET}/${encodedKey}`;
+  const url = `https://${host}${canonicalUri}`;
+  const now = new Date();
+  const amzDate = now.toISOString().replace(/[:-]|\.\d{3}/g, "");
+  const dateStamp = amzDate.slice(0, 8);
+  const payloadHash = sha256(body);
+  const credentialScope = `${dateStamp}/auto/s3/aws4_request`;
+  const canonicalHeaders = [
+    `host:${host}`,
+    `x-amz-content-sha256:${payloadHash}`,
+    `x-amz-date:${amzDate}`,
+  ].join("\n") + "\n";
+  const signedHeaders = "host;x-amz-content-sha256;x-amz-date";
+  const canonicalRequest = [
+    "PUT",
+    canonicalUri,
+    "",
+    canonicalHeaders,
+    signedHeaders,
+    payloadHash,
+  ].join("\n");
+  const stringToSign = [
+    "AWS4-HMAC-SHA256",
+    amzDate,
+    credentialScope,
+    sha256(canonicalRequest),
+  ].join("\n");
+  const kDate = hmac(`AWS4${CF_R2_SECRET_ACCESS_KEY}`, dateStamp);
+  const kRegion = hmac(kDate, "auto");
+  const kService = hmac(kRegion, "s3");
+  const kSigning = hmac(kService, "aws4_request");
+  const signature = hmac(kSigning, stringToSign, "hex");
+  const authorization = [
+    `AWS4-HMAC-SHA256 Credential=${CF_R2_ACCESS_KEY_ID}/${credentialScope}`,
+    `SignedHeaders=${signedHeaders}`,
+    `Signature=${signature}`,
+  ].join(", ");
+
+  const response = await fetch(url, {
+    method: "PUT",
+    headers: {
+      Authorization: authorization,
+      "Content-Type": "application/json",
+      "X-Amz-Content-Sha256": payloadHash,
+      "X-Amz-Date": amzDate,
+    },
+    body,
+  });
+
+  if (!response.ok) {
+    const message = await response.text().catch(() => "");
+    throw new Error(`R2 put failed for ${key}: ${response.status} ${message}`);
+  }
+
+  return { skipped: false, key };
+}
+
+async function seedCloudflareStats(manifest) {
   if (!CF_ACCOUNT_ID || !CF_API_TOKEN) return { skipped: true };
 
-  const topCountries = [
-    { country: "KR", count: 118, minutes: 920 },
-    { country: "US", count: 82, minutes: 640 },
-    { country: "JP", count: 46, minutes: 310 },
-    { country: "CN", count: 39, minutes: 270 },
-    { country: "VN", count: 28, minutes: 180 },
-  ];
-  const requestList = {
-    fixture: runId,
-    source: "agency-e2e-fixture",
-    description: "Synthetic Cloudflare country stats for commission/statistics UI verification",
+  const logs = buildSimulatedCfLogs(manifest);
+  const results = [];
+  const r2Writes = [];
+  const storedAt = new Date().toISOString();
+
+  for (const period of ["daily", "weekly", "monthly"]) {
+    const aggregate = aggregateSimulatedCfLogs(logs, period, manifest.targetDate);
+
+    await d1Query(
+      `INSERT INTO cf_stats (period, date, total_minutes, total_requests, top_countries, request_list)
+       VALUES (?, ?, ?, ?, ?, ?)
+       ON CONFLICT(period, date) DO UPDATE SET
+         total_minutes = excluded.total_minutes,
+         total_requests = excluded.total_requests,
+         top_countries = excluded.top_countries,
+         request_list = excluded.request_list`,
+      [
+        period,
+        manifest.targetDate,
+        aggregate.totalMinutes,
+        logs.length,
+        JSON.stringify(aggregate.topCountries),
+        JSON.stringify(aggregate.requestList),
+      ],
+    );
+
+    r2Writes.push(await putR2JsonObject(`cf-stats/${period}/${manifest.targetDate}.json`, {
+      source: "cfstats-admin",
+      storedAt,
+      period,
+      date: manifest.targetDate,
+      totalMinutes: aggregate.totalMinutes,
+      topCountries: aggregate.topCountries,
+      requestList: aggregate.requestList,
+    }).catch((error) => ({ skipped: true, key: `cf-stats/${period}/${manifest.targetDate}.json`, error: String(error) })));
+
+    for (const creator of manifest.accounts.creators) {
+      const creatorAggregate = aggregateSimulatedCfLogs(
+        logs.filter((log) => log.creator === creator.id),
+        period,
+        manifest.targetDate,
+      );
+      r2Writes.push(await putR2JsonObject(
+        `cf-stats/${period}/${manifest.targetDate}/creators/${encodeURIComponent(creator.id)}.json`,
+        {
+          source: "cfstats-admin",
+          storedAt,
+          period,
+          date: manifest.targetDate,
+          creator: creator.id,
+          totalMinutes: creatorAggregate.totalMinutes,
+          topCountries: creatorAggregate.topCountries,
+          requestList: {},
+        },
+      ).catch((error) => ({
+        skipped: true,
+        key: `cf-stats/${period}/${manifest.targetDate}/creators/${encodeURIComponent(creator.id)}.json`,
+        error: String(error),
+      })));
+    }
+
+    results.push({ period, ...aggregate });
+  }
+
+  return {
+    skipped: false,
+    source: "agency-e2e-fixture-cfstats-admin-schema",
+    logs: logs.length,
+    results,
+    r2Writes,
   };
-
-  await d1Query(
-    `INSERT INTO cf_stats (period, date, total_minutes, total_requests, top_countries, request_list)
-     VALUES ('weekly', ?, ?, ?, ?, ?)
-     ON CONFLICT(period, date) DO UPDATE SET
-       total_minutes = excluded.total_minutes,
-       total_requests = excluded.total_requests,
-       top_countries = excluded.top_countries,
-       request_list = excluded.request_list`,
-    [date, 2320, 313, JSON.stringify(topCountries), JSON.stringify(requestList)],
-  );
-
-  return { skipped: false, topCountries };
 }
 
 async function cleanup(runId) {
@@ -504,9 +784,21 @@ async function cleanup(runId) {
       manifest = JSON.parse(await readFile(manifestPath(runId), "utf8"));
     } catch {}
   }
+  const manifestUserIds = manifest?.accounts
+    ? [
+        manifest.accounts.admin?.id,
+        ...(manifest.accounts.creators || []).map((user) => user.id),
+        ...(manifest.accounts.teams || []).flatMap((team) => (team.members || []).map((user) => user.id)),
+      ].filter(Boolean)
+    : [];
 
   const users = await prisma.user.findMany({
-    where: { username: { startsWith } },
+    where: {
+      OR: [
+        { username: { startsWith } },
+        ...(manifestUserIds.length ? [{ id: { in: manifestUserIds } }] : []),
+      ],
+    },
     select: { id: true },
   });
   const userIds = users.map((u) => u.id);
@@ -670,8 +962,9 @@ async function setup(runId = nowRunId()) {
 
   for (const creator of creators) {
     for (let index = 1; index <= 2; index += 1) {
-      const postId = testId(runId, `${creator.username.split(`${runId}_`)[1]}_post_${index}`);
-      const videoId = testId(runId, `${creator.username.split(`${runId}_`)[1]}_video_${index}`);
+      const creatorSuffix = suffixFromTestId(runId, creator.id);
+      const postId = testId(runId, `${creatorSuffix}_post_${index}`);
+      const videoId = testId(runId, `${creatorSuffix}_video_${index}`);
 
       await prisma.post.create({
         data: {
@@ -693,6 +986,7 @@ async function setup(runId = nowRunId()) {
               isPremium: true,
               filename: `${postId}.mp4`,
               subtitle: ["KOREAN"],
+              createdAt,
             },
           },
         },
@@ -939,7 +1233,7 @@ async function trigger(runId) {
     headers: headers(),
   });
   const cfStats = await cfStatsResponse.json().catch(() => null);
-  const cfStatsSeed = await seedCloudflareStats(manifest.targetDate, runId).catch((error) => ({
+  const cfStatsSeed = await seedCloudflareStats(manifest).catch((error) => ({
     skipped: true,
     error: String(error),
   }));
@@ -964,13 +1258,33 @@ async function trigger(runId) {
 }
 
 async function fetchWorkerSummary(manifest, scope, userId) {
-  const url = new URL("/summary", COMMISSION_WORKER_URL);
-  url.searchParams.set("date", manifest.targetDate);
-  url.searchParams.set("scope", scope);
-  if (userId) url.searchParams.set("userId", userId);
+  const rows = await d1Query(
+    `SELECT
+      user_id,
+      master_id,
+      commission_type,
+      post_id,
+      SUM(COALESCE(point_by_coin, 0)) AS point_by_coin,
+      SUM(COALESCE(point_by_subscription, 0)) AS point_by_subscription,
+      SUM(COALESCE(view_count_coin, 0)) AS view_count_coin,
+      SUM(COALESCE(view_count_subscription, 0)) AS view_count_subscription
+    FROM commission_batch
+    WHERE date = ?
+      AND processed = 1
+      ${userId ? "AND user_id = ?" : ""}
+    GROUP BY user_id, master_id, commission_type, post_id`,
+    userId ? [manifest.targetDate, userId] : [manifest.targetDate],
+  );
 
-  const response = await fetch(url, { headers: headers() });
-  return response.json().catch(() => null);
+  return {
+    source: "cloudflare-d1-commission_batch",
+    targetDate: manifest.targetDate,
+    scope,
+    userId,
+    rows,
+    totalPoints: rows.reduce((sum, row) => sum + Number(row.point_by_coin || 0) + Number(row.point_by_subscription || 0), 0),
+    totalViews: rows.reduce((sum, row) => sum + Number(row.view_count_coin || 0) + Number(row.view_count_subscription || 0), 0),
+  };
 }
 
 async function verify(runId) {
@@ -1025,6 +1339,7 @@ async function verify(runId) {
   let d1 = CF_ACCOUNT_ID && CF_API_TOKEN
     ? {
         groupedViews: await d1Query("SELECT * FROM grouped_views WHERE date = ? ORDER BY id", [manifest.targetDate]),
+        groupedViewDetails: await d1Query("SELECT * FROM grouped_view_details WHERE date = ? ORDER BY post_id, video_id, access_method", [manifest.targetDate]),
         commissionBatch: await d1Query("SELECT * FROM commission_batch WHERE date = ? ORDER BY user_id, commission_type", [manifest.targetDate]),
         cfStats: await d1Query("SELECT * FROM cf_stats WHERE date = ? ORDER BY period", [manifest.targetDate]),
       }
@@ -1044,15 +1359,20 @@ async function verify(runId) {
   }
 
   if (CF_ACCOUNT_ID && CF_API_TOKEN) {
-    await seedCloudflareStats(manifest.targetDate, manifest.runId).catch(() => null);
+    await seedCloudflareStats(manifest).catch(() => null);
     d1 = {
       groupedViews: await d1Query("SELECT * FROM grouped_views WHERE date = ? ORDER BY id", [manifest.targetDate]),
+      groupedViewDetails: await d1Query("SELECT * FROM grouped_view_details WHERE date = ? ORDER BY post_id, video_id, access_method", [manifest.targetDate]),
       commissionBatch: await d1Query("SELECT * FROM commission_batch WHERE date = ? ORDER BY user_id, commission_type", [manifest.targetDate]),
       cfStats: await d1Query("SELECT * FROM cf_stats WHERE date = ? ORDER BY period", [manifest.targetDate]),
     };
   }
 
   const cfStatsRows = Array.isArray(d1.cfStats) ? d1.cfStats : [];
+  const commissionRows = Array.isArray(d1.commissionBatch) ? d1.commissionBatch : [];
+  const agencyCommissionRows = commissionRows.filter((row) => row.commission_type !== "CREATOR");
+  const agencyCommissionRowsMissingPost = agencyCommissionRows.filter((row) => !row.post_id);
+  const processedAgencyCommissionRowsMissingPost = agencyCommissionRowsMissingPost.filter((row) => Number(row.processed) === 1);
   const hasCountryStats = cfStatsRows.some((row) => {
     try {
       return JSON.parse(row.top_countries || "[]").length > 0;
@@ -1075,8 +1395,12 @@ async function verify(runId) {
       postCount: manifest.posts.length,
       viewCount: manifest.views.length,
       usersWithPositivePoints: users.filter((user) => Number(user.points || 0) > 0).length,
-      d1CommissionRows: Array.isArray(d1.commissionBatch) ? d1.commissionBatch.length : 0,
+      d1CommissionRows: commissionRows.length,
+      d1AgencyCommissionRows: agencyCommissionRows.length,
+      d1AgencyCommissionRowsMissingPost: agencyCommissionRowsMissingPost.length,
+      d1ProcessedAgencyCommissionRowsMissingPost: processedAgencyCommissionRowsMissingPost.length,
       d1GroupedViewRows: Array.isArray(d1.groupedViews) ? d1.groupedViews.length : 0,
+      d1GroupedViewDetailRows: Array.isArray(d1.groupedViewDetails) ? d1.groupedViewDetails.length : 0,
       cfStatsRows: cfStatsRows.length,
       hasCountryStats,
       withdrawalRows: withdrawals.length,
@@ -1091,7 +1415,10 @@ async function verify(runId) {
   };
   verification.checks.passed = verification.checks.accountCount === userIds.length
     && verification.checks.d1GroupedViewRows >= manifest.views.length
+    && verification.checks.d1GroupedViewDetailRows >= manifest.views.length
     && verification.checks.d1CommissionRows > 0
+    && verification.checks.d1AgencyCommissionRows > 0
+    && verification.checks.d1ProcessedAgencyCommissionRowsMissingPost === 0
     && verification.checks.usersWithPositivePoints > 0
     && verification.checks.hasCountryStats
     && verification.checks.withdrawalRows > 0;
@@ -1142,6 +1469,18 @@ async function report(runId) {
     view.postId,
     view.accessMethod,
   ]);
+  const viewDetailRows = Array.isArray(verification.d1?.groupedViewDetails)
+    ? verification.d1.groupedViewDetails.map((row) => [
+        row.source_view_id,
+        row.viewer_id,
+        row.video_id,
+        row.access_method,
+        row.view_count,
+        row.post_id,
+        row.master_id || "-",
+        row.referrer_id || "-",
+      ])
+    : [];
   const commissionRows = Array.isArray(verification.d1?.commissionBatch)
     ? verification.d1.commissionBatch.map((row) => [
         row.user_id,
@@ -1176,7 +1515,7 @@ async function report(runId) {
   const agencyLogin = manifest.accounts.teams[0].master.username;
   const creatorUiPath = `${BASE_URL}/ko/usermenu/earnings?tab=statistics&period=${periodKey}`;
   const agencyUiPath = `${BASE_URL}/ko/usermenu/agency-earnings?tab=statistics&period=${periodKey}`;
-  const adminUiPath = `${BASE_URL}/ko/admin/system?period=${periodKey}`;
+  const adminUiPath = `${BASE_URL}/ko/admin/system?tab=stats&period=${periodKey}&unit=weekly`;
 
   const content = `# 에이전시 / 크리에이터 정산 시스템 검증 보고서
 
@@ -1192,33 +1531,38 @@ async function report(runId) {
 - 테스트 포스트: \`${verification.checks.postCount}\`개
 - 테스트 시청 기록: \`${verification.checks.viewCount}\`건
 - D1 그룹 시청 행: \`${verification.checks.d1GroupedViewRows}\`건
+- D1 상세 시청 근거 행: \`${verification.checks.d1GroupedViewDetailRows || 0}\`건
 - D1 커미션 행: \`${verification.checks.d1CommissionRows}\`건
+- D1 영업수수료 행: \`${verification.checks.d1AgencyCommissionRows || 0}\`건
+- D1 지급완료 영업수수료 post_id 누락 행: \`${verification.checks.d1ProcessedAgencyCommissionRowsMissingPost || 0}\`건
 - 커미션 처리 상태: \`${JSON.stringify(verification.checks.commissionStatusCounts)}\` (1=지급완료, 3=조건 미충족 보류)
 - 포인트가 실제 증가한 계정: \`${verification.checks.usersWithPositivePoints}\`개
 - 지급 신청/승인 예시: \`${verification.checks.withdrawalRows}\`건
-- Cloudflare 국가별 지도 데이터: \`${verification.checks.hasCountryStats ? "있음" : "없음"}\`
+- Cloudflare 국가별 지도 데이터: \`${verification.checks.hasCountryStats ? "운영 cfstats-admin D1 스키마로 생성됨" : "없음"}\`
 
-${verification.checks.passed ? "이번 run은 계정 생성, 시청 기록 생성, 워커 연계, D1 저장, 포인트 지급, 지급 신청 내역, Cloudflare 지도 통계까지 모두 확인된 상태입니다." : "이번 run은 일부 검증 항목이 통과하지 못했습니다. 위 숫자와 아래 상세 표를 먼저 확인해야 합니다."}
+${verification.checks.passed ? "이번 run은 계정 생성, 시청 기록 생성, 워커 연계, D1 저장, 포인트 지급, 지급 신청 내역, 운영 cfstats-admin과 같은 D1 국가 통계 스키마까지 확인된 상태입니다." : "이번 run은 일부 검증 항목이 통과하지 못했습니다. 위 숫자와 아래 상세 표를 먼저 확인해야 합니다."}
 
 ## 2. 이번 테스트가 확인한 것
 - 크리에이터 등급별 차등 지급률이 적용됩니다. 역할 20은 10%, 역할 22는 20%, 역할 24는 30% 기준으로 테스트했습니다.
 - 영업팀은 \`HEADQUARTERS\`, \`NETWORK\`, \`BINARY_NETWORK\` 세 종류를 모두 만들었습니다.
 - 테스트 사용자가 유료 포스트를 코인 또는 구독 방식으로 시청한 것처럼 \`video_views\`에 기록을 만들었습니다.
-- 뷰 그룹화 워커가 이 원본 시청 기록을 읽어 D1의 \`grouped_views\`로 묶었습니다.
+- 뷰 그룹화 워커가 이 원본 시청 기록을 읽어 D1의 \`grouped_views\`로 묶고, \`grouped_view_details\`에 viewer/video/accessMethod 단위 근거도 저장했습니다.
 - 커미션 워커가 \`grouped_views\`를 읽어 D1의 \`commission_batch\`를 만들고, 지급 가능한 행은 실제 사용자 포인트에 반영했습니다.
 - 지급 자격 확인용으로 이메일 인증, 은행 정보, 신분 확인 완료 상태를 넣었고, 일부 계정에는 지급 신청/승인 기록도 생성했습니다.
-- Cloudflare 통계용 D1 행을 만들어 글로벌 접속자 지도에 쓸 국가별 데이터를 확인했습니다.
+- Cloudflare 통계용 D1 행은 운영 \`cfstats-admin\`과 같은 \`top_countries=[{country,minutes}]\`, 기간별 \`request_list\` 형식으로 생성해 지도 읽기/표현을 확인했습니다.
 
 ## 3. 아주 쉽게 보는 전체 흐름
 1. 사용자가 영상을 봅니다. 플랫폼에는 원본 시청 기록이 Postgres의 \`video_views\`에 남습니다. 이 기록에는 누가 봤는지, 어떤 포스트인지, 크리에이터가 누구인지, 코인 시청인지 구독 시청인지, 추천인과 영업팀 마스터가 누구인지가 들어갑니다.
 2. \`viewgroup\` 워커가 정산일의 \`video_views\`를 읽습니다. 같은 날짜, 같은 크리에이터, 같은 포스트, 같은 영업팀, 같은 추천인 기준으로 시청을 묶어서 Cloudflare D1의 \`grouped_views\`에 저장합니다. 원본을 매번 전부 다시 계산하지 않기 위한 중간 요약표입니다.
-3. \`viewgroup\` 워커는 한 번에 처리할 수 있는 양보다 데이터가 많으면 \`continue\` 상태를 반환하고 큐에 다음 작업을 넣습니다. 그래서 큰 데이터도 여러 번 나누어 처리됩니다.
-4. \`commission\` 워커가 D1의 \`grouped_views\`를 읽습니다. 크리에이터 등급, 코인/구독 시청 수, 영업팀 설정, 추천인 구조를 함께 보고 누가 얼마를 받을지 계산합니다.
-5. 계산 결과는 바로 사용자 포인트에 쓰기 전에 D1의 \`commission_batch\`에 먼저 저장됩니다. 이 표가 “왜 이 사람이 이 포인트를 받았는지”를 추적하는 근거 자료입니다.
-6. \`commission\` 워커는 지급 가능한 행을 Postgres 사용자 포인트에 반영합니다. 지급 완료 행은 \`processed=1\`이 되고, 조건을 아직 만족하지 못한 바이너리/네트워크성 보류 행은 \`processed=3\`으로 남습니다.
-7. 커미션 워커는 지급 완료 자료를 바탕으로 주간 요약 통계도 만듭니다. 이 요약은 관리자 통계, 크리에이터 수익, 영업팀 수익 화면에서 조회할 수 있습니다.
-8. \`cfstats-admin\` 워커는 Cloudflare 접속 통계 또는 테스트용 D1 통계 행을 읽어 국가별 접속자 지도, 총 요청 수, 총 시청 시간 같은 화면용 통계를 제공합니다.
-9. 사용자가 포인트 지급을 신청하면 Postgres의 \`point_withdrawals\`에 신청 내역이 저장됩니다. 이메일 인증, 은행 정보, 신분 확인이 되어 있어야 신청이 가능하고, 운영자가 승인하면 승인 상태와 처리자가 기록됩니다.
+3. 같은 실행에서 \`grouped_view_details\`에도 원본 시청 ID, 시청자, 비디오, 시청 방식, 포스트, 추천인, 영업팀 마스터를 남깁니다. 관리자 상세 리포트의 비디오 단위 근거는 이 표를 사용합니다.
+4. \`viewgroup\` 워커는 한 번에 처리할 수 있는 양보다 데이터가 많으면 \`continue\` 상태를 반환하고 큐에 다음 작업을 넣습니다. 그래서 큰 데이터도 여러 번 나누어 처리됩니다.
+5. \`commission\` 워커가 D1의 \`grouped_views\`를 읽습니다. 크리에이터 등급, 코인/구독 시청 수, 영업팀 설정, 추천인 구조를 함께 보고 누가 얼마를 받을지 계산합니다.
+6. 계산 결과는 바로 사용자 포인트에 쓰기 전에 D1의 \`commission_batch\`에 먼저 저장됩니다. 이 표가 “왜 이 사람이 이 포인트를 받았는지”를 추적하는 근거 자료입니다.
+7. \`commission\` 워커는 지급 가능한 행을 Postgres 사용자 포인트에 반영합니다. 지급 완료 행은 \`processed=1\`이 되고, 조건을 아직 만족하지 못한 바이너리/네트워크성 보류 행은 \`processed=3\`으로 남습니다.
+8. 영업수수료 원장도 \`post_id\`를 보존해야 합니다. 지급완료 영업수수료의 \`post_id\`가 비어 있으면 최신 \`commission\` 워커가 배포되지 않았거나 원장이 재생성되지 않은 상태입니다.
+8. 커미션 워커는 지급 완료 자료를 바탕으로 주간 요약 통계도 만듭니다. 이 요약은 관리자 통계, 크리에이터 수익, 영업팀 수익 화면에서 조회할 수 있습니다.
+9. \`cfstats-admin\` 워커는 Cloudflare Stream 집계 결과를 \`cf_stats\`와 R2에 저장합니다. 이 fixture의 국가 통계는 실제 미래 Cloudflare API 응답이 아니라, 운영 워커가 저장하는 것과 같은 JSON 구조로 만든 검증용 집계값입니다.
+10. 사용자가 포인트 지급을 신청하면 Postgres의 \`point_withdrawals\`에 신청 내역이 저장됩니다. 이메일 인증, 은행 정보, 신분 확인이 되어 있어야 신청이 가능하고, 운영자가 승인하면 승인 상태와 처리자가 기록됩니다.
 
 ## 4. 실제 로그인 확인 방법
 검증 데이터는 기존 데이터와 충돌하지 않도록 고유 미래 주차 \`${periodKey}\`에 만들었습니다. 화면에서 바로 확인하려면 아래 계정으로 로그인한 뒤 링크의 \`period=${periodKey}\`가 유지되어야 합니다.
@@ -1254,29 +1598,34 @@ ${markdownTable(["영업팀", "타입", "마스터 로그인", "소속 구성원
 
 ${markdownTable(["영업팀 타입", "시청자", "추천인", "크리에이터", "포스트", "시청 방식"], viewRows)}
 
-## 9. 커미션 계산 결과
+## 9. D1 상세 시청 근거
+\`grouped_view_details\`에 저장된 viewer/video/accessMethod 단위 근거입니다. 관리자 통계의 \`Paid View Basis Detail\`이 이 내용을 기간별로 읽습니다.
+
+${viewDetailRows.length ? markdownTable(["원본 시청 ID", "시청자", "비디오", "방식", "수량", "포스트", "마스터", "추천인"], viewDetailRows) : "D1 상세 시청 근거 행을 조회하지 못했습니다."}
+
+## 10. 커미션 계산 결과
 \`processed=1\`은 포인트 지급 완료, \`processed=3\`은 현재 조건 미충족으로 보류된 커미션입니다.
 
 ${commissionRows.length ? markdownTable(["지급 대상", "마스터", "커미션 종류", "코인 포인트", "구독 포인트", "처리상태", "포스트"], commissionRows) : "D1 커미션 행을 조회하지 못했습니다. Cloudflare D1 자격 정보 또는 워커 실행 상태를 확인해야 합니다."}
 
-## 10. 포인트 지급 신청/승인 결과
+## 11. 포인트 지급 신청/승인 결과
 일부 포인트 보유 계정에 대해 지급 신청과 승인 예시를 만들었습니다.
 
 ${withdrawalRows.length ? markdownTable(["사용자", "신청 포인트", "상태", "실지급액", "처리자", "신청일", "처리일"], withdrawalRows) : "포인트가 지급된 계정이 없어 지급 신청 행을 만들지 못했습니다."}
 
-## 11. Cloudflare 국가별 통계 스냅샷
+## 12. Cloudflare 국가별 통계 스냅샷
 글로벌 접속자 지도에 사용할 국가별 데이터입니다.
 
 ${cfRows.length ? markdownTable(["기간", "날짜", "총 분", "국가별 JSON"], cfRows) : "Cloudflare 통계 행을 조회하지 못했습니다."}
 
-## 12. 재현 명령
+## 13. 재현 명령
 \`\`\`bash
 node scripts/agency-e2e-fixture.mjs full ${runId}
 node scripts/agency-e2e-fixture.mjs verify ${runId}
 node scripts/agency-e2e-fixture.mjs report ${runId}
 \`\`\`
 
-## 13. 정리 명령
+## 14. 정리 명령
 정리 명령은 Postgres의 테스트 계정/포스트/시청/지급 신청을 \`runId\` 기준으로 삭제합니다. D1도 \`runId\`가 들어간 그룹뷰/커미션 행만 삭제하고, Cloudflare 통계 행은 이 스크립트가 만든 미래 검증 날짜일 때만 삭제합니다.
 
 \`\`\`bash

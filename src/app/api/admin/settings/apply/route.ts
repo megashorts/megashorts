@@ -10,7 +10,8 @@ const SYSTEM_ENV_KEYS = [
   'eventCoin1Amount',    // EVENT_COIN1
   'eventCoin2Amount',    // EVENT_COIN2
   'minWithdrawPoint',    // MIN_WITHDRAW
-  'referralCoinAmount'   // REFERRAL_COIN
+  'referralCoinAmount',  // REFERRAL_COIN
+  'analyticsTimeZone',   // ANALYTICS TIME ZONE
 ];
 
 // 환경변수 키 매핑 (시스템 설정 키 -> 환경변수 이름)
@@ -20,7 +21,8 @@ const ENV_KEY_MAP: Record<string, string> = {
   'eventCoin1Amount': 'SYSTEM_EVENTCOIN1AMOUNT',
   'eventCoin2Amount': 'SYSTEM_EVENTCOIN2AMOUNT',
   'minWithdrawPoint': 'SYSTEM_MINWITHDRAWPOINT',
-  'referralCoinAmount': 'SYSTEM_REFERRALCOINAMOUNT'
+  'referralCoinAmount': 'SYSTEM_REFERRALCOINAMOUNT',
+  'analyticsTimeZone': 'SYSTEM_ANALYTICSTIMEZONE',
 };
 
 export async function POST() {

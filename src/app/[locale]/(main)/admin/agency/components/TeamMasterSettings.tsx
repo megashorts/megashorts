@@ -69,7 +69,7 @@ export default function TeamMasterSettings() {
       const response = await fetch('/api/admin/team-master-list');
       
       if (!response.ok) {
-        throw new Error(`API 호출 실패: ${response.status} ${response.statusText}`);
+        throw new Error(`API call failed: ${response.status} ${response.statusText}`);
       }
       
       const data = await response.json();
@@ -78,9 +78,9 @@ export default function TeamMasterSettings() {
         setTeamMasters(data.teamMasters);
       }
     } catch (error) {
-      console.error("팀마스터 목록을 불러오는 중 오류가 발생했습니다:", error);
+      console.error("Error loading team master list:", error);
       toast({
-        description: "팀마스터 목록을 불러오는 중 오류가 발생했습니다.",
+        description: "An error occurred while loading team master list.",
         variant: "destructive",
         duration: 1500,
       });
@@ -96,7 +96,7 @@ export default function TeamMasterSettings() {
       const response = await fetch(`/api/agency/settings?userId=${userId}`);
       
       if (!response.ok) {
-        throw new Error(`API 호출 실패: ${response.status} ${response.statusText}`);
+        throw new Error(`API call failed: ${response.status} ${response.statusText}`);
       }
       
       const data = await response.json();
@@ -119,9 +119,9 @@ export default function TeamMasterSettings() {
         setUseMemberLimit(false);
       }
     } catch (error) {
-      console.error("사용자 설정을 불러오는 중 오류가 발생했습니다:", error);
+      console.error("Error loading user settings:", error);
       toast({
-        description: "사용자 설정을 불러오는 중 오류가 발생했습니다.",
+        description: "An error occurred while loading user settings.",
         variant: "destructive",
         duration: 1500,
       });
@@ -147,7 +147,7 @@ export default function TeamMasterSettings() {
   const saveSettings = async () => {
     if (!selectedUser) {
       toast({
-        description: "사용자를 선택해주세요.",
+        description: "Please select a user.",
         variant: "destructive",
         duration: 1500,
       });
@@ -172,7 +172,7 @@ export default function TeamMasterSettings() {
       });
       
       if (!roleUpdateResponse.ok) {
-        throw new Error(`사용자 역할 업데이트 실패: ${roleUpdateResponse.status} ${roleUpdateResponse.statusText}`);
+        throw new Error(`Failed to update user role: ${roleUpdateResponse.status} ${roleUpdateResponse.statusText}`);
       }
       
       // 마스터 타입 설정
@@ -187,8 +187,8 @@ export default function TeamMasterSettings() {
       if (actualMasterType === "HEADQUARTERS") {
         levels = [
           { name: selectedUser.displayName, level: 1, commissionRate: 90 },
-          { name: "대리점", level: 2, commissionRate: 7 },
-          { name: "멤버", level: 3, commissionRate: 3 }
+          { name: "Agency", level: 2, commissionRate: 7 },
+          { name: "Member", level: 3, commissionRate: 3 }
         ];
         
         // 하위 레벨 수수료 합계 계산
@@ -199,8 +199,8 @@ export default function TeamMasterSettings() {
       } else if (actualMasterType === "NETWORK") {
         levels = [
           { name: selectedUser.displayName, level: 1, commissionRate: 90 },
-          { name: "2단계", level: 2, commissionRate: 7 },
-          { name: "3단계", level: 3, commissionRate: 3 }
+          { name: "Level 2", level: 2, commissionRate: 7 },
+          { name: "Level 3", level: 3, commissionRate: 3 }
         ];
         
         // 하위 레벨 수수료 합계 계산
@@ -211,8 +211,8 @@ export default function TeamMasterSettings() {
       } else if (actualMasterType === "BINARY_NETWORK") {
         levels = [
           { name: selectedUser.displayName, level: 1, commissionRate: 90 },
-          { name: "2단계", level: 2, commissionRate: 7 },
-          { name: "3단계", level: 3, commissionRate: 3 }
+          { name: "Level 2", level: 2, commissionRate: 7 },
+          { name: "Level 3", level: 3, commissionRate: 3 }
         ];
         
         // 하위 레벨 수수료 합계 계산
@@ -283,14 +283,14 @@ export default function TeamMasterSettings() {
       });
       
       if (!response.ok) {
-        throw new Error(`API 호출 실패: ${response.status} ${response.statusText}`);
+        throw new Error(`API call failed: ${response.status} ${response.statusText}`);
       }
       
       const data = await response.json();
       
       if (data.success) {
         toast({
-          description: "팀마스터 설정이 저장되었습니다.",
+          description: "Team Master settings saved successfully.",
           variant: "default",
           duration: 1500,
         });
@@ -298,7 +298,7 @@ export default function TeamMasterSettings() {
         // 목록 다시 불러오기
         loadTeamMasters();
       } else {
-        throw new Error(data.error || "설정 저장에 실패했습니다.");
+        throw new Error(data.error || "Failed to save settings.");
       }
 
 
@@ -306,19 +306,19 @@ export default function TeamMasterSettings() {
         await syncReferralStructure(userId, "add", userId);
 
       } catch (error) {
-        console.error('팀마스터 추가 워커 호출 오류:', error);
+        console.error('Error invoking team master addition worker:', error);
         
         return {
-          error: "팀마스터 추가 워커 호출에 실패했습니다. ",
+          error: "Failed to invoke team master addition worker.",
         };
       }
 
 
 
     } catch (error) {
-      console.error("설정 저장 중 오류가 발생했습니다:", error);
+      console.error("Error saving settings:", error);
       toast({
-        description: "설정 저장 중 오류가 발생했습니다.",
+        description: "An error occurred while saving settings.",
         variant: "destructive",
         duration: 1500,
       });
@@ -343,14 +343,14 @@ export default function TeamMasterSettings() {
       });
       
       if (!response.ok) {
-        throw new Error(`API 호출 실패: ${response.status} ${response.statusText}`);
+        throw new Error(`API call failed: ${response.status} ${response.statusText}`);
       }
       
       const data = await response.json();
       
       if (data.success) {
         toast({
-          description: "팀마스터 설정이 해제되었습니다.",
+          description: "Team Master settings removed successfully.",
           variant: "default",
           duration: 1500,
         });
@@ -358,12 +358,12 @@ export default function TeamMasterSettings() {
         // 목록 다시 불러오기
         loadTeamMasters();
       } else {
-        throw new Error(data.error || "설정 해제에 실패했습니다.");
+        throw new Error(data.error || "Failed to remove settings.");
       }
     } catch (error) {
-      console.error("팀마스터 설정 해제 중 오류가 발생했습니다:", error);
+      console.error("Error removing Team Master settings:", error);
       toast({
-        description: "팀마스터 설정 해제 중 오류가 발생했습니다.",
+        description: "An error occurred while removing Team Master settings.",
         variant: "destructive",
         duration: 1500,
       });
@@ -377,19 +377,19 @@ export default function TeamMasterSettings() {
   // 마스터 타입 이름 가져오기
   const getMasterTypeName = (type: string) => {
     switch (type) {
-      case "HEADQUARTERS": return "본부구조";
-      case "NETWORK": return "네트워크";
-      case "BINARY_NETWORK": return "네트워크 바이너리";
-      default: return "알 수 없음";
+      case "HEADQUARTERS": return "HQ Structure";
+      case "NETWORK": return "Network";
+      case "BINARY_NETWORK": return "Network Binary";
+      default: return "Unknown";
     }
   };
   
   return (
     <Card>
       <CardHeader>
-        <CardTitle>영업본부 마스터 설정</CardTitle>
+        <CardTitle>Sales Team Master Settings</CardTitle>
         <CardDescription>
-          본부별 마스터 권한 부여 및 설정 관리.
+          Manage and assign master authority by HQ.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -401,7 +401,7 @@ export default function TeamMasterSettings() {
             <UserSearchInput
               onSelect={handleUserSelect}
               selectedUser={selectedUser}
-              placeholder="유저네임 또는 이메일"
+              placeholder="Username or Email"
               disabled={loading}
               className="w-full"
             />
@@ -411,7 +411,7 @@ export default function TeamMasterSettings() {
           {selectedUser && (
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="masterType">본부 타입</Label>
+                <Label htmlFor="masterType">HQ Type</Label>
                 <Select
                   value={masterType}
                   onValueChange={(value) => {
@@ -425,18 +425,18 @@ export default function TeamMasterSettings() {
                   disabled={loading}
                 >
                   <SelectTrigger id="masterType">
-                    <SelectValue placeholder="본부 타입 선택" />
+                    <SelectValue placeholder="Select HQ Type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="HEADQUARTERS">본부구조</SelectItem>
-                    <SelectItem value="NETWORK">네트워크</SelectItem>
-                    <SelectItem value="BINARY_NETWORK">네트워크 바이너리</SelectItem>
+                    <SelectItem value="HEADQUARTERS">HQ Structure</SelectItem>
+                    <SelectItem value="NETWORK">Network</SelectItem>
+                    <SelectItem value="BINARY_NETWORK">Network Binary</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="commissionRate">기본 수수료 비율 (%)</Label>
+                <Label htmlFor="commissionRate">Default Commission Rate (%)</Label>
                 <Input
                   id="commissionRate"
                   type="number"
@@ -456,7 +456,7 @@ export default function TeamMasterSettings() {
                     disabled={loading || masterType === "BINARY_NETWORK"}
                   />
                   <Label htmlFor="useMemberLimit">
-                    바이너리 하위회원 수 제한 충족시만 포인트지급
+                    Distribute points only when binary sub-member limit is met
                   </Label>
                 </div>
               )}
@@ -514,7 +514,7 @@ export default function TeamMasterSettings() {
                   onClick={saveSettings}
                   disabled={loading || !selectedUser}
                 >
-                  {loading ? "저장 중..." : "설정 저장"}
+                  {loading ? "Saving..." : "Save Settings"}
                 </Button>
               </div>
 
@@ -579,23 +579,23 @@ export default function TeamMasterSettings() {
                         </DialogTrigger>
                       <DialogContent>
                         <DialogHeader>
-                          <DialogTitle>팀마스터 설정 해제</DialogTitle>
+                          <DialogTitle>Remove Team Master Settings</DialogTitle>
                           <DialogDescription>
-                            {master.displayName}님의 팀마스터 설정을 해제하시겠습니까?
+                            Are you sure you want to remove Team Master settings for {master.displayName}?
                             <br />
-                            설정을 해제하면 관련 데이터가 모두 삭제됩니다.
+                            Removing the settings will delete all related data.
                           </DialogDescription>
                         </DialogHeader>
                         <DialogFooter>
                           <Button variant="outline" onClick={() => setRemoveUserId(null)}>
-                            취소
+                            Cancel
                           </Button>
                           <Button 
                             variant="destructive" 
                             onClick={handleRemoveTeamMaster}
                             disabled={loading}
                           >
-                            {loading ? "처리 중..." : "설정 해제"}
+                            {loading ? "Processing..." : "Remove"}
                           </Button>
                         </DialogFooter>
                       </DialogContent>
@@ -608,7 +608,7 @@ export default function TeamMasterSettings() {
           ) : (
             <div className="text-center p-8 border rounded-md">
               <AlertCircle className="h-8 w-8 mx-auto text-muted-foreground" />
-              <p className="mt-2 text-muted-foreground">등록된 팀마스터가 없습니다.</p>
+              <p className="mt-2 text-muted-foreground">No registered team masters.</p>
             </div>
           )}
         </div>

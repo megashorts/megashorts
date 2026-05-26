@@ -3,10 +3,13 @@ import { Loader2 } from "lucide-react";
 import { usePost } from "@/hooks/usePosts";
 import { PostEditor } from "./PostEditor";
 import { PostData } from "@/lib/types";
+import { useTranslations } from "next-intl";
 
 export default function EditPostForm() {
   const params = useParams();
   const router = useRouter();
+  const tEditor = useTranslations('PostEditor');
+  const tCommon = useTranslations('Common');
   const { data: post, isLoading, error } = usePost(params.postId as string);
 
   if (isLoading) {
@@ -20,7 +23,7 @@ export default function EditPostForm() {
   if (error) {
     return (
       <div className="p-4 text-red-500">
-        오류가 발생했습니다: {error.message}
+        {tCommon('error')}: {error.message}
       </div>
     );
   }
@@ -30,7 +33,7 @@ export default function EditPostForm() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-8">포스트 수정</h1>
+      <h1 className="text-2xl font-bold mb-8">{tEditor('editPost')}</h1>
       <PostEditor initialData={editorInitialData} />
     </div>
   );

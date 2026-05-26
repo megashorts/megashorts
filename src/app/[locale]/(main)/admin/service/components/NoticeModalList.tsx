@@ -1,20 +1,8 @@
-import { useState } from 'react';
 import { NoticeModal } from './types';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
-import { Language } from '@prisma/client';
-
-const FLAGS: Record<Language, string> = {
-  KOREAN: '🇰🇷',
-  ENGLISH: '🇺🇸',
-  CHINESE: '🇨🇳',
-  JAPANESE: '🇯🇵',
-  THAI: '🇹🇭',
-  SPANISH: '🇪🇸',
-  INDONESIAN: '🇮🇩',
-  VIETNAMESE: '🇻🇳',
-};
+import LanguageFlag from '@/components/LanguageFlag';
 
 interface NoticeModalListProps {
   modals: NoticeModal[];
@@ -42,13 +30,14 @@ export function NoticeModalList({ modals, onUpdate, onDelete, onEdit }: NoticeMo
               </button>
             </div>
             <div className="mt-1 text-xs text-muted-foreground">
-              우선순위: {modal.priority}
+              Priority: {modal.priority}
               <span className="ml-2">
                 {Object.entries(typeof modal.i18nData === 'string' 
                   ? JSON.parse(modal.i18nData) 
                   : modal.i18nData)
-                  .map(([locale]) => FLAGS[locale.toUpperCase() as Language])
-                  .join(' ')}
+                  .map(([locale]) => (
+                    <LanguageFlag key={locale} language={locale} className="mx-0.5 h-4 w-4" />
+                  ))}
               </span>
             </div>
           </div>

@@ -10,9 +10,11 @@ import { PostsPage } from "@/lib/types";
 import { videoDB } from "@/lib/indexedDB";
 import InfiniteScrollContainer from "@/components/InfiniteScrollContainer";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export default function WatchingContent() {
   const { user } = useSession();
+  const tUserMenu = useTranslations('UserMenu');
 
   const {
     data,
@@ -59,7 +61,7 @@ export default function WatchingContent() {
           />
         </div>
         <p className="text-lg text-muted-foreground text-center font-medium">
-          로그인이 필요한 메뉴입니다
+          {tUserMenu('loginRequiredMenu')}
         </p>
       </div>
     );
@@ -72,7 +74,7 @@ export default function WatchingContent() {
   if (status === "success" && !posts.length) {
     return (
       <p className="text-center text-muted-foreground mt-8">
-        시청 중인 컨텐츠가 없습니다.
+        {tUserMenu('emptyWatching')}
       </p>
     );
   }
@@ -80,7 +82,7 @@ export default function WatchingContent() {
   if (status === "error") {
     return (
       <p className="text-center text-destructive mt-8">
-        컨텐츠를 불러오는 중 오류가 발생했습니다.
+        {tUserMenu('loadError')}
       </p>
     );
   }
@@ -104,7 +106,7 @@ export default function WatchingContent() {
       
       {!hasNextPage && posts.length > 0 && (
         <p className="text-center text-muted-foreground py-4">
-          모든 컨텐츠를 로딩했습니다.
+          {tUserMenu('allLoaded')}
         </p>
       )}
     </InfiniteScrollContainer>

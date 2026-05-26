@@ -33,7 +33,7 @@ export default function NetworkLevelSettings({
     
     // 새 레벨 생성
     const newLevel = {
-      name: `${levels.length}단계`,
+      name: `Level ${levels.length}`,
       level: levels.length,
       commissionRate: 1
     };
@@ -81,7 +81,7 @@ export default function NetworkLevelSettings({
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h3 className="text-sm font-medium">네트워크 단계 및 수수료 설정</h3>
+        <h3 className="text-sm font-medium">Network Level & Commission Settings</h3>
         <Button
           variant="ghost"
           size="sm"

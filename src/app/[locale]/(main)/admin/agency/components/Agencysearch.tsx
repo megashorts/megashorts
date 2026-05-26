@@ -1,245 +1,213 @@
-// src/app/(main)/admin/agency/components/Agencysearch.tsx
-
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSession } from "@/components/SessionProvider";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
+import { USER_ROLE } from "@/lib/constants";
+import { getCurrentStatsPeriod, getRecentStatsPeriods, inferStatsPeriodUnit } from "@/lib/stats-period";
 import { useSearchParams } from "next/navigation";
-
-import ReferralStructureView from "./search/ReferralStructureView";
-import PointDistributionView from "./search/PointDistributionView";
 import StatisticsView from "./search/StatisticsView";
+
+const periodUnits = ["weekly", "monthly"] as const;
+type AgencyStatsPeriodUnit = (typeof periodUnits)[number];
+
+const unitLabels: Record<AgencyStatsPeriodUnit, string> = {
+  weekly: "Week",
+  monthly: "Month",
+};
+
+interface TeamMasterOption {
+  id: string;
+  username: string;
+  displayName?: string | null;
+  email?: string | null;
+}
 
 export default function Agencysearch() {
   const { user } = useSession();
-  const currentUser = user?.displayName ? { displayName: user.displayName, id: user.id } : undefined;
   const { toast } = useToast();
   const searchParams = useSearchParams();
-  
+  const currentUser = user?.id ? { id: user.id, displayName: user.displayName } : undefined;
+  const canSelectTeamMaster = Boolean(user?.userRole && user.userRole >= USER_ROLE.OPERATION1);
+  const initialPeriod = searchParams.get("period") || getCurrentStatsPeriod("weekly");
+  const inferredInitialUnit = inferStatsPeriodUnit(initialPeriod);
+  const initialUnit: AgencyStatsPeriodUnit = inferredInitialUnit === "monthly" ? "monthly" : "weekly";
+  const normalizedInitialPeriod = inferredInitialUnit === "daily" ? getCurrentStatsPeriod("weekly") : initialPeriod;
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState(searchParams.get("searchTab") || "structure");
-  
-  // 추천인 구조 데이터
-  const [structureData, setStructureData] = useState<any>(null);
-  
-  // 포인트 분배 내역 데이터
-  const [distributionData, setDistributionData] = useState<any[]>([]);
-  const [year, setYear] = useState<string>(new Date().getFullYear().toString());
-  const [week, setWeek] = useState<string>("");
-  
-  // 통계 데이터
+  const [periodUnit, setPeriodUnit] = useState<AgencyStatsPeriodUnit>(initialUnit);
+  const [period, setPeriod] = useState(normalizedInitialPeriod === "current" ? getCurrentStatsPeriod(initialUnit) : normalizedInitialPeriod);
+  const [distributionData, setDistributionData] = useState<any>(null);
   const [statisticsData, setStatisticsData] = useState<any>(null);
-  
-  // 추천인 구조 데이터 로드
-  const loadStructureData = async () => {
-    if (loading || structureData) return;
-    
+  const [teamMasters, setTeamMasters] = useState<TeamMasterOption[]>([]);
+  const [targetUserId, setTargetUserId] = useState(searchParams.get("userId") || currentUser?.id || "");
+
+  const periodOptions = useMemo(() => {
+    const options = getRecentStatsPeriods(periodUnit, 12, "en");
+    return options.some((option) => option.value === period)
+      ? options
+      : [{ value: period, key: period, label: period }, ...options];
+  }, [periodUnit, period]);
+
+  const loadJson = async (url: string) => {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) throw new Error(`API call failed: ${response.status} ${response.statusText}`);
+    const data = await response.json();
+    if (!data.success) throw new Error(data.error || "Failed to load data.");
+    return data.data;
+  };
+
+  const loadStatisticsData = async (targetPeriod = period) => {
+    if (!targetUserId) return;
+    setLoading(true);
     try {
-      setLoading(true);
-      const response = await fetch(`/api/agency/structure?userId=${currentUser?.id}`);
-      
-      if (!response.ok) {
-        throw new Error(`API 호출 실패: ${response.status} ${response.statusText}`);
-      }
-      
-      const data = await response.json();
-      
-      if (data.success && data.data) {
-        setStructureData(data.data);
-      } else {
-        throw new Error(data.error || "데이터를 불러오는데 실패했습니다.");
-      }
+      const [cumulative, distribution] = await Promise.all([
+        loadJson(`/api/agency/statistics?userId=${targetUserId}&period=all`),
+        loadJson(`/api/agency/distributions?userId=${targetUserId}&period=${targetPeriod}`),
+      ]);
+      setStatisticsData(cumulative);
+      setDistributionData(distribution);
     } catch (error) {
-      console.error("추천인 구조 데이터를 불러오는 중 오류가 발생했습니다:", error);
-      toast({
-        description: "추천인 구조 데이터를 불러오는 중 오류가 발생했습니다.",
-        variant: "destructive",
-        duration: 1500,
-      });
+      toast({ description: String(error), variant: "destructive", duration: 1800 });
     } finally {
       setLoading(false);
     }
   };
-  
-  // 포인트 분배 내역 데이터 로드
-  const loadDistributionData = async () => {
-    if (loading) return;
-    
-    try {
-      setLoading(true);
-      let url = `/api/agency/distributions?userId=${currentUser?.id}`;
-      
-      if (year && week) {
-        url += `&year=${year}&week=${week}`;
-      }
-      
-      const response = await fetch(url);
-      
-      if (!response.ok) {
-        throw new Error(`API 호출 실패: ${response.status} ${response.statusText}`);
-      }
-      
-      const data = await response.json();
-      
-      if (data.success && data.data) {
-        setDistributionData(data.data);
-      } else {
-        throw new Error(data.error || "데이터를 불러오는데 실패했습니다.");
-      }
-    } catch (error) {
-      console.error("포인트 분배 내역을 불러오는 중 오류가 발생했습니다:", error);
-      toast({
-        description: "포인트 분배 내역을 불러오는 중 오류가 발생했습니다.",
-        variant: "destructive",
-        duration: 1500,
-      });
-    } finally {
-      setLoading(false);
-    }
+
+  const handleUnitChange = (unit: AgencyStatsPeriodUnit) => {
+    const nextPeriod = getCurrentStatsPeriod(unit);
+    setPeriodUnit(unit);
+    setPeriod(nextPeriod);
+    setDistributionData(null);
+    setStatisticsData(null);
   };
-  
-  // 통계 데이터 로드
-  const loadStatisticsData = async () => {
-    if (loading || statisticsData) return;
-    
-    try {
-      setLoading(true);
-      const response = await fetch(`/api/agency/statistics?userId=${currentUser?.id}`);
 
-      if (!response.ok) {
-        throw new Error(`API 호출 실패: ${response.status} ${response.statusText}`);
-      }
-
-      const data = await response.json();
-
-      if (data.success && data.data) {
-        setStatisticsData(data.data);
-      } else {
-        throw new Error(data.error || "데이터를 불러오는데 실패했습니다.");
-      }
-    } catch (error) {
-      console.error("통계 데이터를 불러오는 중 오류가 발생했습니다:", error);
-      toast({
-        description: "통계 데이터를 불러오는 중 오류가 발생했습니다.",
-        variant: "destructive",
-        duration: 1500,
-      });
-    } finally {
-      setLoading(false);
-    }
+  const handleLookup = () => {
+    loadStatisticsData();
   };
-  
-  // 탭 변경 시 데이터 로드
+
+  const handleTargetChange = (userId: string) => {
+    setTargetUserId(userId);
+    setDistributionData(null);
+    setStatisticsData(null);
+  };
+
   useEffect(() => {
-    if (currentUser?.id) {
-      if (activeTab === "structure" && !structureData && !loading) {
-        loadStructureData();
-      } else if (activeTab === "distribution" && !loading) {
-        loadDistributionData();
-      } else if (activeTab === "statistics" && !statisticsData && !loading) {
-        loadStatisticsData();
-      }
-    }
+    if (!currentUser?.id) return;
+    if (!targetUserId) setTargetUserId(currentUser.id);
+  }, [currentUser?.id, targetUserId]);
+
+  useEffect(() => {
+    if (!canSelectTeamMaster) return;
+
+    let ignore = false;
+    fetch("/api/admin/team-master-list", { cache: "no-store" })
+      .then((response) => response.json())
+      .then((data) => {
+        if (ignore || !data.success || !Array.isArray(data.teamMasters)) return;
+        setTeamMasters(data.teamMasters);
+        if ((!targetUserId || targetUserId === currentUser?.id) && data.teamMasters[0]?.id) {
+          handleTargetChange(data.teamMasters[0].id);
+        }
+      })
+      .catch((error) => {
+        if (!ignore) toast({ description: String(error), variant: "destructive", duration: 1800 });
+      });
+
+    return () => {
+      ignore = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab, currentUser?.id]);
-  
+  }, [canSelectTeamMaster, currentUser?.id]);
+
+  useEffect(() => {
+    if (!targetUserId) return;
+    if (!statisticsData) loadStatisticsData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [targetUserId]);
+
+  const lookupControls = (
+    <div className="flex flex-col gap-2 md:flex-row md:items-end">
+      <div className="grid grid-cols-2 gap-2 md:w-52">
+        {periodUnits.map((unit) => (
+          <Button key={unit} variant={periodUnit === unit ? "default" : "outline"} onClick={() => handleUnitChange(unit)}>
+            {unitLabels[unit]}
+          </Button>
+        ))}
+      </div>
+      <div className="w-full md:max-w-sm">
+        <Select value={period} onValueChange={setPeriod}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select period" />
+          </SelectTrigger>
+          <SelectContent>
+            {periodOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      <Button onClick={handleLookup} disabled={loading}>Lookup</Button>
+    </div>
+  );
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>영업 시스템 조회</CardTitle>
-        <CardDescription>
-          영업 구조 및 포인트 분배 내역을 조회합니다.
-        </CardDescription>
+        <CardTitle>Sales System Lookup</CardTitle>
+        <CardDescription>Stored worker results for referral structure, point distribution, and sales statistics.</CardDescription>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="structure" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="structure">추천인 구조</TabsTrigger>
-            <TabsTrigger value="distribution">포인트 분배 내역</TabsTrigger>
-            <TabsTrigger value="statistics">통계</TabsTrigger>
-          </TabsList>
-          
-          {/* 추천인 구조 */}
-          <TabsContent value="structure" className="space-y-4 mt-4">
-            {loading ? (
-              <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-              </div>
-            ) : structureData ? (
-              <ReferralStructureView data={structureData} />
-            ) : (
-              <div className="flex justify-center items-center h-64">
-                <p>추천인 구조 데이터가 없습니다.</p>
-              </div>
-            )}
-          </TabsContent>
-          
-          {/* 포인트 분배 내역 */}
-          <TabsContent value="distribution" className="space-y-4 mt-4">
-            <div className="flex space-x-4 mb-4">
-              <div className="space-y-2 w-1/3">
-                <Label htmlFor="year">연도</Label>
-                <Input
-                  id="year"
-                  value={year}
-                  onChange={(e) => setYear(e.target.value)}
-                  disabled={loading}
-                />
-              </div>
-              <div className="space-y-2 w-1/3">
-                <Label htmlFor="week">주차</Label>
-                <Input
-                  id="week"
-                  value={week}
-                  onChange={(e) => setWeek(e.target.value)}
-                  disabled={loading}
-                />
-              </div>
-              <div className="flex items-end w-1/3">
-                <Button
-                  onClick={loadDistributionData}
-                  disabled={loading}
-                >
-                  조회
-                </Button>
-              </div>
-            </div>
-            
-            {loading ? (
-              <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-              </div>
-            ) : distributionData.length > 0 ? (
-              <PointDistributionView data={distributionData} />
-            ) : (
-              <div className="flex justify-center items-center h-64">
-                <p>포인트 분배 내역이 없습니다.</p>
-              </div>
-            )}
-          </TabsContent>
-          
-          {/* 통계 */}
-          <TabsContent value="statistics" className="space-y-4 mt-4">
-            {loading ? (
-              <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-              </div>
-            ) : statisticsData ? (
-              <StatisticsView data={statisticsData} />
-            ) : (
-              <div className="flex justify-center items-center h-64">
-                <p>통계 데이터가 없습니다.</p>
-              </div>
-            )}
-          </TabsContent>
-        </Tabs>
+        {canSelectTeamMaster && (
+          <div className="mb-2 grid gap-2 md:max-w-md">
+            <div className="text-xs font-medium text-muted-foreground">Lookup team master</div>
+            <Select value={targetUserId} onValueChange={handleTargetChange}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select team master" />
+              </SelectTrigger>
+              <SelectContent>
+                {teamMasters.map((master) => (
+                  <SelectItem key={master.id} value={master.id}>
+                    {master.displayName || master.username} ({master.username})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+        {!canSelectTeamMaster && (
+          <div className="mb-2 rounded-md border bg-muted/30 p-3 text-sm">
+            <div className="text-xs font-medium text-muted-foreground">Current team</div>
+            <div className="mt-1 font-semibold">{currentUser?.displayName || currentUser?.id || "-"}</div>
+          </div>
+        )}
+
+        <div className="mt-2 space-y-2">
+          {loading && !statisticsData ? <Loading /> : statisticsData ? (
+            <StatisticsView data={statisticsData} distributionData={distributionData} controls={lookupControls} />
+          ) : <Empty />}
+        </div>
       </CardContent>
     </Card>
+  );
+}
+
+function Loading() {
+  return (
+    <div className="flex h-64 items-center justify-center">
+      <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-gray-900" />
+    </div>
+  );
+}
+
+function Empty() {
+  return (
+    <div className="flex h-64 items-center justify-center rounded-md bg-muted p-4 text-sm text-muted-foreground">
+      No stored data available.
+    </div>
   );
 }

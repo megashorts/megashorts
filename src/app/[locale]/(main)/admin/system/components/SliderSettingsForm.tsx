@@ -100,7 +100,7 @@ export function SliderSettingsForm({ slider, onUpdate, onDelete, isFixed }: Slid
           <Input
             value={slider.title}
             onChange={(e) => handleTitleChange(e.target.value)}
-            placeholder="슬라이더 제목 (기본 - 영어)"
+            placeholder="Slider Title (Default - English)"
             className="text-sm flex-1"
           />
           <Button 
@@ -108,7 +108,7 @@ export function SliderSettingsForm({ slider, onUpdate, onDelete, isFixed }: Slid
             size="icon" 
             onClick={() => setShowI18n(!showI18n)}
             className={`shrink-0 ${showI18n ? 'bg-primary/10 text-primary' : ''}`}
-            title="다국어 제목 설정"
+            title="Set Multilingual Title"
           >
             <Globe className="h-4 w-4" />
           </Button>
@@ -122,7 +122,7 @@ export function SliderSettingsForm({ slider, onUpdate, onDelete, isFixed }: Slid
               <Input
                 value={slider.titleI18n?.['ko'] || ''}
                 onChange={(e) => handleI18nChange('ko', e.target.value)}
-                placeholder="한국어 제목"
+                placeholder="Korean Title"
                 className="text-sm h-8"
               />
             </div>
@@ -131,7 +131,7 @@ export function SliderSettingsForm({ slider, onUpdate, onDelete, isFixed }: Slid
               <Input
                 value={slider.titleI18n?.['zh'] || ''}
                 onChange={(e) => handleI18nChange('zh', e.target.value)}
-                placeholder="중국어 제목"
+                placeholder="Chinese Title"
                 className="text-sm h-8"
               />
             </div>
@@ -166,11 +166,11 @@ export function SliderSettingsForm({ slider, onUpdate, onDelete, isFixed }: Slid
                   onValueChange={handleRankingTypeChange}
                 >
                   <SelectTrigger className="w-32">
-                    <SelectValue placeholder="랭킹 기준" />
+                    <SelectValue placeholder="Ranking Criteria" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="likes">좋아요 순</SelectItem>
-                    <SelectItem value="views">조회수 순</SelectItem>
+                    <SelectItem value="likes">By Likes</SelectItem>
+                    <SelectItem value="views">By Views</SelectItem>
                   </SelectContent>
                 </Select>
               </>
@@ -182,11 +182,11 @@ export function SliderSettingsForm({ slider, onUpdate, onDelete, isFixed }: Slid
                 onValueChange={handleRankingTypeChange}
               >
                 <SelectTrigger className="w-32">
-                  <SelectValue placeholder="랭킹 기준" />
+                  <SelectValue placeholder="Ranking Criteria" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="likes">좋아요 순</SelectItem>
-                  <SelectItem value="views">조회수 순</SelectItem>
+                  <SelectItem value="likes">By Likes</SelectItem>
+                  <SelectItem value="views">By Views</SelectItem>
                 </SelectContent>
               </Select>
             )} */}
@@ -214,7 +214,7 @@ export function SliderSettingsForm({ slider, onUpdate, onDelete, isFixed }: Slid
                   ))}
                   {(!slider.categories || slider.categories.length === 0) && (
                     <span className="text-xs text-muted-foreground">
-                      카테고리를 선택하세요
+                      Select Categories
                     </span>
                   )}
                 </div>

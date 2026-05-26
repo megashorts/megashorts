@@ -14,8 +14,10 @@ import { getUserDataSelect } from "@/lib/types";
 import ReportDialog from "@/components/posts/ReportDialog";
 import { InquiryType } from "@prisma/client";
 import { Language } from "@prisma/client";
+import { getLocalizedContent } from "@/lib/content-language";
 
 type PageParams = {
+  locale: string;
   postId: string;
 };
 
@@ -37,7 +39,9 @@ export async function generateMetadata(
     where: { id: resolvedParams.postId },
     select: { 
       title: true, 
+      titleI18n: true,
       content: true,
+      contentI18n: true,
       thumbnailId: true,
       user: {
         select: {
@@ -47,8 +51,8 @@ export async function generateMetadata(
     },
   });
 
-  const title = post?.title || '게시물';
-  const description = post?.content?.slice(0, 200) || '';  // 설명 길이 제한
+  const title = post ? getLocalizedContent(post.title, post.titleI18n, resolvedParams.locale) : '게시물';
+  const description = post ? getLocalizedContent(post.content, post.contentI18n, resolvedParams.locale).slice(0, 200) : '';  // 설명 길이 제한
   const image = post?.thumbnailId || '/post-placeholder.jpg';
 
   // 플랫폼별 site name
@@ -121,6 +125,7 @@ export async function generateStaticParams() {
 export default async function PostPage({ params }: Props) {
   const resolvedParams = await params;
   const tCat = await getTranslations('Category');
+  const tContent = await getTranslations('Content');
   console.log(`[Server] Rendering post page: ${resolvedParams.postId}`, new Date().toISOString());
   
   // const currentUser = user ? await prisma.user.findUnique({
@@ -165,7 +170,9 @@ export default async function PostPage({ params }: Props) {
     notFound();
   }
 
-  const post = postData;
+  const post = serializePrismaForClient(postData) as typeof postData;
+  const localizedTitle = getLocalizedContent(post.title, post.titleI18n, resolvedParams.locale);
+  const localizedContent = getLocalizedContent(post.content, post.contentI18n, resolvedParams.locale);
 
   // const hasEditPermission = Boolean(
   //   currentUser && (
@@ -187,7 +194,7 @@ export default async function PostPage({ params }: Props) {
               <div className="relative w-full aspect-[2/3]">
                 <Image
                   src={getThumbnailUrl(post.thumbnailId)}
-                  alt={`타이틀 ${post.title || ''} - ${post.categories || ''} 컨텐츠의 대표 이미지`}
+                  alt={`타이틀 ${localizedTitle} - ${post.categories || ''} 컨텐츠의 대표 이미지`}
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 30vw, 30vw"  // 컨테이너가 30%
                   className="object-cover rounded-lg"
@@ -199,12 +206,12 @@ export default async function PostPage({ params }: Props) {
             {/* 정보 영역 */}
             <div className="flex-1 p-4 rounded-lg flex flex-col">
               {/* 타이틀과 컨텐츠를 정보영역 상단에 */}
-              <h1 className="text-2xl font-bold mb-2 flex items-end">{post.title}              
+              <h1 className="text-2xl font-bold mb-2 flex items-end">{localizedTitle}
                 {post.titleOriginal && post.titleOriginal !== post.title && (
                 <span className="block text-base text-muted-foreground text-end ml-2 self-end">( {post.titleOriginal} )</span>
                 )}
               </h1>
-              <p className="text-gray-300 text-base font-sans text-muted-foreground whitespace-pre-wrap mb-4">{post.content}</p>
+              <p className="text-gray-300 text-base font-sans text-muted-foreground whitespace-pre-wrap mb-4">{localizedContent}</p>
 
               {/* 구분선 */}
               <div className="w-[100%] mx-auto border-t border-white/15 mt-1 mb-6"></div>
@@ -246,7 +253,7 @@ export default async function PostPage({ params }: Props) {
                 {/* 영상 언어 */}
                 {post.videos?.[0] && (
                   <div className="flex items-center gap-2">
-                    <span className="text-white/70">영상 언어 </span>
+                    <span className="text-white/70">{tContent('videoLanguage')} </span>
                     <LanguageFlag language={post.postLanguage} />
                   </div>
                 )}
@@ -254,7 +261,7 @@ export default async function PostPage({ params }: Props) {
                 {/* 자막 지원 */}
                 {post.videos?.[0]?.subtitle?.length > 0 && (
                   <div className="flex items-center gap-2">
-                    <span className="text-white/70">자막 지원 </span>
+                    <span className="text-white/70">{tContent('subtitleSupport')} </span>
                     <div className="flex gap-1">
                       {post.videos[0].subtitle.map((lang: Language) => (
                         <LanguageFlag key={lang} language={lang} />
@@ -272,7 +279,7 @@ export default async function PostPage({ params }: Props) {
                   </div>
                   <span className="text-sm text-gray-300">
                     {/* {post.videos?.length || 0}개의 동영상 */}
-                    {post.videos?.length || 0}개의 동영상
+                    {tContent('videoCount', { count: post.videos?.length || 0 })}
                   </span>
                 </div>
 
@@ -292,8 +299,8 @@ export default async function PostPage({ params }: Props) {
               <ReportDialog 
                 type={InquiryType.REPORT}
                 postId={post.id}
-                postTitle={post.title || undefined}  // null을 undefined로 변환
-                title="신고하기"
+                postTitle={localizedTitle || undefined}  // null을 undefined로 변환
+                title={tContent('report')}
               />
               
             </div>
@@ -305,7 +312,7 @@ export default async function PostPage({ params }: Props) {
             {/* 타이틀과 컨텐츠를 최상단에 */}
             <div className="mb-4">
               {/* <h1 className="text-2xl font-bold mb-2">{post.title}</h1> */}
-              <h1 className="text-2xl font-bold mb-2 flex flex-wrap items-end">{post.title}              
+              <h1 className="text-2xl font-bold mb-2 flex flex-wrap items-end">{localizedTitle}
                 {post.titleOriginal && post.titleOriginal !== post.title && (
                 <span className="block text-base text-muted-foreground text-end ml-2 self-end">( {post.titleOriginal} )</span>
                 )}
@@ -330,7 +337,7 @@ export default async function PostPage({ params }: Props) {
               <div className="relative aspect-[2/3]">
                 <Image
                   src={getThumbnailUrl(post.thumbnailId)}
-                  alt={`타이틀 ${post.title || ''} - ${post.categories || ''} 컨텐츠의 대표 이미지`}
+                  alt={`타이틀 ${localizedTitle} - ${post.categories || ''} 컨텐츠의 대표 이미지`}
                   fill
                   sizes="(max-width: 768px) 50vw, (max-width: 1200px) 50vw, 30vw"  // 모바일에서 50%
                   className="object-cover rounded-lg"
@@ -360,7 +367,7 @@ export default async function PostPage({ params }: Props) {
                 {/* 영상 언어 */}
                 {post.videos?.[0] && (
                   <div className="flex items-center gap-2">
-                    <span className="text-white/70">언어 </span>
+                    <span className="text-white/70">{tContent('language')} </span>
                     <LanguageFlag language={post.postLanguage} />
                   </div>
                 )}
@@ -368,7 +375,7 @@ export default async function PostPage({ params }: Props) {
                 {/* 자막 지원 */}
                 {post.videos?.[0]?.subtitle?.length > 0 && (
                   <div className="flex items-center gap-2">
-                    <span className="text-white/70">자막 </span>
+                    <span className="text-white/70">{tContent('subtitle')} </span>
                     <div className="flex gap-1">
                       {post.videos[0].subtitle.map((lang: Language) => (
                         <LanguageFlag key={lang} language={lang} />
@@ -385,7 +392,7 @@ export default async function PostPage({ params }: Props) {
                     {post.ageLimit === 0 ? "전체" : `${post.ageLimit} +`}
                   </div>
                   <span className="text-xs text-gray-300">
-                    {post.videos?.length || 0}개의 동영상
+                    {tContent('videoCount', { count: post.videos?.length || 0 })}
                   </span>
                 </div>
 
@@ -414,14 +421,14 @@ export default async function PostPage({ params }: Props) {
                 <ReportDialog 
                   type={InquiryType.REPORT}
                   postId={post.id}
-                  postTitle={post.title || undefined}  // null을 undefined로 변환
-                  title="신고하기"
+                  postTitle={localizedTitle || undefined}  // null을 undefined로 변환
+                  title={tContent('report')}
                 />
               </div>
 
             </div>
           </div>
-          <p className="text-gray-300 text-mase font-sans text-muted-foreground whitespace-pre-wrap mt-4 mb-4">{post.content}</p>
+          <p className="text-gray-300 text-mase font-sans text-muted-foreground whitespace-pre-wrap mt-4 mb-4">{localizedContent}</p>
         </div>
 
         
@@ -437,5 +444,35 @@ export default async function PostPage({ params }: Props) {
         )}
       </div>
     </div>
+  );
+}
+
+function serializePrismaForClient(value: unknown): unknown {
+  if (value === null || value === undefined) {
+    return value;
+  }
+
+  if (typeof value !== 'object') {
+    return value;
+  }
+
+  if (value instanceof Date) {
+    return value;
+  }
+
+  if (
+    'toNumber' in value &&
+    typeof (value as { toNumber?: unknown }).toNumber === 'function' &&
+    value.constructor?.name === 'Decimal'
+  ) {
+    return (value as { toNumber: () => number }).toNumber();
+  }
+
+  if (Array.isArray(value)) {
+    return value.map(serializePrismaForClient);
+  }
+
+  return Object.fromEntries(
+    Object.entries(value).map(([key, nestedValue]) => [key, serializePrismaForClient(nestedValue)]),
   );
 }

@@ -229,12 +229,12 @@ export function PostSearchModal({ open, onOpenChange, onPostsSelect, existingPos
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] mx-2 sm:mx-4 p-4 sm:p-6">
         <DialogHeader>
-          <DialogTitle>포스트 검색</DialogTitle>
+          <DialogTitle>Search Posts</DialogTitle>
         </DialogHeader>
 
         <div className="flex gap-2 mb-4">
           <Input
-            placeholder="포스트 번호 또는 제목으로 검색"
+            placeholder="Search by post number or title"
             value={searchTerm}
             onChange={(e) => handleSearch(e.target.value)}
           />
@@ -259,12 +259,12 @@ export function PostSearchModal({ open, onOpenChange, onPostsSelect, existingPos
               ))}
             {searchResults.length === 0 && !isLoading && searchTerm && (
               <div className="text-center py-8 text-muted-foreground">
-                검색 결과가 없습니다
+                No search results found
               </div>
             )}
             {isLoading && (
               <div className="text-center py-8 text-muted-foreground">
-                검색중...
+                Searching...
               </div>
             )}
           </div>
@@ -272,10 +272,10 @@ export function PostSearchModal({ open, onOpenChange, onPostsSelect, existingPos
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            취소
+            Cancel
           </Button>
           <Button onClick={handleSave}>
-            선택 완료
+            Select
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -25,9 +25,9 @@ export default function SearchField() {
           <button
             type="button"
             onClick={() => setIsOpen(true)}
-            className="p-2 rounded-md hover:text-primary"
+            className="flex h-6 w-6 items-center justify-center rounded-full hover:text-primary"
           >
-            <SearchIcon className="size-5" />
+            <SearchIcon className="size-6" />
           </button>
         ) : (
           <div className="fixed left-0 right-0 top-0 p-4 bg-background md:relative md:p-0 md:bg-transparent">
@@ -45,4 +45,3 @@ export default function SearchField() {
     </form>
   );
 }
-

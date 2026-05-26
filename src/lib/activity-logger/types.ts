@@ -3,6 +3,11 @@ export interface CustomActivityLog {
   // 주요 식별 정보
   type: LogType;           // 로그 타입 (auth, video, post 등)
   event: string;           // 이벤트 이름 (login_success, video_upload 등)
+  eventI18n?: {
+    en: string;
+    ko?: string;
+    zh?: string;
+  };
   username?: string;       // 사용자명 (관리자 식별용)
   
   // 액션 상세

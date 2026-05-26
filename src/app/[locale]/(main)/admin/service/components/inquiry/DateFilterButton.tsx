@@ -81,7 +81,7 @@ export default function DateFilterButton({ date, onSelect }: DateFilterButtonPro
   };
 
   const handleAllSelect = () => {
-    setDisplayText("전체");
+    setDisplayText("All");
     onSelect(undefined);  // undefined를 전달하여 날짜 필터 제거
     setIsOpen(false);
   };
@@ -120,16 +120,16 @@ export default function DateFilterButton({ date, onSelect }: DateFilterButtonPro
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="w-[200px]">
           <DropdownMenuItem onClick={() => handleAllSelect()} className="gap-2 text-sm">
-            전체
+            All
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => handlePresetSelect("today")} className="gap-2 text-sm">
-            오늘
+            Today
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => handlePresetSelect("yesterday")} className="gap-2 text-sm">
-            어제부터
+            Since Yesterday
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => handlePresetSelect("week")} className="gap-2 text-sm">
-            일주일전부터
+            Since 1 Week Ago
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <div className="p-2">
@@ -140,7 +140,7 @@ export default function DateFilterButton({ date, onSelect }: DateFilterButtonPro
                   size="sm"
                   className="w-full justify-start text-left font-normal"
                 >
-                  지정일 선택
+                  Select Date
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">

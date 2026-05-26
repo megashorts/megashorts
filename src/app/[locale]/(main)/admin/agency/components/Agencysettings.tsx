@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { USER_ROLE, USER_ROLE_NAME } from "@/lib/constants";
+import { USER_ROLE, USER_ROLE_NAME_EN } from "@/lib/constants";
 import { AlertCircle, CirclePlus, IdCard, Info, Save } from "lucide-react";
 import UserSearchInput from "@/components/admin/UserSearchInput";
 import NetworkMiddleManagerSettings, { MiddleManager } from "./settings/NetworkMiddleManagerSettings";
@@ -58,16 +58,16 @@ export default function Agencysettings() {
   
   // 본부구조 설정
   const [headquartersLevels, setHeadquartersLevels] = useState<Level[]>([
-    { name: "본부마스터", level: 1, commissionRate: 5 },
-    { name: "대리점", level: 2, commissionRate: 3 },
-    { name: "멤버", level: 3, commissionRate: 1 }
+    { name: "HQ Master", level: 1, commissionRate: 5 },
+    { name: "Agency", level: 2, commissionRate: 3 },
+    { name: "Member", level: 3, commissionRate: 1 }
   ]);
   
   // 네트워크 설정
   const [networkLevels, setNetworkLevels] = useState<Level[]>([
-    { name: "본부마스터", level: 1, commissionRate: 5 },
-    { name: "2단계", level: 2, commissionRate: 3 },
-    { name: "3단계", level: 3, commissionRate: 1 }
+    { name: "HQ Master", level: 1, commissionRate: 5 },
+    { name: "Level 2", level: 2, commissionRate: 3 },
+    { name: "Level 3", level: 3, commissionRate: 1 }
   ]);
   
   // 중간관리자 설정
@@ -76,7 +76,7 @@ export default function Agencysettings() {
       // id: "mm1",
       level: 1001,
       enabled: false,
-      name: "매니져 1",
+      name: "Manager 1",
       commissionRate: 3,
       conditions: {
         memberCount: false,
@@ -97,21 +97,15 @@ export default function Agencysettings() {
   const [payoutQualificationEnabled, setPayoutQualificationEnabled] = useState(false);
   const [payoutQualificationMemberCount, setPayoutQualificationMemberCount] = useState(0);
   
-  // 관리자 권한 확인 (OPERATION3 이상)
-  const isAdmin = currentUser?.userRole && currentUser.userRole >= USER_ROLE.OPERATION3;
+  // 운영팀 이상은 영업팀 마스터를 선택해서 설정을 조회/수정한다.
+  const isAdmin = currentUser?.userRole && currentUser.userRole >= USER_ROLE.OPERATION1;
   
   // 사용자 정보 및 설정 불러오기
   useEffect(() => {
     if (currentUser?.id && !loading) {
       if (isAdmin) {
-        // 관리자인 경우 자신을 기본 선택
-        setSelectedTeamMaster({
-          id: currentUser.id,
-          username: currentUser.username || "",
-          email: "",
-          displayName: currentUser.displayName,
-          userRole: currentUser.userRole
-        });
+        // Operations users must choose the team master whose settings they want to inspect.
+        setSelectedTeamMaster(null);
       } else {
         loadUserInfo();
       }
@@ -161,7 +155,7 @@ export default function Agencysettings() {
         updatedLevels[0] = { 
           ...updatedLevels[0], 
           commissionRate: remaining,
-          name: selectedTeamMaster?.displayName || "본부마스터"
+          name: selectedTeamMaster?.displayName || "HQ Master"
         };
         setHeadquartersLevels(updatedLevels);
       }
@@ -172,7 +166,7 @@ export default function Agencysettings() {
         updatedLevels[0] = { 
           ...updatedLevels[0], 
           commissionRate: remaining,
-          name: selectedTeamMaster?.displayName || "본부마스터"
+          name: selectedTeamMaster?.displayName || "HQ Master"
         };
         setNetworkLevels(updatedLevels);
       }
@@ -210,9 +204,9 @@ export default function Agencysettings() {
         userRole: userInfoData.userRole
       });
     } catch (error) {
-      console.error("사용자 정보를 불러오는 중 오류가 발생했습니다:", error);
+      console.error("Error loading user information:", error);
       toast({
-        description: "사용자 정보를 불러오는 중 오류가 발생했습니다.",
+        description: "An error occurred while loading user information.",
         variant: "destructive",
         duration: 1500,
       });
@@ -230,7 +224,7 @@ export default function Agencysettings() {
       const response = await fetch(`/api/agency/settings?userId=${userId}`);
       
       if (!response.ok) {
-        throw new Error(`API 호출 실패: ${response.status} ${response.statusText}`);
+        throw new Error(`API call failed: ${response.status} ${response.statusText}`);
       }
       
       const data = await response.json();
@@ -251,9 +245,9 @@ export default function Agencysettings() {
         } else if (settings.masterType === "HEADQUARTERS") {
           // 기본값 설정
           setHeadquartersLevels([
-            { name: selectedTeamMaster?.displayName || "본부마스터", level: 1, commissionRate: 5 },
-            { name: "대리점", level: 2, commissionRate: 3 },
-            { name: "멤버", level: 3, commissionRate: 1 }
+            { name: selectedTeamMaster?.displayName || "HQ Master", level: 1, commissionRate: 5 },
+            { name: "Agency", level: 2, commissionRate: 3 },
+            { name: "Member", level: 3, commissionRate: 1 }
           ]);
         }
         
@@ -269,9 +263,9 @@ export default function Agencysettings() {
           } else {
             // 기본값 설정
             setNetworkLevels([
-              { name: selectedTeamMaster?.displayName || "본부마스터", level: 1, commissionRate: 5 },
-              { name: "2단계", level: 2, commissionRate: 3 },
-              { name: "3단계", level: 3, commissionRate: 1 }
+              { name: selectedTeamMaster?.displayName || "HQ Master", level: 1, commissionRate: 5 },
+              { name: "Level 2", level: 2, commissionRate: 3 },
+              { name: "Level 3", level: 3, commissionRate: 1 }
             ]);
           }
           
@@ -284,7 +278,7 @@ export default function Agencysettings() {
               // id: "mm1",
               level: 1001,
               enabled: false,
-              name: "매니져 1",
+              name: "Manager 1",
               commissionRate: 3,
               conditions: {
                 memberCount: false,
@@ -322,9 +316,9 @@ export default function Agencysettings() {
         setPayoutQualificationMemberCount(0);
       }
     } catch (error) {
-      console.error("설정을 불러오는 중 오류가 발생했습니다:", error);
+      console.error("Error loading settings:", error);
       toast({
-        description: "설정을 불러오는 중 오류가 발생했습니다.",
+        description: "An error occurred while loading settings.",
         variant: "destructive",
         duration: 1500,
       });
@@ -355,7 +349,7 @@ export default function Agencysettings() {
       // 수수료 합계가 100%를 초과하는지 검증
       if (Math.abs(totalCommission - 100) > 0.1) {
         toast({
-          description: "모든 단계의 수수료 합계가 100%여야 합니다.",
+          description: "The total commission sum across all levels must equal 100%.",
           variant: "destructive",
           duration: 2000,
         });
@@ -364,7 +358,7 @@ export default function Agencysettings() {
       
       if (!selectedTeamMaster?.id) {
         toast({
-          description: "팀마스터가 선택되지 않았습니다.",
+          description: "No team master is selected.",
           variant: "destructive",
           duration: 1500,
         });
@@ -436,14 +430,14 @@ export default function Agencysettings() {
       });
       
       if (!response.ok) {
-        throw new Error(`API 호출 실패: ${response.status} ${response.statusText}`);
+        throw new Error(`API call failed: ${response.status} ${response.statusText}`);
       }
       
       const data = await response.json();
       
       if (data.success) {
         toast({
-          description: "설정이 저장되었습니다.",
+          description: "Settings saved successfully.",
           variant: "default",
           duration: 1500,
         });
@@ -451,12 +445,12 @@ export default function Agencysettings() {
         // 설정 다시 불러오기
         loadSettings(selectedTeamMaster.id);
       } else {
-        throw new Error(data.error || "설정 저장에 실패했습니다.");
+        throw new Error(data.error || "Failed to save settings.");
       }
     } catch (error) {
-      console.error("설정 저장 중 오류가 발생했습니다:", error);
+      console.error("Error saving settings:", error);
       toast({
-        description: "설정 저장 중 오류가 발생했습니다.",
+        description: "An error occurred while saving settings.",
         variant: "destructive",
         duration: 1500,
       });
@@ -468,10 +462,10 @@ export default function Agencysettings() {
   // 마스터 타입 이름 가져오기
   const getMasterTypeName = (type: string) => {
     switch (type) {
-      case "HEADQUARTERS": return "본부구조";
-      case "NETWORK": return "네트워크";
-      case "BINARY_NETWORK": return "네트워크 바이너리";
-      default: return "알 수 없음";
+      case "HEADQUARTERS": return "HQ Structure";
+      case "NETWORK": return "Network";
+      case "BINARY_NETWORK": return "Network Binary";
+      default: return "Unknown";
     }
   };
   
@@ -507,7 +501,7 @@ export default function Agencysettings() {
     const newManager: MiddleManager = {
       level: maxLevel + 1,
       enabled: false,
-      name: `매니져 ${maxLevel - 1000 + 1}`,
+      name: `Manager ${maxLevel - 1000 + 1}`,
       commissionRate: 3,
       conditions: {
         memberCount: false,
@@ -527,9 +521,9 @@ export default function Agencysettings() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>영업본부 구조설정</CardTitle>
+        <CardTitle>Sales Team Structure Settings</CardTitle>
         <CardDescription>
-          영업본부 단계 / 지급비율 / 방식 설정
+          Configure sales team levels, payout rates, and distribution methods for the selected team master.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -540,7 +534,6 @@ export default function Agencysettings() {
             <UserSearchInput
               onSelect={(user) => {
                 if (user) {
-                  // 팀마스터 유저롤인 경우에만 선택 가능
                   if (user.userRole === USER_ROLE.TEAM_MASTER) {
                     setSelectedTeamMaster({
                       id: user.id,
@@ -551,7 +544,7 @@ export default function Agencysettings() {
                     });
                   } else {
                     toast({
-                      description: "본부마스터 권한을 가진 사용자만 선택할 수 있습니다.",
+                      description: "Only team master accounts can be selected.",
                       variant: "destructive",
                       duration: 1500,
                     });
@@ -567,7 +560,8 @@ export default function Agencysettings() {
                 displayName: selectedTeamMaster.displayName,
                 userRole: selectedTeamMaster.userRole
               } : null}
-              placeholder="본부마스터 검색..."
+              placeholder="Search team master..."
+              roleFilter={USER_ROLE.TEAM_MASTER}
               disabled={loading}
             />
           </div>
@@ -585,7 +579,7 @@ export default function Agencysettings() {
                 <p className="text-base font-medium">{selectedTeamMaster.displayName}</p>
               </div>
               <div className="col-span-3 justify-items-end">
-                <p className="text-xs font-medium text-muted-foreground">{USER_ROLE_NAME[selectedTeamMaster.userRole as keyof typeof USER_ROLE_NAME] || "알 수 없음"}</p>
+                <p className="text-xs font-medium text-muted-foreground">{USER_ROLE_NAME_EN[selectedTeamMaster.userRole as keyof typeof USER_ROLE_NAME_EN] || "Unknown"}</p>
               </div>
               <div className="col-span-2 justify-items-center">
                 <p className="text-xs font-medium text-muted-foreground">{getMasterTypeName(masterType)}</p>
@@ -600,8 +594,8 @@ export default function Agencysettings() {
         {!masterType ? (
           <div className="flex flex-col text-sm items-center justify-center p-8 border rounded-md">
             <AlertCircle className="h-8 w-8 text-muted-foreground mb-2" />
-            <p className="text-muted-foreground text-sm">본부마스터 멤버가 아닙니다.</p>
-            <p className="text-muted-foreground text-sm">회원권한을 확인하세요</p>
+            <p className="text-muted-foreground text-sm">No team master settings selected.</p>
+            <p className="text-muted-foreground text-sm">Search and select a team master account.</p>
           </div>
         ) : (
           <div className="space-y-6">
@@ -632,10 +626,10 @@ export default function Agencysettings() {
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <Label htmlFor="payout-qualification-enabled" className="text-sm">
-                        하위회원 조건 충족 전 커미션 지급 보류
+                        Hold commission until sub-member conditions are met
                       </Label>
                       <p className="text-xs text-muted-foreground">
-                        조건 전에는 커미션을 계산해 보류하고, 조건 달성 시 누적분을 지급합니다.
+                        Commission is calculated and held, and cumulative amounts are paid once conditions are met.
                       </p>
                     </div>
                     <Switch
@@ -649,7 +643,7 @@ export default function Agencysettings() {
                   {(masterType === "BINARY_NETWORK" || payoutQualificationEnabled) && (
                     <div className="space-y-1">
                       <Label htmlFor="payout-qualification-member-count" className="text-xs">
-                        지급 시작 직접 하위회원 수
+                        Number of direct sub-members to start payout
                       </Label>
                       <Input
                         id="payout-qualification-member-count"
@@ -667,7 +661,7 @@ export default function Agencysettings() {
 
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <h3 className="text-sm font-medium">매니져 설정</h3>
+                    <h3 className="text-sm font-medium">Manager Settings</h3>
                     <Button
                       variant="ghost"
                       size="sm"

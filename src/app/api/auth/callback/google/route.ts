@@ -133,7 +133,7 @@ export async function GET(req: NextRequest) {
         issuerId: userId,
         type: 'COMMENT',
         metadata: {
-          reason: '가입을 환영합니다! 🎉🎉'
+          reason: 'welcome_msg'
         }
       }
     });

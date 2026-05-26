@@ -9,8 +9,8 @@ export async function GET(request: NextRequest) {
   try {
     const { user } = await validateRequest();
     
-    // 권한 확인 (OPERATION3 이상)
-    if (!user || user.userRole < USER_ROLE.OPERATION3) {
+    // 운영팀 관리자 이상은 Lookup에서 팀마스터를 선택해 팀별 정보를 조회할 수 있다.
+    if (!user || user.userRole < USER_ROLE.OPERATION1) {
       return Response.json(
         { success: false, error: 'Unauthorized' },
         { status: 401 }

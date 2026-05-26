@@ -1,0 +1,71 @@
+
+--- 2026-05-18T16:47:58.739Z debug
+🪵  Writing logs to "/Users/kimryan/Desktop/megas/.tmp/wrangler-logs/wrangler-2026-05-18_16-47-58_679.log"
+---
+
+--- 2026-05-18T16:47:58.739Z debug
+Metrics dispatcher: Dispatching disabled - would have sent {"deviceId":"c8397d8f-15b6-4383-ac87-c9f1f1083fc4","event":"wrangler command started","timestamp":1779122878739,"properties":{"amplitude_session_id":1779122878738,"amplitude_event_id":0,"wranglerVersion":"4.0.0","osPlatform":"Mac OS","osVersion":"Darwin Kernel Version 22.6.0: Sun Dec 17 22:14:25 PST 2023; root:xnu-8796.141.3.703.2~2/RELEASE_ARM64_T8112","nodeVersion":24,"packageManager":"npm","isFirstUsage":false,"configFileType":"toml","isCI":false,"isPagesCI":false,"isWorkersCI":false,"isInteractive":false,"hasAssets":false,"argsUsed":["c","config"],"argsCombination":"c, config","command":"wrangler secret put","args":{"config":"<REDACTED>","c":"<REDACTED>","xJsonConfig":true,"j":true,"key":"<REDACTED>"}}}.
+---
+
+--- 2026-05-18T16:47:58.740Z debug
+.env file not found at ".env". Continuing... For more details, refer to https://developers.cloudflare.com/workers/wrangler/system-environment-variables/
+---
+
+--- 2026-05-18T16:47:58.745Z log
+
+ ⛅️ wrangler 4.0.0 (update available 4.92.0)
+--------------------------------------------
+
+---
+
+--- 2026-05-18T16:47:58.748Z debug
+Saving to cache: {"account":{"id":"923201050a960d4c64fb9b90a88cb956","name":""}}
+---
+
+--- 2026-05-18T16:47:58.749Z log
+🌀 Creating the secret for the Worker "commission-worker" 
+---
+
+--- 2026-05-18T16:47:58.749Z debug
+-- START CF API REQUEST: PUT https://api.cloudflare.com/client/v4/accounts/923201050a960d4c64fb9b90a88cb956/workers/scripts/commission-worker/secrets
+---
+
+--- 2026-05-18T16:47:58.749Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:58.749Z debug
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:58.749Z debug
+-- END CF API REQUEST
+---
+
+--- 2026-05-18T16:47:59.361Z debug
+-- START CF API RESPONSE: Created 201
+---
+
+--- 2026-05-18T16:47:59.362Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:59.362Z debug
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T16:47:59.362Z debug
+-- END CF API RESPONSE
+---
+
+--- 2026-05-18T16:47:59.363Z debug
+Metrics dispatcher: Dispatching disabled - would have sent {"deviceId":"c8397d8f-15b6-4383-ac87-c9f1f1083fc4","event":"create encrypted variable","timestamp":1779122879363,"properties":{"category":"Workers","wranglerVersion":"4.0.0","os":"darwin:arm64"}}.
+---
+
+--- 2026-05-18T16:47:59.363Z log
+✨ Success! Uploaded secret SUPABASE_SERVICE_ROLE_KEY
+---
+
+--- 2026-05-18T16:47:59.364Z debug
+Metrics dispatcher: Dispatching disabled - would have sent {"deviceId":"c8397d8f-15b6-4383-ac87-c9f1f1083fc4","event":"wrangler command completed","timestamp":1779122879364,"properties":{"amplitude_session_id":1779122878738,"amplitude_event_id":1,"wranglerVersion":"4.0.0","osPlatform":"Mac OS","osVersion":"Darwin Kernel Version 22.6.0: Sun Dec 17 22:14:25 PST 2023; root:xnu-8796.141.3.703.2~2/RELEASE_ARM64_T8112","nodeVersion":24,"packageManager":"npm","isFirstUsage":false,"configFileType":"toml","isCI":false,"isPagesCI":false,"isWorkersCI":false,"isInteractive":false,"hasAssets":false,"argsUsed":["c","config"],"argsCombination":"c, config","command":"wrangler secret put","args":{"config":"<REDACTED>","c":"<REDACTED>","xJsonConfig":true,"j":true,"key":"<REDACTED>"},"durationMs":633,"durationSeconds":0.633,"durationMinutes":0.01055}}.
+---

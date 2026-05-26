@@ -1,7 +1,11 @@
 import { validateRequest } from "@/auth";
 import { USER_ROLE } from "@/lib/constants";
-import { assertStatsAccess, getAgencyStats } from "@/lib/stats-queries";
+import { formatStoredAgencyStats } from "@/lib/stored-stats-formatters";
+import { assertStatsAccess } from "@/lib/stats-queries";
+import { canOpenAgencyEarnings, isOperationsRole } from "@/lib/user-roles";
 import { fetchCommissionSummaryFromWorker } from "@/lib/worker-stats";
+import { getAnalyticsTimeZone } from "@/lib/analytics-timezone-server";
+import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -17,29 +21,60 @@ export async function GET(request: NextRequest) {
     const period = searchParams.get("period") || "current";
 
     await assertStatsAccess(user, userId);
+    if (user.id === userId && !canOpenAgencyEarnings(user.userRole)) {
+      return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
+    }
+    if (user.id !== userId && !isOperationsRole(user.userRole)) {
+      return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
+    }
 
-    const fallback = await getAgencyStats(userId!, period);
-    const workerSummary = await fetchCommissionSummaryFromWorker({
-      scope: "agency",
-      userId: userId!,
-      period,
-    });
-    const team = workerSummary?.teamSummary;
+    const now = new Date();
+    const kstToday = new Date(now.getTime() + 9 * 60 * 60 * 1000).toISOString().slice(0, 10);
+    const kstTodayStart = new Date(`${kstToday}T00:00:00.000Z`);
+    kstTodayStart.setUTCHours(kstTodayStart.getUTCHours() - 9);
+
+    const [workerSummary, cumulativeSummary, targetUser, referredTotal, referredToday, timezone] = await Promise.all([
+      fetchCommissionSummaryFromWorker({
+        scope: "agency",
+        userId: userId!,
+        period,
+      }),
+      fetchCommissionSummaryFromWorker({
+        scope: "agency",
+        userId: userId!,
+        period: "all",
+      }),
+      prisma.user.findUnique({ where: { id: userId! }, select: { points: true } }),
+      prisma.user.count({ where: { referredBy: userId! } }),
+      prisma.user.count({
+        where: {
+          referredBy: userId!,
+          createdAt: {
+            gte: kstTodayStart,
+          },
+        },
+      }),
+      getAnalyticsTimeZone(),
+    ]);
+    const stats = formatStoredAgencyStats(workerSummary, period);
+    const cumulativeStats = formatStoredAgencyStats(cumulativeSummary, "all");
 
     return NextResponse.json({
       success: true,
       data: {
-        ...fallback,
-        source: workerSummary?.source || "postgres",
-        totalPoints: team?.teamTotal ?? fallback.totalPoints,
-        subscriptionViews:
-          (team?.creators?.subscriptionViews || 0) +
-          (team?.directReferrers?.subscriptionViews || 0) +
-          (team?.indirectReferrers?.subscriptionViews || 0) || fallback.subscriptionViews,
-        coinViews:
-          (team?.creators?.coinViews || 0) +
-          (team?.directReferrers?.coinViews || 0) +
-          (team?.indirectReferrers?.coinViews || 0) || fallback.coinViews,
+        ...stats,
+        totalReferredUsers: referredTotal,
+        todayReferredUsers: referredToday,
+        currentPoints: Number(targetUser?.points || 0),
+        cumulative: {
+          subscriptionViews: cumulativeStats.subscriptionViews,
+          coinViews: cumulativeStats.coinViews,
+          totalViews: cumulativeStats.totalViews,
+          totalPoints: cumulativeStats.totalPoints,
+          breakdown: cumulativeStats.breakdown || [],
+          paidPoints: Number(targetUser?.points || 0),
+        },
+        timezone,
       },
     });
   } catch (error) {

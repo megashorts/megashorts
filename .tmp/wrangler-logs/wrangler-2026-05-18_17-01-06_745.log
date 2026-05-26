@@ -1,0 +1,63 @@
+
+--- 2026-05-18T17:01:06.787Z debug
+🪵  Writing logs to "/Users/kimryan/Desktop/megas/.tmp/wrangler-logs/wrangler-2026-05-18_17-01-06_745.log"
+---
+
+--- 2026-05-18T17:01:06.787Z debug
+Metrics dispatcher: Dispatching disabled - would have sent {"deviceId":"c8397d8f-15b6-4383-ac87-c9f1f1083fc4","event":"wrangler command started","timestamp":1779123666787,"properties":{"amplitude_session_id":1779123666785,"amplitude_event_id":0,"wranglerVersion":"4.0.0","osPlatform":"Mac OS","osVersion":"Darwin Kernel Version 22.6.0: Sun Dec 17 22:14:25 PST 2023; root:xnu-8796.141.3.703.2~2/RELEASE_ARM64_T8112","nodeVersion":24,"packageManager":"npm","isFirstUsage":false,"configFileType":"toml","isCI":false,"isPagesCI":false,"isWorkersCI":false,"isInteractive":false,"hasAssets":false,"argsUsed":["command","remote"],"argsCombination":"command, remote","command":"wrangler d1 execute","args":{"remote":true,"command":"<REDACTED>","xJsonConfig":true,"j":true,"json":false,"preview":false,"database":"<REDACTED>"}}}.
+---
+
+--- 2026-05-18T17:01:06.788Z debug
+.env file not found at ".env". Continuing... For more details, refer to https://developers.cloudflare.com/workers/wrangler/system-environment-variables/
+---
+
+--- 2026-05-18T17:01:06.793Z log
+
+ ⛅️ wrangler 4.0.0 (update available 4.92.0)
+--------------------------------------------
+
+---
+
+--- 2026-05-18T17:01:06.795Z debug
+No experimental flag store instantiated
+---
+
+--- 2026-05-18T17:01:06.795Z debug
+Attempted to use flag "RESOURCES_PROVISION" which has not been instantiated
+---
+
+--- 2026-05-18T17:01:06.795Z debug
+No experimental flag store instantiated
+---
+
+--- 2026-05-18T17:01:06.795Z debug
+Attempted to use flag "RESOURCES_PROVISION" which has not been instantiated
+---
+
+--- 2026-05-18T17:01:06.797Z debug
+Saving to cache: {"account":{"id":"923201050a960d4c64fb9b90a88cb956","name":""}}
+---
+
+--- 2026-05-18T17:01:06.799Z log
+🌀 Executing on remote database megashorts-db (52d25396-2a61-42a8-904f-2d7956cede44):
+---
+
+--- 2026-05-18T17:01:06.799Z log
+🌀 To execute on your local development database, remove the --remote flag from your wrangler command.
+---
+
+--- 2026-05-18T17:01:06.799Z debug
+-- START CF API REQUEST: POST https://api.cloudflare.com/client/v4/accounts/923201050a960d4c64fb9b90a88cb956/d1/database/52d25396-2a61-42a8-904f-2d7956cede44/query
+---
+
+--- 2026-05-18T17:01:06.799Z debug
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T17:01:06.799Z debug
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+---
+
+--- 2026-05-18T17:01:06.799Z debug
+-- END CF API REQUEST
+---

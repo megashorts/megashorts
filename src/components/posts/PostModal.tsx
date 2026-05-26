@@ -7,11 +7,13 @@ import Image from "next/image";
 import Link from "next/link";
 // import LikeButton from "./LikeButton";
 import BookmarkButton from "./BookmarkButton";
-import { cn } from "@/lib/utils";
 import LikeButton from "./LikeButtonOnly";
 import { getThumbnailUrl } from "@/lib/constants";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
+import { getLocalizedPostContent, getLocalizedPostTitle } from "@/lib/content-language";
+import LanguageFlag from "@/components/LanguageFlag";
+import { Language } from "@prisma/client";
 
 interface PostModalProps {
   post: PostData;
@@ -22,6 +24,10 @@ interface PostModalProps {
 export default function PostModal({ post, handleClose }: PostModalProps) {
   const { user } = useSession();
   const t = useTranslations('Category');
+  const tContent = useTranslations('Content');
+  const locale = useLocale();
+  const localizedTitle = getLocalizedPostTitle(post, locale);
+  const localizedContent = getLocalizedPostContent(post, locale);
   const [showPreview, setShowPreview] = useState(true);
   const [isVideoReady, setIsVideoReady] = useState(false);
 
@@ -112,163 +118,6 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
     };
   }, [firstVideoId, showPreview]);
 
-  if (typeof window !== 'undefined' && (window.innerWidth < 1024 || window.innerHeight < 800)) {
-    return (
-      <div 
-        className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4 border"
-        onClick={handleClose}
-      >
-
-        <link rel="preconnect" href="https://videodelivery.net" />
-        <link rel="preconnect" href="https://iframe.videodelivery.net" />
-        
-        <div 
-          className="bg-black rounded-lg overflow-hidden w-[90%] max-w-[340px]"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {/* 상단 영역: 썸네일(좌측 50%) + 버튼(우측) */}
-          <div className="flex">
-            {/* 썸네일/비디오 영역 */}
-            <div className="w-3/4 relative aspect-video">
-
-              
-              <div 
-                className={`absolute inset-0 transition-opacity duration-500 ${
-                  isVideoReady ? 'opacity-0 pointer-events-none' : 'opacity-100'
-                }`}
-              >
-                <Image
-                  // src={post.thumbnailUrl || '/post-placeholder.jpg'}
-                  src={getThumbnailUrl(post.thumbnailId)}
-                  alt={`타이틀 ${post.title || ''} - ${post.categories || ''} 컨텐츠의 대표 이미지`}
-                  fill
-                  sizes="(max-width: 768px) 90vw, (max-width: 1200px) 40vw, 500px"  // 컨테이너 크기에 맞게 설정
-                  className="object-cover"
-                />
-              </div>
-
-              {(showPreview && firstVideoId) && (
-                <div 
-                  className={`absolute inset-0 transition-opacity duration-500 ${
-                    isVideoReady ? 'opacity-100' : 'opacity-0'
-                  }`}
-                >
-                  <video
-                    ref={videoRef}
-                    playsInline
-                    preload="auto"
-                    className="w-full h-full translate-x-2"
-                    autoPlay
-                    onLoad={() => setIsVideoReady(true)}
-                  />
-                </div>
-              )}
-            </div>
-
-            {/* 버튼 영역 */}
-            <div className="flex flex-col items-center justify-end gap-4 p-4">
-              <button 
-                onClick={handleClose}
-                className="relative top-0 left-5 -translate-y-2 p-1 bg-slate-500/15 hover:bg-black/70 rounded-full border-red-500 text-muted-foreground z-10"
-              >
-                <X className="w-4 h-4" />
-              </button>
-              <div className="w-10 aspect-square flex items-center justify-center hover:bg-white/10"></div>
-
-              <div className="w-10 aspect-square flex items-center justify-center hover:bg-white/10"></div>
-
-              {!user && (
-                <>
-                  <div className="w-10 aspect-square flex items-center justify-center hover:bg-white/10"></div>
-                  <div className="w-10 aspect-square flex items-center justify-center hover:bg-white/10"></div>
-                </>
-              )}
-              {post.videos && post.videos.length > 0 && (
-                <Link 
-                  href={`/video-view/${post.id}`}
-                  className="w-12 aspect-square flex items-center justify-center hover:bg-white/10 border border-white rounded-full"
-                >
-                  <Play className="size-5 text-white" />
-                </Link>
-              )}
-              {user && (
-                <>
-                  <div className="w-12 aspect-square flex items-center justify-center hover:bg-white/10 border border-white rounded-full">
-                    <BookmarkButton
-                      postId={post.id}
-                      initialState={{
-                        isBookmarkedByUser: post.bookmarks.some(
-                          (bookmark) => bookmark.userId === user.id,
-                        ),
-                      }}
-                    />
-                  </div>
-                  <div className="w-12 aspect-square flex items-center justify-center hover:bg-white/10 border border-white rounded-full">
-                    <LikeButton
-                      postId={post.id}
-                      initialState={{
-                        likes: post._count.likes,
-                        isLikedByUser: post.likes.some((like) => like.userId === user.id),
-                      }}
-                    />
-                  </div>
-                  
-                </>
-              )}
-              <Link 
-                href={`/posts/${post.id}`}
-                className="w-12 aspect-square flex items-center justify-center hover:bg-white/10 border border-white rounded-full"
-              >
-                <ChevronDown className="w-8 h-8 text-white" />
-              </Link>
-            </div>
-          </div>
-
-          {/* 하단 정보 영역 */}
-          <div className="w-full bg-black px-8 py-4">
-            <div className="mb-1 mt-2 text-white/90">
-              <p className="line-clamp-2 text-lg">
-                {post.title}
-              </p>
-            </div>
-
-            <div className="mb-2 text-slate-400">
-              <p className="line-clamp-2 text-sm font-sans">
-                {post.content}
-              </p>
-            </div>
-
-            <div className="flex items-center gap-4 mb-1">
-              <div className={`flex items-center justify-center w-12 h-7 rounded-md border border-white font-bold text-sm text-white ${
-                  post.ageLimit === 18 ? "bg-red-700" : "bg-blue-700"
-                }`}>
-                {post.ageLimit === 0 ? "전체" : `${post.ageLimit} +`}
-              </div>
-              <span className="text-sm text-gray-300">
-                {post.videoCount || 0}개 동영상
-              </span>
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              {post.categories?.map((category) => (
-                <span
-                  key={category}
-                  className="flex items-center py-2 rounded-sm text-muted-foreground text-xs"
-                >
-                  #{t(category)}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-
-
-
-
-    );
-  }
   return (
     <div 
       className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4"
@@ -278,10 +127,11 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
       <link rel="preconnect" href="https://iframe.videodelivery.net" />
       
       <div 
-        className="bg-black rounded-lg overflow-hidden max-h-[90%] w-[90%] md:w-[40%] max-w-[500px]"
+        className="bg-black rounded-lg overflow-hidden w-[min(92vw,560px)] max-h-[92dvh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="relative aspect-[2/3] w-full overflow-hidden flex-shrink-0 max-h-[90vh] md:max-h-none">
+        <div className="relative w-full flex justify-center px-3 pt-3 flex-shrink-0">
+          <div className="relative aspect-[2/3] w-[min(100%,36dvh)] sm:w-[min(100%,40dvh)] md:w-[min(100%,44dvh)] lg:w-[min(100%,46dvh)] overflow-hidden rounded-md">
           <button 
             onClick={handleClose}
             className="absolute top-3 right-3 p-2 bg-black/50 hover:bg-black/70 rounded-full text-white z-10"
@@ -296,7 +146,7 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
           >
             <Image
               src={getThumbnailUrl(post.thumbnailId)}
-              alt={`타이틀 ${post.title || ''} - ${post.categories || ''} 컨텐츠의 대표 이미지`}
+              alt={`타이틀 ${localizedTitle} - ${post.categories || ''} 컨텐츠의 대표 이미지`}
               fill
               sizes="(max-width: 768px) 90vw, (max-width: 1200px) 40vw, 500px"  // 컨테이너 크기에 맞게 설정
               className="object-cover"
@@ -306,7 +156,7 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
 
           {(showPreview && firstVideoId) && (
             <div 
-              className={`absolute inset-0 flex items-center justify-center pt-8 transition-opacity duration-500 ${
+              className={`absolute inset-0 flex items-center justify-center transition-opacity duration-500 ${
                 isVideoReady ? 'opacity-100' : 'opacity-0'
               }`}
             >
@@ -314,16 +164,16 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
                 ref={videoRef}
                 playsInline
                 preload="auto"
-                className="w-full h-full translate-x-2"
+                className="w-full h-full object-cover"
                 autoPlay
                 onLoad={() => setIsVideoReady(true)}
               />
             </div>
           )}
-          
+          </div>
         </div>
   
-        <div className="w-full bg-black pl-10 pr-10 pb-6 pt-4 overflow-y-auto flex-grow max-h-[calc(90vh)] md:max-h-none">
+        <div className="w-full bg-black px-5 sm:px-8 pb-6 pt-4 overflow-y-auto min-h-0 flex-1">
           <div className="flex items-center mb-4">
             <div className="flex items-center gap-3">
               {post.videos && post.videos.length > 0 && (
@@ -373,13 +223,13 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
 
           <div className="mb-1 text-white/90">
             <p className="line-clamp-2 text-lg">
-              {post.title}
+              {localizedTitle}
             </p>
           </div>
 
           <div className="mb-4 text-slate-400">
             <p className="line-clamp-2 text-sm font-sans">
-              {post.content}
+              {localizedContent}
             </p>
           </div>
 
@@ -389,9 +239,25 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
               }`}>
               {post.ageLimit === 0 ? "전체" : `${post.ageLimit} +`}
             </div>
-            <span className="text-sm text-gray-300">
-              {post.videoCount || 0}개 동영상
-            </span>
+            <div className="text-sm text-gray-300 min-w-0 flex items-center gap-2 flex-wrap">
+              <span>{tContent('videoCount', { count: post.videoCount || 0 })}</span>
+              {post.postLanguage && (
+                <>
+                  <span>-</span>
+                  <LanguageFlag language={post.postLanguage as Language} className="relative top-[1px]" />
+                  {post.videos?.[0]?.subtitle?.length > 0 && (
+                    <>
+                      <span>/</span>
+                      <div className="inline-flex items-center gap-1.5">
+                        {post.videos[0].subtitle.map((lang: Language) => (
+                          <LanguageFlag key={lang} language={lang} className="relative top-[1px]" />
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </>
+              )}
+            </div>
           </div>
   
           <div className="flex flex-wrap gap-2">

@@ -8,6 +8,7 @@ import { VideoWithSubtitles } from "@/lib/types";
 import { toast } from "../ui/use-toast";
 import { useUploader } from "@/hooks/useUploader";
 import LanguageFlag from "@/components/LanguageFlag";
+import { useTranslations } from "next-intl";
 
 type Video = VideoWithSubtitles;
 
@@ -33,6 +34,7 @@ export function VideoItem({
   } = useSortable({ id: video.id });
 
   const { deleteSubtitle } = useUploader(); 
+  const tUploader = useTranslations('VideoUploader');
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -102,7 +104,7 @@ export function VideoItem({
             document.getElementById(`subtitle-${video.id}`)?.click();
           }}
         >
-          자막 추가
+          {tUploader('addSubtitle')}
         </Button>
         <div className="flex gap-2">
           {video.subtitle.map((lang) => (
@@ -123,26 +125,16 @@ export function VideoItem({
                       subtitle: video.subtitle.filter(l => l !== lang)
                     });
 
-                    await fetch('/api/revalidate', {
-                      method: 'POST',
-                      headers: {
-                        'Content-Type': 'application/json'
-                      },
-                      body: JSON.stringify({
-                        path: `/usermenu/posts/${video.postId}/edit`
-                      })
-                    });
-
                     toast({
                       variant: "default",
-                      description: "자막이 삭제되었습니다.",
+                      description: tUploader('deleteSubtitleSuccess'),
                       duration: 1500
                     });
                   } catch (error) {
                     console.error('Error deleting subtitle:', error);
                     toast({
                       variant: "destructive",
-                      description: "자막 삭제에 실패했습니다.",
+                      description: tUploader('deleteSubtitleFailed'),
                       duration: 1500
                     });
                   }
@@ -169,7 +161,7 @@ export function VideoItem({
           }}
           className="rounded border-gray-300 dark:border-gray-700"
         />
-        <span className="text-sm">유료컨텐츠</span>
+        <span className="text-sm">{tUploader('premiumContent')}</span>
       </label>
 
       <Button

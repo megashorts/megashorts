@@ -7,10 +7,16 @@ import BlogCard from "@/components/posts/BlogCard";
 import NoticeSidebar from "@/components/NoticeSidebar";
 import { Pin } from "lucide-react";
 import { getTranslations } from "next-intl/server";
+import { getLocalizedPostTitle, getLocalizedPostContent } from "@/lib/content-language";
 
 export const dynamic = 'force-dynamic';
 
-export default async function NoticePage() {
+export default async function NoticePage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
   const t = await getTranslations('Notice');
   
   const totalNoticeCount = await prisma.post.count({
@@ -107,7 +113,7 @@ export default async function NoticePage() {
                     <TableCell>{format(post.createdAt, 'yyyy.MM.dd')}</TableCell>
                     <TableCell>
                       <Link href={`/notice/${post.id}`} className="hover:text-red-500">
-                        {post.title}
+                        {getLocalizedPostTitle(post, locale)}
                       </Link>
                     </TableCell>
                     <TableCell className="text-end text-muted-foreground text-xs">
@@ -147,7 +153,7 @@ export default async function NoticePage() {
                   href={`/notice/${post.id}`} 
                   className="block hover:underline"
                 >
-                  {post.title}
+                  {getLocalizedPostTitle(post, locale)}
                 </Link>
                 <div className="text-xs text-muted-foreground">
                   {post.featured && (
@@ -185,7 +191,11 @@ export default async function NoticePage() {
           {blogPosts.map((post) => (
             <div key={post.id} className="relative">
 
-              <BlogCard post={post} />
+              <BlogCard post={{
+                ...post,
+                title: getLocalizedPostTitle(post, locale),
+                content: getLocalizedPostContent(post, locale),
+              }} />
 
               {/* {post.featured && (
                 <Pin className="absolute left-[1.0rem] top-4 w-4 h-4 text-red-500" />

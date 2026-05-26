@@ -1,7 +1,75 @@
 import { validateRequest } from '@/auth';
+import { getAnalyticsTimeZone } from '@/lib/analytics-timezone-server';
+import { USER_ROLE, USER_ROLE_NAME_EN } from '@/lib/constants';
 import prisma from '@/lib/prisma';
-import { USER_ROLE } from '@/lib/constants';
+import { fetchAgencyTeamSummaryFromWorker } from '@/lib/worker-stats';
 import { NextRequest } from 'next/server';
+
+function rowPoints(row: any) {
+  return Number(row.point_by_coin || 0) + Number(row.point_by_subscription || 0);
+}
+
+function rowViews(row: any) {
+  return Number(row.view_count_coin || 0) + Number(row.view_count_subscription || 0);
+}
+
+function groupLabel(type: string) {
+  if (type === 'DIRECT') return 'Direct referral';
+  if (type === 'INDIRECT') return 'Indirect referral';
+  if (type === 'NETWORK_LEVEL') return 'Network level';
+  if (type === 'CREATOR') return 'Creator payout';
+  return type || '-';
+}
+
+function buildTeamStats(rows: any[]) {
+  const groups = new Map<string, any>();
+  const members = new Map<string, any>();
+
+  rows.forEach((row) => {
+    const type = row.commission_type || '-';
+    const userId = row.user_id || '-';
+    const currentGroup = groups.get(type) || {
+      type,
+      label: groupLabel(type),
+      userIds: new Set<string>(),
+      subscriptionViews: 0,
+      coinViews: 0,
+      points: 0,
+    };
+    currentGroup.userIds.add(userId);
+    currentGroup.subscriptionViews += Number(row.view_count_subscription || 0);
+    currentGroup.coinViews += Number(row.view_count_coin || 0);
+    currentGroup.points += rowPoints(row);
+    groups.set(type, currentGroup);
+
+    const currentMember = members.get(userId) || { userId, name: userId, totalPoints: 0, totalViews: 0 };
+    currentMember.totalPoints += rowPoints(row);
+    currentMember.totalViews += rowViews(row);
+    members.set(userId, currentMember);
+  });
+
+  const groupList = Array.from(groups.values());
+  const memberIds = new Set(rows.map((row) => row.user_id).filter(Boolean));
+
+  return {
+    totalMembers: memberIds.size,
+    totalViews: rows.reduce((sum, row) => sum + rowViews(row), 0),
+    subscriptionViews: rows.reduce((sum, row) => sum + Number(row.view_count_subscription || 0), 0),
+    coinViews: rows.reduce((sum, row) => sum + Number(row.view_count_coin || 0), 0),
+    totalPoints: rows.reduce((sum, row) => sum + rowPoints(row), 0),
+    membersByLevel: groupList.map((group, index) => ({
+      level: index + 1,
+      count: group.userIds.size,
+      label: group.label,
+    })),
+    pointsByLevel: groupList.map((group, index) => ({
+      level: index + 1,
+      points: group.points,
+      label: group.label,
+    })),
+    topMembers: Array.from(members.values()).sort((a, b) => b.totalPoints - a.totalPoints).slice(0, 10),
+  };
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -16,6 +84,7 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
+    const period = searchParams.get('period') || 'current';
 
     if (!userId) {
       return Response.json(
@@ -24,76 +93,60 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const members = await prisma.user.findMany({
-      where: {
-        OR: [
-          { id: userId },
-          { teamMaster: userId }
-        ]
-      },
-      select: {
-        id: true,
-        username: true,
-        userRole: true,
-        points: true,
-        createdAt: true
-      }
-    });
+    if (user.id !== userId && user.userRole < USER_ROLE.OPERATION1) {
+      return Response.json({ success: false, error: 'Forbidden' }, { status: 403 });
+    }
 
-    const membersByLevelMap = new Map<number, number>();
-    const pointsByLevelMap = new Map<number, number>();
-    let totalPoints = 0;
-
-    members.forEach(member => {
-      const level = normalizeAgencyLevel(member.userRole);
-      const points = Number(member.points || 0);
-
-      membersByLevelMap.set(level, (membersByLevelMap.get(level) || 0) + 1);
-      pointsByLevelMap.set(level, (pointsByLevelMap.get(level) || 0) + points);
-      totalPoints += points;
-    });
-
-    const totalManagers = members.filter(member => member.userRole >= USER_ROLE.TEAM_AGENCY).length;
-    const memberIds = members.map(member => member.id);
-    const since = new Date();
-    since.setDate(since.getDate() - 90);
-    const withdrawals = await prisma.pointWithdrawal.findMany({
-      where: {
-        userId: { in: memberIds },
-        requestedAt: { gte: since }
-      },
-      select: {
-        userId: true,
-        amount: true,
-        status: true,
-        requestedAt: true
-      },
-      orderBy: { requestedAt: 'desc' }
-    });
-    const dailyStats = buildTimeSeries('day', 14, members, withdrawals);
-    const weeklyStats = buildTimeSeries('week', 12, members, withdrawals);
-    const monthlyStats = buildTimeSeries('month', 6, members, withdrawals);
+    const [workerSummary, timezone, teamMembers] = await Promise.all([
+      fetchAgencyTeamSummaryFromWorker({
+        masterId: userId,
+        period,
+      }),
+      getAnalyticsTimeZone(),
+      prisma.user.findMany({
+        where: {
+          OR: [{ id: userId }, { teamMaster: userId }],
+          userRole: { gte: USER_ROLE.TEAM_MEMBER, lt: USER_ROLE.OPERATION1 },
+        },
+        select: { id: true, userRole: true },
+      }),
+    ]);
+    const rows = Array.isArray(workerSummary?.rows) ? workerSummary.rows : [];
+    const stats = buildTeamStats(rows);
+    const membersByRole = Array.from(
+      teamMembers.reduce((map, member) => {
+        map.set(member.userRole, (map.get(member.userRole) || 0) + 1);
+        return map;
+      }, new Map<number, number>()),
+    )
+      .sort((a, b) => a[0] - b[0])
+      .map(([role, count]) => ({
+        level: role,
+        count,
+        label: (USER_ROLE_NAME_EN as Record<number, string>)[role] || `Role ${role}`,
+      }));
+    const memberIds = (stats.topMembers || []).map((member: any) => member.userId).filter(Boolean);
+    const users = memberIds.length > 0
+      ? await prisma.user.findMany({ where: { id: { in: memberIds } }, select: { id: true, username: true, displayName: true } })
+      : [];
+    const userMap = new Map(users.map((item) => [item.id, item.displayName || item.username]));
 
     return Response.json({
       success: true,
       data: {
-        totalMembers: members.length,
-        totalAgencies: members.filter(member => member.userRole >= USER_ROLE.TEAM_MEMBER).length,
-        totalManagers,
-        totalPoints,
-        membersByLevel: toSortedArray(membersByLevelMap, 'count'),
-        pointsByLevel: toSortedArray(pointsByLevelMap, 'points'),
-        dailyStats,
-        weeklyStats,
-        monthlyStats,
-        topMembers: members
-          .sort((a, b) => Number(b.points || 0) - Number(a.points || 0))
-          .slice(0, 5)
-          .map(member => ({
-            id: member.id,
-            name: member.username,
-            points: Number(member.points || 0)
-          }))
+        ...stats,
+        topMembers: (stats.topMembers || []).map((member: any) => ({
+          ...member,
+          name: userMap.get(member.userId) || member.name,
+        })),
+        source: workerSummary?.source || 'empty',
+        pointSettings: workerSummary?.pointSettings || null,
+        timezone,
+        totalMembers: teamMembers.length,
+        payoutMembers: stats.totalMembers,
+        membersByRole,
+        totalAgencies: teamMembers.length,
+        totalManagers: 1,
       }
     });
   } catch (error) {
@@ -103,81 +156,4 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
-}
-
-function normalizeAgencyLevel(userRole: number): number {
-  if (userRole >= USER_ROLE.TEAM_MASTER) return 1;
-  if (userRole >= USER_ROLE.TEAM_AGENCY) return 2;
-  if (userRole >= USER_ROLE.TEAM_MEMBER) return 3;
-  return 0;
-}
-
-function toSortedArray(map: Map<number, number>, valueKey: 'count' | 'points') {
-  return Array.from(map.entries())
-    .sort(([a], [b]) => a - b)
-    .map(([level, value]) => ({
-      level,
-      [valueKey]: value
-    }));
-}
-
-function buildTimeSeries(
-  unit: 'day' | 'week' | 'month',
-  count: number,
-  members: Array<{ createdAt: Date }>,
-  withdrawals: Array<{ amount: number; status: string; requestedAt: Date }>
-) {
-  const buckets = new Map<string, { label: string; newMembers: number; points: number; applications: number }>();
-  const now = new Date();
-
-  for (let index = count - 1; index >= 0; index -= 1) {
-    const date = new Date(now);
-
-    if (unit === 'day') date.setDate(now.getDate() - index);
-    if (unit === 'week') date.setDate(now.getDate() - index * 7);
-    if (unit === 'month') date.setMonth(now.getMonth() - index);
-
-    const key = getBucketKey(date, unit);
-    buckets.set(key, { label: key, newMembers: 0, points: 0, applications: 0 });
-  }
-
-  members.forEach(member => {
-    const key = getBucketKey(member.createdAt, unit);
-    const bucket = buckets.get(key);
-    if (bucket) bucket.newMembers += 1;
-  });
-
-  withdrawals.forEach(withdrawal => {
-    const key = getBucketKey(withdrawal.requestedAt, unit);
-    const bucket = buckets.get(key);
-    if (!bucket) return;
-
-    bucket.applications += 1;
-    if (withdrawal.status === 'APPROVED') {
-      bucket.points += withdrawal.amount;
-    }
-  });
-
-  return Array.from(buckets.values());
-}
-
-function getBucketKey(date: Date, unit: 'day' | 'week' | 'month') {
-  const year = date.getUTCFullYear();
-  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-  const day = String(date.getUTCDate()).padStart(2, '0');
-
-  if (unit === 'month') return `${year}-${month}`;
-  if (unit === 'week') {
-    const start = new Date(Date.UTC(year, date.getUTCMonth(), date.getUTCDate()));
-    const weekday = start.getUTCDay() || 7;
-    start.setUTCDate(start.getUTCDate() - weekday + 1);
-    const jan4 = new Date(Date.UTC(start.getUTCFullYear(), 0, 4));
-    const jan4Day = jan4.getUTCDay() || 7;
-    const week1 = new Date(jan4.getTime() - (jan4Day - 1) * 86400000);
-    const week = Math.ceil(((start.getTime() - week1.getTime()) / 86400000 + 1) / 7);
-
-    return `${start.getUTCFullYear()}-W${String(week).padStart(2, '0')}`;
-  }
-
-  return `${year}-${month}-${day}`;
 }

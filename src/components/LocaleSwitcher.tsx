@@ -9,6 +9,7 @@ import { updatePreferredLocale } from '@/app/actions/locale';
 import { myLanguageToLocale } from '@/lib/locale-language';
 import { useQueryClient } from '@tanstack/react-query';
 import type { Language } from '@prisma/client';
+import LanguageFlag from '@/components/LanguageFlag';
 
 // 동그란 국기 버튼 + 드롭다운 방식의 언어 선택 컴포넌트
 export default function LocaleSwitcher() {
@@ -25,7 +26,7 @@ export default function LocaleSwitcher() {
     : null;
   const activeLocale = userLocale ?? locale;
 
-  // 현재 선택된 언어의 국기
+  // 현재 선택된 언어
   const currentLocale = locales.find(l => l.code === activeLocale) || locales[0];
 
   // 드롭다운 외부 클릭 시 닫기
@@ -74,14 +75,14 @@ export default function LocaleSwitcher() {
       {/* 동그란 국기 버튼 */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-white/10 transition-colors duration-200 text-lg"
+        className="flex h-6 w-6 items-center justify-center rounded-full transition-colors duration-200 hover:opacity-90"
         aria-label="Select language"
         disabled={isPending}
       >
-        <div className={`w-6 h-6 rounded-full overflow-hidden flex items-center justify-center ${isPending ? 'opacity-50' : ''}`}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={currentLocale.flag} alt={currentLocale.name} className="w-full h-full object-cover" />
-        </div>
+        <LanguageFlag
+          language={currentLocale.code}
+          className={`h-5 w-5 ${isPending ? 'opacity-50' : ''}`}
+        />
       </button>
 
       {/* 드롭다운 메뉴 */}
@@ -95,10 +96,7 @@ export default function LocaleSwitcher() {
                 loc.code === activeLocale ? 'bg-accent/30 font-medium' : ''
               }`}
             >
-              <div className="w-5 h-5 rounded-full overflow-hidden flex items-center justify-center shrink-0">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={loc.flag} alt={loc.name} className="w-full h-full object-cover" />
-              </div>
+              <LanguageFlag language={loc.code} className="h-5 w-5 shrink-0" />
               <span>{loc.name}</span>
             </button>
           ))}

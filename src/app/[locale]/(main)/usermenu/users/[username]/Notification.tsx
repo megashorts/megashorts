@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import { NotificationData } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { NotificationType } from "@prisma/client";
@@ -10,6 +13,7 @@ interface NotificationProps {
 }
 
 export default function Notification({ notification }: NotificationProps) {
+  const tNotificationMessage = useTranslations('NotificationMessage');
   const notificationTypeMap: Record<
     NotificationType,
     { 
@@ -19,27 +23,26 @@ export default function Notification({ notification }: NotificationProps) {
     }
   > = {
     FOLLOW: {
-      getMessage: (n) => `${n.issuer.displayName} followed you`,
+      getMessage: () => tNotificationMessage('followed'),
       icon: <User2 className="size-4 text-primary" />,
       href: `/users/${notification.issuer.username}`,
     },
     COMMENT: {
       getMessage: (n) => {
-        // const amount = n.metadata?.amount;
         const reason = n.metadata?.reason;
-        return reason ? `${reason}` : '';
+        if (!reason) return '';
+        return tNotificationMessage.has(reason) ? tNotificationMessage(reason) : reason;
       },
-      // icon: <MessageCircle className="size-4 fill-primary text-primary" />,
       icon: <Image src="/MS Logo emblem.svg" alt="MEGASHORTS logo emblem" width={20} height={20} />,
       href: `/usermenu/users/${notification.issuer.username}`,
     },
     LIKE: {
-      getMessage: (n) => `님이 컨텐츠를 좋아합니다!`,
+      getMessage: () => tNotificationMessage('likedContent'),
       icon: <Heart className="size-4 fill-red-500 text-red-500" />,
       href: `/posts/${notification.postId}`,
     },
     POST: {
-      getMessage: (n) => `${n.issuer.displayName} created a new post`,
+      getMessage: () => tNotificationMessage('createdPost'),
       icon: <MessageCircle className="size-4 fill-primary text-primary" />,
       href: `/posts/${notification.postId}`,
     },
@@ -47,7 +50,12 @@ export default function Notification({ notification }: NotificationProps) {
       getMessage: (n) => {
         const amount = n.metadata?.amount;
         const reason = n.metadata?.reason;
-        return amount ? `${reason}(으)로 ${amount}코인이 지급!` : '코인이 지급!';
+        const translatedReason = reason
+          ? (tNotificationMessage.has(reason) ? tNotificationMessage(reason) : reason)
+          : '';
+        return amount
+          ? tNotificationMessage('coinGrantedWithReason', { reason: translatedReason || '', amount })
+          : tNotificationMessage('coinGranted');
       },
       icon: <Gem className="size-4 fill-emerald-300" />,
       href: `/usermenu/users/${notification.issuer.username}`,
@@ -56,13 +64,18 @@ export default function Notification({ notification }: NotificationProps) {
       getMessage: (n) => {
         const amount = n.metadata?.amount;
         const reason = n.metadata?.reason;
-        return amount ? `${reason}으로 ${amount}포인트가 적립되었습니다` : '포인트가 적립되었습니다';
+        const translatedReason = reason
+          ? (tNotificationMessage.has(reason) ? tNotificationMessage(reason) : reason)
+          : '';
+        return amount
+          ? tNotificationMessage('pointGrantedWithReason', { reason: translatedReason || '', amount })
+          : tNotificationMessage('pointGranted');
       },
       icon: <Star className="size-4 fill-yellow-500 text-yellow-500" />,
       href: `/usermenu/users/${notification.issuer.username}`,
     },
     BOOKMARK: {
-      getMessage: (n) => `님이 컨텐츠를 북마크했습니다!`,
+      getMessage: () => tNotificationMessage('bookmarkedContent'),
       icon: <Heart className="size-4 fill-red-500 text-red-500" />,
       href: `/posts/${notification.postId}`,
     }

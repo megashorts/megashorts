@@ -16,6 +16,10 @@ import VideoControls from '@/components/videos/VideoControls';
 import { useSearchParams } from 'next/navigation';
 import { videoDB } from '@/lib/indexedDB';
 import { ResumeModal } from '@/components/ui/ResumeModal';
+import { useLocale, useTranslations } from 'next-intl';
+import { getLocalizedPostTitle, localeToVideoUserLanguage } from '@/lib/content-language';
+import { usePwaVideoChrome } from '@/hooks/usePwaVideoChrome';
+import { warmPwaVideoIds } from '@/lib/pwa-video-preload';
 
 interface ModalState {
   isOpen: boolean;
@@ -30,11 +34,16 @@ interface VideoViewClientProps {
     id: string;
     ageLimit: number;
     title: string | null;
+    titleI18n?: unknown;
+    content?: string | null;
+    contentI18n?: unknown;
+    postLanguage?: string;
     userId: string;
     videos: {
       id: string;
       sequence: number;
       isPremium: boolean;
+      subtitle?: string[];
     }[];
   };
   initialSequence: number;
@@ -44,6 +53,10 @@ interface VideoViewClientProps {
 export function VideoViewClient({ post, initialSequence, initialTime }: VideoViewClientProps) {
   // 이어보기 파라미터
   const searchParams = useSearchParams();
+  const locale = useLocale();
+  const tContent = useTranslations('Content');
+  const localizedTitle = getLocalizedPostTitle(post, locale);
+  const userLanguage = localeToVideoUserLanguage(locale);
   const [resumeData, setResumeData] = useState<{sequence: number, timestamp: number} | null>(null);
   const [showResumeModal, setShowResumeModal] = useState(false);  
 
@@ -56,6 +69,7 @@ export function VideoViewClient({ post, initialSequence, initialTime }: VideoVie
     imageUrl: '',
   });
   const [showButtons, setShowButtons] = useState(false);
+  const { isPwaMobile } = usePwaVideoChrome(showButtons);
   const timeoutRef = useRef<NodeJS.Timeout>();
   const [isMuted, setIsMuted] = useState(true);
   const resumeHandledRef = useRef(false);
@@ -141,19 +155,28 @@ export function VideoViewClient({ post, initialSequence, initialTime }: VideoVie
     setActiveIndex(swiper.activeIndex);
   }, [post.videos]);
 
+  useEffect(() => {
+    if (!isPwaMobile) return;
+    warmPwaVideoIds(
+      post.videos
+        .slice(activeIndex + 1, activeIndex + 3)
+        .map((video) => video.id),
+    );
+  }, [activeIndex, isPwaMobile, post.videos]);
+
   const handleVideoEnd = useCallback(() => {
     if (activeIndex === post.videos.length - 1) {
       setModalState({
         isOpen: true,
-        message: '시청완료! 다음 추천컨텐츠!\n\n관리자 로직입력시 자동생성영역',
+        message: tContent('watchCompleteMessage'),
         imageUrl: '/MS Logo emblem.svg',
         redirectUrl: `/categories/recent`,
-        buttonText: '최신작 보러가기'
+        buttonText: tContent('goLatest')
       });
     } else if (activeIndex < post.videos.length - 1) {
       swiperRef.current?.slideNext();
     }
-  }, [activeIndex, post.videos.length]);
+  }, [activeIndex, post.videos.length, tContent]);
 
   useEffect(() => {
     return () => {
@@ -193,7 +216,10 @@ export function VideoViewClient({ post, initialSequence, initialTime }: VideoVie
         lastTimestamp={resumeData?.timestamp || 0}
       />
       <div 
-        className="fixed inset-0 bg-black overflow-hidden"
+        className={cn(
+          "fixed inset-0 bg-black overflow-hidden",
+          isPwaMobile && "pwa-recommended-page"
+        )}
         onMouseMove={updateButtonsVisibility}
         onTouchStart={updateButtonsVisibility}
       >
@@ -259,7 +285,7 @@ export function VideoViewClient({ post, initialSequence, initialTime }: VideoVie
             if (swiper.isBeginning && !swiper.allowSlidePrev) {
               toast({
                 variant: "default",
-                description: '처음 동영상입니다.',
+                description: tContent('firstVideo'),
                 duration: 1000,
               });
             }
@@ -267,7 +293,7 @@ export function VideoViewClient({ post, initialSequence, initialTime }: VideoVie
             if (swiper.isEnd && !swiper.allowSlideNext) {
               toast({
                 variant: "default",
-                description: '마지막 동영상입니다.',
+                description: tContent('lastVideo'),
                 duration: 1000,
               });
             }
@@ -281,16 +307,23 @@ export function VideoViewClient({ post, initialSequence, initialTime }: VideoVie
             const streamId = video.id;
             return (
               <SwiperSlide key={video.id} virtualIndex={index}>
-                <div className="w-full h-full flex items-center justify-center bg-black pt-[48px] md:pt-[70px] pb-1">
+                <div className={cn(
+                  "w-full h-full flex items-center justify-center bg-black",
+                  isPwaMobile ? "pwa-recommended-slide" : "pt-[48px] md:pt-[70px] pb-1"
+                )}>
                   {/* <div className="relative w-[calc(100vh*16/9)] max-w-[640px] h-full md:pt-24 md:mb-8 pb-8 mb-8 pt-8"> */}
-                  <div className="relative aspect-[9/16] h-full mx-auto">
+                  <div className={cn(
+                    "relative aspect-[9/16] h-full mx-auto",
+                    isPwaMobile && "max-h-[100dvh]"
+                  )}>
                     <div className={cn(
-                      "absolute inset-x-0 top-10 md:mb-8 z-10 transition-opacity duration-300",
+                      "absolute inset-x-0 md:mb-8 z-10 transition-opacity duration-300",
+                      isPwaMobile ? "top-[max(0.75rem,env(safe-area-inset-top))]" : "top-10",
                       showButtons ? "opacity-100" : "opacity-0"
                     )}>
                       <div className="pl-4 md:pl-4 pt-4 text-white flex items-center relative">
                         <div className="bg-gradient-to-r from-black/70 to-transparent px-4 py-2 rounded-lg">
-                          <h1 className="text-sm md:text-lg text-slate-100 inline">{post.title}</h1>
+                          <h1 className="text-sm md:text-lg text-slate-100 inline">{localizedTitle}</h1>
                           <h1 className="text-sm md:text-lg text-white pl-2 inline-block">EP.{activeIndex + 1}</h1>
                           <p className="text-xl font-semibold pl-2 inline-block relative top-[4px]">👀</p>
                         </div>
@@ -301,11 +334,11 @@ export function VideoViewClient({ post, initialSequence, initialTime }: VideoVie
                       videoId={streamId}
                       postId={post.id}
                       sequence={video.sequence}
-                      title={post.title || ''}
+                      title={localizedTitle}
                       isActive={index === activeIndex && !showResumeModal}
                       onEnded={handleVideoEnd}
                       className="w-full h-full"
-                      userLanguage="KOREAN"
+                      userLanguage={userLanguage}
                       initialTime={
                         // 1. 이어보기로 이동한 경우: resumeData의 시간 사용
                         index === activeIndex && resumeData?.sequence === video.sequence
@@ -336,10 +369,10 @@ export function VideoViewClient({ post, initialSequence, initialTime }: VideoVie
                               case 1:
                                 setModalState({
                                   isOpen: true,
-                                  message: '로그인이 필요한 컨텐츠입니다.',
+                                  message: tContent('loginRequired'),
                                   imageUrl: '/MS Logo emblem.svg',
                                   redirectUrl: '/login',
-                                  buttonText: '로그인 이동'
+                                  buttonText: tContent('goLogin')
                                 });
                                 break;
                               case 2:
@@ -348,19 +381,19 @@ export function VideoViewClient({ post, initialSequence, initialTime }: VideoVie
                               case 3:
                                 setModalState({
                                   isOpen: true,
-                                  message: '프리미엄 컨텐츠입니다.\n구독 또는 코인으로 이용하세요',
+                                  message: tContent('premiumRequired'),
                                   imageUrl: '/MS Logo emblem.svg',
                                   redirectUrl: '/subscription',
-                                  buttonText: '이용하러 가기'
+                                  buttonText: tContent('goUse')
                                 });
                                 break;
                               case 4:
                                 setModalState({
                                   isOpen: true,
-                                  message: '코인이용 에러입니다.\n다시 시도해 주세요',
+                                  message: tContent('coinError'),
                                   imageUrl: '/MS Logo emblem.svg',
                                   redirectUrl: '/',
-                                  buttonText: '홈으로 이동'
+                                  buttonText: tContent('goHome')
                                 });
                                 break;
                             }
@@ -370,7 +403,10 @@ export function VideoViewClient({ post, initialSequence, initialTime }: VideoVie
                         {/* VideoControls 추가 */}
                         <div 
                           className={cn(
-                            "absolute right-4 bottom-32 md:right-[-5.5rem] md:bottom-30 z-10 transition-opacity duration-300",
+                            "z-10 transition-opacity duration-300",
+                            isPwaMobile
+                              ? "absolute right-2 bottom-[calc(env(safe-area-inset-bottom)+5.5rem)]"
+                              : "absolute right-4 bottom-32 md:right-[-5.5rem] md:bottom-30",
                             showButtons ? "opacity-100" : "opacity-0"
                           )}
                           onClick={(e) => e.stopPropagation()}

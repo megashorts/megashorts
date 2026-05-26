@@ -109,7 +109,7 @@ export default function NetworkMiddleManagerSettings({
           
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              {/* <Label htmlFor={`manager-name-${manager.id}`}>중간관리자 이름</Label> */}
+              {/* <Label htmlFor={`manager-name-${manager.id}`}>Middle Manager Name</Label> */}
               <Input
                 id={`manager-name-${manager.level}`}
                 value={manager.name}
@@ -120,7 +120,7 @@ export default function NetworkMiddleManagerSettings({
             </div>
             
             <div className="space-y-2">
-              {/* <Label htmlFor={`manager-rate-${manager.id}`}>수수료 비율</Label> */}
+              {/* <Label htmlFor={`manager-rate-${manager.id}`}>Commission Rate</Label> */}
               <div className="relative">
                 <Input
                   id={`manager-rate-${manager.level}`}
@@ -140,7 +140,7 @@ export default function NetworkMiddleManagerSettings({
           </div>
           
           {/* <div className="space-y-2">
-            <Label className="text-muted-foreground text-xs">* 매니져 설정 자동화 옵션</Label>
+            <Label className="text-muted-foreground text-xs">* Manager Automation Options</Label>
             <div className="flex flex-wrap gap-4">
               <div className="flex items-center space-x-2">
                 <Switch
@@ -149,7 +149,7 @@ export default function NetworkMiddleManagerSettings({
                   onChange={(e) => updateCondition(index, "memberCount", e.target.checked)}
                   disabled={loading || !manager.enabled}
                 />
-                <Label htmlFor={`manager-condition-member-${manager.id}`}>산하 회원수</Label>
+                <Label htmlFor={`manager-condition-member-${manager.id}`}>Sub-members</Label>
                 <Input
                   id={`manager-threshold-member-${manager.id}`}
                   type="number"
@@ -167,7 +167,7 @@ export default function NetworkMiddleManagerSettings({
                   onChange={(e) => updateCondition(index, "viewCount", e.target.checked)}
                   disabled={loading || !manager.enabled}
                 />
-                <Label htmlFor={`manager-condition-usage-${manager.id}`}>산하 유료시청</Label>
+                <Label htmlFor={`manager-condition-usage-${manager.id}`}>Sub-member views</Label>
                 <Input
                   id={`manager-threshold-usage-${manager.id}`}
                   type="number"
@@ -182,13 +182,13 @@ export default function NetworkMiddleManagerSettings({
           </div> */}
           
           <div className="space-y-2">
-            <Label className="text-muted-foreground text-xs" htmlFor={`manager-duplicate-${manager.level}`}># 동일자격 매니져 중복처리 (미입력시 근접 1인 지급)</Label>
+            <Label className="text-muted-foreground text-xs" htmlFor={`manager-duplicate-${manager.level}`}># Handle duplicate managers of same qualification (If empty, paid only to the closest 1 person)</Label>
             <div className="flex space-x-2">
               <Input
                 id={`manager-duplicate-${manager.level}`}
                 value={manager.duplicateDistribution}
                 onChange={(e) => updateManager(index, "duplicateDistribution", e.target.value)}
-                placeholder="예: 60, 40 (가까운 순서대로 60%, 40% 지급)"
+                placeholder="e.g. 60, 40 (distributes 60% and 40% in order of proximity)"
                 disabled={loading || !manager.enabled}
                 className="text-xs"
               />
@@ -196,7 +196,7 @@ export default function NetworkMiddleManagerSettings({
                 variant="outline"
                 size="icon"
                 disabled={loading || !manager.enabled}
-                title="중간관리자 조회"
+                title="Search Middle Manager"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="11" cy="11" r="8"></circle>
@@ -205,7 +205,7 @@ export default function NetworkMiddleManagerSettings({
               </Button> */}
             </div>
             {/* <p className="text-xs text-muted-foreground">
-              미입력시 근접한 매니져에게 전부 지급됩니다.
+              If empty, paid entirely to the closest manager.
             </p> */}
           </div>
         </div>
