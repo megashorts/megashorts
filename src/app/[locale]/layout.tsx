@@ -10,7 +10,7 @@ import { PWAEnhancer } from "@/components/PWAEnhancer";
 import { Analytics } from '@vercel/analytics/next';
 import '@/lib/logging-wrapper';
 import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
+import { getMessages, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { locales as localeConfigs, defaultLocale } from '@/i18n/config';
@@ -112,9 +112,11 @@ export default async function RootLayout({
     notFound();
   }
 
+  setRequestLocale(locale);
+
   // Providing all messages to the client
   // side is the easiest way to get started
-  const messages = await getMessages();
+  const messages = await getMessages({ locale });
   const localeFontClass = locale === 'zh'
     ? 'font-locale-zh'
     : locale === 'en'
@@ -138,8 +140,8 @@ export default async function RootLayout({
         <link rel="alternate" hrefLang="x-default" href={baseUrl} />
         <link rel="manifest" href="/manifest.json" />
         <link rel="apple-touch-icon" href="/apple-icon.png" />
-        <link rel="preconnect" href="https://customer-2cdfxbmja64x0pqo.cloudflarestream.com" />
         <link rel="preconnect" href="https://videodelivery.net" />
+        <link rel="preconnect" href="https://iframe.videodelivery.net" />
       </head>
       <body className={`${BMDOHYEON.variable} ${localeFontClass}`}>
         <NextIntlClientProvider messages={messages}>

@@ -269,6 +269,7 @@
 
 ### 6-6. 로그 시스템
 - 커스텀 로그는 지금 구조상 단순 디버그가 아니라 운영 기록 저장소입니다.
+- **글로벌 운영 표준**: `saveLogDirectly` 및 `sendLogToWorker`로 저장되는 내부 로그 이벤트 문자열은 모두 간결한 **영어(English)**로 작성되어야 합니다. 이는 다국적 운영팀 환경 및 자동화된 로그 모니터링 시스템(예: Datadog 등) 연동 시 텍스트 파싱 오류를 방지하기 위한 표준입니다 (2026-05-27 적용 완료).
 - 로그 저장은 단일 객체와 배열 둘 다 받아야 합니다.
 - 로그 조회는 `startDate`와 `endDate`가 필수입니다.
 - `type`, `userId`, `country` 필터가 가능해야 운영 시 추적이 수월합니다.
@@ -1304,3 +1305,19 @@
 - Verification:
   - `./node_modules/.bin/tsc --noEmit --pretty false` passed after these changes.
   - Message JSON parsing passed for Korean, English, and Chinese.
+
+### 14-16. 2026-05-27 로그 시스템 모바일 반응형 UI 최적화 및 시간대/영문화 검증
+
+- **로그 시스템 모바일/태블릿 반응형 UI 최적화**:
+  - `admin/service?tab=logs` 화면의 `LogTable` 컴포넌트에 모바일 환경(`sm` 미만) 전용 카드 뷰 레이아웃을 도입했습니다.
+  - 각 카드는 로그의 타임스탬프, 사용자(username), 타입 아이콘, 국가 및 IP 주소, 로그 이벤트 설명이 적절히 배치되도록 구성하여 좁은 화면에서도 찌그러지거나 잘리지 않도록 개선했습니다.
+  - 기존의 데스크톱 전용 테이블 UI는 `hidden sm:block`으로 감싸서 모바일 환경에서 렌더링되지 않도록 조치했습니다.
+  - `LogFilters`의 모바일 입력 필드 `placeholder`에 `"User ID"`를 지정하여 모바일 뷰에서의 사용성을 보완했습니다.
+  - 불필요한 `ko` 로케일 임포트를 정리했습니다.
+- **시간대 설정 연동 및 표기 검증**:
+  - 어드민 설정 페이지(`admin/system?tab=settings`)에서 지정한 `analyticsTimeZone`과 워커의 `ANALYTICS_TIME_ZONE` 환경변수가 연동되어 동작하고 있음을 확인했습니다.
+  - Next.js 서버사이드(`/api/admin/service/logs`)에서 타임존 정보를 안전하게 파싱하여 로그 워커로 전송하고, 워커 측에서 기간 필터링 바운더리를 계산할 때 타임존을 기반으로 UTC 변환을 정확히 수행하고 있습니다.
+  - 어드민 UI단(`LogTable`, `LogModal`)에서도 설정된 타임존 프롭을 바탕으로 `formatInTimeZone` 유틸을 거쳐 정확한 현지 시간대로 출력되고 있음을 검증했습니다.
+- **검증**:
+  - `pnpm exec tsc --noEmit` 검사 통과.
+  - `pnpm run build` 검사 진행 완료.

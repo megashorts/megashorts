@@ -3,7 +3,6 @@ import { CommentsPage, PostData } from "@/lib/types";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { Button } from "../ui/button";
-// import Comment from "./Comment";
 import CommentInput from "./CommentInput";
 
 interface CommentsProps {
@@ -54,9 +53,6 @@ export default function Comments({ post }: CommentsProps) {
         </p>
       )}
       <div className="divide-y">
-        {/* {comments.map((comment) => (
-          <Comment key={comment.id} comment={comment} />
-        ))} */}
       </div>
     </div>
   );

@@ -8,7 +8,7 @@ import Link from "next/link";
 // import LikeButton from "./LikeButton";
 import BookmarkButton from "./BookmarkButton";
 import LikeButton from "./LikeButtonOnly";
-import { getThumbnailUrl } from "@/lib/constants";
+import { getThumbnailUrl, getStreamManifestUrl } from "@/lib/constants";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { getLocalizedPostContent, getLocalizedPostTitle } from "@/lib/content-language";
@@ -53,7 +53,7 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
           });
           hlsRef.current = hls;
 
-          const videoUrl = `https://customer-2cdfxbmja64x0pqo.cloudflarestream.com/${firstVideoId}/manifest/video.m3u8`;
+          const videoUrl = getStreamManifestUrl(firstVideoId);
           hls.loadSource(videoUrl);
           hls.attachMedia(video);
 
@@ -92,7 +92,7 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
           });
         }
         else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-          video.src = `https://customer-2cdfxbmja64x0pqo.cloudflarestream.com/${firstVideoId}/manifest/video.m3u8`;
+          video.src = getStreamManifestUrl(firstVideoId);
           video.addEventListener('loadedmetadata', () => {
             if (isMounted) {
               video.muted = true;
@@ -127,11 +127,11 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
       <link rel="preconnect" href="https://iframe.videodelivery.net" />
       
       <div 
-        className="bg-black rounded-lg overflow-hidden w-[min(92vw,560px)] max-h-[92dvh] flex flex-col"
+        className="bg-black rounded-lg overflow-hidden w-[min(92vw,420px)] max-h-[90dvh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="relative w-full flex justify-center px-3 pt-3 flex-shrink-0">
-          <div className="relative aspect-[2/3] w-[min(100%,36dvh)] sm:w-[min(100%,40dvh)] md:w-[min(100%,44dvh)] lg:w-[min(100%,46dvh)] overflow-hidden rounded-md">
+        <div className="relative w-full pt-3 flex-shrink-0">
+          <div className="relative aspect-[2/3] w-[min(100%,calc(50dvh*2/3))] mx-auto overflow-hidden rounded-md">
           <button 
             onClick={handleClose}
             className="absolute top-3 right-3 p-2 bg-black/50 hover:bg-black/70 rounded-full text-white z-10"
@@ -212,6 +212,7 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
             <div className="ml-auto">
               <Link 
                 href={`/posts/${post.id}`}
+                prefetch={false}
                 className="w-12 aspect-square flex items-center justify-center hover:bg-white/10 border border-white rounded-full"
               >
                 <ChevronDown className="w-8 h-8 text-white" />

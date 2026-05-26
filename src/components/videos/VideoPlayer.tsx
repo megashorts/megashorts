@@ -3,11 +3,11 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import dynamic from 'next/dynamic';
-// import { videoTracking } from '@/lib/videoTracking';
 import { useSession } from '@/components/SessionProvider';
 import { videoDB } from '@/lib/indexedDB';
 import { logActivity } from '@/lib/activity-logger/client';
 import { isStandalonePWA } from '@/lib/pwa-client';
+import { getStreamManifestUrl, getStreamThumbnailUrl } from '@/lib/constants';
 import {
   getSubtitleLangCandidates,
   videoUserLanguageToSubtitleLang,
@@ -51,8 +51,8 @@ const VideoPlayer = dynamic(() => Promise.resolve(({
   const isProcessingRef = useRef(false);
   const [isMuted, setIsMuted] = useState(true);
   
-  const thumbnailUrl = `https://customer-2cdfxbmja64x0pqo.cloudflarestream.com/${videoId}/thumbnails/thumbnail.jpg?time=&height=600`;
-  const videoUrl = `https://customer-2cdfxbmja64x0pqo.cloudflarestream.com/${videoId}/manifest/video.m3u8`;
+  const thumbnailUrl = getStreamThumbnailUrl(videoId);
+  const videoUrl = getStreamManifestUrl(videoId);
 
   // 컴포넌트 마운트 시 localStorage에서 뮤트 상태 확인
   useEffect(() => {
@@ -257,6 +257,8 @@ useEffect(() => {
                   Array.from(track.cues || []).forEach((cue: any) => {
                     if (cue) {
                       cue.size = 200;  // 더 큰 크기로 설정
+                      cue.snapToLines = false;
+                      cue.line = 67; // 영상 아래를 0, 상단을 100으로 보았을 때 33% 높이에 위치 (상단 기준 100 - 33 = 67)
                     }
                   });
                 }
@@ -421,41 +423,13 @@ useEffect(() => {
     const handleCueChange = (event: Event) => {
       const track = event.target as TextTrack;
       if (track.cues) {
-        const isDesktop = window.matchMedia('(min-width: 1024px)').matches;
-        const isFullscreen = !!(
-          document.fullscreenElement ||
-          (document as any).webkitFullscreenElement ||
-          (document as any).mozFullScreenElement ||
-          (document as any).msFullscreenElement
-        );
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    
         for (let i = 0; i < track.cues.length; i++) {
           const cue = track.cues[i] as VTTCue;
           cue.size = 95;
-          cue.track
-          
-          if (isIOS) {
-            if (isDesktop) {
-              cue.line = 18;
-            } else {
-              cue.line = 16;
-            }
-          } else {
-            if (isFullscreen) {
-              if (isDesktop) {
-                cue.line = 24;
-              } else {
-                cue.line = 16;
-              }
-            } else {
-              if (isDesktop) {
-                cue.line = 21;
-              } else {
-                cue.line = 11;
-              }
-            }
-          }
+          cue.snapToLines = false;
+          // 영상 하단을 0, 상단을 100으로 보았을 때 33% 높이에 자막을 둡니다.
+          // VTT의 snapToLines = false 일 때 line 값은 상단(Top) 기준의 백분율(%)이 되므로, 100 - 33 = 67% 지점(67)으로 설정합니다.
+          cue.line = 67;
         }
       }
     };

@@ -17,7 +17,18 @@ export interface AuthUser {
   subscription: SubscriptionType;
 }
 
-export function getUserDataSelect(loggedInUserId: string) {
+export function getUserDataSelect(loggedInUserId?: string | null) {
+  const followersSelect = loggedInUserId
+    ? {
+        where: {
+          followerId: loggedInUserId,
+        },
+        select: {
+          followerId: true,
+        },
+      }
+    : false;
+
   return {
     id: true,
     username: true,
@@ -37,14 +48,7 @@ export function getUserDataSelect(loggedInUserId: string) {
     points: true,
     userRole: true,
     myLanguage: true,
-    followers: {
-      where: {
-        followerId: loggedInUserId,
-      },
-      select: {
-        followerId: true,
-      },
-    },
+    followers: followersSelect,
     _count: {
       select: {
         posts: true,

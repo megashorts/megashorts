@@ -247,3 +247,17 @@
 - [x] `/api/cron/billingkr` 외부 자동청구 제거, 구독 만료 상태 정리만 유지 ✅
 - [x] `/api/payments/cancel` 외부 취소 호출 제거, 다음 글로벌 결제 제공자 구현 전 `501` 응답으로 고정 ✅
 - [x] 후속 글로벌 결제솔루션 연계 가이드 작성: `docs/GLOBAL_PAYMENT_INTEGRATION_GUIDE.md` ✅
+
+## Phase 24: 로그 시스템 모바일 반응형 UI 최적화 및 시간대/영문화 검증 (2026-05-27)
+- [x] `LogTable.tsx` 모바일 전용 카드 뷰 리스트 레이아웃 추가 및 데스크톱 테이블 분리 (`hidden sm:block`) ✅
+- [x] `LogFilters.tsx` 모바일 뷰 User ID Input placeholder 보완 및 미사용 `ko` 로케일 정리 ✅
+- [x] 어드민 설정 타임존(`analyticsTimeZone`)과 워커 타임존(`ANALYTICS_TIME_ZONE`) 연동 및 UI 표기 검증 ✅
+- [x] 워커 전역 커스텀 로그 호출(`saveLogDirectly`, `sendLogToWorker`) 내의 활성 한글 문자열 전량 영어로 교체 완료 ✅
+- [x] 컴파일 검사 `pnpm exec tsc --noEmit` 및 빌드 `pnpm run build` 통과 ✅
+- [x] `.agents/04_architecture.md` 아키텍처 문서 동기화 완료 ✅
+
+## Phase 25: 자막 위치 일관성 확보 및 33% 높이 조절 (2026-05-27)
+- [x] 모든 재생 환경(프리뷰, 정식재생, PWA)에서 자막 위치를 비디오 프레임 하단 기준 33% 높이로 일관되게 고정 ✅
+- [x] `VTTCue`의 `snapToLines = false` 및 `line = 67` 설정을 도입하여 디바이스 및 전체화면 상태와 관계없이 균일한 높이 구현 ✅
+- [x] iOS 환경에서의 초기 자막 로딩 시 위치 조정을 위한 `MANIFEST_PARSED` 핸들러 내 자막 트랙 설정 보완 ✅
+- [x] TypeScript 빌드 및 컴파일러 오류가 발생하지 않음을 검증 (`npx tsc --noEmit`) ✅

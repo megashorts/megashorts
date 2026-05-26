@@ -1,4 +1,3 @@
-import { render } from "@react-email/render";
 import {
   Body,
   Button,
@@ -9,7 +8,6 @@ import {
   Section,
   Text,
 } from "@react-email/components";
-// import { APP_TITLE } from "@/lib/constants";
 
 export interface ResetPasswordTemplateProps {
   link: string;
@@ -46,38 +44,6 @@ export const ResetPasswordTemplate = ({ link }: ResetPasswordTemplateProps) => {
     </Html>
   );
 };
-
-// export const ResetPasswordTemplate = ({ link }: ResetPasswordTemplateProps) => {
-//   return (
-//     <Html>
-//       <Head />
-//       <Preview>Reset your password</Preview>
-//       <Body style={main}>
-//         <Container style={container}>
-//           <Section>
-//             <Text style={title}>{APP_TITLE}</Text>
-//             <Text style={text}>Hi,</Text>
-//             <Text style={text}>
-//               Someone recently requested a password change for your {APP_TITLE} account. If this was
-//               you, you can set a new password here:
-//             </Text>
-//             <Button style={button} href={link}>
-//               Reset password
-//             </Button>
-//             <Text style={text}>
-//               If you don&apos;t want to change your password or didn&apos;t request this, just
-//               ignore and delete this message.
-//             </Text>
-//             <Text style={text}>
-//               To keep your account secure, please don&apos;t forward this email to anyone.
-//             </Text>
-//             <Text style={text}>Have a nice day!</Text>
-//           </Section>
-//         </Container>
-//       </Body>
-//     </Html>
-//   );
-// };
 
 const main = {
   backgroundColor: "#f6f9fc",
@@ -118,7 +84,3 @@ const button = {
   width: "210px",
   padding: "14px 7px",
 };
-
-// const anchor = {
-//   textDecoration: "underline",
-// };

@@ -53,7 +53,7 @@ export async function generateMetadata(
 
   const title = post ? getLocalizedContent(post.title, post.titleI18n, resolvedParams.locale) : '게시물';
   const description = post ? getLocalizedContent(post.content, post.contentI18n, resolvedParams.locale).slice(0, 200) : '';  // 설명 길이 제한
-  const image = post?.thumbnailId || '/post-placeholder.jpg';
+  const image = getThumbnailUrl(post?.thumbnailId);
 
   // 플랫폼별 site name
   const siteNames = {
@@ -98,9 +98,6 @@ export async function generateMetadata(
   };
 }
 
-// export const dynamic = 'error';
-// export const dynamicParams = true;
-
 // 포스트 작업 시에만 재생성되도록 설정
 export const revalidate = false;
 
@@ -124,8 +121,14 @@ export async function generateStaticParams() {
 
 export default async function PostPage({ params }: Props) {
   const resolvedParams = await params;
-  const tCat = await getTranslations('Category');
-  const tContent = await getTranslations('Content');
+  const tCat = await getTranslations({
+    locale: resolvedParams.locale,
+    namespace: 'Category',
+  });
+  const tContent = await getTranslations({
+    locale: resolvedParams.locale,
+    namespace: 'Content',
+  });
   console.log(`[Server] Rendering post page: ${resolvedParams.postId}`, new Date().toISOString());
   
   // const currentUser = user ? await prisma.user.findUnique({
@@ -137,7 +140,7 @@ export default async function PostPage({ params }: Props) {
     where: { id: resolvedParams.postId },
     include: {
       user: {
-        select: getUserDataSelect(""),
+        select: getUserDataSelect(),
       },
       likes: {
         select: {
@@ -173,6 +176,18 @@ export default async function PostPage({ params }: Props) {
   const post = serializePrismaForClient(postData) as typeof postData;
   const localizedTitle = getLocalizedContent(post.title, post.titleI18n, resolvedParams.locale);
   const localizedContent = getLocalizedContent(post.content, post.contentI18n, resolvedParams.locale);
+  const safeCategories = Array.isArray(post.categories) ? post.categories : [];
+  const safeSubtitleLanguages = Array.isArray(post.videos?.[0]?.subtitle)
+    ? post.videos[0].subtitle
+    : [];
+  const uploaderDisplayName = post.user?.displayName ?? 'unknown';
+  const safeTranslateCategory = (category: string) => {
+    try {
+      return tCat(category);
+    } catch {
+      return category;
+    }
+  };
 
   // const hasEditPermission = Boolean(
   //   currentUser && (
@@ -232,7 +247,7 @@ export default async function PostPage({ params }: Props) {
                     <PostMoreButton post={post} />
                   </div>
                 )} */}
-                <PostMoreButton post={post} />
+                {post.user?.id ? <PostMoreButton post={post} /> : null}
               </div>
               {/* 정보 내용 */}
               <div className="space-y-3 text-sm text-white/90 flex-grow">
@@ -246,12 +261,12 @@ export default async function PostPage({ params }: Props) {
 
                 <div>
                   <p className="text-white/70">
-                    No.{post.postNum} - @{post.user.displayName}
+                    No.{post.postNum} - @{uploaderDisplayName}
                   </p>
                 </div>
 
                 {/* 영상 언어 */}
-                {post.videos?.[0] && (
+                {post.videos?.[0] && post.postLanguage && (
                   <div className="flex items-center gap-2">
                     <span className="text-white/70">{tContent('videoLanguage')} </span>
                     <LanguageFlag language={post.postLanguage} />
@@ -259,11 +274,11 @@ export default async function PostPage({ params }: Props) {
                 )}
 
                 {/* 자막 지원 */}
-                {post.videos?.[0]?.subtitle?.length > 0 && (
+                {safeSubtitleLanguages.length > 0 && (
                   <div className="flex items-center gap-2">
                     <span className="text-white/70">{tContent('subtitleSupport')} </span>
                     <div className="flex gap-1">
-                      {post.videos[0].subtitle.map((lang: Language) => (
+                      {safeSubtitleLanguages.map((lang: Language) => (
                         <LanguageFlag key={lang} language={lang} />
                       ))}
                     </div>
@@ -285,12 +300,12 @@ export default async function PostPage({ params }: Props) {
 
                 {/* 카테고리 */}
                 <div className="flex flex-wrap gap-2">
-                  {post.categories?.map((category) => (
+                  {safeCategories.map((category) => (
                     <span
                       key={category}
                       className="flex items-center py-2 text-muted-foreground text-sm"
                     >
-                      #{tCat(category)}
+                      #{safeTranslateCategory(category)}
                     </span>
                   ))}
                 </div>
@@ -325,7 +340,7 @@ export default async function PostPage({ params }: Props) {
               <PublicActions post={post} />
                   <UserActions post={post} />
             </div>
-            <PostMoreButton post={post} />
+            {post.user?.id ? <PostMoreButton post={post} /> : null}
           </div>
           
           <div className="w-[95%] mx-auto border-t border-white/15 mt-1 mb-6"></div>
@@ -352,7 +367,7 @@ export default async function PostPage({ params }: Props) {
 
                 <div className="flex items-center gap-2">
                   <span className="text-white/70">
-                    @{post.user.displayName}
+                    @{uploaderDisplayName}
                   </span>
                 </div>
 
@@ -365,7 +380,7 @@ export default async function PostPage({ params }: Props) {
                 )} */}
 
                 {/* 영상 언어 */}
-                {post.videos?.[0] && (
+                {post.videos?.[0] && post.postLanguage && (
                   <div className="flex items-center gap-2">
                     <span className="text-white/70">{tContent('language')} </span>
                     <LanguageFlag language={post.postLanguage} />
@@ -373,11 +388,11 @@ export default async function PostPage({ params }: Props) {
                 )}
 
                 {/* 자막 지원 */}
-                {post.videos?.[0]?.subtitle?.length > 0 && (
+                {safeSubtitleLanguages.length > 0 && (
                   <div className="flex items-center gap-2">
                     <span className="text-white/70">{tContent('subtitle')} </span>
                     <div className="flex gap-1">
-                      {post.videos[0].subtitle.map((lang: Language) => (
+                      {safeSubtitleLanguages.map((lang: Language) => (
                         <LanguageFlag key={lang} language={lang} />
                       ))}
                     </div>
@@ -398,12 +413,12 @@ export default async function PostPage({ params }: Props) {
 
                 {/* 카테고리 */}
                 <div className="flex flex-wrap gap-2">
-                  {post.categories?.map((category) => (
+                  {safeCategories.map((category) => (
                     <span
                       key={category}
                       className="flex items-center py-2 rounded-sm text-muted-foreground text-xs"
                     >
-                      #{tCat(category)}
+                      #{safeTranslateCategory(category)}
                     </span>
                   ))}
                 </div>
@@ -452,6 +467,10 @@ function serializePrismaForClient(value: unknown): unknown {
     return value;
   }
 
+  if (typeof value === 'bigint') {
+    return Number(value);
+  }
+
   if (typeof value !== 'object') {
     return value;
   }
@@ -462,10 +481,15 @@ function serializePrismaForClient(value: unknown): unknown {
 
   if (
     'toNumber' in value &&
+    'toJSON' in value &&
     typeof (value as { toNumber?: unknown }).toNumber === 'function' &&
-    value.constructor?.name === 'Decimal'
+    typeof (value as { toJSON?: unknown }).toJSON === 'function'
   ) {
-    return (value as { toNumber: () => number }).toNumber();
+    try {
+      return (value as { toNumber: () => number }).toNumber();
+    } catch {
+      return value;
+    }
   }
 
   if (Array.isArray(value)) {

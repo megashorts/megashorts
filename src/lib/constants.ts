@@ -6,6 +6,20 @@ export const getEmailSender = () => {
 
 export const CLOUDFLARE_ACCOUNT_HASH = 'wuhPilUNWOdMaNWjMYkZJg';
 
+const DEFAULT_STREAM_DELIVERY_BASE_URL = "https://videodelivery.net";
+const rawStreamDeliveryBaseUrl = process.env.NEXT_PUBLIC_STREAM_DELIVERY_BASE_URL?.trim();
+
+export const STREAM_DELIVERY_BASE_URL =
+  rawStreamDeliveryBaseUrl && rawStreamDeliveryBaseUrl.length > 0
+    ? rawStreamDeliveryBaseUrl.replace(/\/+$/, "")
+    : DEFAULT_STREAM_DELIVERY_BASE_URL;
+
+export const getStreamManifestUrl = (videoId: string) =>
+  `${STREAM_DELIVERY_BASE_URL}/${videoId}/manifest/video.m3u8`;
+
+export const getStreamThumbnailUrl = (videoId: string, height = 600) =>
+  `${STREAM_DELIVERY_BASE_URL}/${videoId}/thumbnails/thumbnail.jpg?time=&height=${height}`;
+
 export const getThumbnailUrl = (thumbnailId: string | null | undefined, variant: 'thumbnail' | 'public' = 'thumbnail') => {
   if (!thumbnailId) return '/post-placeholder.jpg';
   return `https://imagedelivery.net/${CLOUDFLARE_ACCOUNT_HASH}/${thumbnailId}/${variant}`;

@@ -151,7 +151,7 @@ export default function VideoControls({
         </div> */}
 
         <div className="group flex flex-col items-center gap-1">
-          <Link href={`/posts/${postId}`}> 
+          <Link href={`/posts/${postId}`} prefetch={false}> 
             <div className="rounded-full bg-black/40 p-4 md:p-5 backdrop-blur-lg transition-all group-hover:bg-black/40 border border-white/40">
               {/* 아이콘 크기만 별도로 조정 */}
               <ListCollapse className="h-5 w-5 md:h-5 md:w-5 text-white" />

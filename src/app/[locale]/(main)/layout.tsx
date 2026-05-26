@@ -1,12 +1,10 @@
 'use client'
 
 import Navbar from '../(main)/Navbar';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import SessionProvider from '@/components/SessionProvider';
-import { Session, User } from 'lucia';
 import MenuBar from './MenuBar';
 import Footer from '@/components/footer';
-import { MainPopupModal } from '@/components/MainPopupModal';
 import { useQuery } from '@tanstack/react-query';
 
 export default function Layout({
@@ -85,35 +83,3 @@ export default function Layout({
     </SessionProvider>
   );
 }
-
-// import { validateRequest } from '@/lib/auth';
-// import Navbar from "./Navbar";
-// import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-// import { AppSidebar } from "@/components/app-sidebar";
-// import SessionProvider from '@/components/SessionProvider';
-
-// export default async function Layout({
-//   children,
-// }: {
-//   children: React.ReactNode;
-// }) {
-//   const session = await validateRequest();
-
-//   return (
-//     <>
-//       <SessionProvider value={session}>
-//         <div className="relative">
-//           {/* <SidebarProvider defaultOpen={false}> */}
-//             <Navbar />
-//             {/* <AppSidebar /> */}
-//             <div className="absolute inset-0 pt-[64px]">
-//               <main className="w-full max-w-7xl mx-auto sm:px-6 lg:px-8">
-//                 {children}
-//               </main>
-//             </div>
-//           {/* </SidebarProvider> */}
-//         </div>
-//       </SessionProvider>
-//     </>
-//   );
-// }

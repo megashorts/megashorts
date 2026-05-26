@@ -1,8 +1,7 @@
 "use client";
 
 import { canWarmVideoNetwork, isStandalonePWA } from "@/lib/pwa-client";
-
-const STREAM_BASE_URL = "https://customer-2cdfxbmja64x0pqo.cloudflarestream.com";
+import { getStreamManifestUrl, getStreamThumbnailUrl } from "@/lib/constants";
 const warmed = new Set<string>();
 
 interface PreloadablePost {
@@ -11,8 +10,8 @@ interface PreloadablePost {
 
 function getStreamUrls(videoId: string) {
   return {
-    thumbnail: `${STREAM_BASE_URL}/${videoId}/thumbnails/thumbnail.jpg?time=&height=600`,
-    manifest: `${STREAM_BASE_URL}/${videoId}/manifest/video.m3u8`,
+    thumbnail: getStreamThumbnailUrl(videoId),
+    manifest: getStreamManifestUrl(videoId),
   };
 }
 

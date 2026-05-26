@@ -105,155 +105,212 @@ export function LogTable({
   };
 
   if (loading) {
-    return <div className="text-center py-4">Loading logs...</div>;
+    return <div className="text-center py-4 text-muted-foreground">Loading logs...</div>;
   }
 
   return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[80px] md:w-[120px]">
-              <Button
-                variant="ghost"
-                onClick={() => handleSort('timestamp')}
-                className="h-8 px-2 -ml-4"
-              >
-                <Timer className="ml-2 h-4 w-4" />
-                <span className="text-[10px] ml-1">{timeZone}</span>
-                <ArrowUpDown className="ml-2 h-4 w-4" />
-              </Button>
-            </TableHead>
-            <TableHead className="hidden md:table-cell w-[60px]">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex justify-center">
-                    <span className="sr-only">Type</span>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>Log Type</TooltipContent>
-              </Tooltip>
-            </TableHead>
-            <TableHead className="hidden md:table-cell w-[60px]">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex justify-center">
-                  <Globe className="h-4 w-4" />
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>Country</TooltipContent>
-              </Tooltip>
-            </TableHead>
-            <TableHead className="hidden md:table-cell w-[100px]">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex justify-center">
-                    <MapPin className="h-4 w-4" />
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>IP Address</TooltipContent>
-              </Tooltip>
-            </TableHead>
-            <TableHead className="w-[120px]">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex items-center gap-2">
-                    <User2 className="h-4 w-4" />
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>User</TooltipContent>
-              </Tooltip>
-            </TableHead>
-            <TableHead>
-              <Pen className="h-4 w-4" />
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {logs.length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={6} className="text-center">
-                No data.
-              </TableCell>
-            </TableRow>
-          ) : (
-            logs.map((log: ActivityLog & { uniqueId?: string }) => (
-              <TableRow 
+    <div className="space-y-3">
+      {/* 모바일 화면용 카드 리스트 */}
+      {logs.length === 0 ? (
+        <div className="sm:hidden py-8 text-center text-muted-foreground border rounded-lg">
+          No data.
+        </div>
+      ) : (
+        <div className="sm:hidden space-y-3">
+          {logs.map((log: ActivityLog & { uniqueId?: string }) => {
+            const { date, time } = formatInTimeZone(log.timestamp, timeZone);
+            return (
+              <div
                 key={log.uniqueId}
-                className="cursor-pointer hover:bg-muted/50"
+                className="p-3 border rounded-lg bg-card space-y-2 shadow-xs cursor-pointer hover:bg-muted/50 transition-colors"
                 onClick={() => onViewDetails(log)}
               >
-                {/* <TableCell className="font-mono whitespace-nowrap">
-                  {format(new Date(log.timestamp), 'HH:mm:ss')}
-                </TableCell> */}
-                <TableCell className="font-mono whitespace-nowrap">
-                  {/* <span className="text-xs text-gray-500 mr-1"> */}
-                    <span className="mr-2">
-                    {formatInTimeZone(log.timestamp, timeZone).date}
-                  </span>
-                  {formatInTimeZone(log.timestamp, timeZone).time}
-                </TableCell>
-                <TableCell className="hidden md:table-cell text-center">
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <div className="flex justify-center">
-                        {getTypeIcon(log.type)}
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      {isValidLogType(log.type) ? typeIcons[log.type as LogType].label : TYPE_DISPLAY_NAMES.system}
-                    </TooltipContent>
-                  </Tooltip>
-                </TableCell>
-                <TableCell className="hidden md:table-cell text-center">
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <div className="flex justify-center">
-                        {log.country ? (
-                          <span className="text-xs">{log.country.slice(0, 2)}</span>
-                        ) : (
-                          <MapPin className="h-3 w-3 text-muted-foreground" />
-                        )}
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      {log.country || 'Unknown'}
-                      {log.city ? ` (${log.city})` : ''}
-                    </TooltipContent>
-                  </Tooltip>
-                </TableCell>
-                <TableCell className="hidden md:table-cell">
-                  <div className="text-xs font-mono truncate">
-                    {log.ip || '-'}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-1">
-                    <span className="md:hidden">
-                      {getTypeIcon(log.type)}
+                <div className="flex justify-between items-start gap-2">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <span className="flex-shrink-0">{getTypeIcon(log.type)}</span>
+                    <span className="font-semibold truncate text-xs text-muted-foreground">
+                      {log.username || 'Guest'}
                     </span>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <span className="truncate max-w-[120px] block">
-                          {log.username || '-'}
-                        </span>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        {log.username || 'Guest User'}
-                      </TooltipContent>
-                    </Tooltip>
                   </div>
-                </TableCell>
-                <TableCell>
-                  <div className="truncate">
-                    {getLogDescription(log)}
+                  <div className="text-[10px] text-muted-foreground font-mono flex-shrink-0">
+                    {date} {time}
                   </div>
+                </div>
+
+                <div className="text-sm font-medium break-all line-clamp-2">
+                  {getLogDescription(log)}
+                </div>
+
+                <div className="flex gap-2 items-center text-[10px] text-muted-foreground pt-1.5 border-t">
+                  {log.country && (
+                    <span className="bg-muted px-1.5 py-0.5 rounded">
+                      {log.country}
+                    </span>
+                  )}
+                  {log.ip && (
+                    <span className="font-mono bg-muted px-1.5 py-0.5 rounded truncate max-w-[120px]">
+                      {log.ip}
+                    </span>
+                  )}
+                  {isValidLogType(log.type) && (
+                    <span className="ml-auto px-1.5 py-0.5 rounded border border-muted-foreground/20 text-[9px] uppercase">
+                      {typeIcons[log.type as LogType].label}
+                    </span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* 데스크톱 화면용 테이블 */}
+      <div className="hidden sm:block rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[80px] md:w-[120px]">
+                <Button
+                  variant="ghost"
+                  onClick={() => handleSort('timestamp')}
+                  className="h-8 px-2 -ml-4"
+                >
+                  <Timer className="ml-2 h-4 w-4" />
+                  <span className="text-[10px] ml-1">{timeZone}</span>
+                  <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+              </TableHead>
+              <TableHead className="hidden md:table-cell w-[60px]">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex justify-center">
+                      <span className="sr-only">Type</span>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>Log Type</TooltipContent>
+                </Tooltip>
+              </TableHead>
+              <TableHead className="hidden md:table-cell w-[60px]">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex justify-center">
+                    <Globe className="h-4 w-4" />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>Country</TooltipContent>
+                </Tooltip>
+              </TableHead>
+              <TableHead className="hidden md:table-cell w-[100px]">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex justify-center">
+                      <MapPin className="h-4 w-4" />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>IP Address</TooltipContent>
+                </Tooltip>
+              </TableHead>
+              <TableHead className="w-[120px]">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex items-center gap-2">
+                      <User2 className="h-4 w-4" />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>User</TooltipContent>
+                </Tooltip>
+              </TableHead>
+              <TableHead>
+                <Pen className="h-4 w-4" />
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {logs.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center">
+                  No data.
                 </TableCell>
               </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
+            ) : (
+              logs.map((log: ActivityLog & { uniqueId?: string }) => (
+                <TableRow
+                  key={log.uniqueId}
+                  className="cursor-pointer hover:bg-muted/50"
+                  onClick={() => onViewDetails(log)}
+                >
+                  {/* <TableCell className="font-mono whitespace-nowrap">
+                    {format(new Date(log.timestamp), 'HH:mm:ss')}
+                  </TableCell> */}
+                  <TableCell className="font-mono whitespace-nowrap">
+                    {/* <span className="text-xs text-gray-500 mr-1"> */}
+                      <span className="mr-2">
+                      {formatInTimeZone(log.timestamp, timeZone).date}
+                    </span>
+                    {formatInTimeZone(log.timestamp, timeZone).time}
+                  </TableCell>
+                  <TableCell className="hidden md:table-cell text-center">
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <div className="flex justify-center">
+                          {getTypeIcon(log.type)}
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        {isValidLogType(log.type) ? typeIcons[log.type as LogType].label : TYPE_DISPLAY_NAMES.system}
+                      </TooltipContent>
+                    </Tooltip>
+                  </TableCell>
+                  <TableCell className="hidden md:table-cell text-center">
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <div className="flex justify-center">
+                          {log.country ? (
+                            <span className="text-xs">{log.country.slice(0, 2)}</span>
+                          ) : (
+                            <MapPin className="h-3 w-3 text-muted-foreground" />
+                          )}
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        {log.country || 'Unknown'}
+                        {log.city ? ` (${log.city})` : ''}
+                      </TooltipContent>
+                    </Tooltip>
+                  </TableCell>
+                  <TableCell className="hidden md:table-cell">
+                    <div className="text-xs font-mono truncate">
+                      {log.ip || '-'}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-1">
+                      <span className="md:hidden">
+                        {getTypeIcon(log.type)}
+                      </span>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <span className="truncate max-w-[120px] block">
+                            {log.username || '-'}
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {log.username || 'Guest User'}
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="truncate">
+                      {getLogDescription(log)}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }

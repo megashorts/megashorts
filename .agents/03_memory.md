@@ -525,3 +525,41 @@
 - **후속 문서**:
   - `docs/GLOBAL_PAYMENT_INTEGRATION_GUIDE.md`를 추가했다.
   - DB 테이블, 웹훅, 관리자 설정, `/subscription` 연결, 워커 시청/정산/통계 원장 결합 기준을 provider 중립 구조로 정리했다.
+
+### 31. 로그 시스템 모바일 반응형 UI 최적화 및 시간대/영문화 검증 (2026-05-27)
+- **요청**:
+  - `admin/service?tab=logs` 탭의 모바일 및 태블릿 반응형 UI 최적화.
+  - 어드민 설정 시간대와 워커 배포 변수 설정 연동 및 표기 검증.
+  - 영어 고정 하드코딩 표준을 위반하는 잔여 코드 및 한글 하드코딩 여부 점검 및 교정.
+- **구현**:
+  - `LogTable.tsx`에 모바일 환경(`sm` 미만)용 전용 카드 뷰 리스트 UI를 추가하여 로그의 타임스탬프, 사용자(username), 타입 아이콘, 국가 및 IP, 이벤트 설명이 잘리지 않고 알맞게 렌더링되도록 수정했다.
+  - 기존의 데스크톱 테이블 뷰는 `hidden sm:block` 스타일을 주어 모바일 환경에서 렌더링되지 않도록 조치했다.
+  - `LogFilters.tsx`에서 모바일 입력 필드 `Input`의 placeholder를 `"User ID"`로 지정하여 비어 있던 모바일 사용성을 보완했다.
+  - 미사용 중이던 `import { ko } from 'date-fns/locale'`를 제거했다.
+- **검증**:
+  - 설정된 `analyticsTimeZone`과 워커의 `ANALYTICS_TIME_ZONE`이 API 및 화면(로그 상세 모달, 테이블, 카드 뷰)에서 UTC 오프셋을 통해 완벽히 변환되어 현지 시간대로 출력되고 있음을 확인했다.
+  - 타입체크 `pnpm exec tsc --noEmit` 정상 통과.
+  - 빌드 `pnpm run build` 정상 통과.
+
+### 32. 워커(msworker) 전역 커스텀 로그 호출부 영문화 완료 (2026-05-27)
+- **요청**: `saveLogDirectly` 및 `sendLogToWorker`를 통한 워커 내부 로그 저장 시, 한글로 하드코딩된 로그 메시지가 남아있는지 전수 조사하여 최대한 간략한 영문으로 수정.
+- **조치 사항**:
+  - `grep`을 통해 `msworker/src/dailywork/workers` 내부의 모든 `saveLogDirectly` 및 `sendLogToWorker` 호출을 전수 조사.
+  - `cfstats-admin`, `team-master-settings`, `viewgroup`, `postdata`, `viewcountteam`, `system-settings`, `referral-structure-worker`, `workersmanager` 등 워커 전반에서 사용 중인 활성(비주석) 한글 로그 메시지를 찾아 모두 간결한 영어로 교체 완료. (예: `4_ CF DAILY 통계 처리 완료` -> `4_ CF DAILY stats done`)
+  - 모든 활성 코드의 교체가 완료되었으며, 주석(`//`) 처리된 코드 내의 한글만 남겨두어 런타임에 실행되는 모든 커스텀 로그는 영어로 적재되도록 보장함.
+  - 이 변경 사항으로 인한 타입 오류나 구문 오류가 없는지 `tsc --noEmit` 및 전체 워커 대상 스크립트로 검증 완료.
+
+### 33. 자막 위치 일관성 확보 및 33% 높이 조절 (2026-05-27)
+- **요청**:
+  - 프리뷰, 정식재생, PWA 설치 앱을 포함한 모든 재생 환경에서 자막 위치를 비디오 프레임 아래에서 33% 높이 지점(0: 하단, 100: 상단)으로 일정하게 조절하고, 변경된 위치와 그 조절 방식에 대해 설명.
+- **원인 및 분석**:
+  - 기존에는 `isIOS`, `isDesktop`, `isFullscreen` 상태를 분기하여 `VTTCue.line`을 11, 16, 21, 24 등 정수 라인 넘버로 다르게 설정하고 있었음.
+  - 정수 라인으로 설정(snapToLines = true, 기본값) 시, 화면 크기나 해상도에 따라 자막의 절대적인 높이가 달라지며 화면 하단 33% 수준으로 일치시키는 데 한계가 존재함.
+- **해결**:
+  - `src/components/videos/VideoPlayer.tsx` 내의 자막 `cue` 처리 로직을 수정함:
+    1. 모든 `cue`에 대해 `cue.snapToLines = false;`를 지정하여 위치 설정을 백분율(Percentage, 0~100) 방식으로 전환.
+    2. `cue.line = 67;`로 설정함. VTT 표준 스펙상 `snapToLines = false` 일 때 `line`은 상단(Top) 기준의 오프셋 백분율(%)이 되므로, 하단에서 33% 떨어진 지점은 `100 - 33 = 67`이 됨.
+    3. HLS Manifest 파싱 완료 단계의 iOS 특화 설정 부(`Hls.Events.MANIFEST_PARSED` 내부)에서도 초기 `cue`들의 `snapToLines`와 `line` 값을 동일하게 `false`, `67`로 처리하도록 보완함.
+- **운영 기준 및 검증**:
+  - `npx tsc --noEmit` 실행 시 어떠한 타입 빌드 오류도 발생하지 않고 완벽하게 통과함.
+  - 이 설정을 통해 모바일, 데스크톱, PWA, 전체화면 여부와 관계없이 세로형 영상의 아래에서 정확히 약 33% 높이 지점에 자막이 일관적으로 고정되어 렌더링됨.

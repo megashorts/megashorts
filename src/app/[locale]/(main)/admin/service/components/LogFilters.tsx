@@ -8,7 +8,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { LogFiltersProps, LogFiltersState, DateRange } from '../types';
 import { format, subDays } from 'date-fns';
-import { ko } from 'date-fns/locale';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { TYPE_DISPLAY_NAMES } from '@/lib/activity-logger/constants';
 import LanguageFlag from '@/components/LanguageFlag';
@@ -281,7 +280,7 @@ export function LogFilters({ filters, onFiltersChange }: LogFiltersProps) {
             <div className="relative">
               <User2 className="absolute left-2 top-2.5 h-5 w-5 text-muted-foreground" />
               <Input
-                placeholder=""
+                placeholder="User ID"
                 value={filters.userId}
                 onChange={(e) => handleInputChange('userId', e.target.value)}
                 className="w-full pl-8 text-xs h-10"
