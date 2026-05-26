@@ -127,58 +127,102 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
       <link rel="preconnect" href="https://iframe.videodelivery.net" />
       
       <div 
-        className="bg-black rounded-lg overflow-hidden w-[min(92vw,calc(52dvh*2/3))] max-w-[420px] max-h-[90dvh] flex flex-col"
+        className="bg-black rounded-lg overflow-hidden w-[94vw] max-w-[560px] max-h-[90dvh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="relative w-full pt-3 flex-shrink-0">
-          <div className="relative aspect-[2/3] w-full overflow-hidden rounded-md">
+        <div className="relative w-full pt-3 px-3 sm:px-4 flex-shrink-0">
           <button 
             onClick={handleClose}
-            className="absolute top-3 right-3 p-2 bg-black/50 hover:bg-black/70 rounded-full text-white z-10"
+            className="absolute top-5 right-5 p-2 bg-black/50 hover:bg-black/70 rounded-full text-white z-20"
           >
             <X className="w-6 h-6" />
           </button>
-          
-          <div 
-            className={`absolute inset-0 transition-opacity duration-500 ${
-              isVideoReady ? 'opacity-0 pointer-events-none' : 'opacity-100'
-            }`}
-          >
-            <Image
-              src={getThumbnailUrl(post.thumbnailId)}
-              alt={`타이틀 ${localizedTitle} - ${post.categories || ''} 컨텐츠의 대표 이미지`}
-              fill
-              sizes="(max-width: 768px) 90vw, (max-width: 1200px) 40vw, 500px"  // 컨테이너 크기에 맞게 설정
-              className="object-cover"
-            />
-            
-          </div>
 
-          {(showPreview && firstVideoId) && (
-            <div 
-              className={`absolute inset-0 flex items-center justify-center transition-opacity duration-500 ${
-                isVideoReady ? 'opacity-100' : 'opacity-0'
-              }`}
-            >
-              <video
-                ref={videoRef}
-                playsInline
-                preload="auto"
-                className="w-full h-full object-cover"
-                autoPlay
-                onLoad={() => setIsVideoReady(true)}
-              />
+          <div className="flex items-end gap-3 lg:block">
+            <div className="relative aspect-[2/3] w-[min(72vw,320px)] sm:w-[min(58vw,340px)] lg:w-full overflow-hidden rounded-md">
+              <div 
+                className={`absolute inset-0 transition-opacity duration-500 ${
+                  isVideoReady ? 'opacity-0 pointer-events-none' : 'opacity-100'
+                }`}
+              >
+                <Image
+                  src={getThumbnailUrl(post.thumbnailId)}
+                  alt={`타이틀 ${localizedTitle} - ${post.categories || ''} 컨텐츠의 대표 이미지`}
+                  fill
+                  sizes="(max-width: 768px) 72vw, (max-width: 1024px) 58vw, 500px"
+                  className="object-cover"
+                />
+              </div>
+
+              {(showPreview && firstVideoId) && (
+                <div 
+                  className={`absolute inset-0 flex items-center justify-center transition-opacity duration-500 ${
+                    isVideoReady ? 'opacity-100' : 'opacity-0'
+                  }`}
+                >
+                  <video
+                    ref={videoRef}
+                    playsInline
+                    preload="auto"
+                    className="w-full h-full object-cover"
+                    autoPlay
+                    onLoad={() => setIsVideoReady(true)}
+                  />
+                </div>
+              )}
             </div>
-          )}
+
+            <div className="flex flex-col gap-2 pb-1 lg:hidden">
+              {post.videos && post.videos.length > 0 && (
+                <Link 
+                  href={`/${locale}/video-view/${post.id}`}
+                  className="w-11 h-11 flex items-center justify-center hover:bg-white/10 border border-white rounded-full"
+                >
+                  <Play className="size-5 text-white" />
+                </Link>
+              )}
+
+              {user && (
+                <>
+                  <div className="w-11 h-11 flex items-center justify-center hover:bg-white/10 border border-white rounded-full">
+                    <BookmarkButton
+                      postId={post.id}
+                      initialState={{
+                        isBookmarkedByUser: post.bookmarks.some(
+                          (bookmark) => bookmark.userId === user.id,
+                        ),
+                      }}
+                    />
+                  </div>
+                  <div className="w-11 h-11 flex items-center justify-center hover:bg-white/10 border border-white rounded-full">
+                    <LikeButton
+                      postId={post.id}
+                      initialState={{
+                        likes: post._count.likes,
+                        isLikedByUser: post.likes.some((like) => like.userId === user.id),
+                      }}
+                    />
+                  </div>
+                </>
+              )}
+
+              <Link 
+                href={`/${locale}/posts/${post.id}`}
+                prefetch={false}
+                className="w-11 h-11 flex items-center justify-center hover:bg-white/10 border border-white rounded-full"
+              >
+                <ChevronDown className="w-7 h-7 text-white" />
+              </Link>
+            </div>
           </div>
         </div>
   
-        <div className="w-full bg-black px-5 sm:px-8 pb-6 pt-4 overflow-y-auto min-h-0 flex-1">
-          <div className="flex items-center mb-4">
+        <div className="w-full bg-black px-5 sm:px-6 pb-6 pt-4 overflow-y-auto min-h-0 flex-1">
+          <div className="hidden lg:flex items-center mb-4">
             <div className="flex items-center gap-3">
               {post.videos && post.videos.length > 0 && (
                 <Link 
-                  href={`/video-view/${post.id}`}
+                  href={`/${locale}/video-view/${post.id}`}
                   className="w-12 aspect-square flex items-center justify-center hover:bg-white/10 border border-white rounded-full"
                 >
                   <Play className="size-5 text-white" />
