@@ -1,13 +1,17 @@
 {
   "name": "MEGASHORTS",
   "short_name": "MEGASHORTS",
-  "description": "글로벌 No.1 숏폼컨텐츠 플랫폼",
+  "description": "Global No.1 short-form platform",
   "id": "/",
   "start_url": "/",
   "scope": "/",
-  "lang": "ko",
+  "lang": "en",
   "display": "standalone",
-  "display_override": ["standalone", "minimal-ui", "browser"],
+  "display_override": [
+    "standalone",
+    "minimal-ui",
+    "browser"
+  ],
   "orientation": "portrait",
   "background_color": "#000000",
   "theme_color": "#000000",

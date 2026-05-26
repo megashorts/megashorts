@@ -38,10 +38,10 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://megashorts.com'),
   manifest: "/manifest.json",
   title: {
-    default: "메가쇼츠 MEGASHORTS",
+    default: "MEGASHORTS",
     template: "%s | 메가쇼츠"
   },
-  description: "글로벌 No.1 숏폼컨텐츠 오픈형 플랫폼",
+  description: "Global No.1 short-form platform",
   keywords: ["메가쇼츠", "숏폼", "동영상", "크리에이터", "콘텐츠", "MEGASHORTS", "shortform"],
   applicationName: "MEGASHORTS",
   authors: [{ name: "APPLIED LABS" }],
@@ -70,20 +70,20 @@ export const metadata: Metadata = {
     type: "website",
     locale: "ko_KR",
     url: "https://megashorts.com",
-    title: "메가쇼츠 MEGASHORTS",
-    description: "글로벌 No.1 숏폼컨텐츠 오픈형 플랫폼",
+    title: "MEGASHORTS",
+    description: "Global No.1 short-form platform",
     siteName: "MEGASHORTS",
     images: [{
       url: "/megashortsSNS2.jpg",
-      width: 800,   
-      height: 420,  
-      alt: "MEGASHORTS 로고",
+      width: 800,
+      height: 420,
+      alt: "MEGASHORTS logo",
     }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: "메가쇼츠 MEGASHORTS",
-    description: "글로벌 No.1 숏폼컨텐츠 오픈형 플랫폼",
+    title: "MEGASHORTS",
+    description: "Global No.1 short-form platform",
     images: ["/megashortsSNS.jpg"],
   },
   alternates: {
@@ -91,9 +91,10 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: '/favicon.ico',
-    apple: [
-      { url: '/apple-icon.png' },
-    ],
+    // apple: [
+    //   { url: '/apple-icon.png' },
+    // ],
+    apple: "/apple-touch-icon.png",
   },
 };
 
@@ -102,9 +103,9 @@ export default async function RootLayout({
   params
 }: Readonly<{
   children: React.ReactNode;
-  params: Promise<{locale: string}>;
+  params: Promise<{ locale: string }>;
 }>) {
-  const {locale} = await params;
+  const { locale } = await params;
 
   // Ensure that the incoming `locale` is valid
   if (!routing.locales.includes(locale as any)) {
