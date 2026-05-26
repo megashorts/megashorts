@@ -230,8 +230,9 @@ export function RecommendedVideosClient({ posts: initialPosts }: RecommendedVide
                 isPwaMobile ? "pwa-recommended-slide" : "pt-[48px] md:pt-[70px] pb-1"
               )}>
                 <div className={cn(
-                  "relative aspect-[9/16] h-full mx-auto",
-                  isPwaMobile && "max-h-[100dvh]"
+                  isPwaMobile
+                    ? "relative w-full h-full mx-auto"
+                    : "relative aspect-[9/16] h-full mx-auto"
                 )}>
                   <div 
                     className={cn(
@@ -262,7 +263,7 @@ export function RecommendedVideosClient({ posts: initialPosts }: RecommendedVide
                     isActive={index === activeIndex}
                     onEnded={handleVideoEnd}
                     onTimeUpdate={setCurrentTime}
-                    className="w-full h-full aspect-[9/16]"
+                    className={cn("w-full h-full", isPwaMobile && "object-contain")}
                     userLanguage={userLanguage}
                     muted={isMuted}
                     title={localizedTitle}

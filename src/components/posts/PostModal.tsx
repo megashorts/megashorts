@@ -127,11 +127,11 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
       <link rel="preconnect" href="https://iframe.videodelivery.net" />
       
       <div 
-        className="bg-black rounded-lg overflow-hidden w-[min(92vw,420px)] max-h-[90dvh] flex flex-col"
+        className="bg-black rounded-lg overflow-hidden w-[min(92vw,calc(52dvh*2/3))] max-w-[420px] max-h-[90dvh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="relative w-full pt-3 flex-shrink-0">
-          <div className="relative aspect-[2/3] w-[min(100%,calc(50dvh*2/3))] mx-auto overflow-hidden rounded-md">
+          <div className="relative aspect-[2/3] w-full overflow-hidden rounded-md">
           <button 
             onClick={handleClose}
             className="absolute top-3 right-3 p-2 bg-black/50 hover:bg-black/70 rounded-full text-white z-10"
@@ -211,7 +211,7 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
             </div>
             <div className="ml-auto">
               <Link 
-                href={`/posts/${post.id}`}
+                href={`/${locale}/posts/${post.id}`}
                 prefetch={false}
                 className="w-12 aspect-square flex items-center justify-center hover:bg-white/10 border border-white rounded-full"
               >

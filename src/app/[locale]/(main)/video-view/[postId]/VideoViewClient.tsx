@@ -313,8 +313,9 @@ export function VideoViewClient({ post, initialSequence, initialTime }: VideoVie
                 )}>
                   {/* <div className="relative w-[calc(100vh*16/9)] max-w-[640px] h-full md:pt-24 md:mb-8 pb-8 mb-8 pt-8"> */}
                   <div className={cn(
-                    "relative aspect-[9/16] h-full mx-auto",
-                    isPwaMobile && "max-h-[100dvh]"
+                    isPwaMobile
+                      ? "relative w-full h-full mx-auto"
+                      : "relative aspect-[9/16] h-full mx-auto"
                   )}>
                     <div className={cn(
                       "absolute inset-x-0 md:mb-8 z-10 transition-opacity duration-300",
@@ -337,7 +338,7 @@ export function VideoViewClient({ post, initialSequence, initialTime }: VideoVie
                       title={localizedTitle}
                       isActive={index === activeIndex && !showResumeModal}
                       onEnded={handleVideoEnd}
-                      className="w-full h-full"
+                      className={cn("w-full h-full", isPwaMobile && "object-contain")}
                       userLanguage={userLanguage}
                       initialTime={
                         // 1. 이어보기로 이동한 경우: resumeData의 시간 사용
