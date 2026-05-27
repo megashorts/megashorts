@@ -44,7 +44,7 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
     const initHls = async () => {
       try {
         const { default: Hls } = await import('hls.js');
-        
+
         if (Hls.isSupported()) {
           const hls = new Hls({
             enableWorker: true,
@@ -119,19 +119,19 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
   }, [firstVideoId, showPreview]);
 
   return (
-    <div 
+    <div
       className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4"
       onClick={handleClose}
     >
       <link rel="preconnect" href="https://videodelivery.net" />
       <link rel="preconnect" href="https://iframe.videodelivery.net" />
-      
-      <div 
+
+      <div
         className="bg-black rounded-lg overflow-hidden w-[94vw] max-w-[560px] max-h-[90dvh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="relative w-full pt-3 px-3 sm:px-4 flex-shrink-0">
-          <button 
+          <button
             onClick={handleClose}
             className="absolute top-5 right-5 p-2 bg-black/50 hover:bg-black/70 rounded-full text-white z-20"
           >
@@ -140,10 +140,9 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
 
           <div className="flex items-end gap-3 w-full">
             <div className="relative aspect-[2/3] flex-grow overflow-hidden rounded-md">
-              <div 
-                className={`absolute inset-0 transition-opacity duration-500 ${
-                  isVideoReady ? 'opacity-0 pointer-events-none' : 'opacity-100'
-                }`}
+              <div
+                className={`absolute inset-0 transition-opacity duration-500 ${isVideoReady ? 'opacity-0 pointer-events-none' : 'opacity-100'
+                  }`}
               >
                 <Image
                   src={getThumbnailUrl(post.thumbnailId)}
@@ -155,10 +154,9 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
               </div>
 
               {(showPreview && firstVideoId) && (
-                <div 
-                  className={`absolute inset-0 flex items-center justify-center transition-opacity duration-500 ${
-                    isVideoReady ? 'opacity-100' : 'opacity-0'
-                  }`}
+                <div
+                  className={`absolute inset-0 flex items-center justify-center transition-opacity duration-500 ${isVideoReady ? 'opacity-100' : 'opacity-0'
+                    }`}
                 >
                   <video
                     ref={videoRef}
@@ -174,7 +172,7 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
 
             <div className="flex flex-col gap-2 pb-1 flex-shrink-0">
               {post.videos && post.videos.length > 0 && (
-                <Link 
+                <Link
                   href={`/${locale}/video-view/${post.id}`}
                   className="w-11 h-11 flex items-center justify-center hover:bg-white/10 border border-white rounded-full"
                 >
@@ -206,7 +204,7 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
                 </>
               )}
 
-              <Link 
+              <Link
                 href={`/${locale}/posts/${post.id}`}
                 prefetch={false}
                 className="w-11 h-11 flex items-center justify-center hover:bg-white/10 border border-white rounded-full"
@@ -216,12 +214,12 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
             </div>
           </div>
         </div>
-  
+
         <div className="w-full bg-black px-5 sm:px-6 pb-6 pt-4 overflow-y-auto min-h-0 flex-1">
           <div className="hidden items-center mb-4">
             <div className="flex items-center gap-3">
               {post.videos && post.videos.length > 0 && (
-                <Link 
+                <Link
                   href={`/${locale}/video-view/${post.id}`}
                   className="w-12 aspect-square flex items-center justify-center hover:bg-white/10 border border-white rounded-full"
                 >
@@ -254,7 +252,7 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
               )}
             </div>
             <div className="ml-auto">
-              <Link 
+              <Link
                 href={`/${locale}/posts/${post.id}`}
                 prefetch={false}
                 className="w-12 aspect-square flex items-center justify-center hover:bg-white/10 border border-white rounded-full"
@@ -267,20 +265,19 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
           <div className="w-[98%] mx-auto border-t border-white/15 mb-5"></div>
 
           <div className="mb-1 text-white/90">
-            <p className="line-clamp-2 text-lg">
+            <p className="line-clamp-1 md:line-clamp-2 text-lg">
               {localizedTitle}
             </p>
           </div>
 
           <div className="mb-4 text-slate-400">
-            <p className="line-clamp-2 text-sm font-sans">
+            <p className="line-clamp-1 md:line-clamp-2 text-sm font-sans">
               {localizedContent}
             </p>
           </div>
 
           <div className="flex items-center gap-4 mb-4">
-            <div className={`flex items-center justify-center w-14 h-9 rounded-md border border-white font-bold text-sm text-white ${
-                post.ageLimit === 18 ? "bg-red-700" : "bg-blue-700"
+            <div className={`flex items-center justify-center w-14 h-9 rounded-md border border-white font-bold text-sm text-white ${post.ageLimit === 18 ? "bg-red-700" : "bg-blue-700"
               }`}>
               {post.ageLimit === 0 ? "전체" : `${post.ageLimit} +`}
             </div>
@@ -304,7 +301,7 @@ export default function PostModal({ post, handleClose }: PostModalProps) {
               )}
             </div>
           </div>
-  
+
           <div className="flex flex-wrap gap-2">
             {post.categories?.map((category) => (
               <span
