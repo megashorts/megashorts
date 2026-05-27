@@ -2,11 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 const DEFAULT_LOG_WORKER_URL = "https://megashorts-logs.msdevcm.workers.dev";
 const MAX_LOG_BODY_BYTES = 512 * 1024;
-const ALLOWED_ORIGINS = new Set([
-  "https://www.megashorts.com",
-  "https://megashorts.com",
-  "http://localhost:3000",
-]);
+
+function isMegashortsDomainHost(hostname: string): boolean {
+  return hostname === "megashorts.com" || hostname.endsWith(".megashorts.com");
+}
 
 function getLogWorkerConfig() {
   return {
@@ -18,7 +17,20 @@ function getLogWorkerConfig() {
 }
 
 function isAllowedOrigin(origin: string | null) {
-  return !origin || ALLOWED_ORIGINS.has(origin);
+  if (!origin) return true;
+
+  try {
+    const url = new URL(origin);
+    if (url.protocol === "http:" && url.hostname === "localhost" && url.port === "3000") {
+      return true;
+    }
+    if (url.protocol !== "https:") {
+      return false;
+    }
+    return isMegashortsDomainHost(url.hostname);
+  } catch {
+    return false;
+  }
 }
 
 export async function POST(request: NextRequest) {
