@@ -30,7 +30,7 @@
 
 ## 1. 시스템 기술 구성도
 
-### 1-1. 코어 기술 스택
+### 1-1. 코어 기술 스택 및 중요검토사항
 
 | 영역 | 기술 | 버전 |
 |------|------|------|
@@ -51,6 +51,41 @@
 | 워커 런타임 | Cloudflare Workers | - |
 | 배포 | Vercel | - |
 | 모니터링 | Sentry | - |
+
+### 중요 검토사항
+- 넥스트 중요 보안이슈 중 현재 15.1.6버젼은 “CVE-2025-29927 Middleware 인증 우회”, “CVE-2025-66478 / React Server Components RCE”이 해당되어 15.5.18로 넥스트 버젼 변경 재설치
+- 성인용 컨텐츠는 재생시 블락제어
+- 사용자 페이지 다국어 구현 / 관리자 페이지 영문 고정
+- 글로벌 반응시간을 위해 선재생 후 권한검증으로 블락
+- 토스와 패들 결제솔루션은 모두 삭제하였고 구매페이지만 유지
+
+
+### 사용자 역할 권한 정리
+
+| 권한 숫자 | 권한 코드 | 한국어 명칭 | 영어 명칭 |
+|---:|---|---|---|
+| 10 | `USER` | MS멤버 | MS Member |
+| 20 | `CREATOR_Lv1` | 크리에이터 Lv1 | Creator Lv1 |
+| 22 | `CREATOR_Lv2` | 크리에이터 Lv2 | Creator Lv2 |
+| 24 | `CREATOR_Lv3` | 크리에이터 Lv3 | Creator Lv3 |
+| 26 | `CREATOR_Lv4` | 크리에이터 Lv4 | Creator Lv4 |
+| 28 | `CREATOR_Lv5` | 크리에이터 Lv5 | Creator Lv5 |
+| 30 | `CREATOR_Lv6` | 크리에이터 Lv6 | Creator Lv6 |
+| 32 | `CREATOR_Lv7` | 크리에이터 Lv7 | Creator Lv7 |
+| 34 | `CREATOR_Lv8` | 크리에이터 Lv8 | Creator Lv8 |
+| 38 | `SUPPORTER` | 서포터 | Supporter |
+| 40 | `TEAM_MEMBER` | 에이젼시 멤버 | Agency Member |
+| 45 | `TEAM_AGENCY` | 에이젼시 마스터 | Agency Master |
+| 48 | `TEAM_OPERATOR` | 본부 운영자 | HQ Operator |
+| 50 | `TEAM_MASTER` | 본부 마스터 | HQ Master |
+| 51 | `NATIONAL_MASTER` | 국가 마스터 | National Master |
+| 52 | `MARKETING1` | 마케팅팀 | Marketing Team |
+| 55 | `MARKETING2` | 마케팅 매니저 | Marketing Manager |
+| 60 | `OPERATION1` | 운영팀 | Operations Team |
+| 70 | `OPERATION2` | 운영팀 매니저 | Operations Manager |
+| 80 | `OPERATION3` | 운영팀 마스터 | Operations Master |
+| 90 | `EXECUTIVE` | 임원진 | Executive |
+| 99 | `MASTER_ADMIN` | 최고 관리자 | Super Admin |
 
 ### 1-2. 아키텍처 레이어
 
