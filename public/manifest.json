@@ -34,7 +34,7 @@
       "name": "Recommended Videos",
       "short_name": "Recommended",
       "description": "Open MEGASHORTS recommended videos.",
-      "url": "/ko/recommended-videos",
+      "url": "/recommended-videos",
       "icons": [
         {
           "src": "/pwa-192x192.png",

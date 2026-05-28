@@ -6,7 +6,6 @@ import { videoDB } from "@/lib/indexedDB";
 
 const PWA_SESSION_EXTENDED_AT_KEY = "ms_pwa_session_extended_at";
 const PWA_SESSION_REFRESH_INTERVAL_MS = 12 * 60 * 60 * 1000;
-const PREVIEW_HOSTNAME = "preview.megashorts.com";
 
 async function lockPortraitIfAvailable() {
   const orientation = screen.orientation as ScreenOrientation & {
@@ -38,22 +37,8 @@ async function extendPwaSessionIfNeeded() {
   }
 }
 
-async function cleanupPreviewServiceWorkerIfNeeded() {
-  if (window.location.hostname !== PREVIEW_HOSTNAME) return;
-  if (!("serviceWorker" in navigator)) return;
-
-  try {
-    const registrations = await navigator.serviceWorker.getRegistrations();
-    await Promise.all(registrations.map((registration) => registration.unregister()));
-  } catch {
-    // Ignore cleanup errors in preview.
-  }
-}
-
 export function PWAEnhancer() {
   useEffect(() => {
-    cleanupPreviewServiceWorkerIfNeeded().catch(() => {});
-
     const updatePwaState = () => {
       const standalone = isStandalonePWA();
       const mobile = isMobileViewport();

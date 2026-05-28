@@ -754,14 +754,17 @@
   - 무효화 카테고리는 `이전 categories + 현재 categories`의 합집합으로 처리합니다.
   - 따라서 카테고리 변경(예: A -> B) 시에도 A/B 양쪽 관련 페이지 캐시가 함께 갱신됩니다.
 
-### 11-7-1. 프리뷰 PWA 캐시 격리 기준 (2026-05-28)
-- Vercel Preview 환경에서는 PWA를 생성하지 않습니다.
+### 11-7-1. 프리뷰 PWA 검증 기준 (2026-05-28)
+- Vercel Preview에서도 PWA 서비스워커를 빌드합니다.
   - 구현 위치: `next.config.mjs`
-  - 기준: `process.env.VERCEL_ENV === "preview"`이면 `withPWA({ disable: true })`
-- 이미 과거에 `preview.megashorts.com`에서 설치/등록된 서비스워커는 프리뷰 호스트에서만 정리합니다.
-  - 구현 위치: `src/components/PWAEnhancer.tsx`
-  - 기준: `window.location.hostname === "preview.megashorts.com"`일 때만 `navigator.serviceWorker.getRegistrations().unregister()`
-- 이 조치는 프리뷰 검증 정확도를 위한 격리입니다. 운영 도메인의 PWA 설치, 세션 연장, Workbox runtime cache 정책은 변경하지 않습니다.
+  - 기준: 개발 모드만 기본 비활성화하며, `VERCEL_ENV=preview`는 비활성화 조건에 포함하지 않습니다.
+- `public/sw.js`, `public/workbox-*.js`, `public/fallback-*.js`, `public/swe-worker-*.js`는 빌드 산출물이므로 Git에 커밋하지 않습니다.
+  - 저장소의 `.gitignore`에 이미 포함되어 있으며, stale service worker가 preview에 정적 파일로 남지 않도록 Git 추적에서 제거했습니다.
+  - Vercel/production 빌드에서 `next-pwa`가 매 배포마다 현재 빌드에 맞는 서비스워커를 새로 생성합니다.
+- PWA shortcut의 추천 영상 URL은 기본 언어 canonical 기준인 `/recommended-videos`를 사용합니다.
+  - 구현 위치: `public/manifest.json`
+  - 이전 `/ko/recommended-videos` 고정값을 제거하여 설치 앱/shortcut이 특정 언어에 묶이지 않게 했습니다.
+- 이 조치는 preview에서도 실제 PWA 경로를 검증하기 위한 기준입니다. 랜딩 stale 문제는 홈 서버 캐시 제거로 해결하며, PWA 자체를 끄는 방식으로 우회하지 않습니다.
 - `/en` 접속이 `/`로 보이는 것은 `next-intl`의 `localePrefix: 'as-needed'` 정책 때문입니다. 기본 언어 영어는 prefix 없는 URL이 canonical이며, `NEXT_LOCALE=en` 쿠키와 `<html lang="en">`로 영어 상태가 유지됩니다.
 
 ### 11-8. E2E 영업팀 통계 화면 검증 기준 (2026-05-22)

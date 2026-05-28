@@ -593,12 +593,13 @@
 - **수정**:
   - `src/app/[locale]/(main)/page.tsx`: 홈 라우트를 `dynamic = 'force-dynamic'`, `revalidate = 0`으로 전환.
   - `src/components/MainContent.tsx`: 홈 메인 슬라이더 조회에서 `unstable_cache`를 제거하고 `unstable_noStore()`를 적용.
-  - `next.config.mjs`: `VERCEL_ENV === "preview"`에서는 PWA 빌드를 비활성화.
-  - `src/components/PWAEnhancer.tsx`: `preview.megashorts.com`에서만 기존 서비스워커 registration을 unregister.
+  - `next.config.mjs`: preview에서도 최신 PWA 서비스워커를 빌드하도록 유지하고, 개발 모드에서만 기본 비활성화.
+  - `public/sw.js`, `public/workbox-*.js`, `public/fallback-*.js`, `public/swe-worker-*.js`: Git에 남아 있던 과거 생성 산출물 추적 제거.
+  - `public/manifest.json`: PWA shortcut URL을 `/ko/recommended-videos`에서 `/recommended-videos`로 교정.
 - **영향 범위**:
   - 이 변경은 랜딩 홈 메인 콘텐츠의 서버 캐시만 제거한다.
   - Next 정적 JS/CSS chunk, 이미지, Cloudflare Stream 썸네일/HLS 캐시, 카테고리/최근/추천 페이지의 `unstable_cache`, 포스트 생성/수정/삭제의 `invalidatePostContent()` 경로는 유지된다.
-  - 운영 도메인의 PWA 정책은 유지되며, preview host에서만 PWA/서비스워커 캐시를 격리한다.
+  - PWA 서비스워커는 배포별로 새로 생성되며, 저장소에 커밋된 과거 서비스워커가 preview에 남는 구조를 제거했다.
 - **검증**:
   - `pnpm -s tsc --noEmit` 통과.
   - Vercel preview deployment `dpl_8vzhx9ggo4AbKBqbAmfcWTsQFRHY`가 `preview.megashorts.com` alias에 연결된 것을 확인.
