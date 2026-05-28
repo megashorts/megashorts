@@ -273,5 +273,6 @@
 - [x] 영어 기본 URL 정책 확인: `/en`은 `localePrefix: 'as-needed'`에 따라 `/`로 canonicalize되고 `NEXT_LOCALE=en`, `<html lang="en">` 상태로 동작 ✅
 - [x] Vercel Preview에서도 최신 PWA 서비스워커를 빌드하도록 유지하고, Git에 남아 있던 과거 `public/sw.js` 계열 생성 산출물을 추적 제거 ✅
 - [x] PWA manifest shortcut을 `/ko/recommended-videos` 고정값에서 기본 언어 canonical인 `/recommended-videos`로 교정 ✅
+- [x] PWA document fallback을 `/ko/~offline` 고정값에서 기본 언어 canonical인 `/~offline`로 교정 ✅
 - [x] 영향 범위 확인: 정적 JS/CSS/이미지, 카테고리/최근/추천 페이지의 태그 캐시, 포스트 생성/수정/삭제 on-demand 무효화 경로는 유지 ✅
 - [x] 검증: `pnpm -s tsc --noEmit`, Vercel 배포 `dpl_8vzhx9ggo4AbKBqbAmfcWTsQFRHY`, `preview.megashorts.com` alias, `/en` HTML의 최신 agency sample post 노출 확인 ✅

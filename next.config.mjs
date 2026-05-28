@@ -51,7 +51,7 @@ const withPWA = withPWAInit({
   cacheOnFrontEndNav: true,
   reloadOnOnline: false,
   fallbacks: {
-    document: "/ko/~offline",
+    document: "/~offline",
   },
   workboxOptions: {
     runtimeCaching: pwaRuntimeCaching,

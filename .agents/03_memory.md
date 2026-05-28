@@ -594,6 +594,7 @@
   - `src/app/[locale]/(main)/page.tsx`: 홈 라우트를 `dynamic = 'force-dynamic'`, `revalidate = 0`으로 전환.
   - `src/components/MainContent.tsx`: 홈 메인 슬라이더 조회에서 `unstable_cache`를 제거하고 `unstable_noStore()`를 적용.
   - `next.config.mjs`: preview에서도 최신 PWA 서비스워커를 빌드하도록 유지하고, 개발 모드에서만 기본 비활성화.
+  - `next.config.mjs`: PWA document fallback을 `/ko/~offline`에서 `/~offline`로 교정.
   - `public/sw.js`, `public/workbox-*.js`, `public/fallback-*.js`, `public/swe-worker-*.js`: Git에 남아 있던 과거 생성 산출물 추적 제거.
   - `public/manifest.json`: PWA shortcut URL을 `/ko/recommended-videos`에서 `/recommended-videos`로 교정.
 - **영향 범위**:

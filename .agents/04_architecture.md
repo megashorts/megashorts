@@ -194,7 +194,7 @@
   - `orientation: "portrait"`와 `viewport-fit=cover`를 사용하고, 설치 앱에서는 가능한 경우 `screen.orientation.lock("portrait")`를 시도합니다.
   - 추천/시청 영상 화면에서는 모든 PWA 설치 앱에서 컨트롤이 숨겨질 때 상단 메뉴도 함께 숨깁니다. 모바일 PWA에서는 safe-area 기반 전체화면형 레이아웃을 추가 적용합니다.
   - 브라우저 저장소도 같은 origin 기준입니다. IndexedDB(`videoDB`)에 저장되는 시청 기록/재생 위치는 웹과 PWA 모두 같은 origin 저장소를 사용합니다.
-  - 오프라인 지원은 “전체 콘텐츠 오프라인 재생”이 아닙니다. 네트워크와 캐시가 모두 실패하면 `/ko/~offline` fallback 페이지를 보여주는 수준입니다.
+  - 오프라인 지원은 “전체 콘텐츠 오프라인 재생”이 아닙니다. 네트워크와 캐시가 모두 실패하면 `/~offline` fallback 페이지를 보여주는 수준입니다.
   - 추천 콘텐츠 목록 자체는 `/api/posts/recommended` 또는 서버 렌더링 결과에 의존하므로, 완전 오프라인에서 항상 최신 추천 목록을 보장하지 않습니다.
   - 한 번 로드된 정적 JS/CSS, 일부 페이지 응답, 이미지, API GET 응답은 Workbox 런타임 캐시에 의해 재방문 시 더 빠르게 표시될 수 있습니다.
   - Cloudflare Stream 썸네일은 `StaleWhileRevalidate`로 캐시합니다. 이미 본 썸네일은 다음 진입 시 빠르게 보이고, 백그라운드에서 새 버전을 갱신합니다.
@@ -764,6 +764,9 @@
 - PWA shortcut의 추천 영상 URL은 기본 언어 canonical 기준인 `/recommended-videos`를 사용합니다.
   - 구현 위치: `public/manifest.json`
   - 이전 `/ko/recommended-videos` 고정값을 제거하여 설치 앱/shortcut이 특정 언어에 묶이지 않게 했습니다.
+- PWA document fallback은 기본 언어 canonical 기준인 `/~offline`을 사용합니다.
+  - 구현 위치: `next.config.mjs`
+  - 이전 `/ko/~offline` 고정값을 제거하여 오프라인 fallback도 특정 언어에 묶이지 않게 했습니다.
 - 이 조치는 preview에서도 실제 PWA 경로를 검증하기 위한 기준입니다. 랜딩 stale 문제는 홈 서버 캐시 제거로 해결하며, PWA 자체를 끄는 방식으로 우회하지 않습니다.
 - `/en` 접속이 `/`로 보이는 것은 `next-intl`의 `localePrefix: 'as-needed'` 정책 때문입니다. 기본 언어 영어는 prefix 없는 URL이 canonical이며, `NEXT_LOCALE=en` 쿠키와 `<html lang="en">`로 영어 상태가 유지됩니다.
 
