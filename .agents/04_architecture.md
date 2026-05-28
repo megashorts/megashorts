@@ -677,34 +677,43 @@
 
 ---
 
-## 11. 랜딩/카테고리 캐시 및 재생성 전략 (초보자용, 2026-05-22 확인본)
+## 11. 랜딩/카테고리 캐시 및 재생성 전략 (초보자용, 2026-05-28 확인본)
 
 이 섹션은 “포스트를 만들거나 수정/삭제했을 때 랜딩, 카테고리, 최근, 추천 페이지가 어떻게 빠르게 반영되는가”를 운영 관점에서 쉽게 설명한 기준입니다.
 
-### 11-1. 먼저 결론: ISR(시간 간격 재생성) 중심에서 On-demand 무효화 중심으로 변경
-- 과거에는 “일정 시간마다 다시 만들기(ISR 주기 재생성)” 방식이 일반적이었습니다.
-- 현재 코드 기준으로 핵심 페이지는 `revalidate = false`를 사용합니다.
-  - 랜딩: `src/app/[locale]/(main)/page.tsx`
+### 11-1. 먼저 결론: 랜딩 홈과 나머지 목록 페이지의 전략을 분리
+- 랜딩 홈(`/`, `/ko`, `/zh`)은 2026-05-28부터 request-time 렌더링으로 운영합니다.
+  - 구현 위치: `src/app/[locale]/(main)/page.tsx`
+  - 현재 설정: `dynamic = 'force-dynamic'`, `revalidate = 0`
+  - 데이터 위치: `src/components/MainContent.tsx`
+  - 현재 설정: `unstable_noStore()` 호출 후 `main_sliders`, 최신/인기/추천/카테고리 슬라이더 포스트를 Prisma로 직접 조회
+- 카테고리/최근/추천 페이지는 기존처럼 `unstable_cache` + on-demand 무효화 구조를 유지합니다.
   - 카테고리: `src/app/[locale]/(main)/(static)/categories/[category]/page.tsx`
+  - 복합 카테고리: `src/app/[locale]/(main)/(static)/categories/combined/[encodedCategories]/page.tsx`
   - 최근: `src/app/[locale]/(main)/(static)/categories/recent/page.tsx`
   - 추천: `src/app/[locale]/(main)/recommended-videos/page.tsx`
 - 의미:
-  - 시간 지나면 자동 재생성되는 구조가 아니라,
-  - “콘텐츠가 바뀐 순간”에 필요한 캐시만 정확히 지우고 다시 채우는 구조입니다.
+  - 랜딩 홈은 프리뷰/운영에서 샘플 포스트나 슬라이더 변경이 오래된 서버 캐시에 묶이지 않도록 매 요청 최신 DB 상태를 읽습니다.
+  - 나머지 목록 페이지는 평소 캐시 성능을 유지하고, 포스트 변경 시 필요한 캐시만 무효화합니다.
 
 ### 11-2. 왜 이렇게 바꿨는가
-- 시간 기반 ISR만 쓰면, 글을 수정/삭제해도 다음 재생성 주기 전까지는 오래된 화면이 잠시 남을 수 있습니다.
-- 지금 구조는 필요한 순간에만 무효화하므로:
-  - 사용자 입장: 평소엔 빠른 캐시 응답
-  - 운영자 입장: 변경 직후 반영 지연 최소화
-- 즉, “속도”와 “반영 정확도”를 동시에 맞추기 위한 구조입니다.
+- 2026-05-28 프리뷰에서 영어 랜딩(`/en` -> `/`)이 한국어/중국어 랜딩과 다르게 오래된 슬라이더 데이터를 보여주는 문제가 확인되었습니다.
+- 실제 원인은 콘텐츠 언어 필터가 아니라 랜딩 홈의 무기한 서버 캐시와 기존 브라우저 서비스워커 캐시가 최신 DB 상태 확인을 방해할 수 있는 구조였습니다.
+- 따라서 가장 변경 빈도가 높고 운영자가 즉시 확인해야 하는 랜딩 홈만 동적 조회로 전환했습니다.
+- 카테고리/최근/추천/상세 등은 기존 on-demand 무효화 구조가 유지되므로, 전체 사이트의 정적 자원 로딩 최적화와 목록 페이지 캐시 전략은 그대로 유지됩니다.
 
 ### 11-3. 실제 캐시 구조 (핵심만)
-- 랜딩의 각 슬라이더 데이터는 `unstable_cache` + 태그 기반 캐시를 사용합니다.
-  - 구현 위치: `src/components/MainContent.tsx`
+- 랜딩 홈 메인 콘텐츠:
+  - `src/components/MainContent.tsx`에서 `unstable_cache`를 사용하지 않습니다.
+  - `noStore()`로 요청 단위 DB 조회를 강제합니다.
+  - 대상 데이터는 `systemSetting.key = 'main_sliders'`와 포스트 슬라이더 조회입니다.
+  - 관리자 수동 고정 포스트는 `FILTER_BY_SELECTED_LANGUAGE` 정책에서 선택 언어 필터로 모두 제외되더라도 fallback 조회로 유지됩니다.
+- 카테고리/최근/추천 페이지:
+  - 기존처럼 `unstable_cache`와 태그 기반 무효화를 사용합니다.
   - 주요 태그: `content:home`, `content:recent`, `content:recommended`, `content:categories`, `content:sliders`, `content:settings`, `content:locale:*`, `content:category:*`
-- 카테고리/최근/추천 페이지도 `unstable_cache`와 동일한 태그 체계를 사용합니다.
-- 따라서 평소 요청은 캐시를 최대 활용하고, 변경 발생 시 태그 단위로 필요한 부분만 갱신합니다.
+- 정적 자원:
+  - Next 정적 JS/CSS chunk, 이미지, Cloudflare Stream 썸네일/HLS 캐시 정책은 이 변경의 대상이 아닙니다.
+  - 홈 HTML/홈 데이터 조회만 동적화한 것이며, 전체 정적 자원 최적화를 끈 것이 아닙니다.
 
 ### 11-4. 포스트 생성/수정/삭제 시 반영 흐름
 
@@ -735,8 +744,8 @@
 - 슬라이더 설정 저장 시에는 홈/최근/추천 태그 무효화 + 영향 카테고리 경로 재생성까지 함께 수행합니다.
 
 ### 11-6. 정리 (운영자가 기억할 한 줄)
-- **현재는 “시간 지나면 재생성”보다 “변경되면 즉시 정확히 무효화”가 핵심입니다.**
-- 그래서 평소엔 캐시로 빠르고, 포스트 생성/수정/삭제 시엔 필요한 페이지들만 정확히 갱신됩니다.
+- **랜딩 홈은 즉시성 우선으로 매 요청 DB 조회, 카테고리/최근/추천은 성능 우선으로 캐시 + on-demand 무효화입니다.**
+- 따라서 영어 랜딩의 최신 샘플 포스트 반영 문제는 홈 캐시 stale 문제로 해결했고, 포스트 생성/수정/삭제 반영을 위한 기존 무효화 경로는 그대로 유지됩니다.
 
 ### 11-7. 상태 전환 보강 완료 (2026-05-22)
 - `submitPost`는 이제 **신규 상태가 `PUBLISHED`인 경우뿐 아니라, 이전 상태가 `PUBLISHED`였던 경우(`PUBLISHED -> DRAFT`)도 무효화**합니다.
@@ -744,6 +753,16 @@
 - 추가 보강:
   - 무효화 카테고리는 `이전 categories + 현재 categories`의 합집합으로 처리합니다.
   - 따라서 카테고리 변경(예: A -> B) 시에도 A/B 양쪽 관련 페이지 캐시가 함께 갱신됩니다.
+
+### 11-7-1. 프리뷰 PWA 캐시 격리 기준 (2026-05-28)
+- Vercel Preview 환경에서는 PWA를 생성하지 않습니다.
+  - 구현 위치: `next.config.mjs`
+  - 기준: `process.env.VERCEL_ENV === "preview"`이면 `withPWA({ disable: true })`
+- 이미 과거에 `preview.megashorts.com`에서 설치/등록된 서비스워커는 프리뷰 호스트에서만 정리합니다.
+  - 구현 위치: `src/components/PWAEnhancer.tsx`
+  - 기준: `window.location.hostname === "preview.megashorts.com"`일 때만 `navigator.serviceWorker.getRegistrations().unregister()`
+- 이 조치는 프리뷰 검증 정확도를 위한 격리입니다. 운영 도메인의 PWA 설치, 세션 연장, Workbox runtime cache 정책은 변경하지 않습니다.
+- `/en` 접속이 `/`로 보이는 것은 `next-intl`의 `localePrefix: 'as-needed'` 정책 때문입니다. 기본 언어 영어는 prefix 없는 URL이 canonical이며, `NEXT_LOCALE=en` 쿠키와 `<html lang="en">`로 영어 상태가 유지됩니다.
 
 ### 11-8. E2E 영업팀 통계 화면 검증 기준 (2026-05-22)
 - 영업팀 검증은 목적에 따라 화면을 구분해서 봐야 합니다.

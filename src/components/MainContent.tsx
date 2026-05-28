@@ -9,10 +9,7 @@ import { getLocale } from 'next-intl/server';
 import { getDynamicContent } from '@/lib/i18n-utils';
 import { getContentLanguagePolicy, getContentLanguageWhere } from '@/lib/content-language-server';
 import type { ContentLanguagePolicy } from '@/lib/content-language';
-import { unstable_cache } from "next/cache";
-import { CONTENT_TAGS } from "@/lib/content-revalidation";
-
-export const dynamic = 'force-static';
+import { unstable_noStore as noStore } from "next/cache";
 
 const postSelect = {
   id: true,
@@ -65,33 +62,22 @@ const postSelect = {
 };
 
 async function getLatestPosts(locale: string, policy: ContentLanguagePolicy, take: number = 20) {
-  const getCachedLatestPosts = unstable_cache(
-    async (cacheLocale: string, cachePolicy: ContentLanguagePolicy, cacheTake: number) => {
-      return prisma.post.findMany({
-        where: {
-          status: 'PUBLISHED',
-          ...getContentLanguageWhere(cacheLocale, cachePolicy),
-          NOT: {
-            categories: {
-              hasSome: [CategoryType.MSPOST, CategoryType.NOTIFICATION]
-            }
-          }
-        },
-        select: postSelect,
-        orderBy: {
-          publishedAt: 'desc'
-        },
-        take: cacheTake
-      });
+  return prisma.post.findMany({
+    where: {
+      status: 'PUBLISHED',
+      ...getContentLanguageWhere(locale, policy),
+      NOT: {
+        categories: {
+          hasSome: [CategoryType.MSPOST, CategoryType.NOTIFICATION]
+        }
+      }
     },
-    ["main-content-latest-posts"],
-    {
-      tags: [CONTENT_TAGS.home, CONTENT_TAGS.recent, CONTENT_TAGS.categories, `content:locale:${locale}`],
-      revalidate: false,
-    }
-  );
-
-  return getCachedLatestPosts(locale, policy, take) as Promise<PostData[]>;
+    select: postSelect,
+    orderBy: {
+      publishedAt: 'desc'
+    },
+    take
+  }) as Promise<PostData[]>;
 }
 
 async function getRankedPosts(
@@ -100,59 +86,43 @@ async function getRankedPosts(
   take: number = 10,
   rankingType: 'likes' | 'views' = 'likes',
 ) {
-  const getCachedRankedPosts = unstable_cache(
-    async (
-      cacheLocale: string,
-      cachePolicy: ContentLanguagePolicy,
-      cacheTake: number,
-      cacheRankingType: 'likes' | 'views',
-    ) => {
-      if (cacheRankingType === 'views') {
-        return prisma.post.findMany({
-          where: {
-            status: 'PUBLISHED',
-            ...getContentLanguageWhere(cacheLocale, cachePolicy),
-            NOT: {
-              categories: {
-                hasSome: [CategoryType.MSPOST, CategoryType.NOTIFICATION]
-              }
-            },
-          },
-          select: postSelect,
-          orderBy: {
-            viewCount: 'desc'
-          },
-          take: cacheTake
-        });
-      }
-
-      return prisma.post.findMany({
-        where: {
-          status: 'PUBLISHED',
-          ...getContentLanguageWhere(cacheLocale, cachePolicy),
-          NOT: {
-            categories: {
-              hasSome: [CategoryType.MSPOST, CategoryType.NOTIFICATION]
-            }
-          },
-        },
-        select: postSelect,
-        orderBy: {
-          likes: {
-            _count: 'desc'
+  if (rankingType === 'views') {
+    return prisma.post.findMany({
+      where: {
+        status: 'PUBLISHED',
+        ...getContentLanguageWhere(locale, policy),
+        NOT: {
+          categories: {
+            hasSome: [CategoryType.MSPOST, CategoryType.NOTIFICATION]
           }
         },
-        take: cacheTake
-      });
-    },
-    ["main-content-ranked-posts"],
-    {
-      tags: [CONTENT_TAGS.home, CONTENT_TAGS.categories, `content:locale:${locale}`],
-      revalidate: false,
-    }
-  );
+      },
+      select: postSelect,
+      orderBy: {
+        viewCount: 'desc'
+      },
+      take
+    }) as Promise<PostData[]>;
+  }
 
-  return getCachedRankedPosts(locale, policy, take, rankingType) as Promise<PostData[]>;
+  return prisma.post.findMany({
+    where: {
+      status: 'PUBLISHED',
+      ...getContentLanguageWhere(locale, policy),
+      NOT: {
+        categories: {
+          hasSome: [CategoryType.MSPOST, CategoryType.NOTIFICATION]
+        }
+      },
+    },
+    select: postSelect,
+    orderBy: {
+      likes: {
+        _count: 'desc'
+      }
+    },
+    take
+  }) as Promise<PostData[]>;
 }
 
 async function getFeaturedPosts(
@@ -161,88 +131,72 @@ async function getFeaturedPosts(
   take: number = 10,
   manualPosts: string[] = [],
 ) {
-  const getCachedFeaturedPosts = unstable_cache(
-    async (
-      cacheLocale: string,
-      cachePolicy: ContentLanguagePolicy,
-      cacheTake: number,
-      cacheManualPosts: string[],
-    ) => {
-      const contentLanguageWhere = getContentLanguageWhere(cacheLocale, cachePolicy);
+  const contentLanguageWhere = getContentLanguageWhere(locale, policy);
 
-      const manualPostsData = cacheManualPosts.length > 0
-        ? await prisma.post.findMany({
-            where: {
-              id: { in: cacheManualPosts },
-              status: 'PUBLISHED',
-              ...contentLanguageWhere,
-              NOT: {
-                categories: {
-                  hasSome: [CategoryType.MSPOST, CategoryType.NOTIFICATION]
-                }
-              }
-            },
-            select: postSelect,
-          })
-        : [];
-
-      let sortedManualPosts = cacheManualPosts
-        .map(id => manualPostsData.find(post => post.id === id))
-        .filter((post): post is PostData => post !== undefined);
-
-      // Always keep admin-pinned manual posts visible even when locale language filter excludes them.
-      if (cacheManualPosts.length > 0 && sortedManualPosts.length === 0 && cachePolicy === 'FILTER_BY_SELECTED_LANGUAGE') {
-        const fallbackManualPosts = await prisma.post.findMany({
-          where: {
-            id: { in: cacheManualPosts },
-            status: 'PUBLISHED',
-            NOT: {
-              categories: {
-                hasSome: [CategoryType.MSPOST, CategoryType.NOTIFICATION]
-              }
+  const manualPostsData = manualPosts.length > 0
+    ? await prisma.post.findMany({
+        where: {
+          id: { in: manualPosts },
+          status: 'PUBLISHED',
+          ...contentLanguageWhere,
+          NOT: {
+            categories: {
+              hasSome: [CategoryType.MSPOST, CategoryType.NOTIFICATION]
             }
-          },
-          select: postSelect,
-        });
+          }
+        },
+        select: postSelect,
+      })
+    : [];
 
-        sortedManualPosts = cacheManualPosts
-          .map(id => fallbackManualPosts.find(post => post.id === id))
-          .filter((post): post is PostData => post !== undefined);
-      }
+  let sortedManualPosts = manualPosts
+    .map(id => manualPostsData.find(post => post.id === id))
+    .filter((post): post is PostData => post !== undefined);
 
-      const remainingCount = cacheTake - sortedManualPosts.length;
-      const featuredPosts = remainingCount > 0
-        ? await prisma.post.findMany({
-            where: {
-              status: 'PUBLISHED',
-              featured: true,
-              ...contentLanguageWhere,
-              NOT: {
-                OR: [
-                  { id: { in: cacheManualPosts } },
-                  { categories: { hasSome: [CategoryType.MSPOST, CategoryType.NOTIFICATION] } }
-                ]
-              }
-            },
-            select: postSelect,
-            orderBy: [
-              { priority: 'desc' },
-              { publishedAt: 'desc' }
-            ],
-            take: remainingCount
-          })
-        : [];
+  // Always keep admin-pinned manual posts visible even when locale language filter excludes them.
+  if (manualPosts.length > 0 && sortedManualPosts.length === 0 && policy === 'FILTER_BY_SELECTED_LANGUAGE') {
+    const fallbackManualPosts = await prisma.post.findMany({
+      where: {
+        id: { in: manualPosts },
+        status: 'PUBLISHED',
+        NOT: {
+          categories: {
+            hasSome: [CategoryType.MSPOST, CategoryType.NOTIFICATION]
+          }
+        }
+      },
+      select: postSelect,
+    });
 
-      return [...sortedManualPosts, ...featuredPosts] as PostData[];
-    },
-    ["main-content-featured-posts"],
-    {
-      tags: [CONTENT_TAGS.home, CONTENT_TAGS.sliders, CONTENT_TAGS.categories, `content:locale:${locale}`],
-      revalidate: false,
-    }
-  );
+    sortedManualPosts = manualPosts
+      .map(id => fallbackManualPosts.find(post => post.id === id))
+      .filter((post): post is PostData => post !== undefined);
+  }
 
-  return getCachedFeaturedPosts(locale, policy, take, manualPosts) as Promise<PostData[]>;
+  const remainingCount = take - sortedManualPosts.length;
+  const featuredPosts = remainingCount > 0
+    ? await prisma.post.findMany({
+        where: {
+          status: 'PUBLISHED',
+          featured: true,
+          ...contentLanguageWhere,
+          NOT: {
+            OR: [
+              { id: { in: manualPosts } },
+              { categories: { hasSome: [CategoryType.MSPOST, CategoryType.NOTIFICATION] } }
+            ]
+          }
+        },
+        select: postSelect,
+        orderBy: [
+          { priority: 'desc' },
+          { publishedAt: 'desc' }
+        ],
+        take: remainingCount
+      })
+    : [];
+
+  return [...sortedManualPosts, ...featuredPosts] as PostData[];
 }
 
 async function getCategoryPosts(
@@ -251,66 +205,37 @@ async function getCategoryPosts(
   categories: CategoryType[],
   take: number = 20,
 ) {
-  const getCachedCategoryPosts = unstable_cache(
-    async (
-      cacheLocale: string,
-      cachePolicy: ContentLanguagePolicy,
-      cacheCategories: CategoryType[],
-      cacheTake: number,
-    ) => {
-      return prisma.post.findMany({
-        where: {
-          status: 'PUBLISHED',
-          ...getContentLanguageWhere(cacheLocale, cachePolicy),
-          NOT: {
-            categories: {
-              hasSome: [CategoryType.MSPOST, CategoryType.NOTIFICATION]
-            }
-          },
-          categories: {
-            hasEvery: cacheCategories
-          }
-        },
-        select: postSelect,
-        orderBy: [
-          { featured: 'desc' },
-          { priority: 'desc' },
-          { publishedAt: 'desc' }
-        ],
-        take: cacheTake
-      });
+  return prisma.post.findMany({
+    where: {
+      status: 'PUBLISHED',
+      ...getContentLanguageWhere(locale, policy),
+      NOT: {
+        categories: {
+          hasSome: [CategoryType.MSPOST, CategoryType.NOTIFICATION]
+        }
+      },
+      categories: {
+        hasEvery: categories
+      }
     },
-    ["main-content-category-posts"],
-    {
-      tags: [
-        CONTENT_TAGS.home,
-        CONTENT_TAGS.categories,
-        `content:locale:${locale}`,
-        ...categories.map((category) => `content:category:${category}`),
-      ],
-      revalidate: false,
-    }
-  );
-
-  return getCachedCategoryPosts(locale, policy, categories, take) as Promise<PostData[]>;
+    select: postSelect,
+    orderBy: [
+      { featured: 'desc' },
+      { priority: 'desc' },
+      { publishedAt: 'desc' }
+    ],
+    take
+  }) as Promise<PostData[]>;
 }
 
 export default async function MainContent() {
+  noStore();
+
   const currentLocale = await getLocale();
   const contentLanguagePolicy = await getContentLanguagePolicy();
-  // 슬라이더 설정 가져오기
-  const getMainSliderSettings = unstable_cache(
-    async () => prisma.systemSetting.findUnique({
-      where: { key: 'main_sliders' }
-    }),
-    ["main-content-slider-settings"],
-    {
-      tags: [CONTENT_TAGS.home, CONTENT_TAGS.sliders, CONTENT_TAGS.settings],
-      revalidate: false,
-    }
-  );
-
-  const settings = await getMainSliderSettings();
+  const settings = await prisma.systemSetting.findUnique({
+    where: { key: 'main_sliders' }
+  });
   
   const sliderSettings = (settings?.value as SliderSetting[]) || [];
 

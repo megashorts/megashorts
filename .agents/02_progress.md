@@ -267,3 +267,10 @@
 - [x] 우측 아이콘 컨테이너에 `flex-shrink-0`을 적용하여 찌그러지지 않고 모달 우측 경계선에 정렬되도록 레이아웃 최적화 완료 ✅
 - [x] `npx tsc --noEmit`을 통한 빌드 안정성 및 TypeScript 컴파일 오류 없음 검증 완료 ✅
 
+## Phase 27: 프리뷰 영어 랜딩 샘플 포스트 stale 캐시 보정 (2026-05-28)
+- [x] 랜딩 홈 라우트를 `dynamic = 'force-dynamic'`, `revalidate = 0`으로 전환하여 프리뷰/운영 홈이 오래된 서버 캐시에 묶이지 않도록 수정 ✅
+- [x] `MainContent`의 무기한 `unstable_cache` 래퍼를 제거하고 `noStore()` 기반 request-time Prisma 조회로 전환 ✅
+- [x] 영어 기본 URL 정책 확인: `/en`은 `localePrefix: 'as-needed'`에 따라 `/`로 canonicalize되고 `NEXT_LOCALE=en`, `<html lang="en">` 상태로 동작 ✅
+- [x] Vercel Preview에서 PWA 생성을 비활성화하고 `preview.megashorts.com`에 남아 있을 수 있는 기존 서비스워커만 정리하도록 제한 ✅
+- [x] 영향 범위 확인: 정적 JS/CSS/이미지, 카테고리/최근/추천 페이지의 태그 캐시, 포스트 생성/수정/삭제 on-demand 무효화 경로는 유지 ✅
+- [x] 검증: `pnpm -s tsc --noEmit`, Vercel 배포 `dpl_8vzhx9ggo4AbKBqbAmfcWTsQFRHY`, `preview.megashorts.com` alias, `/en` HTML의 최신 agency sample post 노출 확인 ✅

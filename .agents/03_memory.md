@@ -1,6 +1,6 @@
 # MegaShorts 개발 메모리 (에러/해결/구조변경 기록)
 
-> 최종 업데이트: 2026-05-22
+> 최종 업데이트: 2026-05-28
 
 ## 2026-05-13 — 플랫폼 고도화 (다국어, PWA, 권한 최적화, 성인인증)
 
@@ -579,3 +579,28 @@
   - `npx tsc --noEmit` 정적 타입 검사 무오류 통과.
   - 이 최적화를 통해 모달 너비에 따라 영상 프리뷰 카드가 가로로 유연하고 꽉 차게 늘어나며, 아이콘의 우측 불필요한 빈 여백이 완전히 제거되어 훨씬 깔끔하고 프리미엄한 UI를 확보함.
 
+### 35. 프리뷰 영어 랜딩 샘플 포스트 stale 캐시 보정 (2026-05-28)
+- **현상**:
+  - 로컬 `localhost:3000` 영어 랜딩에서는 agency simulation sample post가 보이지만, `preview.megashorts.com/en`에서는 보이지 않았다.
+  - 한국어/중국어 랜딩에서는 보이고 영어 기본 랜딩만 오래된 상태처럼 보이는 증상이 있었다.
+- **확인한 사실**:
+  - `/en`이 `/`로 이동하는 것은 버그가 아니다. `next-intl`의 `localePrefix: 'as-needed'` 정책상 기본 언어 영어는 prefix 없는 URL이 canonical이다.
+  - 실제 preview 응답은 `NEXT_LOCALE=en` 쿠키와 `<html lang="en">` 상태로 영어 렌더링된다.
+  - DB의 `contentLanguagePolicy`는 `null`이었고 기본값은 `SHOW_ALL_WITH_FALLBACK`이므로, 영어에서 한국어/중국어 포스트가 제외되는 언어 필터 문제가 아니었다.
+- **원인**:
+  - 랜딩 홈의 `MainContent`가 `unstable_cache(..., revalidate: false)`로 슬라이더 설정과 포스트 목록을 무기한 캐시하고 있었다.
+  - 프리뷰 호스트에 과거 PWA 서비스워커가 남아 있으면 최신 배포 확인을 더 혼동시킬 수 있었다.
+- **수정**:
+  - `src/app/[locale]/(main)/page.tsx`: 홈 라우트를 `dynamic = 'force-dynamic'`, `revalidate = 0`으로 전환.
+  - `src/components/MainContent.tsx`: 홈 메인 슬라이더 조회에서 `unstable_cache`를 제거하고 `unstable_noStore()`를 적용.
+  - `next.config.mjs`: `VERCEL_ENV === "preview"`에서는 PWA 빌드를 비활성화.
+  - `src/components/PWAEnhancer.tsx`: `preview.megashorts.com`에서만 기존 서비스워커 registration을 unregister.
+- **영향 범위**:
+  - 이 변경은 랜딩 홈 메인 콘텐츠의 서버 캐시만 제거한다.
+  - Next 정적 JS/CSS chunk, 이미지, Cloudflare Stream 썸네일/HLS 캐시, 카테고리/최근/추천 페이지의 `unstable_cache`, 포스트 생성/수정/삭제의 `invalidatePostContent()` 경로는 유지된다.
+  - 운영 도메인의 PWA 정책은 유지되며, preview host에서만 PWA/서비스워커 캐시를 격리한다.
+- **검증**:
+  - `pnpm -s tsc --noEmit` 통과.
+  - Vercel preview deployment `dpl_8vzhx9ggo4AbKBqbAmfcWTsQFRHY`가 `preview.megashorts.com` alias에 연결된 것을 확인.
+  - `https://preview.megashorts.com/en` 응답에서 최신 deployment id, `<html lang="en">`, `Agency E2E ... Post` 제목 노출 확인.
+  - 홈 응답 헤더에서 `cache-control: private, no-cache, no-store, max-age=0, must-revalidate`, `cf-cache-status: DYNAMIC` 확인.

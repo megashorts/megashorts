@@ -5,6 +5,7 @@ import withPWAInit, { runtimeCaching as defaultRuntimeCaching } from "@ducanh291
 const withNextIntl = createNextIntlPlugin();
 const uploadSentrySourceMaps = process.env.SENTRY_UPLOAD_SOURCE_MAPS === "true";
 const enablePwaInDev = process.env.NEXT_PUBLIC_PWA_DEV === "true";
+const isVercelPreview = process.env.VERCEL_ENV === "preview";
 const baseRuntimeCaching = defaultRuntimeCaching.filter(
   (rule) => rule?.options?.cacheName !== "cross-origin",
 );
@@ -47,7 +48,7 @@ const pwaRuntimeCaching = [
 ];
 const withPWA = withPWAInit({
   dest: "public",
-  disable: process.env.NODE_ENV === "development" && !enablePwaInDev,
+  disable: (process.env.NODE_ENV === "development" && !enablePwaInDev) || isVercelPreview,
   cacheOnFrontEndNav: true,
   reloadOnOnline: false,
   fallbacks: {
