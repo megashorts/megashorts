@@ -94,7 +94,8 @@ export default function LogsClient() {
           cache: 'no-store'
         });
         if (!response.ok) {
-          throw new Error('Failed to fetch logs');
+          const errorText = await response.text();
+          throw new Error(`Failed to fetch logs: ${response.status} ${errorText}`);
         }
         
         const data = await response.json();
@@ -113,7 +114,8 @@ export default function LogsClient() {
             cache: 'no-store'
           });
           if (!response.ok) {
-            throw new Error(`Failed to fetch logs for type: ${type}`);
+            const errorText = await response.text();
+            throw new Error(`Failed to fetch logs for type: ${type} (${response.status}) ${errorText}`);
           }
           
           const data = await response.json();

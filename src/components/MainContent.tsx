@@ -186,9 +186,29 @@ async function getFeaturedPosts(
           })
         : [];
 
-      const sortedManualPosts = cacheManualPosts
+      let sortedManualPosts = cacheManualPosts
         .map(id => manualPostsData.find(post => post.id === id))
         .filter((post): post is PostData => post !== undefined);
+
+      // Always keep admin-pinned manual posts visible even when locale language filter excludes them.
+      if (cacheManualPosts.length > 0 && sortedManualPosts.length === 0 && cachePolicy === 'FILTER_BY_SELECTED_LANGUAGE') {
+        const fallbackManualPosts = await prisma.post.findMany({
+          where: {
+            id: { in: cacheManualPosts },
+            status: 'PUBLISHED',
+            NOT: {
+              categories: {
+                hasSome: [CategoryType.MSPOST, CategoryType.NOTIFICATION]
+              }
+            }
+          },
+          select: postSelect,
+        });
+
+        sortedManualPosts = cacheManualPosts
+          .map(id => fallbackManualPosts.find(post => post.id === id))
+          .filter((post): post is PostData => post !== undefined);
+      }
 
       const remainingCount = cacheTake - sortedManualPosts.length;
       const featuredPosts = remainingCount > 0

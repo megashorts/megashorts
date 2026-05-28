@@ -1,7 +1,19 @@
 import { TooltipProvider } from '@/components/ui/tooltip';
 import ServiceTabs from './components/ServiceTabs';
+import { validateRequest } from '@/auth';
+import { USER_ROLE } from '@/lib/constants';
+import { redirect } from 'next/navigation';
 
-export default function ServicePage() {
+interface ServicePageProps {
+  params: Promise<{ locale: string }>;
+}
+
+export default async function ServicePage({ params }: ServicePageProps) {
+  const [{ locale }, { user }] = await Promise.all([params, validateRequest()]);
+  if (!user || user.userRole < USER_ROLE.OPERATION1) {
+    redirect(`/${locale}/login?next=/${locale}/admin/service?tab=logs`);
+  }
+
   return (
     <TooltipProvider>
       <main className="flex w-full min-w-0 gap-5">

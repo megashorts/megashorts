@@ -4,6 +4,12 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Download } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { isStandalonePWA } from '@/lib/pwa-client';
+
+const PROMPT_LAST_SHOWN_KEY = 'ms_pwa_install_prompt_last_shown_at';
+const PROMPT_HIDDEN_UNTIL_KEY = 'ms_pwa_install_prompt_hidden_until';
+const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+const ACCEPT_HIDE_MS = 30 * ONE_DAY_MS;
 
 export function PWAInstallPrompt() {
   const t = useTranslations('PWA');
@@ -13,6 +19,17 @@ export function PWAInstallPrompt() {
   useEffect(() => {
     const handler = (e: any) => {
       e.preventDefault();
+
+      if (isStandalonePWA()) return;
+
+      const now = Date.now();
+      const hiddenUntil = Number(localStorage.getItem(PROMPT_HIDDEN_UNTIL_KEY) || 0);
+      if (hiddenUntil > now) return;
+
+      const lastShownAt = Number(localStorage.getItem(PROMPT_LAST_SHOWN_KEY) || 0);
+      if (now - lastShownAt < ONE_DAY_MS) return;
+
+      localStorage.setItem(PROMPT_LAST_SHOWN_KEY, String(now));
       setDeferredPrompt(e);
       setShowPrompt(true);
     };
@@ -25,13 +42,16 @@ export function PWAInstallPrompt() {
     if (!deferredPrompt) return;
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
+    setShowPrompt(false);
+
     if (outcome === 'accepted') {
-      setShowPrompt(false);
+      localStorage.setItem(PROMPT_HIDDEN_UNTIL_KEY, String(Date.now() + ACCEPT_HIDE_MS));
       setDeferredPrompt(null);
     }
   };
 
   const handleDismiss = () => {
+    localStorage.setItem(PROMPT_HIDDEN_UNTIL_KEY, String(Date.now() + ONE_DAY_MS));
     setShowPrompt(false);
   };
 

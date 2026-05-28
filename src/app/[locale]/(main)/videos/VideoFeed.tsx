@@ -5,20 +5,24 @@ import { useEffect, useRef } from 'react';
 import ky from '../../../../lib/ky';
 import FullScreenVideo from '../../../../components/videos/FullScreenVideo';
 import type { PostWithVideos } from '../../../../lib/types';
+import { useLocale } from 'next-intl';
 
 // 추천 포스트를 가져오는 함수
-const fetchRecommendedPosts = async () => {
-  const response = await ky.get('/api/posts/recommended').json<PostWithVideos[]>();
+const fetchRecommendedPosts = async (locale: string) => {
+  const response = await ky.get('/api/posts/recommended', {
+    searchParams: { locale },
+  }).json<PostWithVideos[]>();
   return response;
 };
 
 export default function VideoFeed() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const locale = useLocale();
 
   // 포스트 데이터를 가져옵니다
   const { data: posts = [] } = useQuery({
-    queryKey: ['posts', 'recommended'],
-    queryFn: fetchRecommendedPosts,
+    queryKey: ['posts', 'recommended', locale],
+    queryFn: () => fetchRecommendedPosts(locale),
   });
 
   // 컴포넌트 마운트 시 사용자 상호작용 시뮬레이션

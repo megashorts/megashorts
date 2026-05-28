@@ -9,7 +9,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import InfiniteScrollContainer from "@/components/InfiniteScrollContainer";
 import kyInstance from "@/lib/ky";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 interface CategoriesProps {
   category: CategoryType;
@@ -18,6 +18,7 @@ interface CategoriesProps {
 
 export default function Categories({ category, initialPosts }: CategoriesProps) {
   const [isMobile, setIsMobile] = useState(false);
+  const locale = useLocale();
   const tCommon = useTranslations('Common');
 
   useEffect(() => {
@@ -36,7 +37,7 @@ export default function Categories({ category, initialPosts }: CategoriesProps) 
     isFetchingNextPage,
     status,
   } = useInfiniteQuery({
-    queryKey: ["post-feed", "category", category],
+    queryKey: ["post-feed", "category", category, locale],
     queryFn: ({ pageParam }) =>
       kyInstance
         .get(
@@ -46,6 +47,7 @@ export default function Categories({ category, initialPosts }: CategoriesProps) 
               ...(pageParam ? { cursor: pageParam } : {}),
               category: category.toString(),
               isMobile: String(isMobile),
+              locale,
             })
           }
         )

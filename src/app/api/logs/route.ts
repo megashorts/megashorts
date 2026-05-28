@@ -8,11 +8,18 @@ function isMegashortsDomainHost(hostname: string): boolean {
 }
 
 function getLogWorkerConfig() {
+  const candidateKeys = [
+    process.env.WORKER_API_KEY,
+    process.env.CRON_SECRET,
+    process.env.NEXT_PUBLIC_WORKER_API_KEY,
+    process.env.NEXT_PUBLIC_LOG_WRITE_KEY,
+  ].filter((value): value is string => Boolean(value && value.trim()));
+
   return {
     url: process.env.LOGS_WORKER_URL
       || process.env.NEXT_PUBLIC_LOGS_WORKER_URL
       || DEFAULT_LOG_WORKER_URL,
-    apiKey: process.env.WORKER_API_KEY || process.env.NEXT_PUBLIC_WORKER_API_KEY,
+    apiKeys: Array.from(new Set(candidateKeys)),
   };
 }
 
@@ -49,30 +56,48 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: false, error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const { url, apiKey } = getLogWorkerConfig();
-  if (!apiKey) {
+  const { url, apiKeys } = getLogWorkerConfig();
+  if (apiKeys.length === 0) {
     return NextResponse.json(
       { success: false, error: "Log worker API key is not configured" },
       { status: 500 },
     );
   }
 
-  const response = await fetch(url, {
-    method: "POST",
+  let lastUnauthorizedBody = "";
+  for (const apiKey of apiKeys) {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+        "X-API-Key": apiKey,
+      },
+      body,
+      cache: "no-store",
+    });
+
+    const responseBody = await response.text();
+    if (response.status !== 401) {
+      return new NextResponse(responseBody, {
+        status: response.status,
+        headers: {
+          "Content-Type": response.headers.get("Content-Type") || "application/json",
+          "Cache-Control": "no-store",
+        },
+      });
+    }
+
+    lastUnauthorizedBody = responseBody;
+  }
+
+  return new NextResponse(lastUnauthorizedBody || JSON.stringify({
+    success: false,
+    error: "Worker authorization failed",
+  }), {
+    status: 401,
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-      "X-API-Key": apiKey,
-    },
-    body,
-    cache: "no-store",
-  });
-
-  const responseBody = await response.text();
-  return new NextResponse(responseBody, {
-    status: response.status,
-    headers: {
-      "Content-Type": response.headers.get("Content-Type") || "application/json",
       "Cache-Control": "no-store",
     },
   });
