@@ -4,6 +4,7 @@
 import { validateRequest } from '@/auth';
 import prisma from '@/lib/prisma';
 import { uuidv7 } from 'uuidv7';
+import { revalidateTag } from 'next/cache';
 
 export async function POST(req: Request) {
   try {
@@ -139,6 +140,10 @@ export async function POST(req: Request) {
         remainingCoins: updatedUser.mscoin
       };
     });
+
+    if (result.success) {
+      revalidateTag(`user-auth-${user.id}`);
+    }
 
     return new Response(
       JSON.stringify(result),

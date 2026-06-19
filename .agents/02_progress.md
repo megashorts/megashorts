@@ -18,6 +18,7 @@
 - [x] Supabase MCP 설치 및 설정 (`~/.codex/config.toml`, `.mcp.json`) 완료
 - [x] Cloudflare MCP 설치 및 설정 (`~/.codex/config.toml`, `.mcp.json`) 완료
 - [x] 연결 테스트/도구 인식 확인 완료
+- [x] 2026-06-20 Antigravity IDE 글로벌 mcp_config.json 동기화 및 Vercel/Wrangler CLI 로그인 세션 최종 확인 완료 ✅
 
 ## Phase 3: msworker 정리 및 끊어진 API 복구 (요청#2)
 - [x] 미사용 워커(agency, stats, uploader, d1-test, test-cloudflare-stream) 5개 삭제
@@ -275,4 +276,14 @@
 - [x] PWA manifest shortcut을 `/ko/recommended-videos` 고정값에서 기본 언어 canonical인 `/recommended-videos`로 교정 ✅
 - [x] PWA document fallback을 `/ko/~offline` 고정값에서 기본 언어 canonical인 `/~offline`로 교정 ✅
 - [x] 영향 범위 확인: 정적 JS/CSS/이미지, 카테고리/최근/추천 페이지의 태그 캐시, 포스트 생성/수정/삭제 on-demand 무효화 경로는 유지 ✅
-- [x] 검증: `pnpm -s tsc --noEmit`, Vercel 배포 `dpl_8vzhx9ggo4AbKBqbAmfcWTsQFRHY`, `preview.megashorts.com` alias, `/en` HTML의 최신 agency sample post 노출 확인 ✅
+
+## Phase 28: 관리자 기능 코인/구독 변경 및 실시간 시청 권한 동기화 버그 해결 (2026-06-20)
+- [x] userAuth API의 `unstable_cache` 키 및 태그를 `userId` 단위로 고유화하여 사용자 간 캐시 꼬임 및 캐시 유지 현상 해결 ✅
+- [x] 관리자 코인/포인트 충전(`grant`) API에 `revalidateTag` 호출 추가 ✅
+- [x] 관리자 사용자 상세 변경(`PATCH`) API에 `revalidateTag` 호출 추가 ✅
+- [x] 코인 결제(`coinpay`) API에 `revalidateTag` 호출 추가 ✅
+- [x] 나이인증(`verify-age`) API에 사용자 고유 `revalidateTag` 호출 보완 ✅
+- [x] 클라이언트 `useUserAuth` 훅의 `staleTime`을 12시간에서 5분으로 단축하고 `refetchOnMount: true`로 설정하여 실시간 반응성 개선 및 연속 시청 성능 유지 ✅
+- [x] `PlayPermissionCheck`의 클라이언트 코인 차감 기준(1코인 -> 2코인) 및 Optimistic UI 동작을 서버 설정과 동기화하고, 백그라운드 결제 실패 및 네트워크 오류 발생 시 로컬 캐시 롤백 및 재생 차단 구현 ✅
+- [x] `pnpm exec tsc --noEmit` 검증 통과 및 전체 `pnpm run build` 검증 확인 ✅
+

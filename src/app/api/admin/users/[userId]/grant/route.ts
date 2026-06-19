@@ -2,6 +2,7 @@ import { validateRequest } from "@/auth";
 import { USER_ROLE } from "@/lib/constants";
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 
 type GrantType = "POINTS" | "COINS";
 
@@ -105,6 +106,8 @@ export async function POST(
         mscoin: true,
       },
     });
+
+    revalidateTag(`user-auth-${userId}`);
 
     return NextResponse.json({
       success: true,

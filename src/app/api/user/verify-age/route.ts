@@ -86,6 +86,7 @@ export async function POST(req: NextRequest) {
 
     // 사용자 인증 캐시 무효화
     revalidateTag('user-auth');
+    revalidateTag(`user-auth-${user.id}`);
 
     return NextResponse.json({
       success: true,

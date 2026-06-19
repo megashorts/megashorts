@@ -606,3 +606,29 @@
   - Vercel preview deployment `dpl_8vzhx9ggo4AbKBqbAmfcWTsQFRHY`가 `preview.megashorts.com` alias에 연결된 것을 확인.
   - `https://preview.megashorts.com/en` 응답에서 최신 deployment id, `<html lang="en">`, `Agency E2E ... Post` 제목 노출 확인.
   - 홈 응답 헤더에서 `cache-control: private, no-cache, no-store, max-age=0, must-revalidate`, `cf-cache-status: DYNAMIC` 확인.
+
+## 2026-06-20 — Antigravity IDE 글로벌 MCP 설정 동기화 및 CLI 상태 검증
+- **문제**: 
+  - 신규 `antigravity-ide` 에이전트 환경에서 글로벌 MCP 설정 파일(`~/.gemini/antigravity-ide/mcp_config.json`)이 비어 있어서 로컬 프로젝트 설정(`.mcp.json`)에 있는 Vercel, Supabase, Cloudflare MCP 도구들이 에이전트에 로드되지 않고 있었음.
+- **해결**:
+  - `~/.gemini/antigravity-ide/mcp_config.json`에 프로젝트(`.mcp.json`) 및 과거 툴 설정(`~/.codex/config.toml`)과 동일하게 Vercel, Supabase, Cloudflare-api MCP를 URL/HTTP 서버 타입으로 등록함.
+- **검증 및 환경 확인**:
+  - `npx vercel whoami` 실행 결과 `megashorts` 계정으로 정상 로그인되어 있음을 확인.
+  - `npx wrangler whoami` 실행 결과 `Msdevcm@gmail.com` 계정 API 토큰(`CLOUDFLARE_API_TOKEN` 환경 변수 사용)으로 정상 로그인되어 있음을 확인.
+  - Supabase는 `.env` 파일에 데이터베이스 접속 주소와 API 키가 안전하게 선언되어 있어 사용 가능함을 확인.
+  - 새로운 MCP 설정을 반영하고 도구를 최종 활성화하기 위해 IDE 세션의 재가동(Restart)이 필요함을 확인 및 안내함.
+
+## 2026-06-20 — 관리자 권한 코인/구독 상태 실시간 연동 및 동기화 이슈 해결
+- **문제**: 
+  - 관리자 기능(admin/service?tab=user)으로 특정 사용자의 코인(수동 지급) 및 구독 정보를 강제로 활성화했음에도 불구하고, 실제 유료 영상 시청 화면(`PlayPermissionCheck.tsx`)에서 "구독이나 코인이 필요합니다" 라는 에러 메시지가 계속 출력됨.
+- **원인**:
+  1. 서버측 `/api/users/[userId]/auth` API에서 사용하는 `unstable_cache`가 특정 `userId`가 아닌 `['user-auth']` 단일 배열 키와 태그로 고정되어 있어 모든 사용자의 캐시가 꼬이거나 동일 캐시를 참조하는 버그 발생.
+  2. 코인 지급 API(`grant`), 사용자 정보 업데이트 API(`PATCH`), 사용자 코인 차감 API(`coinpay`) 등 데이터 변경 시점에 캐시 무효화(`revalidateTag`) 로직이 아예 누락되어 12시간의 서버 캐시가 계속 유지됨.
+  3. 클라이언트 `useUserAuth` 훅의 `staleTime`이 12시간으로 과도하게 길어, 새로고침을 해도 React Query가 서버 요청을 보내지 않고 예전 캐시를 그대로 반환함.
+  4. 클라이언트의 코인 보유 판단 기준(`userAuth.mscoin >= 1`)과 서버의 차감 기준(2코인)이 맞지 않아 불일치 발생.
+- **해결**:
+  1. `src/app/api/users/[userId]/auth/route.ts`의 `getUserAuth` 래퍼 캐시 함수를 수정하여 `userId`별로 독립된 `['user-auth', userId]` 캐시 키와 `user-auth-${userId}` 태그를 할당하도록 개선.
+  2. `/api/admin/users/[userId]/grant`, `/api/admin/users/[userId]`, `/api/user/coinpay`, `/api/user/verify-age` API 내부에서 데이터 갱신 완료 후 해당 사용자의 캐시 태그(`user-auth-${userId}`)를 `revalidateTag`로 무효화하도록 처리.
+  3. `src/hooks/queries/useUserAuth.ts`의 `staleTime`을 5분으로 단축하고 `refetchOnMount`를 `true`로 설정하여 실시간 반응성을 확보하는 동시에 연속 시청 시의 로딩 성능 보장.
+  4. `PlayPermissionCheck.tsx`의 코인 필요 조건을 `userAuth.mscoin >= 2`로 변경하고, `queryClient.setQueryData`를 통한 Optimistic UI의 차감량을 `-2`로 서버와 통동기화. 추가로 비동기 결제 API 실패 또는 네트워크 에러 발생 시 원래 코인을 돌려주고 시청 권한을 차단하는 롤백 메커니즘을 추가하여 견고성 보장.
+

@@ -2,6 +2,7 @@ import { validateRequest } from "@/auth";
 import { USER_ROLE } from "@/lib/constants";
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 
 const MANAGEABLE_SUBSCRIPTION_TYPES = ["free", "basic", "premium"] as const;
 type ManageableSubscriptionType = (typeof MANAGEABLE_SUBSCRIPTION_TYPES)[number];
@@ -302,6 +303,8 @@ export async function PATCH(
         },
       },
     });
+
+    revalidateTag(`user-auth-${userId}`);
 
     return NextResponse.json({
       success: true,

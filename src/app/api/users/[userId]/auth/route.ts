@@ -5,8 +5,8 @@ import prisma from '@/lib/prisma';
 import { unstable_cache } from 'next/cache';
 
 // 사용자 인증 데이터 캐시 함수
-const getUserAuth = unstable_cache(
-  async (userId: string) => {
+const getUserAuth = (userId: string) => unstable_cache(
+  async () => {
     const userData = await prisma.user.findUnique({
       where: { id: userId },
       select: {
@@ -38,12 +38,12 @@ const getUserAuth = unstable_cache(
       videoViews: undefined // omit the raw array
     };
   },
-  ['user-auth'],
+  ['user-auth', userId],
   {
     revalidate: 60 * 60 * 12,  // 12시간 캐시
-    tags: ['user-auth']
+    tags: ['user-auth', `user-auth-${userId}`]
   }
-);
+)();
 
 export async function GET(
   req: Request,

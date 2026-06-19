@@ -90,16 +90,16 @@ export default function PlayPermissionCheck({
           }
 
           // 4. 코인 확인 및 비동기 차감 (Optimistic UI)
-          if (userAuth.mscoin >= 1) {
+          if (userAuth.mscoin >= 2) {
             // 즉시 재생 허용 (스와이프 딜레이 제거)
             isChecked.current = videoId;
             
-            // 로컬 캐시 즉시 업데이트 (코인 -1, 소장목록 추가)
+            // 로컬 캐시 즉시 업데이트 (코인 -2, 소장목록 추가)
             queryClient.setQueryData(['userAuth', user?.id], (oldData: any) => {
               if (!oldData) return oldData;
               return {
                 ...oldData,
-                mscoin: oldData.mscoin - 1,
+                mscoin: oldData.mscoin - 2,
                 purchasedVideoIds: [...oldData.purchasedVideoIds, videoId]
               };
             });
@@ -111,11 +111,33 @@ export default function PlayPermissionCheck({
               body: JSON.stringify({ videoId, postId, uploaderId })
             }).then(async (payResponse) => {
               if (!payResponse.ok) {
-                // 실패 시 롤백 로직 (생략 또는 구현 필요)
                 console.error('Failed to process coin payment async');
-                // 실제 서비스에서는 롤백 후 재생을 중단하거나 모달을 다시 띄우는 로직이 필요할 수 있습니다.
+                // 롤백 로직: 코인을 2개 다시 더하고, 소장 목록에서 비디오 ID를 제거합니다.
+                queryClient.setQueryData(['userAuth', user?.id], (oldData: any) => {
+                  if (!oldData) return oldData;
+                  return {
+                    ...oldData,
+                    mscoin: oldData.mscoin + 2,
+                    purchasedVideoIds: oldData.purchasedVideoIds.filter((id: string) => id !== videoId)
+                  };
+                });
+                setIsActive(false);
+                onPermissionCheck(3);  // 코인 부족/충전 필요 모달 표시
               }
-            }).catch(e => console.error('Coin payment network error:', e));
+            }).catch(e => {
+              console.error('Coin payment network error:', e);
+              // 네트워크 에러 시에도 롤백
+              queryClient.setQueryData(['userAuth', user?.id], (oldData: any) => {
+                if (!oldData) return oldData;
+                return {
+                  ...oldData,
+                  mscoin: oldData.mscoin + 2,
+                  purchasedVideoIds: oldData.purchasedVideoIds.filter((id: string) => id !== videoId)
+                };
+              });
+              setIsActive(false);
+              onPermissionCheck(3);
+            });
 
             return;
           }
