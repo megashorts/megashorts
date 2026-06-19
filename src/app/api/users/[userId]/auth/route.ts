@@ -16,6 +16,8 @@ const getUserAuth = (userId: string) => unstable_cache(
         mscoin: true,
         subscription: {
           select: {
+            status: true,
+            type: true,
             currentPeriodEnd: true
           }
         },

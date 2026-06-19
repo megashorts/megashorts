@@ -653,19 +653,21 @@ export default function UserManagementClient() {
 
       <Dialog open={Boolean(selectedUserId)} onOpenChange={(open) => (!open ? closeAllDialogs() : undefined)}>
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[760px]">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">User Details</DialogTitle>
+            {selectedUser && (
+              <DialogDescription>
+                @{selectedUser.username} · {selectedUser.email || "-"}
+              </DialogDescription>
+            )}
+          </DialogHeader>
+
           {detailQuery.isLoading ? (
             <div className="py-12 text-center text-muted-foreground">
               <Loader2 className="mx-auto h-5 w-5 animate-spin" />
             </div>
           ) : selectedUser ? (
             <>
-              <DialogHeader>
-                <DialogTitle className="text-2xl">User Details</DialogTitle>
-                <DialogDescription>
-                  @{selectedUser.username} · {selectedUser.email || "-"}
-                </DialogDescription>
-              </DialogHeader>
-
               <div className="grid grid-cols-1 gap-x-8 gap-y-3 text-sm md:grid-cols-2">
                 <div className="space-y-2">
                   <p><span className="text-muted-foreground">Name</span><br />{selectedUser.displayName}</p>

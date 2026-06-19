@@ -10,6 +10,8 @@ interface UserAuthData {
   mscoin: number;
   purchasedVideoIds: string[];
   subscription: {
+    status: string;
+    type: string;
     currentPeriodEnd: Date | null;
   } | null;
 }

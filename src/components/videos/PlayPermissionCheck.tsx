@@ -73,9 +73,14 @@ export default function PlayPermissionCheck({
             return;
           }
 
-          const currentPeriodEnd = userAuth.subscription?.currentPeriodEnd;
-          const isSubscribed = currentPeriodEnd && 
-            new Date(currentPeriodEnd) >= new Date();
+          const subscription = userAuth.subscription;
+          const currentPeriodEnd = subscription?.currentPeriodEnd;
+          const isSubscribed = Boolean(
+            subscription?.status?.toLowerCase() === 'active' &&
+              subscription?.type?.toLowerCase() !== 'free' &&
+              currentPeriodEnd &&
+              new Date(currentPeriodEnd) >= new Date(),
+          );
           
           if (isSubscribed) {
             isChecked.current = videoId;
@@ -161,7 +166,7 @@ export default function PlayPermissionCheck({
     };
 
     checkPermission();
-  }, [postId, videoId, playOrder, ageLimit, isPremium, user, userAuth, isLoading, setIsActive, onPermissionCheck, queryClient]);
+  }, [postId, videoId, playOrder, ageLimit, isPremium, uploaderId, user, userAuth, isLoading, setIsActive, onPermissionCheck, queryClient]);
 
   return null;
 }

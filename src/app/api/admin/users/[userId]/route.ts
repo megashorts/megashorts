@@ -266,13 +266,15 @@ export async function PATCH(
             type: subscriptionType,
             status: isFree ? "inactive" : "active",
             currentPeriodStart: now,
-            currentPeriodEnd: nextPeriodEnd,
+            currentPeriodEnd: isFree ? now : nextPeriodEnd,
           },
           update: {
             type: subscriptionType,
             status: isFree ? "inactive" : "active",
             ...(isFree
-              ? {}
+              ? {
+                  currentPeriodEnd: now,
+                }
               : {
                   currentPeriodEnd:
                     nextPeriodEnd,
