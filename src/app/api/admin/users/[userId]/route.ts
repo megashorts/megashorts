@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
 
-const MANAGEABLE_SUBSCRIPTION_TYPES = ["free", "basic", "premium"] as const;
+const MANAGEABLE_SUBSCRIPTION_TYPES = ["free", "manual"] as const;
 type ManageableSubscriptionType = (typeof MANAGEABLE_SUBSCRIPTION_TYPES)[number];
 
 function hasManagementAccess(userRole: number) {

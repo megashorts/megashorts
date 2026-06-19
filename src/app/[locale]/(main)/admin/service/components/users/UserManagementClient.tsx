@@ -139,10 +139,18 @@ function getSubscriptionDisplay(subscription: UserSubscription | null) {
 
   const status = subscription.status?.toLowerCase() ?? "";
   const type = subscription.type?.toLowerCase() ?? "free";
-  const label = type === "free" ? "Free" : type[0].toUpperCase() + type.slice(1);
 
-  if (status === "active" && type !== "free") {
-    return { label, ledClass: "led-blue" };
+  if (status === "active") {
+    if (type === "manual") {
+      return { label: "Manual Subscribed", ledClass: "led-blue" };
+    }
+
+    if (type === "weekly" || type === "yearly") {
+      return {
+        label: `Paid ${type[0].toUpperCase()}${type.slice(1)}`,
+        ledClass: "led-blue",
+      };
+    }
   }
 
   return { label: "Free", ledClass: "led-red" };
@@ -153,7 +161,8 @@ function getDefaultSubscriptionType(subscription: UserSubscription | null) {
   const status = subscription.status?.toLowerCase();
   const type = subscription.type?.toLowerCase();
   if (status !== "active") return "free";
-  if (type === "basic" || type === "premium") return type;
+  if (type === "manual") return type;
+  if (type === "weekly" || type === "yearly") return "paid";
   return "free";
 }
 
@@ -326,7 +335,9 @@ export default function UserManagementClient() {
           displayName: editDisplayName,
           userRole: Number(editRole),
           emailVerified: editEmailVerified,
-          subscriptionType: editSubscriptionType,
+          ...(editSubscriptionType !== "paid"
+            ? { subscriptionType: editSubscriptionType }
+            : {}),
         },
       });
     },
@@ -843,9 +854,13 @@ export default function UserManagementClient() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="free">free</SelectItem>
-                    <SelectItem value="basic">basic</SelectItem>
-                    <SelectItem value="premium">premium</SelectItem>
+                    {editSubscriptionType === "paid" && (
+                      <SelectItem value="paid" disabled>
+                        Paid Subscription
+                      </SelectItem>
+                    )}
+                    <SelectItem value="free">Free</SelectItem>
+                    <SelectItem value="manual">Manual Subscribed</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

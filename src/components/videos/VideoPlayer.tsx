@@ -135,17 +135,22 @@ const VideoPlayer = dynamic(() => Promise.resolve(({
             }
             
             // 로그 기록
+            const viewEvent =
+              result.message === "SUBSCRIPTION view save"
+                ? `SubsView_${title}_${sequence}`
+                : result.message === "ADMIN_GRANT view save"
+                  ? `AdminGrantView_${title}_${sequence}`
+                  : `coinview_${title}_${sequence}`;
+
             logActivity({
               type: 'video',
-              event: result.message === "SUBSCRIPTION view save" 
-                ? `SubsView_${title}_${sequence}`
-                : `coinview_${title}_${sequence}`,
-                username: user?.username,
-                details: {
-                  action: videoId,
-                  target: `${postId}_${sequence}`,
-                  result: 'success'
-                }
+              event: viewEvent,
+              username: user?.username,
+              details: {
+                action: videoId,
+                target: `${postId}_${sequence}`,
+                result: 'success'
+              }
             });
           }
     
@@ -324,7 +329,7 @@ useEffect(() => {
   return () => {
     video.removeEventListener('timeupdate', handleTimeUpdate);
   };
-}, [handleTimeUpdate]);
+}, [handleTimeUpdate, videoId, sequence, isActive]);
 
 // 재생 제어
 useEffect(() => {

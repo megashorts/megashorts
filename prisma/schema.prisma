@@ -436,6 +436,7 @@ enum AccessMethod {
   FREE
   SUBSCRIPTION
   COIN
+  ADMIN_GRANT
 }
 
 enum CategoryType {

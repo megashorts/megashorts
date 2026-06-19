@@ -71,16 +71,21 @@ export async function POST(req: Request) {
         
         const subscription = userData.subscription;
         const currentPeriodEnd = subscription?.currentPeriodEnd;
+        const subscriptionType = subscription?.type?.toLowerCase();
         const isSubscribed = Boolean(
           subscription?.status?.toLowerCase() === 'active' &&
-            subscription?.type?.toLowerCase() !== 'free' &&
+            subscriptionType !== 'free' &&
             currentPeriodEnd &&
             new Date(currentPeriodEnd) >= new Date(),
         );
+        const isAdminGrant = isSubscribed && subscriptionType === 'manual';
 
         if (!isSubscribed) {
           accessMethod = AccessMethod.COIN;
           viewMessage = "COIN view save";
+        } else if (isAdminGrant) {
+          accessMethod = AccessMethod.ADMIN_GRANT;
+          viewMessage = "ADMIN_GRANT view save";
         } else {
           accessMethod = AccessMethod.SUBSCRIPTION;
           viewMessage = "SUBSCRIPTION view save";
